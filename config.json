@@ -1,0 +1,9 @@
+{
+    "save_locations": {
+        "dataset_metadata_file": "data/datasets.json",
+        "data_folder": "data/"
+    },
+    "experiment_parameters": {
+        "answer_model": "HuggingFaceTB/SmolLM2-360M-Instruct"
+    }
+}

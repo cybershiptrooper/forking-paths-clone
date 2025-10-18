@@ -1,0 +1,58 @@
+{
+    "AQuA": {
+        "name": "AQuA",
+        "source": "deepmind/aqua_rat",
+        "hf": true,
+        "hf_name": null,
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "GPQA": {
+        "name": "GPQA",
+        "source": "Idavidrein/gpqa",
+        "hf": true,
+        "hf_name": "gpqa_diamond",
+        "hf_split": "train",
+        "type": "multiple choice"
+    },
+    "GSM8k": {
+        "name": "GSM8k",
+        "source": "data/mc_evaluation/gsm8k-mc",
+        "hf": false,
+        "hf_name": null,
+        "hf_split": null,
+        "type": "multiple choice"
+    },
+    "MATH": {
+        "name": "MATH",
+        "source": "data/mc_evaluation/math-mc",
+        "hf": false,
+        "hf_name": null,
+        "hf_split": null,
+        "type": "multiple choice"
+    },
+    "PythonIO": {
+        "name": "PythonIO",
+        "source": "data/mc_evaluation/pythonio-mc",
+        "hf": false,
+        "hf_name": null,
+        "hf_split": null,
+        "type": "multiple choice"
+    },
+    "WildJailBreak": {
+        "name": "WildJailBreak",
+        "source": "allenai/wildjailbreak",
+        "hf": true,
+        "hf_name": "eval",
+        "hf_split": "train",
+        "type": "alignment"
+    },
+    "Just-Eval": {
+        "name": "Just-Eval",
+        "source": "re-align/just-eval-instruct",
+        "hf": true,
+        "hf_name": null,
+        "hf_split": "test",
+        "type": "alignment"
+    }
+}
