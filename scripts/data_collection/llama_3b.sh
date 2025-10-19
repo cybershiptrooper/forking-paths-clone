@@ -1,6 +1,6 @@
 names=$1
 
-python data_collection.py \
+uv run python data_collection.py \
     --model meta-llama/Llama-3.2-3B-Instruct \
     --dataset_names $names \
     --num_examples 100 \

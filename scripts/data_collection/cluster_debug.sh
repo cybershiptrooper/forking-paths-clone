@@ -1,1 +1,1 @@
-nlprun -a ellipse -q jag -g 1 -r 80G -o logs/select_debug.log 'bash scripts/data_collection/debug.sh'
+nlprun -q jag -g 1 -r 80G -o logs/select_debug.log 'bash scripts/data_collection/debug.sh'
