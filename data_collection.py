@@ -1,6 +1,5 @@
 import os
 import json
-import yaml
 from typing import List
 from datasets import load_dataset, concatenate_datasets, Dataset
 from transformers import PreTrainedTokenizer
