@@ -6,10 +6,6 @@ from datasets import load_dataset, concatenate_datasets, Dataset
 from transformers import PreTrainedTokenizer
 from vllm import LLM, SamplingParams
 
-# from dataset_utils import DATASET_TO_FORMAT
-# from forking_paths_analysis import parse_final_answer
-# from utils import MODEL_METADATA, clear_cuda, set_seed, get_alignment_prompt, get_cot_prompt, get_answer_extraction_prompt
-
 from utils.answer_utils import parse_answer
 from utils.utils import MODEL_METADATA, clear_cuda, set_seed
 from utils.prompt_utils import get_cot_prompt, get_alignment_prompt
@@ -219,6 +215,7 @@ def sort_by_uncertainty(
         aggregated_results.append(aggregated_result)
     
     def uncertainty_score(datapoint):
+        """Very ad hoc uncertainty/entropy score, where we want to ignore answers that went over the max token limit"""
         score = 0
         # filter out long answers
         if datapoint['base_answer_cut_short']:

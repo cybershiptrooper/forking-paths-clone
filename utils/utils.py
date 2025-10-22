@@ -26,6 +26,14 @@ MODEL_METADATA = {
     }
 }
 
+# should we do something smarter? what about "0.8"?
+SENTENCE_DELIMITERS = [
+    ".",
+    ";",
+    "!",
+    "?"
+]
+
 def set_seed(seed : int):
     random.seed(seed)
     np.random.seed(seed)
