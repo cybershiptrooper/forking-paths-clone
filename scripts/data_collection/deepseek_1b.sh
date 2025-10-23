@@ -1,8 +1,7 @@
 names=$1
 
 uv run python data_collection.py \
-    --base_model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B \
-    --answer_model meta-llama/Llama-3.2-1B-Instruct \
+    --model_name deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B \
     --dataset_names $names \
     --num_examples 100 \
     --shuffle \

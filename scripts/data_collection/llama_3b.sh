@@ -1,7 +1,7 @@
 names=$1
 
 uv run python data_collection.py \
-    --model meta-llama/Llama-3.2-3B-Instruct \
+    --model_name meta-llama/Llama-3.2-3B-Instruct \
     --dataset_names $names \
     --num_examples 100 \
     --shuffle \
