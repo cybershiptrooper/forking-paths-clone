@@ -203,9 +203,13 @@ def main(
             branches = json.load(f)
         
         # copy relevant information from datapoint
+        datapoint = dataset[prompt_index]
         branch_dataset = [{
-            **dataset[prompt_index],
-            **branch # OVERWRITE output_text from branch!
+            "dataset_type": datapoint["dataset_type"],
+            "question": datapoint["question"],
+            "all_answers": datapoint["all_answers"],
+            "all_letters": datapoint["all_letters"],
+            **branch # output_text comes from branch!
         } for branch in branches]
 
         # feed generated answers (ext_full) into answer extraction prompt template
