@@ -5,5 +5,6 @@ uv run python data_collection.py \
     --shuffle \
     --num_paths 2 \
     --max_new_tokens 400 \
+    --temperature 0.7 \
     --return_logprobs \
     --return_alternate_texts

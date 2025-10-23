@@ -136,6 +136,7 @@ def generate_alternate_paths(
     dataset : List[dict],
     max_new_tokens : int = 10000,
     num_paths : int = 10,
+    temperature : float = 0.7
 ):
     """
     Generate a few random paths to quickly estimate uncertainty.
@@ -150,7 +151,7 @@ def generate_alternate_paths(
     prompts = [d['prompt'] for d in dataset]
     sampling_params = SamplingParams(
         n=num_paths,
-        temperature=1.0, # truly random sampling??
+        temperature=temperature, # truly random sampling??
         max_tokens=max_new_tokens
     )
     outputs = llm.generate(prompts, sampling_params)
@@ -237,6 +238,7 @@ def main(
     # generation parameters
     num_paths : int = 10,
     max_new_tokens : int = 10000,
+    temperature : float = 0.7,
     return_logprobs : bool = True,
     # output parameters
     return_alternate_texts : bool = True,
@@ -266,7 +268,7 @@ def main(
         dataset = load_data(base_llm.get_tokenizer(), datasets_metadata[dataset_name], n=num_examples, shuffle=shuffle)
         
         base_paths = generate_base_paths(base_llm, dataset, max_new_tokens=max_new_tokens, return_logprobs=return_logprobs)
-        alternate_paths = generate_alternate_paths(base_llm, dataset, max_new_tokens=max_new_tokens, num_paths=num_paths)
+        alternate_paths = generate_alternate_paths(base_llm, dataset, max_new_tokens=max_new_tokens, num_paths=num_paths, temperature=temperature)
 
         # clear cache
         del base_llm
@@ -305,6 +307,7 @@ if __name__ == "__main__":
     parser.add_argument("--shuffle", action='store_true', help="Shuffle the dataset before sampling")
     parser.add_argument("--num_paths", type=int, default=10, help="Number of alternate paths to generate")
     parser.add_argument("--max_new_tokens", type=int, default=10000, help="Maximum number of new tokens to generate")
+    parser.add_argument("--temperature", type=float, default=0.7, help="temperature for sampling alternate paths")
     parser.add_argument("--return_logprobs", action='store_true', help="Return log probabilities for base paths")
     parser.add_argument("--return_alternate_texts", action='store_true', help="Return texts of randomly sampled alternative paths")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")

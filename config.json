@@ -1,7 +1,8 @@
 {
     "save_locations": {
         "dataset_metadata_file": "data/datasets.json",
-        "data_folder": "data/"
+        "data_folder": "data/collection/",
+        "forking_paths_folder": "data/forking_paths"
     },
     "experiment_parameters": {
         "answer_model": "HuggingFaceTB/SmolLM2-360M-Instruct"
