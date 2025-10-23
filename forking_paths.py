@@ -132,7 +132,7 @@ def main(
         dataset = json.load(f)
 
     # create output dir
-    output_dir = f'{forking_paths_dir}/{model_nickname}/{dataset_name.lower()}'
+    output_dir = f'{forking_paths_dir}/{model_nickname}/{dataset_name.lower()}.json'
     os.makedirs(output_dir, exist_ok=True)
 
     # load LLM
