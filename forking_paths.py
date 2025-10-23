@@ -128,11 +128,11 @@ def main(
 
     # load input
     model_nickname = MODEL_METADATA[model_name]['nickname']
-    with open(f'{data_dir}/{model_nickname}/{dataset_name.lower()}') as f:
+    with open(f'{data_dir}/{model_nickname}/{dataset_name.lower()}.json') as f:
         dataset = json.load(f)
 
     # create output dir
-    output_dir = f'{forking_paths_dir}/{model_nickname}/{dataset_name.lower()}.json'
+    output_dir = f'{forking_paths_dir}/{model_nickname}/{dataset_name.lower()}'
     os.makedirs(output_dir, exist_ok=True)
 
     # load LLM
