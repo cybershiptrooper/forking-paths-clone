@@ -1,7 +1,8 @@
 {
     "save_locations": {
         "dataset_metadata_file": "data/datasets.json",
-        "data_folder": "data/collection/",
+        "collection_folder": "data/collection",
+        "selection_folder": "data/selection",
         "forking_paths_folder": "data/forking_paths"
     },
     "experiment_parameters": {

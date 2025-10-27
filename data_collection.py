@@ -249,7 +249,7 @@ def main(
     with open('config.json') as f:
         config = json.load(f)
         dataset_metadata_filename = config["save_locations"]["dataset_metadata_file"] # input
-        data_dir = config["save_locations"]["data_folder"] # output
+        data_dir = config["save_locations"]["collection_folder"] # output
         answer_model_name = config["experiment_parameters"]["answer_model"]
 
     with open(dataset_metadata_filename) as f:
