@@ -36,16 +36,14 @@ def collect_stumps(
     delimiter_token_ids = llm.get_tokenizer().convert_tokens_to_ids(SENTENCE_DELIMITERS)
 
     stumps = []
-    cutoff = 0
     for i in range(len(output_token_ids)):
         if output_token_ids[i] in delimiter_token_ids:
-            stump_token_ids = output_token_ids[cutoff:i+1] # include punctuation at the end
+            stump_token_ids = output_token_ids[:i+1] # include punctuation at the end
             stumps.append({
                 "stump_token_ids": stump_token_ids,
                 "prompt_and_stump_token_ids": prompt_token_ids + stump_token_ids,
-                "t": cutoff # where we started, not where we finished!
+                "t": i+1 # where we started, not where we finished!
             })
-        cutoff = i + 1
 
     return stumps
 
