@@ -1,4 +1,4 @@
-# Road not taken
+# 🌳 Road not taken
 
 This is the repository for the road not taken project!
 
