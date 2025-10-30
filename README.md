@@ -76,12 +76,12 @@ Next, add a function to parse the right information from the dataset in `utils/d
 
 The `config.json` file specifies shared experiment parameters, including save directories and the model used to parse answers.
 
-```json
+```java
 {
   "save_locations": {
-    "dataset_metadata_file": "data/datasets.json", // where datasets.json is stored
+    "dataset_metadata_file": "data/datasets.json", // inputs to data_collection.py
     "collection_folder": "{collection_folder}", // outputs of data_collection.py
-    "selection_folder": "{collection_folder}", // inputs for forking_paths.py (ok to reuse collection_folder)
+    "selection_folder": "{collection_folder}", // inputs to forking_paths.py (ok to reuse collection_folder)
     "forking_paths_folder": "{forking_paths_folder}" // outputs for forking_paths.py (fairly large)
   },
   "experiment_parameters": {
