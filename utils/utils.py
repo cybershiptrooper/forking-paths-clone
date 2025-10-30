@@ -4,18 +4,29 @@ import numpy as np
 import torch
 
 MODEL_METADATA = {
-    "meta-llama/Llama-3.2-3B-Instruct": {
-        "nickname" : "llama_3b",
-        "reasoning" : False,
-    },
+    # Deepseek
     "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B": {
         "nickname" : "deepseek_1b",
         "reasoning" : True,
+    },
+    "deepseek-ai/DeepSeek-R1-Distill-Llama-8B": {
+        "nickname": "deepseek_llama_8b",
+        "reasoning": True
+    },
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B": {
+        "nickname": "deepseek_qwen_7b",
+        "reasoning": True
+    },
+    # Llama
+    "meta-llama/Llama-3.2-3B-Instruct": {
+        "nickname" : "llama_3b",
+        "reasoning" : False,
     },
     "meta-llama/Llama-3.2-1B-Instruct": {
         "nickname" : "llama_1b",
         "reasoning" : False,
     },
+    # Other
     "microsoft/Phi-4-mini-reasoning": {
         "nickname" : "phi_4b",
         "reasoning" : True,
