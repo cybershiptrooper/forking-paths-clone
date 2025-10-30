@@ -144,6 +144,10 @@ def main(
             print(f"Results for prompt #{prompt_index} already exist, skipping")
             continue
 
+        if dataset[prompt_index]["finish_reason"] != "stop":
+            print(f"Base #{prompt_index} exceeded length, skipping")
+            continue
+
         print("Question:")
         print(dataset[prompt_index]["question"])
         print("Base path:")
