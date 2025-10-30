@@ -1,7 +1,7 @@
 name=$1
 
 uv run python forking_paths.py \
-    --model_name deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B \
+    --model_name microsoft/Phi-4-mini-reasoning \
     --dataset_name $name \
     --dataset_size 50 \
     --num_branches 20 \

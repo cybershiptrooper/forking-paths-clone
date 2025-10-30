@@ -33,11 +33,10 @@ def collect_stumps(
         Collection of stumps (places in base path at which we want to branch off).
         stump = {token_ids: ..., t: ..., token_id : ..., token_prob: ...} 
     """
-    delimiter_token_ids = llm.get_tokenizer().convert_tokens_to_ids(SENTENCE_DELIMITERS)
-
     stumps = []
     for i in range(len(output_token_ids)):
-        if output_token_ids[i] in delimiter_token_ids:
+        # if token contains ., !, ?, or \n, then it's a new sentence
+        if any(delimiter in llm.get_tokenizer().decode(output_token_ids[i]) for delimiter in SENTENCE_DELIMITERS):
             stump_token_ids = output_token_ids[:i+1] # include punctuation at the end
             stumps.append({
                 "stump_token_ids": stump_token_ids,

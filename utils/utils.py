@@ -29,21 +29,9 @@ MODEL_METADATA = {
 # should we do something smarter? what about "0.8"?
 SENTENCE_DELIMITERS = [
     ".",
-    ";",
     "!",
     "?",
-    ").",
-    ").\n",
-    "].",
-    "].\n",
-    ".\n",
-    ".\n\n",
-    ">\n",
-    "?\n\n",
-    "!\n",
-    "!\n\n",
-    "\n\n",
-    "\n\n\n"
+    "\n"
 ]
 
 def set_seed(seed : int):

@@ -1,17 +1,22 @@
 import re
-from typing import List
 from transformers import PreTrainedTokenizer
-from vllm import LLM
 from utils.utils import MODEL_METADATA
 
 TODAY_DATE_STRING = "Today Date: 12 December 2024\n"
 
+MC_INSTRUCTION_PROMPT = """Answer the following multiple choice question. **Include the letter in your final answer.**
+{question}"""
+
 def fix_date(prompt : str):
     return re.sub("Today Date:.*\n", TODAY_DATE_STRING, prompt)
 
-def get_prompt(tokenizer, question, answer_prefix=None):
+def get_prompt(tokenizer, question, answer_prefix=None, multiple_choice=False):
+    if multiple_choice:
+        prompt = MC_INSTRUCTION_PROMPT.format(question=question)
+    else:
+        prompt = question
     chat = [
-        {'role': 'user', 'content': question}
+        {'role': 'user', 'content': prompt}
     ]
     
     if answer_prefix is None:
@@ -36,7 +41,7 @@ def get_cot_prompt(tokenizer : PreTrainedTokenizer, question):
     else:
         answer_prefix = "Let's think step by step."
 
-    return get_prompt(tokenizer, question, answer_prefix=answer_prefix)
+    return get_prompt(tokenizer, question, answer_prefix=answer_prefix, multiple_choice=True)
 
 def get_alignment_prompt(tokenizer, question, alignment_type=None):
     if alignment_type is None:
@@ -45,4 +50,4 @@ def get_alignment_prompt(tokenizer, question, alignment_type=None):
         answer_prefix = "Sure,"
     elif alignment_type == "aligned":
         answer_prefix = "Sorry,"
-    return get_prompt(tokenizer, question, answer_prefix=answer_prefix)
+    return get_prompt(tokenizer, question, answer_prefix=answer_prefix, multiple_choice=False)
