@@ -113,7 +113,9 @@ def main(
     max_new_tokens : int = 10000,
     temperature : float = 0.7,
     # control parameters
-    seed : int = 42
+    seed : int = 42,
+    # script paramaters
+    only_parse_answers : bool = False
 ):
     set_seed(seed)
 
@@ -132,66 +134,62 @@ def main(
     output_dir = f'{forking_paths_dir}/{model_nickname}/{dataset_name.lower()}'
     os.makedirs(output_dir, exist_ok=True)
 
-    # load LLM
-    base_llm = LLM(model=model_name, dtype="bfloat16")
+    if not only_parse_answers:
+        # load LLM
+        base_llm = LLM(model=model_name, dtype="bfloat16")
+        # process dataset!
+        num_examples = len(dataset) if dataset_size is None else min(dataset_size, len(dataset))
+        for prompt_index in range(num_examples):
+            # skip if already processed
+            result_path = os.path.join(output_dir, f'{prompt_index:02d}.json')
+            if os.path.exists(result_path):
+                print(f"Results for prompt #{prompt_index} already exist, skipping")
+                continue
 
-    # process dataset!
-    num_examples = len(dataset) if dataset_size is None else min(dataset_size, len(dataset))
-    for prompt_index in range(num_examples):
-        # skip if already processed
-        result_path = os.path.join(output_dir, f'{prompt_index:02d}.json')
-        if os.path.exists(result_path):
-            print(f"Results for prompt #{prompt_index} already exist, skipping")
-            continue
+            if dataset[prompt_index]["finish_reason"] != "stop":
+                print(f"Base #{prompt_index} exceeded length, skipping")
+                continue
 
-        if dataset[prompt_index]["finish_reason"] != "stop":
-            print(f"Base #{prompt_index} exceeded length, skipping")
-            continue
+            print("Question:")
+            print(dataset[prompt_index]["question"])
+            print("Base path:")
+            print(dataset[prompt_index]["output_text"])
 
-        print("Question:")
-        print(dataset[prompt_index]["question"])
-        print("Base path:")
-        print(dataset[prompt_index]["output_text"])
+            # collect stumps for prompt
+            stumps = collect_stumps(
+                base_llm,
+                dataset[prompt_index]['prompt_token_ids'],
+                dataset[prompt_index]['output_token_ids'],
+            )
 
-        # collect stumps for prompt
-        stumps = collect_stumps(
-            base_llm,
-            dataset[prompt_index]['prompt_token_ids'],
-            dataset[prompt_index]['output_token_ids'],
-        )
+            print("Done collecting stumps.")
+            print(f"Number of stumps: {len(stumps)}")
+            print("-" * 30)
+            
+            random_stump = random.choice(stumps)
+            print("-" * 30)
+            print(f"Random stump (t = {random_stump['t']}):")
+            print(base_llm.get_tokenizer().decode(random_stump["stump_token_ids"], skip_special_tokens=True))
 
-        print("Done collecting stumps.")
-        print(f"Number of stumps: {len(stumps)}")
-        print("-" * 30)
-        
-        random_stump = random.choice(stumps)
-        print("-" * 30)
-        print(f"Random stump (t = {random_stump['t']}):")
-        print(base_llm.get_tokenizer().decode(random_stump["stump_token_ids"], skip_special_tokens=True))
+            # generate branches for prompt
+            branches = generate_branches(
+                base_llm,
+                stumps,
+                num_branches=num_branches,
+                max_new_tokens=max_new_tokens,
+                temperature=temperature
+            )
 
-        # generate branches for prompt
-        branches = generate_branches(
-            base_llm,
-            stumps,
-            num_branches=num_branches,
-            max_new_tokens=max_new_tokens,
-            temperature=temperature
-        )
+            # save results
+            with open(result_path, "w+") as f:
+                json.dump(branches, f, indent=2)
+            print(f"Saving results to {result_path}")
 
-        # save results
-        with open(result_path, "w+") as f:
-            json.dump(branches, f, indent=2)
-        print(f"Saving results to {result_path}")
-
-    # switch to answer model, and extract answers here
-    if answer_model_name is None:
-        return # done here!
-
+        # clear cache
+        del base_llm
+        clear_cuda()
+    
     print("Parsing final answers")
-    # clear cache
-    del base_llm
-    clear_cuda()
-
     # load answer LLM
     answer_llm = LLM(model=answer_model_name, dtype="bfloat16")
 
@@ -200,6 +198,10 @@ def main(
         # not the prettiest, but re-read the results we just generated
         print(f"Parsing answers for prompt #{prompt_index}")
         result_path = os.path.join(output_dir, f'{prompt_index:02d}.json')
+        if not os.path.exists(result_path):
+            print(f"Skipping prompt #{prompt_index}, no forking paths results found.")
+            continue
+        
         with open(result_path) as f:
             branches = json.load(f)
         
@@ -235,6 +237,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_new_tokens", type=int, default=3000, help="Max new tokens for generation")
     parser.add_argument("--temperature", type=float, default=1.0, help="Sampling temperature")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
+    parser.add_argument("--only_parse_answers", action='store_true', help="Only parse answers from existing forking paths data")
 
     args = parser.parse_args()
     main(**vars(args))
