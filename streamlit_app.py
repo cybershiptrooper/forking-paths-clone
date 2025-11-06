@@ -1,5 +1,7 @@
 import json
 import os
+import torch
+from torch.distributions import Categorical
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -151,8 +153,65 @@ fig.add_traces([
     )
     for oi, outcome in enumerate(outcome_set)
 ])
-
+st.subheader("Outcome probabilities")
 st.plotly_chart(fig)
+
+dist = []
+for t in sorted(outcome_df.t.unique()):
+    ts = []
+    for outcome in outcome_set:
+        row = outcome_df[(outcome_df['outcome'] == outcome) & (outcome_df['t'] == t)]
+        if len(row) == 0:
+            ts.append(0.)
+        elif len(row) == 1:
+            ts.append(row.iloc[0]['outcome_probability'])
+        else:
+            assert False
+    dist.append(ts)
+
+d = Categorical(probs=torch.tensor(dist))
+
+layout =  go.Layout(
+    title = None,
+    font = {'size': 10},
+    
+    # xaxis_range=(0,1), 
+    margin=dict(l=20, r=20, t=60, b=40),
+    yaxis_range=(0, 2),
+    # plot_bgcolor='white',
+    showlegend=True,
+    hovermode='x',
+
+    yaxis=dict(
+        title='Entropy',
+        showgrid=False,
+        # gridwidth=.5, 
+        # gridcolor='rgb(.8, .8, .8)',
+    ),
+
+    xaxis = dict(
+        showticklabels=False,
+
+        showgrid=True,
+        gridwidth=.5, 
+        gridcolor='rgba(.8, .8, .8, .3)',
+    )
+)
+
+fig = go.Figure(layout=layout) 
+fig.add_trace(
+    go.Scatter( 
+        x = sorted(outcome_df.t.unique()), 
+        y = d.entropy(), 
+        # stackgroup='one',
+
+        line={'color': '#C4DADE'}
+    )
+)
+st.subheader("Entropy of outcome probabilities")
+st.plotly_chart(fig)
+
+
 
 x = outcome_df[outcome_df['outcome'] == outcome_set[0]]['t'].values
 y = outcome_df[outcome_df['outcome'] == outcome_set[0]]['outcome_probability'].values
@@ -213,9 +272,11 @@ fig.add_trace(
         line={'color': '#C4DADE'}
     )
 )
-
+st.subheader("Changepoints in outcome probabilities")
 st.plotly_chart(fig)
 
+
+st.subheader("Sample rollouts")
 t = st.select_slider("Timestep:", options=outcome_df.t.unique(), value=x[np.argmax(o.trend.__dict__['cpOccPr'])])
 possible_outcomes = outcome_df[outcome_df['t'] == t]['outcome'].unique()
 outcome = st.selectbox("Outcome:", possible_outcomes)
