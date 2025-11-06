@@ -34,7 +34,7 @@ streamlit_folder = config['save_locations']['streamlit_folder']
 model_name = model_selection.selectbox(
     'Select a model:',
     os.listdir(streamlit_folder),
-    index=1
+    index=0
 )
 
 
@@ -44,7 +44,7 @@ tokenizer = AutoTokenizer.from_pretrained(inv_model_netadata[model_name])
 dataset_name = dataset_selection.selectbox(
     'Select a task:',
     os.listdir(f'{streamlit_folder}/{model_name}'),
-    index=3
+    index=0
 )
 
 example_ids = sorted([filename.split('.')[0] for filename in os.listdir(f'{streamlit_folder}/{model_name}/{dataset_name}')])
