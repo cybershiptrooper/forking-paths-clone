@@ -1,0 +1,75 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,33,A,15,0.5," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.","5 hours). 
+
+15 ÷ 2.5 = 6
+
+Therefore, Mary's average speed is 6 miles per hour.
+
+The correct answer is A) 6 miles per hour."
+1,33,B,14,0.4666666666666667," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.","5 hours). 
+
+Average speed = Total distance ÷ Total time
+= 15 miles ÷ 2.5 hours
+= 6 miles per hour
+
+Since the answer choices are given in different notations, we can choose any of them. The correct answer is B) 6 miles per hour."
+2,33,D,1,0.03333333333333333," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.","5 hours). 
+\[ \text{Average Speed}=\frac{\text{Total Distance}}{\text{Total Time}}=\frac{15 \text{ miles}}{2.5 \text{ hours}}=6\text{ mph.}\]The correct answer is (D).
+The best answer is D."
+3,36,A,14,0.4666666666666667," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.5 hours)."," 
+
+Average speed = total distance ÷ total time
+Average speed = 15 miles ÷ 2.5 hours
+Average speed = 6 miles per hour
+
+Therefore, the correct answer is A) 6 miles per hour."
+4,36,B,9,0.3," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.5 hours).", That's 15 ÷ 2.5 = 6 miles per hour. The correct answer is (B).
+5,36,C,2,0.06666666666666667," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.5 hours)."," This will give us the number of miles she ran per hour. So her average speed is 15 ÷ 2.5 = 6 miles per hour. Since we are working with the mile per hour unit, the answer should be in the mph format.
+The correct answer is C."
+6,36,D,5,0.16666666666666666," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.5 hours)."," 
+
+Average speed = total distance ÷ total time 
+Average speed = 15 ÷ 2.5 
+Average speed = 6 mph. 
+
+So, the correct answer is D."
+7,56,A,18,0.6," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.5 hours). 
+
+Average speed = Total distance ÷ Total time
+= 15 miles ÷ 2.","5 hours
+= 6 miles per hour
+
+So, the correct answer is (A) 6."
+8,56,B,9,0.3," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.5 hours). 
+
+Average speed = Total distance ÷ Total time
+= 15 miles ÷ 2.","5 hours
+= 6 miles per hour
+
+The correct answer is B."
+9,56,C,1,0.03333333333333333," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.5 hours). 
+
+Average speed = Total distance ÷ Total time
+= 15 miles ÷ 2.","5 hours
+= 6 miles per hour
+
+Since the answer should be in miles per hour, we can write it as 6 miles per hour. So, the correct answer is C."
+10,56,D,2,0.06666666666666667," 
+To find Mary's average speed, we need to divide the total distance she ran (15 miles) by the total time she took to run it (2.5 hours). 
+
+Average speed = Total distance ÷ Total time
+= 15 miles ÷ 2.","5 hours
+= 6 miles per hour
+
+Since the options include the unit of speed, the correct answer is D) 6 mph."
+11,78,A,30,1.0,,

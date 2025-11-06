@@ -1,0 +1,1600 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,47,A,10,0.5,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \)."," With a 20% discount, the selling price becomes \( P_{\text{discounted}} = P \times (1 - 0.20) = 0.80P \).
+
+The goal is to find the percentage increase, \( x \), needed on \( P_{\text{discounted}} \) to reach the original price \( P \). This can be expressed as:
+\[ P_{\text{discounted}} \times (1 + x) = P \]
+Substituting \( P_{\text{discounted}} \) gives:
+\[ 0.80P \times (1 + x) = P \]
+Dividing both sides by \( 0.80P \):
+\[ 1 + x = \frac{1}{0.80} \]
+\[ 1 + x = 1.25 \]
+Subtracting 1 from both sides:
+\[ x = 0.25 \]
+Converting 0.25 to a percentage:
+\[ x = 25\% \]
+
+Therefore, the price must be increased by 25% to restore the original price.
+</think>
+
+Let’s determine the percentage increase required to restore the original price after a 20% discount.
+
+1. **Let the original price be \( P \).**
+
+2. **After a 20% discount:**
+   \[
+   \text{Discounted Price} = P - 20\% \text{ of } P = 0.80P
+   \]
+
+3. **Let \( x \) be the required percentage increase to return to the original price \( P \).**
+   \[
+   0.80P \times (1 + x) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + x = \frac{P}{0.80P} = \frac{1}{0.80} = 1.25
+   \]
+   \[
+   x = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 25\%
+   \]
+
+**Final Answer:** \(\boxed{25\%}\)"
+1,47,B,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \)."," After a 20% discount, the new price becomes 80% of the original, which is \( 0.8P \).
+
+To find the percentage increase required to return to the original price from the discounted price, I'll set up the equation:
+\( 1.05 \times \text{Discounted Price} = \text{Original Price} \).
+
+Substituting the discounted price:
+\( 1.05 \times 0.8P = P \).
+
+Solving this equation gives:
+\( 0.84P = P \).
+
+This simplifies to:
+\( 0.84 = 1 \).
+
+This tells me that a 13.08% increase is needed to restore the original price. However, since the answer choices don't include 13.08%, I'll check my calculations again.
+
+Upon reviewing, I realize that the correct increase should be 25%. This is because multiplying the discounted price by 1.25 (which is a 25% increase) brings it back to the original price:
+\( 0.8P \times 1.25 = P \).
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original price.
+</think>
+
+To determine by what percentage the shopkeeper must increase the price to restore the original value after a 20% discount, let's break it down step by step.
+
+### **Step 1: Understand the Discount**
+- **Original Price:** Let's denote the original price as \( P \).
+- **Discount:** 20% off means the shopkeeper sells items at 80% of the original price.
+- **Discounted Price:** 
+  \[
+  \text{Discounted Price} = P - 20\% \text{ of } P = P - 0.2P = 0.8P
+  \]
+
+### **Step 2: Determine the Required Increase**
+- **Desired New Price:** The shopkeeper wants to sell items back to the original price \( P \).
+- **Let \( x \) be the required percentage increase:** 
+  \[
+  \text{New Price after Increase} = 0.8P \times (1 + x) = P
+  \]
+- **Set Up the Equation:**
+  \[
+  0.8P \times (1 + x) = P
+  \]
+- **Solve for \( x \):**
+  \[
+  0.8(1 + x) = 1 \\
+  1 + x = \frac{1}{0.8} \\
+  1 + x = 1.25 \\
+  x = 0.25
+  \]
+
+### **Step 3: Convert to Percentage**
+- \( x = 0.25 \) means **25% increase** is needed.
+
+### **Final Answer**
+\[
+\boxed{25\%}
+\]"
+2,47,C,9,0.45,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \)."," After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase needed to reach the original price from \( 0.8P \), I'll set up the equation:
+\( 0.8P \times (1 + \text{Increase Percentage}) = P \)
+
+Solving for the Increase Percentage:
+\( 1 + \text{Increase Percentage} = \frac{P}{0.8P} = 1.25 \)
+\( \text{Increase Percentage} = 1.25 - 1 = 0.25 \)
+\( \text{Increase Percentage} = 25\% \)
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original price.
+</think>
+
+Let's determine the required percentage increase after a 20% discount to restore the original price.
+
+**Step 1: Understand the Discount**
+
+Let the **original price** of an item be denoted as \( P \).
+
+A **20% discount** on the original price means the selling price becomes:
+\[
+\text{Selling Price} = P - 20\% \times P = 0.8P
+\]
+
+**Step 2: Determine the Required Increase**
+
+To restore the original price from \( 0.8P \), we need to find the percentage increase (\( x \% \)) such that:
+\[
+0.8P \times \left(1 + \frac{x}{100}\right) = P
+\]
+
+**Step 3: Solve for \( x \% \)**
+
+\[
+1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+\]
+\[
+\frac{x}{100} = 1.25 - 1 = 0.25
+\]
+\[
+x = 0.25 \times 100 = 25\%
+\]
+
+**Final Answer:**
+
+The shopkeeper must increase the price by \(\boxed{25\%}\)."
+3,63,A,13,0.65,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.","8P \).
+
+To find the percentage increase needed to revert from \( 0.8P \) back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{c}{100}) = P \]
+where \( c \) is the required percentage increase.
+
+Solving for \( c \):
+\[ 0.8 \times (1 + \frac{c}{100}) = 1 \]
+\[ 1 + \frac{c}{100} = \frac{1}{0.8} \]
+\[ 1 + \frac{c}{100} = 1.25 \]
+\[ \frac{c}{100} = 0.25 \]
+\[ c = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+Let's solve the problem step by step.
+
+**Let:**
+- **\( P \)** = Original price of an item
+- **\( D \)** = Discount rate = 20%
+- **\( S \)** = Selling price after discount
+
+**Step 1: Calculate the Selling Price After Discount**
+
+The selling price after a 20% discount is given by:
+\[
+S = P - (0.20 \times P) = 0.80P
+\]
+
+**Step 2: Determine the Required Percentage Increase**
+
+To find the percentage increase needed to restore the original price (\( P \)) from the discounted price (\( S \)), we set up the equation:
+\[
+S \times \left(1 + \frac{c}{100}\right) = P
+\]
+where \( c \) is the required percentage increase.
+
+Substitute \( S \) with \( 0.80P \):
+\[
+0.80P \times \left(1 + \frac{c}{100}\right) = P
+\]
+
+**Step 3: Solve for \( c \)**
+
+\[
+0.80 \times \left(1 + \frac{c}{100}\right) = 1
+\]
+\[
+1 + \frac{c}{100} = \frac{1}{0.80}
+\]
+\[
+1 + \frac{c}{100} = 1.25
+\]
+\[
+\frac{c}{100} = 0.25
+\]
+\[
+c = 25\%
+\]
+
+**Conclusion:**
+
+The shopkeeper must increase the price by \(\boxed{25\%}\) to restore the original amount."
+4,63,B,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.","8P \).
+
+To find the percentage increase required to return to the original price \( P \) from the discounted price \( 0.8P \), I'll set up the equation:
+
+\( 0.8P \times (1 + x) = P \)
+
+Dividing both sides by \( 0.8P \) gives:
+
+\( 1 + x = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25 \)
+
+Subtracting 1 from both sides to solve for \( x \):
+
+\( x = 1.25 - 1 = 0.25 \)
+
+Converting this to a percentage:
+
+\( x = 25\% \)
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original price.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \):**
+
+   - **Discounted Price:** After a 20% discount, the selling price becomes:
+     \[
+     \text{Discounted Price} = P - 0.20P = 0.80P
+     \]
+
+2. **Determine the Required Increase:**
+
+   - Let \( x \) be the percentage increase needed to restore the price to \( P \) from the discounted price.
+   - The equation becomes:
+     \[
+     0.80P \times (1 + x) = P
+     \]
+   
+3. **Solve for \( x \):**
+
+   \[
+   1 + x = \frac{P}{0.80P} = \frac{1}{0.80} = 1.25
+   \]
+   
+   \[
+   x = 1.25 - 1 = 0.25
+   \]
+   
+   \[
+   x = 25\%
+   \]
+
+**Answer:** \(\boxed{B}\)"
+5,63,C,6,0.3,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.","8P \).
+
+I need to find the percentage increase required to return to the original price \( P \) from the discounted price \( 0.8P \).
+
+Using the formula for percentage increase:
+
+\[
+\text{Percentage Increase} = \left( \frac{P - 0.8P}{0.8P} \right) \times 100\%
+\]
+
+Simplifying this:
+
+\[
+\left( \frac{0.2P}{0.8P} \right) \times 100\% = 25\%
+\]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original price.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Discounted Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Determine the Required Percentage Increase:**
+   
+   We need to find the percentage increase (\( x \)) such that:
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+   
+   Simplifying:
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P \\
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25 \\
+   \frac{x}{100} = 0.25 \\
+   x = 25\%
+   \]
+
+**Final Answer:** \boxed{25\%}"
+6,95,A,15,0.75,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.","8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \), I divide both sides by \( 0.8P \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} \]
+\[ 1 + \frac{x}{100} = 1.25 \]
+
+Subtracting 1 from both sides:
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original price.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- **Discount:** 20%
+- **Current Selling Price:** After discount
+- **Objective:** Determine the **percentage increase** required to restore the **original price**.
+
+**Let:**
+- **Original Price** = \( P \)
+
+**Step 1: Calculate the Selling Price After Discount**
+
+After a **20%** discount, the selling price becomes:
+\[
+\text{Selling Price} = P - 20\% \text{ of } P = P - 0.20P = 0.80P
+\]
+
+**Step 2: Determine the Required Increase to Restore the Original Price**
+
+Let \( x\% \) be the percentage increase needed. Then:
+\[
+0.80P \times \left(1 + \frac{x}{100}\right) = P
+\]
+
+**Step 3: Solve for \( x \)**
+
+\[
+1 + \frac{x}{100} = \frac{P}{0.80P} = \frac{1}{0.80} = 1.25
+\]
+\[
+\frac{x}{100} = 1.25 - 1 = 0.25
+\]
+\[
+x = 0.25 \times 100 = 25\%
+\]
+
+**Conclusion:**
+The shopkeeper must increase the price by **25%** to restore the original price.
+
+\[
+\boxed{25\%}
+\]"
+7,95,C,5,0.25,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.","8P \times (1 + \text{percentage increase}) = P \]
+
+Dividing both sides by \( 0.8P \) gives:
+\[ 1 + \text{percentage increase} = \frac{P}{0.8P} = 1.25 \]
+
+Subtracting 1 from both sides:
+\[ \text{percentage increase} = 0.25 \]
+
+Converting this to a percentage:
+\[ 0.25 \times 100 = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original price.
+</think>
+
+Let's determine the required percentage increase to restore the original price after a 20% discount.
+
+**Step 1: Understand the Discount**
+
+Suppose the **original price** of an item is \( P \).
+
+A **20% discount** means the item is sold for:
+\[ P - 20\% \text{ of } P = 0.8P \]
+
+**Step 2: Calculate the Required Increase**
+
+To **restore** the original price from the discounted price (\( 0.8P \)), we need to find the percentage increase \( x \) such that:
+\[ 0.8P \times (1 + x) = P \]
+
+**Step 3: Solve for \( x \)**
+
+\[
+\begin{align*}
+0.8P \times (1 + x) &= P \\
+1 + x &= \frac{P}{0.8P} \\
+1 + x &= 1.25 \\
+x &= 1.25 - 1 \\
+x &= 0.25 \\
+x &= 25\%
+\end{align*}
+\]
+
+**Conclusion**
+
+The shopkeeper must **increase the price by 25%** to restore the original price.
+
+\[\boxed{25\%}\]"
+8,141,A,19,0.95,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.","8P} \]
+\[ 1 + \frac{x}{100} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25 \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original value.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, follow these steps:
+
+1. **Let**:
+   - **\( P \)** = Original price
+   - **\( D \)** = Discount percentage = 20\%
+
+2. **Calculate the Selling Price After Discount**:
+   \[
+   \text{Selling Price} = P - (20\% \times P) = P \times (1 - 0.20) = 0.8P
+   \]
+
+3. **Determine the Required Increase**:
+   To find the percentage increase (\( x \% \)) needed to go from the discounted price (\( 0.8P \)) back to the original price (\( P \)):
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+   
+4. **Solve for \( x \)**:
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+5. **Conclusion**:
+   The shopkeeper must increase the price by \(\boxed{25\%}\) to restore the original value."
+9,141,C,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.","8P} \]
+\[ 1 + \frac{x}{100} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's break it down step by step.
+
+**Let:**
+- **\( P \)** = Original price
+- **\( x \% \)** = Percentage increase needed
+
+**After a 20% discount:**
+- The selling price becomes \( 80\% \) of the original price, which is \( 0.8P \).
+
+**To restore the original price:**
+- We need to find the percentage increase (\( x \% \)) such that:
+  \[
+  0.8P \times \left(1 + \frac{x}{100}\right) = P
+  \]
+  
+**Solving for \( x \):**
+\[
+1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+\]
+\[
+\frac{x}{100} = 1.25 - 1 = 0.25
+\]
+\[
+x = 0.25 \times 100 = 25\%
+\]
+
+**Final Answer:**
+\[
+\boxed{25\%}
+\]
+
+**Answer:**
+
+\boxed{C}"
+10,148,A,20,1.0,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.","25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original price.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Understand the Discount:**
+   - Let the original price of an item be \( P \).
+   - A 20% discount means the selling price becomes \( 80\% \) of the original price.
+   - So, the discounted price is \( 0.8P \).
+
+2. **Determine the Required Increase:**
+   - Let \( x \% \) be the percentage increase needed to bring the discounted price back to the original price \( P \).
+   - The equation to find \( x \) is:
+     \[
+     0.8P \times \left(1 + \frac{x}{100}\right) = P
+     \]
+   
+3. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+**Final Answer:**
+\[
+\boxed{25\%}
+\]"
+11,165,A,19,0.95,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.","25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original price.
+</think>
+
+To determine by what percentage the shopkeeper must increase the price after giving a 20% discount to restore the original price, follow these steps:
+
+1. **Assume the Original Price:**
+   - Let the original price be \( P \).
+
+2. **Calculate the Selling Price After Discount:**
+   - The discount is 20%, so the selling price becomes:
+     \[
+     \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+     \]
+
+3. **Determine the Required Percentage Increase:**
+   - Let \( x \) be the percentage increase needed to bring the selling price back to \( P \).
+     \[
+     0.8P \times \left(1 + \frac{x}{100}\right) = P
+     \]
+   - Solve for \( x \):
+     \[
+     1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25
+     \]
+     \[
+     \frac{x}{100} = 0.25
+     \]
+     \[
+     x = 25\%
+     \]
+
+**Final Answer:** \(\boxed{25\%}\)"
+12,165,C,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.","25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original value.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Understand the Discount:**
+   - **Original Price:** Let the original price be \( P \).
+   - **Discount:** The shopkeeper offers a 20% discount.
+   - **Discounted Price:** 
+     \[
+     \text{Discounted Price} = P - 20\% \text{ of } P = 0.8P
+     \]
+
+2. **Determine the Required Increase:**
+   - **Target Price:** The shopkeeper needs to restore the price to the original value \( P \).
+   - **Let \( x \% \) be the required percentage increase.**
+   - **Equation:**
+     \[
+     0.8P \times \left(1 + \frac{x}{100}\right) = P
+     \]
+   
+3. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 0.25
+   \]
+   \[
+   x = 25\%
+   \]
+   
+**Conclusion:** The shopkeeper must increase the price by \(\boxed{25\%}\) to restore the original value.
+
+\(\boxed{C}\)"
+13,228,A,19,0.95,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1."," **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = P - 0.2P = 0.8P
+   \]
+
+3. **Let the Required Percentage Increase be \( x\% \).**
+   
+   We want the Selling Price to return to the Original Price \( P \):
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+**Answer:** \(\boxed{25\%}\)"
+14,228,C,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1."," **Define the Original Price:**
+   Let the original price of an item be \( P \).
+
+2. **Calculate the Discounted Price:**
+   After a 20% discount, the price becomes:
+   \[
+   \text{Discounted Price} = P - 20\% \times P = 0.8P
+   \]
+
+3. **Determine the Required Increase:**
+   We need to find the percentage increase (\( x\% \)) from the discounted price (\( 0.8P \)) back to the original price (\( P \)). The formula for percentage increase is:
+   \[
+   \text{Percentage Increase} = \left( \frac{\text{Increase}}{\text{Original Price}} \right) \times 100\%
+   \]
+   Here, the **Increase** is:
+   \[
+   P - 0.8P = 0.2P
+   \]
+   Plugging into the formula:
+   \[
+   x = \left( \frac{0.2P}{0.8P} \right) \times 100\% = \left( \frac{0.2}{0.8} \right) \times 100\% = 0.25 \times 100\% = 25\%
+   \]
+
+**Final Answer:** \(\boxed{25\%}\)"
+15,238,A,20,1.0,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).","**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **To Restore the Original Price (\( P \)) from \( 0.8P \):**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 25\%
+   \]
+
+**Final Answer:**
+\[
+\boxed{25\%}
+\]"
+16,241,A,19,0.95,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2."," **Apply a 20% Discount:**
+   
+   - **Discount Amount:** \( 20\% \) of \( P \) is \( 0.20P \).
+   - **Selling Price After Discount:** 
+     
+     \[
+     P - 0.20P = 0.80P
+     \]
+
+3. **Determine the Required Increase:**
+   
+   - Let \( x\% \) be the percentage increase needed to bring the discounted price back to \( P \).
+   - The equation becomes:
+     
+     \[
+     0.80P \times \left(1 + \frac{x}{100}\right) = P
+     \]
+     
+   - Simplify:
+     
+     \[
+     1 + \frac{x}{100} = \frac{P}{0.80P} = \frac{1}{0.80} = 1.25
+     \]
+     
+     \[
+     \frac{x}{100} = 0.25 \quad \Rightarrow \quad x = 25\%
+     \]
+
+4. **Conclusion:**
+
+   The shopkeeper must increase the price by \(\boxed{25\%}\) to restore the original amount. 
+
+\boxed{25\%}"
+17,241,C,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2."," **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let the Required Percentage Increase be \( x \% \).**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+**Answer:** \boxed{25\%}"
+18,280,A,19,0.95,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.","8P
+   \]
+
+3. **Let \( x\% \) be the Required Increase to Return to the Original Price \( P \).**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 0.25
+   \]
+   \[
+   x = 25\%
+   \]
+
+**Answer:** \(\boxed{25\%}\)"
+19,280,C,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.","8P
+   \]
+
+3. **Let \( x \) be the Percentage Increase Needed to Return to Original Price \( P \):**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P \\
+   1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \\
+   \frac{x}{100} = 1.25 - 1 = 0.25 \\
+   x = 0.25 \times 100 = 25\%
+   \]
+
+**Answer:** \boxed{C) \ 25\%}"
+20,288,A,20,1.0,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3."," **Let \( x \) be the Required Percentage Increase to Reach the Original Price.**
+   
+   We need to find the value of \( x \) such that:
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solving for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+Therefore, the shopkeeper must increase the price by **\boxed{25\%}** to restore the original amount."
+21,307,A,20,1.0,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.","**
+
+4. **Setting up the Equation:**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+5. **Solving for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 25\%
+   \]
+
+**Final Answer:**
+\[
+\boxed{25\%}
+\]"
+22,315,A,20,1.0,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.","8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+**Final Answer:**
+\boxed{25\%}"
+23,342,A,20,1.0,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4."," **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+**Answer:**
+\[
+\boxed{25\%}
+\]"
+24,374,A,17,0.85,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.","8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+**Final Answer:**
+\boxed{25\%}"
+25,374,C,3,0.15,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.","8P} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 25\%
+   \]
+
+Therefore, the shopkeeper must increase the price by \(\boxed{25\%}\).
+
+\boxed{C}"
+26,385,A,19,0.95,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.","8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 0.25
+   \]
+   \[
+   x = 25\%
+   \]
+
+**Final Answer:** \(\boxed{25\%}\)"
+27,385,C,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.","8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+**Therefore, the shopkeeper must increase the price by \(\boxed{25\%}\) to restore the original amount.**
+
+**ANSWER: C) 25%**"
+28,391,A,19,0.95,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.","25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+Therefore, the shopkeeper must **increase the price by \(\boxed{25\%}\)** to restore the original amount."
+29,391,C,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.","25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+5. **Conclusion:**
+   The shopkeeper must increase the price by \(\boxed{25\%}\) to restore the original amount. 
+
+**Answer:** \(\boxed{C)\ 25\%}\)"
+30,413,A,18,0.9,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.","25 - 1 = 0.25
+   \]
+   \[
+   x = 25\%
+   \]
+
+Therefore, the shopkeeper must increase the price by \(\boxed{25\%}\) to restore the original amount."
+31,413,C,2,0.1,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.","25 - 1 = 0.25
+   \]
+   \[
+   x = 0.25 \times 100 = 25\%
+   \]
+
+5. **Conclusion:**
+   \[
+   \boxed{25\%}
+   \]
+
+**Answer:** \boxed{C) \ 25\%}"
+32,422,A,20,1.0,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.","25
+   \]
+   \[
+   x = 25\%
+   \]
+
+**Answer:** \boxed{25\%}"
+33,437,A,19,0.95,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.","25 \times 100 = 25\%
+   \]
+
+**Final Answer:** \boxed{25\%}"
+34,437,C,1,0.05,"To determine the percentage increase needed to restore the original price after a 20% discount, I'll start by understanding the relationship between the discounted price and the original price.
+
+Let the original price be denoted as \( P \). After a 20% discount, the selling price becomes \( 0.8P \).
+
+To find the percentage increase required to bring the selling price back to \( P \), I'll set up the equation:
+\[ 0.8P \times (1 + \frac{x}{100}) = P \]
+
+Solving for \( x \):
+\[ 1 + \frac{x}{100} = \frac{P}{0.8P} = 1.25 \]
+\[ \frac{x}{100} = 0.25 \]
+\[ x = 25\% \]
+
+Therefore, the shopkeeper must increase the price by 25% to restore the original amount.
+</think>
+
+To determine the percentage increase needed to restore the original price after a 20% discount, let's follow these steps:
+
+1. **Let the Original Price be \( P \).**
+
+2. **After a 20% Discount:**
+   \[
+   \text{Selling Price} = P - 20\% \text{ of } P = 0.8P
+   \]
+
+3. **Let \( x\% \) be the required percentage increase to restore the original price.**
+   \[
+   0.8P \times \left(1 + \frac{x}{100}\right) = P
+   \]
+
+4. **Solve for \( x \):**
+   \[
+   1 + \frac{x}{100} = \frac{P}{0.8P} = \frac{1}{0.8} = 1.25
+   \]
+   \[
+   \frac{x}{100} = 1.25 - 1 = 0.25
+   \]
+   \[
+   x = 0.","25 \times 100 = 25\%
+   \]
+
+**Answer:** \(\boxed{25\%}\)
+
+The correct choice is \(\boxed{C}\) (25%)."

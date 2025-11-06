@@ -1,0 +1,101 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,25,A,14,0.4666666666666667," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people."," He already has the 10 people he wants to form his team. Therefore, he has 0 choices to form his team from outside his existing group of friends. This is because he can simply choose all 10 of his friends to form his team.
+
+The correct answer is A) 0."
+1,25,B,9,0.3," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people."," He just needs to choose 0 additional people to reach the team size of 10. Therefore, he only has 1 choice, which is to choose no additional people.
+
+The correct answer is B) 1."
+2,25,C,3,0.1," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people."," He can simply pick from his existing group of 10 friends. 
+
+Therefore, Peter has 10 choices to form his team.
+
+The correct answer is C)2"
+3,25,D,1,0.03333333333333333," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people."," He simply needs to select 10 more people from his existing group of friends. 
+
+In this case, the number of choices Peter has is equal to the number of people he already has (10 friends). Therefore, he has 10 choices for forming his team.
+
+The correct answer is D)3"
+4,25,E,3,0.1," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people."," He just needs to choose from the 10 people who are already available. 
+
+So, Peter has 10 choices for forming his team. 
+
+The correct answer is: E) 10"
+5,38,A,11,0.36666666666666664," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends."," 
+
+So, he has 10 choices (his 10 friends) for forming his team.
+
+The correct answer is A)0."
+6,38,B,5,0.16666666666666666," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends."," 
+
+Therefore, Peter has 10 choices, but the question asks for the number of additional choices he has to form the team. Since he has already chosen his 10 friends, there's only 1 choice available - his remaining friends.
+
+The correct answer is B) 1."
+7,38,C,2,0.06666666666666667," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends."," Therefore, the answer is:
+
+The correct answer is C)2."
+8,38,D,6,0.2," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends."," The number of choices Peter has is equal to the number of his friends he needs to form the team. 
+
+Therefore, Peter has 10 choices for forming his team. The correct answer is:
+
+D) 10"
+9,38,E,6,0.2," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends."," 
+
+So, in this case, Peter has 10 choices for forming his team. The correct answer is:
+
+The correct answer is E)4"
+10,62,A,3,0.1," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends. 
+
+So, he has 10 choices for forming his team, as he can choose any of his 10 friends."," 
+
+The correct answer is A) 10."
+11,62,B,2,0.06666666666666667," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends. 
+
+So, he has 10 choices for forming his team, as he can choose any of his 10 friends."," 
+
+The correct answer is (B) 1"
+12,62,C,11,0.36666666666666664," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends. 
+
+So, he has 10 choices for forming his team, as he can choose any of his 10 friends."," 
+
+The correct answer is:
+C)2"
+13,62,D,8,0.26666666666666666," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends. 
+
+So, he has 10 choices for forming his team, as he can choose any of his 10 friends."," 
+
+The correct answer is D) 3"
+14,62,E,6,0.2," 
+
+Since Peter already has 10 friends who want to participate, he doesn't need to choose from a pool of people. He can simply select 10 more people from his existing friends. 
+
+So, he has 10 choices for forming his team, as he can choose any of his 10 friends."," 
+
+The correct answer is E)4"

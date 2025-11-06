@@ -1,0 +1,336 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,22,A,2,0.06666666666666667," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount."," 
+
+The cost of 1 pack is $10.00. 
+So, 4 packs will cost 4 * $10.00 = $40.00.
+
+Since there is a 10% discount, we can calculate the discount amount as 10% of the total cost, which is $40.00.
+
+10% of $40.00 is 0.10 * $40.00 = $4.00
+
+The total cost after the discount is $40.00 - $4.00 = $36.00.
+
+Now, we need to find the cost of 1 bagel. We know that there are 9 bagels in each pack. 
+
+To find the cost of 1 bagel, we need to divide the total cost by the number of bagels in the pack.
+
+$36.00 / 9 = $4.00.
+
+So, each single bagel will cost $4.00."
+1,22,B,1,0.03333333333333333," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount."," Since each pack of bagels costs $10, we multiply 4 packs by $10 to get $40. 
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 10% is the same as 0.1, so we multiply 0.1 * $40 to get $4.
+
+Now we subtract the discount from the total cost: $40 - $4 = $36.
+
+Since there are 36 bagels in 4 packs, we need to divide $36 by 36."
+2,22,C,21,0.7," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount."," 
+4 packs * $10 per pack = 40 dollars. 
+
+Since Russell gets a 10% discount, we need to calculate the discount amount. 
+The discount is 10% of 40 dollars. 
+10% of 40 dollars is 0.1 * 40 = 4 dollars. 
+
+The final amount Russell pays is 40 - 4 = 36 dollars. 
+
+Now we need to find the cost of a single bagel. Since there are 9 bagels in each pack, we need to divide $36 by 9 bagels to find the cost of one bagel. 
+36 ÷ 9 = 4. 
+
+The answer is C) 4."
+3,22,D,6,0.2," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount."," 
+
+Since each pack costs $10 and there are 9 bagels in each pack, and Russell orders 4 packs, we first need to find the total number of bagels. 
+
+4 packs * 9 bagels per pack = 36 bagels.
+
+The total cost of the 36 bagels is:
+36 bagels * $10 = $360.
+
+Now, we need to calculate a 10% discount on the total cost of the bagels. 
+10% of $360 is:
+0.1 * $360 = $36.
+
+After applying the discount, the cost of the bagels is:
+$360 - $36 = $324.
+
+Now, we need to find the cost per bagel. There are 36 bagels.
+Cost per bagel: $324 / 36 bagels = $9.
+
+The correct answer is D) 9."
+4,54,A,3,0.1," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40."," 
+
+10% of $40 is $4, so we subtract this from the total cost: 
+
+$40 - $4 = $36
+
+Since there are 36 bagels and we are dividing the total cost by the number of bagels, we get: 
+
+$36 / 36 bagels = $1 per bagel"
+5,54,B,1,0.03333333333333333," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40."," 
+
+10% of $40 = 0.1 * $40 = $4
+
+Now, we subtract the discount from the total cost. 
+
+$40 - $4 = $36
+
+Now we divide the total cost by 4 to find the cost of each bagel.
+
+$36 / 4 = $9"
+6,54,C,20,0.6666666666666666," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40."," 
+
+10% of $40 = 0.10 * $40 = $4
+
+The discount amount is $4, so we subtract that from the total cost to find the final cost.
+
+$40 - $4 = $36
+
+Since Russell ordered 4 packs, we need to find the cost per bagel. 
+
+$36 / 4 bags = $9 per bagel
+
+The correct answer is C) $9.
+
+The other options are incorrect.  A) 10 is the original price per bagel.  B) 40 is incorrect because it's the total cost before the discount, not the cost per bagel.  D) 1 is incorrect because it is not a correct calculation."
+7,54,D,6,0.2," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40."," 
+
+10% of $40 is 0.1 x $40 = $4
+
+So the discount is $4.
+
+Now we subtract the discount from the original cost to find the final price. 
+
+$40 - $4 = $36
+
+Since there are 4 packs, the cost per bagel will be the total cost divided by 4.
+
+$36 / 4 = $9
+
+So the answer is D) $9."
+8,64,A,3,0.1," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.","10 * $40 = $4
+
+So the discount is $4. 
+
+The total cost of the 4 packs of bagels after the discount is $40 - $4 = $36.
+
+Since there are 36 bagels in total, we need to divide $36 by 36 to find the cost of each bagel. 
+
+$36 / 36 = $1"
+9,64,C,23,0.7666666666666667," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.","1 * $40 = $4
+
+Now we subtract the discount from the total cost. 
+
+Total cost after discount = Total cost - Discount = $40 - $4 = $36 
+
+Since there are 4 packs of 9 bagels each, we need to find the total number of bagels. 
+
+Total bagels = 4 packs * 9 bagels per pack = 36 bagels
+
+Now, we can find the cost of each bagel by dividing the total cost by the total number of bagels. 
+
+Cost per bagel = Total cost after discount / Total bagels = $36 / 36 = $1
+
+The answer is C) $1."
+10,64,D,4,0.13333333333333333," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.","10 * $40 = $4
+
+Now, we subtract the discount from the total cost. 
+
+$40 - $4 = $36
+
+Now we need to find the cost of one bagel. 
+
+$36 / 4 = $9
+
+Therefore, the correct answer is D) 9."
+11,83,A,1,0.03333333333333333," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.1 * $40 = $4
+
+Now, we subtract the discount from the total cost."," 
+
+$40 - $4 = $36
+
+Since there are 36 bagels, we divide $36 by 36. 
+
+$36 ÷ 36 = $1
+
+So each bagel will cost $1."
+12,83,B,1,0.03333333333333333," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.1 * $40 = $4
+
+Now, we subtract the discount from the total cost."," 
+
+$40 - $4 = $36
+
+Since there are 9 bagels in a pack, we can find the cost of each bagel by dividing the total cost by 9. 
+
+$36 / 9 = $4
+
+The answer is C) $4, but the answer choice is not listed, however, we can see that $4 is not listed in the answer options."
+13,83,C,22,0.7333333333333333," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.1 * $40 = $4
+
+Now, we subtract the discount from the total cost."," 
+
+$40 - $4 = $36
+
+Since there are 36 bagels in total (9 bagels per pack and 4 packs), we divide the total cost by 36 to find the cost per bagel.
+
+$36 / 36 = $1
+
+The answer is C) $1."
+14,83,D,6,0.2," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.1 * $40 = $4
+
+Now, we subtract the discount from the total cost."," 
+
+$40 - $4 = $36
+
+Now we divide the total cost by 4 to get the cost per bagel.
+
+$36 / 4 = $9
+
+The answer is D) $9"
+15,123,A,4,0.13333333333333333," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.1 * $40 = $4
+
+Now, we subtract the discount from the total cost. 
+
+$40 - $4 = $36
+
+Since there are 9 bagels in each pack, we need to divide the total cost by 9 to find the cost of each bagel."," 
+
+$36 / 9 = $4
+
+So, the correct answer is A) $4"
+16,123,B,10,0.3333333333333333," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.1 * $40 = $4
+
+Now, we subtract the discount from the total cost. 
+
+$40 - $4 = $36
+
+Since there are 9 bagels in each pack, we need to divide the total cost by 9 to find the cost of each bagel."," 
+
+$36 / 9 = $4
+
+So each bagel will cost $4. 
+
+The answer is not listed in the choices, but if we round $4 to the nearest choice, the closest answer is $4, which is not an option."
+17,123,C,16,0.5333333333333333," 
+
+First, we need to find the total cost of the 4 packs of bagels before the discount. 
+
+4 packs * $10 per pack = $40
+
+Since Russell gets a 10% discount, we need to find 10% of $40. 
+
+10% of $40 = 0.1 * $40 = $4
+
+Now, we subtract the discount from the total cost. 
+
+$40 - $4 = $36
+
+Since there are 9 bagels in each pack, we need to divide the total cost by 9 to find the cost of each bagel."," 
+
+$36 / 9 = $4
+
+The answer is C) $4."
+18,141,C,30,1.0,,

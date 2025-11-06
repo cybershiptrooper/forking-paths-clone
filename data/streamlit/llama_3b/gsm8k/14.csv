@@ -1,0 +1,352 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,12,A,23,0.7666666666666667," 
+
+The Allosaurus ate 270 kilograms of meat."," Since they ate half of the remaining meat, we can deduce that 270 kilograms is half of the remaining half. To find the total remaining half, we need to multiply 270 by 2, which is 540 kilograms. 
+
+The T-Rex ate half of the original amount, so the 540 kilograms is half of the original amount. To find the original amount, we multiply 540 by 2, which is 1080 kilograms. 
+
+The correct answer is A) 1080."
+1,12,B,4,0.13333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat."," This is what was left after both the T-Rex and the velociraptors ate their share. 
+
+The velociraptors ate half of what the T-Rex ate. The T-Rex ate half of the original amount. 
+
+Let's say x is the original weight. 
+
+The T-Rex ate x/2 kilograms.
+The velociraptors ate (x/2)/2 = x/4 kilograms.
+
+So, the Allosaurus ate x - x/2 - x/4 kilograms of the original amount.
+
+We know that this equals 270 kilograms. 
+
+x - x/2 - x/4 = 270
+
+Simplifying, we get 3x/4 = 270
+
+Multiplying both sides by 4, we get 3x = 1080
+
+Finally, dividing both sides by 3, we get x = 360.
+
+However, this is not an option. It seems there was an error in the calculation or something was misunderstood."
+2,12,C,2,0.06666666666666667," 
+
+The Allosaurus ate 270 kilograms of meat."," Before the Allosaurus ate, a pack of velociraptors had eaten half of what was left. If the Allosaurus ate 270 kilograms, then what was left before the velociraptors ate?
+
+Since the velociraptors ate half of what was left, they must have eaten half of 270 kilograms, which is 135 kilograms. So, before the velociraptors ate, there were 270 + 135 = 405 kilograms.
+
+Since the Tyrannosaurus Rex ate half of the original amount, it must have eaten half of 405 kilograms, which is 202.5 kilograms.
+
+To find the original amount of meat, we add the amount the Tyrannosaurus Rex ate (202.5) to the amount left before it ate (405): 405 + 202.5 = 607.5.
+
+However, this value is not among the provided choices."
+3,12,D,1,0.03333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat."," This is the last 50% of what was left after the Tyrannosaurus rex ate.
+
+If 270 kilograms is 50% of the remaining meat, we can find 100% of the remaining meat by multiplying 270 by 2:
+270 * 2 = 540 kilograms.
+
+This 540 kilograms is 50% of what was originally left after the Tyrannosaurus rex ate, so we can find 100% of the remaining meat after the T-Rex ate by multiplying 540 by 2:
+540 * 2 = 1080 kilograms.
+
+Since the Tyrannosaurus rex ate half of the original meat, we can find the original amount by multiplying 1080 by 2:
+1080 * 2 = 2160 kilograms.
+
+So, the triceratops had 2160 kilograms of meat before the Tyrannosaurus rex ate. The correct answer is:
+
+D) 2160."
+4,26,A,26,0.8666666666666667," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate."," So, if the Allosaurus ate half, then the 270 kilograms is also half of the total. To find the original amount, you can multiply by 2:
+
+270 * 2 = 540 kilograms
+
+The T-Rex ate half of the original amount, so it ate 540 / 2 = 270 kilograms.
+
+The total amount before the T-Rex ate was therefore 540 (the amount left after the T-Rex ate) + 270 (the amount the T-Rex ate) = 810 kilograms.
+
+However, we need to consider the fact that the T-Rex ate half of the triceratops and the raptors ate half of the T-Rex's remains. The choices show options of 1080, 580, 472.5, and 2160. The only one that equals 810 is 1080. 
+
+The correct answer is A) 1080."
+5,26,B,4,0.13333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate."," Let's call the amount of meat left after the T-Rex ate 'x'. 
+
+Since the Allosaurus ate 270 kilograms, which is half of what was left, then 'x' is 540 kilograms. Since the T-Rex ate half of what was initially there, 'x' must be double the amount the T-Rex ate. 
+
+If 'x' is 540 kilograms, then the T-Rex ate 540 / 2 = 270 kilograms. Since the T-Rex ate 270 kilograms, this is half of what was initially on the triceratops. 
+
+The amount the T-Rex ate (270 kilograms) is half of the initial amount. So we can find the initial amount by multiplying 270 by 2. 
+
+Initial amount = 270 * 2 = 540. 
+
+However, this was not an option, but the closest answer is B) 580, which is also 540 * 1.0833."
+6,52,A,27,0.9," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half."," 
+
+Since the Allosaurus ate 270 kilograms of meat, that is half of what was left after the T-Rex ate. So we need to multiply 270 by 2 to get the total amount of meat that was left after the T-Rex ate. 
+
+270 * 2 = 540 kilograms
+
+Since the T-Rex ate half of the original amount, the original amount can be found by multiplying 540 by 2.
+
+540 * 2 = 1080 kilograms
+
+The answer is A) 1080."
+7,52,B,1,0.03333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half."," 
+
+Let's call the original amount of meat M. Since the T-Rex ate half of it, that leaves us with M/2 for the Allosaurus to eat. We know that M/2 = 270, so we can solve for M by multiplying both sides by 2:
+
+M/2 * 2 = 270 * 2
+M = 540
+
+However, that is not an answer choice."
+8,52,C,2,0.06666666666666667," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half."," Therefore, what was left before the T-Rex ate was also 270 kilograms. 
+
+Since the T-Rex ate half of the triceratops, the original amount must have been 2 times 270. 
+
+2 x 270 = 540.
+
+However, this is not an option, but the next closest answer is C) 472.5"
+9,75,A,28,0.9333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half."," This means that the T-Rex ate 270 kilograms. Since the T-Rex ate the other half, the total must be twice that amount. 
+
+Total amount of meat before the T-Rex ate = 2 x 270 kilograms = 540 kilograms."
+10,75,B,2,0.06666666666666667," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half."," Therefore, the Allosaurus ate half of the original 270 kilograms. 270 / 2 = 135 kilograms.
+
+The T-Rex ate half of the original amount, which is 135 kilograms. 135 * 2 = 270 kilograms.
+
+So, the original amount was 270 + 270 = 540 kilograms.
+
+Therefore, the answer is not among the given options."
+11,86,A,25,0.8333333333333334," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms."," The total amount of meat left after the T-Rex ate its half was 270 kilograms. 
+
+The T-Rex ate half of the original amount of meat. This means that the original amount of meat was twice as much as what the T-Rex ate. 
+
+Original amount * 0.5 = 270
+Original amount = 270 * 2
+Original amount = 540
+
+However, that is not an option. If we go back to the fact that the meat that the Allosaurus ate was 270 and this was half of what was left, we can deduce that the original amount was 540. But this is also not an answer. 
+
+However if we use the fact that the 540 was half of the original amount, we can deduce that half of the original amount is 540. Therefore, the original amount is 540 * 2 = 1080.
+
+So, the original amount of meat on the triceratops before the T-Rex ate was 1080 kilograms."
+12,86,B,3,0.1," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms."," Since the T-Rex ate half, the original amount of the triceratops must have been double the amount the T-Rex ate. 
+
+So the original weight of the triceratops was 270 * 2 = 540 kilograms. However, this is not an option."
+13,86,C,2,0.06666666666666667," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms."," 
+
+The remaining half that the Allosaurus didn't eat is also 270 kilograms. 
+
+Since the T-Rex ate 270 kilograms, the total amount of meat was 270 + 270 = 540 kilograms.
+
+Since the T-Rex ate half of the meat and it was 270 kilograms, the initial amount of meat was 2 * 270 = 540 kilograms.
+
+The correct answer is C) 540, but it is not there."
+14,115,A,22,0.7333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate."," 
+
+So, the original amount of meat must have been 2 * 270 = 540 kilograms.
+
+However, the question asks for the original amount before the T-Rex ate. Since the T-Rex ate half of it, we need to multiply the amount the T-Rex ate by 2. 
+
+So, the original amount of meat must have been 2 * 540 = 1080 kilograms."
+15,115,B,6,0.2," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate."," 
+
+The original amount of meat = 2 x 270 = 540 kilograms. 
+
+However, this isn't an answer choice. 
+
+The T-Rex ate half of what was left. The raptors ate half of what the T-Rex ate. The T-Rex ate 270 kilograms, which is half of what was left. 
+
+What was left after the T-Rex ate was 540 kilograms. 
+
+The raptors ate half of that, which is 270 kilograms. 
+
+So, the original weight of the triceratops was 540 + 270 = 810 kilograms.
+
+But that isn't an answer choice."
+16,115,C,1,0.03333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate."," 
+
+So, we multiply 270 by 2 to find the original amount of meat on the triceratops.
+
+270 * 2 = 540 
+
+However, this is not an option. Let's see if we can fit this number into any of the choices. 540 - 270 = 270 which is the amount the Allosaurus ate, and 270 * 2 = 540, so the answer is C) 540 - 540 / 2"
+17,115,D,1,0.03333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate."," 
+
+So, the original amount of meat must have been 270 x 2 = 540 kilograms.
+
+The T-Rex ate a quarter of the original amount. The total amount of meat the T-Rex, the velociraptors, and the Allosaurus ate must have been equal to the original amount of meat. Since the velociraptors ate half of what was left after the T-Rex, the velociraptors must have eaten half of the 540 kilograms. So the velociraptors ate 540 / 2 = 270 kilograms. 
+
+Now that we know the velociraptors ate 270 kilograms, the original amount must have been 540 (the amount eaten by the T-Rex and the Allosaurus) + 270 (the amount eaten by the velociraptors) = 810 kilograms.
+
+So the original amount of meat on the triceratops was 810 kilograms.
+
+The answer is D) 2160."
+18,134,A,27,0.9," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate. 
+
+So, the original amount of meat was 270 * 2 = 540 kilograms."," But 540 is not an answer option. However, we can try another approach to see which of the choices makes sense. 
+
+We know that the T-Rex ate half of the original amount of meat. The Allosaurus ate half of what was left. So, the T-Rex ate half of what the Allosaurus ate. 
+
+Since the Allosaurus ate half of 270, then the T-Rex ate half of half of the original amount. 
+
+Let x be the original amount. 
+
+The T-Rex ate half of x. 
+The Allosaurus ate half of 270. 
+
+So, x / 2 = 270 / 2. 
+
+x = 270. However, that isn't an answer choice. Since 270 is half of what the Allosaurus ate, the original amount must be double what the Allosaurus ate. 
+
+The original amount = 270 * 2 = 540 kilograms. However, that isn't an answer choice. This isn't the right answer.
+
+The T-Rex ate half of what the Allosaurus ate and the Allosaurus ate half of what was left. Since the Allosaurus ate half of 270, the T-Rex ate half of half of what was left. 
+
+So, the original amount = 540 * 2 = 1080 kilograms.
+
+The answer is A) 1080."
+19,134,B,2,0.06666666666666667," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate. 
+
+So, the original amount of meat was 270 * 2 = 540 kilograms."," But, this answer isn't in the choices. However, B) 580 is. 
+
+The correct solution is B) 580."
+20,134,D,1,0.03333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate. 
+
+So, the original amount of meat was 270 * 2 = 540 kilograms."," However, we need to remember that about 540 / 2 = 270 kilograms was eaten by the T-Rex and about 270 kilograms was eaten by the raptors. 
+
+The remaining 540 - 270 - 270 = 540 - 540 = 0 kilograms. 
+
+Wait - we've made a mistake - we started with a positive number, and we ended up with 0. This means the 270 kg eaten by the Allosaurus was only half of what was left. So, the amount that was left after the T-Rex ate it must have been twice as much as what the Allosaurus ate. 
+
+540 / 2 = 270 was eaten by the T-Rex. Therefore, 270 * 2 = 540 was the amount left after the T-Rex ate it. The amount left after the T-Rex ate was 540, so the amount before the T-Rex ate it must have been double this amount. So, 540 * 2 = 1080 kilograms of meat was left after the T-Rex ate it. 
+
+Since the T-Rex ate half of it, that means the original amount was 1080 * 2 = 2160 kilograms. 
+
+The answer is D."
+21,167,A,25,0.8333333333333334," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate. 
+
+So, the original amount of meat was 270 * 2 = 540 kilograms. 
+
+However, the question states that the T-Rex ate half of the original amount, so the original amount must have been twice what the T-Rex ate."," 
+
+The T-Rex ate 270 kilograms, so the original amount was 270 * 2 = 540 kilograms.
+
+The answer is A) 1080."
+22,167,B,4,0.13333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate. 
+
+So, the original amount of meat was 270 * 2 = 540 kilograms. 
+
+However, the question states that the T-Rex ate half of the original amount, so the original amount must have been twice what the T-Rex ate."," 
+
+540 / 2 = 270."
+23,167,D,1,0.03333333333333333," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate. 
+
+So, the original amount of meat was 270 * 2 = 540 kilograms. 
+
+However, the question states that the T-Rex ate half of the original amount, so the original amount must have been twice what the T-Rex ate."," 
+
+540 kilograms / 2 = 270 kilograms.  So, the answer is (D) 2160"
+24,178,A,30,1.0," 
+
+The Allosaurus ate 270 kilograms of meat. This is half of what was left after the T-Rex ate. So, if the Allosaurus ate half of what was left, then the T-Rex must have eaten the other half. 
+
+If the Allosaurus ate half of what was left, then the T-Rex ate the other half. So, the T-Rex ate 270 kilograms. 
+
+Since the T-Rex ate half of what was left, the original amount of meat must have been twice what the T-Rex ate. 
+
+So, the original amount of meat was 270 * 2 = 540 kilograms. 
+
+However, the question states that the T-Rex ate half of the original amount, so the original amount must have been twice what the T-Rex ate. 
+
+540 * 2 = 1080 kilograms."," 
+
+The answer is A."

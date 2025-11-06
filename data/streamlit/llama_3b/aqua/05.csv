@@ -1,0 +1,244 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,10,A,6,0.2," 
+
+Let Ajay's current age be x."," Since Sachin is twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x. 
+
+Now, Sachin will be 40 in 10 years, so his current age is 40 - 10 = 30 years. 
+
+Since Sachin's age 10 years back was 2x, 30 - 10 = 2x, so 20 = 2x, and x = 10.
+
+So, Ajay's current age is 10."
+1,10,B,5,0.16666666666666666," 
+
+Let Ajay's current age be x."," 
+
+Since Sachin was twice as old as Ajay 10 years ago, we can write an equation:
+Sachin's age 10 years ago = 2 * Ajay's age 10 years ago
+Sachin's age 10 years ago = 2 * (x - 10)
+Sachin's age 10 years ago = 2x - 20
+
+Since Sachin will be 40 years old in 10 years, his current age is:
+Sachin's current age = 40 - 10 = 30
+
+Now we can equate the two expressions for Sachin's age 10 years ago:
+2x - 20 = 30
+2x = 50
+x = 25
+
+So, Ajay's current age is 25. The correct answer is B) 25."
+2,10,C,15,0.5," 
+
+Let Ajay's current age be x."," 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back = 2x.
+
+We are also given that in 10 years, Sachin will be 40 years old.
+
+So, currently, Sachin's age = 40 - 10 = 30 years.
+
+As Sachin's age 10 years back = 2x, we can say 2x = 30. 
+
+Solving for x, we get x = 30/2 = 15.
+
+Therefore, Ajay's current age is 15 years.
+
+The correct answer is C) 15."
+3,10,D,4,0.13333333333333333," 
+
+Let Ajay's current age be x."," Since Sachin was twice as old as Ajay 10 years ago, Sachin's current age would be 2x - 10.
+
+We are given that Sachin will be 40 years old in 10 years. So, his current age is 40 - 10 = 30 years.
+
+We know that Sachin's current age is 2x - 10, and we also know that his current age is 30. So we can set up the equation:
+
+2x - 10 = 30
+
+Solving for x:
+
+2x = 30 + 10
+2x = 40
+x = 20
+
+So, Ajay's current age is 20 years. 
+
+The correct answer is D)20"
+4,39,A,3,0.1," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x."," 
+
+Now, Sachin will be 40 years old in 10 years, so his current age is 40 - 10 = 30. 
+
+So, 2x = 30 
+x = 30 / 2 
+x = 15 
+
+Ajay's current age is 15."
+5,39,B,2,0.06666666666666667," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x."," 
+
+We know that Sachin will be 40 years old in 10 years. So, his current age is 40 - 10 = 30 years.
+
+Since Sachin's age 10 years back was 2x, we can set up an equation:
+
+2x = 30 - 10 
+2x = 20
+x = 10
+
+So, Ajay's current age is 10 years. 
+
+The answer is not among the choices. In this case we would need to consider each option and think about how many years ago this was and the 10 years ago age was what was stated for sachin i.e 10 years before he was 30.  Since we know 10 years ago Ajay was 10 years old. So 10 - 10 years ago Ajay would be 20 years old."
+6,39,C,22,0.7333333333333333," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x."," 
+
+Since Sachin will be 40 years old in 10 years, his current age is 40 - 10 = 30 years. 
+
+So, 2x = 30. 
+
+Divide both sides by 2, we get x = 15. 
+
+Therefore, Ajay's current age is 15 years.
+
+The correct answer is (C) 15."
+7,39,D,3,0.1," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x."," 
+
+We are given that Sachin will be 40 years old in 10 years. So, Sachin's current age is 40 - 10 = 30 years. 
+
+Since Sachin's age 10 years back was 2x, we can write the equation: 
+2x = 30 - 10 
+2x = 20 
+x = 10 
+
+So, Ajay's current age is 10 years. 
+
+The answer is not among the choices, so let's check the options. 
+
+If we subtract 10 years from each option, we get: 
+A) 8, B) 15, C) 5, D) 10, E) 11 
+
+The only option close to 10 is D) 10."
+8,68,B,1,0.03333333333333333," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x. 
+
+Since Sachin will be 40 years old in 10 years, his current age is 40 - 10 = 30 years."," 
+
+Since Sachin's age 10 years back was 2x, we can set up the equation: 2x = 30 - 10 
+2x = 20
+x = 10
+
+So, Ajay's current age is 10 years. However, there is no option that matches this answer."
+9,68,C,27,0.9," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x. 
+
+Since Sachin will be 40 years old in 10 years, his current age is 40 - 10 = 30 years."," 
+
+So, 2x = 30. 
+
+Divide both sides by 2, we get x = 15.
+
+So, Ajay is 15 years old today. The correct answer is C."
+10,68,D,2,0.06666666666666667," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x. 
+
+Since Sachin will be 40 years old in 10 years, his current age is 40 - 10 = 30 years."," 
+
+So, 2x = 30 - 10 = 20. 
+
+x = 10. 
+
+Ajay's current age is x = 10 years. 
+
+So, the correct answer is D) 20."
+11,78,A,1,0.03333333333333333," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x. 
+
+Since Sachin will be 40 years old in 10 years, his current age is 40 - 10 = 30 years. 
+
+So, 2x = 30."," 
+
+x = 30 / 2 = 15.
+
+Ajay's current age is 15 years."
+12,78,C,29,0.9666666666666667," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x. 
+
+Since Sachin will be 40 years old in 10 years, his current age is 40 - 10 = 30 years. 
+
+So, 2x = 30."," 
+
+x = 30/2 = 15. 
+
+So, Ajay's current age is 15 years. 
+
+The correct answer is C) 15."
+13,94,A,5,0.16666666666666666," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x. 
+
+Since Sachin will be 40 years old in 10 years, his current age is 40 - 10 = 30 years. 
+
+So, 2x = 30. 
+
+Dividing both sides by 2, we get x = 15."," 
+
+So, Ajay's current age is 15 years."
+14,94,C,25,0.8333333333333334," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x. 
+
+Since Sachin will be 40 years old in 10 years, his current age is 40 - 10 = 30 years. 
+
+So, 2x = 30. 
+
+Dividing both sides by 2, we get x = 15."," 
+
+So, Ajay's current age is 15 years. 
+
+The correct answer is C) 15."
+15,107,A,4,0.13333333333333333,,
+16,107,C,26,0.8666666666666667," 
+
+Let Ajay's current age be x. 
+
+Since Sachin was twice as old as Ajay 10 years back, Sachin's age 10 years back was 2x. 
+
+Since Sachin will be 40 years old in 10 years, his current age is 40 - 10 = 30 years. 
+
+So, 2x = 30. 
+
+Dividing both sides by 2, we get x = 15. 
+
+Therefore, Ajay's current age is 15 years."," 
+
+The correct answer is C) 15."
+17,117,C,30,1.0,,

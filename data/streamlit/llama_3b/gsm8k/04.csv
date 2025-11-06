@@ -1,0 +1,2044 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,21,A,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.","00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+The total cost of the standard items is: $129 + $129 + $129 + $129 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 - 4 = 2 extra mirrors: 2 x $15.00 = $30.00
+- 2 - 1 = 1 extra chandelier: $15.00
+- 20 - 10 = 10 extra pictures: 10 x $15.00 = $150.00
+
+The total cost of the additional items is: $30 + $15 + $150 = $195.00
+
+Now, we can add the cost of the standard items and the additional items:
+$496.00 + $195.00 = $691.00
+
+The answer is none of the choices."
+1,21,B,6,0.2," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.","00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost of standard items: $129 + $129 + $129 + $129 = $496.00
+
+Then, Angela needs to have the following additional items installed:
+- 6 - 4 = 2 mirrors
+- 2 - 1 = 1 chandelier
+- 20 - 10 = 10 pictures
+
+Cost of additional items: 
+- 2 mirrors: 2 * $15.00 = $30.00
+- 1 chandelier: $15.00
+- 10 pictures: 10 * $15.00 = $150.00
+
+Total cost of additional items: $30 + $15 + $150 = $195
+
+Total cost for all items: $496 + $195 = $691
+
+Since none of the options match, we need to look for the closest option."
+2,21,C,14,0.4666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.","00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+The total cost for these standard items is $129.00 x 4 = $516.00
+
+She also needs additional items installed:
+- 6 - 4 = 2 mirrors
+- 2 - 1 = 1 chandelier
+- 20 - 10 = 10 pictures
+
+The total number of additional items is 2 + 1 + 10 = 13.
+
+The cost of the additional items will be $15.00 per item, so the total cost for the additional items is 13 * $15.00 = $195.00
+
+The total cost for all items is $516.00 + $195.00 = $711.00
+
+The correct answer is C) $711."
+3,21,D,6,0.2," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.","00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+The total cost for standard items is $129 + $129 + $129 + $129 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15 = $90
+- 2 chandeliers: 2 x $15 = $30
+- 20 pictures: 20 x $15 = $300
+
+The total cost of the additional items is $90 + $30 + $300 = $420
+
+The total cost for Angela is the cost of the standard items plus the cost of the additional items: $496 + $420 = $916.
+
+The answer is D) $3101"
+4,31,A,2,0.06666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.","00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129 + $129 + $129 + $129 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- Angela has 6 mirrors. The cost for the additional 2 mirrors is 2 * $15.00 = $30.00
+- Angela has 2 chandeliers. The cost for the additional 2 chandeliers is 2 * $15.00 = $30.00
+- Angela has 20 pictures. The cost for the additional 10 pictures is 10 * $15.00 = $150.00
+
+Total cost for additional items: $30.00 + $30.00 + $150.00 = $210.00
+
+The total cost for Angela is the cost of the standard items plus the cost of the additional items: $496.00 + $210.00 = $706.00 
+
+The closest answer option to this total is $710, but it is not available.  The closest available answer is $710."
+5,31,B,13,0.43333333333333335," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.","00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost of standard items = $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost of additional items = $90.00 + $30.00 + $300.00 = $420.00
+
+Now, we add the cost of the standard items and the additional items to get the total cost:
+Total cost = $496.00 + $420.00 = $916.00
+
+The correct answer is not listed, but the closest answer is B) $145."
+6,31,C,14,0.4666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.","00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost of standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items Angela needs:
+- 6 mirrors: 6 * $15.00 = $90.00
+- 2 chandeliers: 2 * $15.00 = $30.00
+- 20 pictures: 20 * $15.00 = $300.00
+
+Total cost of additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of standard items and additional items:
+$496.00 + $420.00 = $916.00
+
+So, the correct answer is not among the options. However, I can see an option closest to the answer: 
+
+ choice C) 219"
+7,31,D,1,0.03333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.","00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+The total cost will be the sum of the cost of the standard items and the cost of the additional items: 
+$496.00 + $420.00 = $916.00
+
+However, this is not an option. The closest value to this calculation is $3101 (which does not include an installation fee of $129 for the 6 mirrors and 2 chandeliers that the original price did not account for), so the correct answer is $3101."
+8,42,A,7,0.23333333333333334," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.","00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Next, let's calculate the cost of the additional items:
+- 2 mirrors: 2 * $15.00 = $30.00
+- 2 chandeliers: 2 * $15.00 = $30.00
+- 10 pictures: 10 * $15.00 = $150.00
+
+Total cost for additional items: $30.00 + $30.00 + $150.00 = $210.00
+
+Now, let's add the cost of the standard items and the additional items: 
+$496.00 + $210.00 = $706.00"
+9,42,B,8,0.26666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.","00
+- 10 pictures: $129.00
+
+The total cost of the standard items is $129 + $129 + $129 + $129 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 10 pictures: 10 x $15.00 = $150.00
+
+The total cost of the additional items is $90 + $30 + $150 = $270.00
+
+The total cost for Angela is the cost of the standard items plus the cost of the additional items: $496 + $270 = $766.00
+
+None of the given choices match the calculated answer, so I would not select any of the choices."
+10,42,C,11,0.36666666666666664," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.","00
+- 10 pictures: $129.00
+
+Total cost of standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, Angela needs additional installations for:
+- 6 - 4 = 2 mirrors
+- 2 chandeliers
+- 20 - 10 = 10 pictures
+
+Cost of additional installations: 
+- 2 mirrors: 2 * $15.00 = $30.00
+- 2 chandeliers: 2 * $15.00 = $30.00
+- 10 pictures: 10 * $15.00 = $150.00
+
+Total cost of additional installations: $30.00 + $30.00 + $150.00 = $210.00
+
+Total cost for Angela: $496.00 + $210.00 = $706.00
+
+The correct answer is not provided in the choices, but the closest one is C) 219."
+11,42,D,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.","00
+- 10 pictures: $129.00
+
+Total cost of standard items: $129 + $129 + $129 + $129 = $496.00
+
+Now, let's calculate the cost of the additional items Angela needs to be installed:
+- 6 mirrors: 6 * $15 = $90
+- 2 chandeliers: 2 * $15 = $30
+- 20 pictures: 20 * $15 = $300
+
+Total cost of additional items: $90 + $30 + $300 = $420
+
+Now, let's add the cost of the standard items and the additional items:
+$496 + $420 = $916
+
+The correct answer is not listed, but based on the choices, the closest answer to $916 is  3101"
+12,52,A,2,0.06666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.","00
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+For the additional items, Angela has:
+- 6 mirrors: 6 * $15.00 = $90.00
+- 2 chandeliers: 2 * $15.00 = $30.00
+- 20 pictures: 20 * $15.00 = $300.00
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Adding the cost of standard items and additional items, we get: $496.00 + $420.00 = $916.00
+
+The correct answer is not listed, so I will choose the closest answer."
+13,52,B,10,0.3333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.","00
+
+Total for standard items: $129 + $129 + $129 + $129 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 * $15.00 = $90.00
+- 2 chandeliers: 2 * $15.00 = $30.00
+- 10 pictures: 10 * $15.00 = $150.00
+
+Total for additional items: $90.00 + $30.00 + $150.00 = $270.00
+
+Now, let's add the total cost of the standard items and the total cost of the additional items:
+$496.00 + $270.00 = $766.00
+
+The answer is not listed in the choices, but the closest answer is B) 145. This is incorrect as that is only the cost for the standard items. The correct answer is $766.00."
+14,52,C,14,0.4666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.","00
+
+Total cost for standard items: $129 + $129 + $129 + $129 = $496.00
+
+Now, let's calculate the cost of the additional items Angela needs:
+- 6 - 4 = 2 additional mirrors
+- 2 additional chandeliers
+- 20 - 10 = 10 additional pictures
+
+The cost of the additional items is: 2 mirrors * $15 = $30, 2 chandeliers * $15 = $30, 10 pictures * $15 = $150
+Total cost for additional items: $30 + $30 + $150 = $210
+
+Now, add the cost of the standard items and the additional items:
+$496.00 + $210.00 = $706.00
+
+The correct answer is C) $706, but that is not a choice.  Let's look at the choices again."
+15,52,D,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.","00
+
+Total cost of standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 2 additional mirrors: 2 x $129.00 = $258.00
+- 2 additional chandeliers: 2 x $129.00 = $258.00
+- 10 additional pictures: 10 x $15.00 = $150.00
+
+Total cost of additional items: $258.00 + $258.00 + $150.00 = $666.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $666.00 = $1162.00
+
+The correct answer is D) 1162, however this is not an option."
+16,63,A,6,0.2," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.","00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's add the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, add the cost of the standard items and the additional items: $496.00 + $420.00 = $916.00
+
+So, Angela will have to pay a total of $916.00."
+17,63,B,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.","00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Since Angela has 6 mirrors, 2 additional mirrors will require an extra $15.00 each, so the cost for the extra mirrors is: 2 x $15.00 = $30.00
+
+Since she has 20 pictures, and there are 10 standard pictures, she needs to have 10 extra pictures installed. The cost for the extra pictures is: 10 x $15.00 = $150.00
+
+Since Angela has 2 chandeliers, she needs to have 2 extra chandeliers installed, so the cost for the extra chandelier is: 2 x $15.00 = $30.00
+
+Now, let's add up all the costs:
+$496.00 (standard items) + $30.00 (extra mirrors) + $150.00 (extra pictures) + $30.00 (extra chandeliers) = $706.00
+
+Unfortunately, none of the given choices match the calculated answer."
+18,63,C,17,0.5666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.","00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Since 6 + 2 is 8, Angela needs 8 additional items (mirrors and chandeliers) installed. 
+The cost for additional items: 8 * $15.00 = $120.00
+
+The total cost is $496.00 + $120.00 = $616.00.
+
+The correct answer is not among the options."
+19,63,D,3,0.1," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.","00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Angela needs 6 mirrors, so the additional mirror cost will be 6 x $15.00 = $90.00
+Angela needs 2 chandeliers, so the additional chandelier cost will be 2 x $15.00 = $30.00
+Angela needs 20 - 10 = 10 additional pictures, so the additional picture cost will be 10 x $15.00 = $150.00
+
+Total additional cost: $90.00 + $30.00 + $150.00 = $270.00
+
+Now, the total cost for Angela will be the sum of the cost of the standard items and the additional cost:
+$496.00 + $270.00 = $766.00
+
+Unfortunately, none of the given choices match $766.00.
+
+However, the closest choice is $3101. 
+
+It seems like there was an error in the calculations, but none of the given choices match the correct answer, but in this case that is the best option to choose."
+20,68,A,3,0.1," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.","00 + $129.00 + $129.00 = $496.00
+
+Next, let's calculate the cost of the additional items:
+- 6 - 4 = 2 mirrors: 2 x $15.00 = $30.00
+- 2 - 1 = 1 chandelier: 1 x $15.00 = $15.00
+- 20 - 10 = 10 pictures: 10 x $15.00 = $150.00
+
+Total cost for additional items: $30.00 + $15.00 + $150.00 = $195.00
+
+Now, let's add the cost of standard items and additional items:
+$496.00 + $195.00 = $691.00
+
+The correct answer is not listed, but the closest answer would be $691."
+21,68,B,10,0.3333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.","00 + $129.00 + $129.00 = $496.00
+
+Next, let's calculate the cost of the additional items:
+- 6 - 4 = 2 extra mirrors: 2 x $15.00 = $30.00
+- 2 - 1 = 1 extra chandelier: 1 x $15.00 = $15.00
+- 20 - 10 = 10 extra pictures: 10 x $15.00 = $150.00
+
+Total cost for additional items: $30.00 + $15.00 + $150.00 = $195.00
+
+Now, let's add the cost of the standard items and the cost of the additional items:
+$496.00 + $195.00 = $691.00
+
+The correct answer is not among the choices provided, but based on the calculation, the correct answer is $691."
+22,68,C,14,0.4666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.","00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 2 extra mirrors: 2 * $129.00 = $258.00
+- 2 extra shelves: 2 * $129.00 = $258.00
+- 10 extra pictures: 10 * $15.00 = $150.00
+- 2 extra chandeliers: 2 * $129.00 = $258.00
+
+Total cost of additional items: $258.00 + $258.00 + $150.00 + $258.00 = $724.00
+
+Now, let's find the total cost by adding the cost of standard items and additional items:
+Total cost = $496.00 + $724.00 = $1220.00
+
+Since none of the options are correct, let's look for the closest value to our answer.  Since our answer is $1220.00 and none of the options are correct we will have to choose the option closest to that value."
+23,68,D,3,0.1," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.","00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- Angela has 6 - 4 = 2 extra mirrors
+- 2 extra chandeliers
+- 20 - 10 = 10 extra pictures
+
+Cost of extra mirrors: 2 x $15.00 = $30.00
+Cost of extra chandeliers: 2 x $15.00 = $30.00
+Cost of extra pictures: 10 x $15.00 = $150.00
+
+Total cost of extra items: $30.00 + $30.00 + $150.00 = $210.00
+
+Now, let's add the cost of standard and extra items:
+$496.00 + $210.00 = $706.00
+
+The correct answer is D) $3101"
+24,73,A,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.","00 + $129.00 = $496.00
+
+Next, let's calculate the cost of the additional items:
+- 2 mirrors: 2 x $129.00 = $258
+- 2 chandeliers: 2 x $129.00 = $258
+- 10 pictures: 10 x $129.00 = $1290
+
+Total cost of additional items: $258 + $258 + $1290 = $1806
+
+Now, let's add the cost of the standard items and the cost of the additional items: 
+$496.00 + $1806.00 = $2302.00
+
+However, Angela only needs 6 mirrors, 2 chandeliers, and 20 pictures. We need to subtract the cost of the extra items she doesn't need:
+- 6 mirrors: 6 x $129.00 = $774
+- 2 chandeliers: 2 x $129.00 = $258
+- 10 pictures: $1290
+
+Total cost of extra items Angela doesn't need: $774 + $258 + $1290 = $2322
+
+Now, let's subtract the cost of the extra items from the total:
+$2302.00 - $2322 = -$20
+
+The correct answer choice would have to be higher than $2302, so looking at the options A, B, C, and D, the best choice is A."
+25,73,B,10,0.3333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.","00 + $129.00 = $496.00
+
+Next, let's calculate the cost of the additional items:
+- 6 mirrors: 6 * $15.00 = $90.00
+- 2 chandeliers: 2 * $15.00 = $30.00
+- 10 pictures: 10 * $15.00 = $150.00
+
+Total cost for additional items: $90.00 + $30.00 + $150.00 = $270.00
+
+Now, let's calculate the total cost:
+Total cost = cost of standard items + cost of additional items
+Total cost = $496.00 + $270.00 = $766.00
+
+Since none of the choices match the calculated answer, it seems there might be some mistake in the question or the options provided, or it might be based on a misunderstanding."
+26,73,C,14,0.4666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.","00 + $129.00 = $496.00
+
+Next, let's calculate the cost of the additional mirrors, shelves, and chandeliers:
+- 6 additional mirrors: 6 x $15.00 = $90.00
+- 2 additional shelves: 2 x $15.00 = $30.00
+- 2 additional chandeliers: 2 x $15.00 = $30.00
+
+Total cost of additional items: $90.00 + $30.00 + $30.00 = $150.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $150.00 = $646.00
+
+The correct answer is C) $646, but it is not available."
+27,73,D,2,0.06666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.","00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 2 additional mirrors: 2 x $129.00 = $258.00
+- 2 additional chandeliers: 2 x $129.00 = $258.00
+- 10 additional pictures: 10 x $129.00 = $1290.00
+
+Total cost of additional items: $258.00 + $258.00 + $1290.00 = $1806.00
+
+Now, let's add the cost of the standard items and the additional items:
+Total cost = $496.00 + $1806.00 = $2302.00
+
+The correct answer is not listed, but the closest answer is D) $3101 ( Angela would need to pay an additional $799)."
+28,78,A,2,0.06666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.","00 = $496.00
+
+Now, let's calculate the cost of the additional items Angela needs:
+- 6 - 4 = 2 extra mirrors
+- 2 - 1 = 1 extra chandelier
+- 20 - 10 = 10 extra pictures
+- Total additional items: 2 + 1 + 10 = 13 items
+- Additional cost: 13 items * $15.00 = $195.00
+
+Total cost for Angela: $496.00 + $195.00 = $691.00"
+29,78,B,10,0.3333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.","00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 2 additional mirrors: 2 * $15.00 = $30.00
+- 2 additional chandeliers: 2 * $15.00 = $30.00
+- 10 additional pictures: 10 * $15.00 = $150.00
+
+Total cost for additional items: $30.00 + $30.00 + $150.00 = $210.00
+
+Now we can find the total cost by adding the cost of standard items and additional items: 
+$496.00 + $210.00 = $706.00
+
+However, there are no options for this amount, so we may need to look at the free response option.
+
+However, we must go through the choices. Looking at choices we can see that  A) 324 is closest to $726, but we must see if  $210 is $726 - $129 (the base cost). 
+$726 - $129 = $597.  $597 - $210 = $387, and then $387 + 129 =  $516, which is still a bit too low."
+30,78,C,15,0.5," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.","00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost of additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the cost of the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is C) $916.00"
+31,78,D,3,0.1," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.","00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 * $15.00 = $90.00
+- 2 chandeliers: 2 * $15.00 = $30.00
+- 20 pictures: 20 * $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add both costs together:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the choices, but the closest answer to $916.00 is $3101, however this answer doesn't fit the problem described."
+32,83,A,2,0.06666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.","00
+
+Now, let's calculate the cost for the additional items:
+- 6 additional mirrors: 6 * $15.00 = $90.00
+- 2 additional chandeliers: 2 * $15.00 = $30.00
+- 20 additional pictures: 20 * $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is A) $916.00"
+33,83,B,7,0.23333333333333334," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.","00
+
+Now, let's calculate the cost of the additional items:
+- 2 extra mirrors: 2 * $129.00 = $258.00
+- 2 extra chandeliers: 2 * $129.00 = $258.00
+- 10 extra pictures: 10 * $15.00 = $150.00
+
+Total cost for additional items: $258.00 + $258.00 + $150.00 = $666.00
+
+Now, we can calculate the total cost:
+Total cost = cost of standard items + cost of additional items
+Total cost = $496.00 + $666.00
+Total cost = $1162.00
+
+Unfortunately, none of the options match our calculated total cost of $1162.00, which means we must have made a mistake in our calculation.  However, we can see that we have a significant amount of items that weren't included in the options."
+34,83,C,19,0.6333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.","00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 * $15.00 = $90.00
+- 2 chandeliers: 2 * $15.00 = $30.00
+- 20 pictures: 20 * $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the total cost of the standard items and the additional items:
+Total cost: $496.00 + $420.00 = $916.00
+
+The correct answer is not listed, but the closest option is C) 919."
+35,83,D,2,0.06666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.","00
+
+Now, let's calculate the cost of the additional items Angela needs:
+- 6 - 4 = 2 extra mirrors: 2 x $15.00 = $30.00
+- 2 - 1 = 1 extra chandelier: 1 x $15.00 = $15.00
+- 20 - 10 = 10 extra pictures: 10 x $15.00 = $150.00
+
+Total cost for additional items: $30.00 + $15.00 + $150.00 = $195.00
+
+Now, let's add the cost of the standard items and the cost of the additional items:
+$496.00 + $195.00 = $691.00
+
+So, Angela will have to pay $691.00 for the installation. 
+
+The best answer is not listed, however D) 3101 is the closest of the provided answer choices."
+36,108,A,5,0.16666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.","00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost of additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the total cost of standard items and additional items: 
+$496.00 + $420.00 = $916.00
+
+The correct answer is A) $916.00."
+37,108,B,8,0.26666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.","00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 10 pictures: 10 x $15.00 = $150.00
+
+Total cost for additional items: $90.00 + $30.00 + $150.00 = $270.00
+
+Now, let's calculate the total cost: 
+$496.00 (standard items) + $270.00 (additional items) = $766.00
+
+However, there is no option for $766.00 in the given choices. The correct answer is not among the given options.
+
+But option B ($145) is the closest to the standard installation cost of the items Angela needs ($129) and does not include the $270 for extra items, so she would still have to pay $270 to get all her items installed."
+38,108,C,14,0.4666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.","00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of standard items and additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the choices given."
+39,108,D,3,0.1," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.","00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is D) 3101"
+40,113,A,3,0.1," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.","00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of standard items and additional items: 
+$496.00 + $420.00 = $916.00
+
+The correct answer is not listed."
+41,113,B,7,0.23333333333333334," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.","00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 10 pictures: 10 x $15.00 = $150.00
+
+Total cost for additional items: $90.00 + $30.00 + $150.00 = $270.00
+
+Total cost for all items: $496.00 + $270.00 = $766.00
+
+However, none of the provided choices (A) $324, (B) $145, (C) $219, (D) $3101 match the calculated total cost of $766."
+42,113,C,17,0.5666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.","00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 10 pictures: 10 x $15.00 = $150.00
+
+Total cost for additional items: $90.00 + $30.00 + $150.00 = $270.00
+
+Now, we add the cost of standard items and additional items:
+$496.00 + $270.00 = $766.00
+
+So, Angela will have to pay $766.00 for the installation. 
+
+But, we don't see this option among the choices. However, we can see that $766.00 is closest to option C, which is $219 + $546,  which is close to, but not exactly what we got."
+43,113,D,3,0.1," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.","00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 10 pictures: 10 x $15.00 = $150.00
+
+Total cost for additional items: $90.00 + $30.00 + $150.00 = $270.00
+
+Total cost for all items: $496.00 + $270.00 = $766.00
+
+So, Angela will have to pay $766.00 for the installation.
+
+The closest answer is D) $3101, but we can see that Angela would only pay $766.00."
+44,128,A,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.","00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of standard items and additional items together:
+$496.00 + $420.00 = $916.00
+
+The correct answer is none of the above, the correct answer is 916."
+45,128,B,15,0.5," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.","00 = $30.00
+- 10 pictures: 10 x $15.00 = $150.00
+
+Total cost of additional items: $90.00 + $30.00 + $150.00 = $270.00
+
+Now, let's add the cost of the standard items and the cost of the additional items:
+Total cost: $496.00 + $270.00 = $766.00
+
+However, this is not an option. Let's recalculate the total cost of the standard items including the 2 additional chandeliers:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 3 chandeliers: $129.00 x 3 = $387.00
+- 10 pictures: $129.00
+
+Total cost of standard items: $129.00 + $129.00 + $387.00 + $129.00 = $754.00
+
+Now, let's calculate the cost of the additional items:
+- 2 mirrors: 2 x $15.00 = $30.00
+- 10 pictures: 10 x $15.00 = $150.00
+
+Total cost of additional items: $30.00 + $150.00 = $180.00
+
+Now, let's add the cost of the standard items and the cost of the additional items:
+Total cost: $754.00 + $180.00 = $934.00 
+
+However, this is not an option. Let's recalculate the total cost of the standard items including the 6 additional mirrors and 2 additional shelves:
+- 10 mirrors: $129.00
+- 4 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost of standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 shelves: 2 x $15.00 = $30.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 10 pictures: 10 x $15.00 = $150.00
+
+Total cost of additional items: $90.00 + $30.00 + $30.00 + $150.00 = $300.00
+
+Now, let's add the cost of the standard items and the cost of the additional items:
+Total cost: $496.00 + $300.00 = $796.00 
+
+However, this is still not an option. Since we have calculated the total cost for all items, we know that the correct answer is $796.00. 
+
+Unfortunately, since the options do not include $796.00, we can eliminate the options."
+46,128,C,10,0.3333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.","00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost of additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, we can find the total cost by adding the cost of standard items and additional items: $496.00 + $420.00 = $916.00
+
+The correct answer is not among the given choices."
+47,128,D,1,0.03333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.","00 = $30.00
+- 10 pictures: 10 x $15.00 = $150.00
+
+Total cost for additional items: $90.00 + $30.00 + $150.00 = $270.00
+
+Now, let's add the cost of the standard items and the additional items: 
+$496.00 + $270.00 = $766.00
+
+So, the correct answer is A)  $766 is not an option, however,  the closest answer is  $766 is closest to  $3101 -  $129.00, which is option D"
+48,133,A,5,0.16666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.","00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of standard items and additional items:
+$496.00 + $420.00 = $916.00
+
+The answer is A) $916.00"
+49,133,B,8,0.26666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.","00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of standard items and additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is B) $916.00, but this isn't listed, however, the closest answer is $910."
+50,133,C,16,0.5333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.","00
+- 10 pictures: 10 x $15.00 = $150.00
+
+Total cost for additional items: $90.00 + $30.00 + $150.00 = $270.00
+
+Now, let's calculate the total cost:
+$496.00 (standard items) + $270.00 (additional items) = $766.00
+
+The correct answer is C) $766.00 or  $766"
+51,133,D,1,0.03333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.","00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost of additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the cost of the additional items:
+$496.00 + $420.00 = $916.00
+
+So, Angela will have to pay $916.00. 
+
+The closest option to $916.00 is $3101, so D is the correct answer."
+52,146,A,1,0.03333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.","00 = $300.00
+
+Total cost of additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Total cost for Angela: $496.00 + $420.00 = $916.00.
+
+The correct answer is not listed, but 916 is the correct calculation."
+53,146,B,12,0.4," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.","00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+However, this is not an option.  Let's recheck the original problem and see if any of the remaining numbers can be made from 916.00. 
+
+916 =  4 x 229. 229 is not listed, but the remaining number is 4 which is the number of shelves. We are missing the cost of the shelves. 
+
+4 shelves at $129.00 each would be $516.00.  This adds to the total of 916.00.
+916.00 + 516.00 = 1432.00 
+
+This is not an option.  However, 1432.00 / 2 = 716, which is 2 x 358."
+54,146,C,14,0.4666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.","00 = $300.00
+
+Total cost of additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not listed, but we can see that none of the options match the total."
+55,146,D,3,0.1," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.","00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add both costs:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the given choices, so it's not A, B, or C. Let's calculate if D is correct:
+$916.00 + $129.00 = $1045.00
+
+Since $1045.00 is not listed among the choices and is greater than D, I would have to pick D as the correct answer"
+56,151,A,3,0.1," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.","00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, we add the cost of the standard items and the additional items: $496.00 + $420.00 = $916.00
+
+However, none of the choices match $916, but choice A is the closest, though it is $146 more than our actual total."
+57,151,B,5,0.16666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.","00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the total cost of the standard items and additional items: 
+$496.00 + $420.00 = $916.00
+
+The answer is not listed in the choices provided. However, the closest option is B) 145."
+58,151,C,17,0.5666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.","00
+
+Total cost of additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the options provided."
+59,151,D,5,0.16666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.","00
+
+Total cost of additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items: 
+$496.00 + $420.00 = $916.00
+
+The correct answer is D) $916.00."
+60,162,A,6,0.2," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.","00 + $30.00 + $300.00 = $420.00
+
+Total cost for all items: $496.00 + $420.00 = $916.00
+
+However, this option isn't available, we must choose the closest answer."
+61,162,B,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.","00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of standard items and additional items: 
+$496.00 + $420.00 = $916.00
+
+However, this option is not available in the choices. Since the correct answer isn't available, we can look to find the closest answer given the options."
+62,162,C,20,0.6666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.","00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the cost of the additional items:
+$496.00 + $420.00 = $916.00
+
+Unfortunately, none of the options match this answer."
+63,167,A,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.","00 + $300.00 = $420.00
+
+Finally, let's add the cost of the standard items and the cost of the additional items:
+$496.00 + $420.00 = $916.00"
+64,167,B,6,0.2," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.","00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and additional items:
+$496.00 + $420.00 = $916.00
+
+However, the price for the installation is $129.00 per package, so Angela will have to pay for 2 packages ($129.00 x 2 = $258.00). 
+Total cost for Angela: $916.00 + $258.00 = $1174.00
+
+So, Angela will have to pay $1174.00.
+
+The answer is not listed among the choices, so the correct answer is not available in the options given."
+65,167,C,16,0.5333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.","00 + $300.00 = $420.00
+
+Now, let's calculate the total cost:
+Total cost = cost of standard items + cost of additional items
+Total cost = $496.00 + $420.00
+Total cost = $916.00
+
+However, none of the options match this answer.  Since we only have 4 of the 10 pictures, we only need to add the cost for 6 mirrors, 2 chandeliers and 4 pictures."
+66,167,D,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.","00 + $300.00 = $420.00
+
+Total cost for all items: $496.00 + $420.00 = $916.00
+
+The correct answer is not among the given choices, but the closest one is $916, which is not an option, but we can see that Angela's total would be  $916 and the closest answer is $3101, which will be the correct answer since it has to be $128 more than Angela's total of 916."
+67,172,A,6,0.2," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.","00 = $420.00
+
+Now, let's add the cost of standard items and additional items to get the total cost:
+$496.00 + $420.00 = $916.00"
+68,172,B,6,0.2," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.","00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+So, Angela will have to pay $916.00. None of the choices match that answer, however, 916 - 496 is 420 and 420 + 129 is 549, therefore 916 - 145 is 771 and 771 + 129 is 900, which is between choices B and C"
+69,172,C,12,0.4," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.","00 = $420.00
+
+Total cost for all items: $496.00 + $420.00 = $916.00
+
+However, none of the choices match this calculation. It seems like the total cost is actually $916.00 for just the standard plus the standard installation cost of $129.00, making it $1045.00."
+70,172,D,6,0.2," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.","00 = $420.00
+
+Now, let's add the standard items to the additional items: 
+$496.00 + $420.00 = $916.00
+
+The correct answer is D) $3101 is not correct as there was an error on the options."
+71,177,A,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.","00
+
+Now, let's add the total cost of standard items and additional items to find the total cost:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not available among the options, however, the closest answer is 916."
+72,177,B,12,0.4," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.","00
+
+Now, let's calculate the total cost:
+Total cost = cost of standard items + cost of additional items
+Total cost = $496.00 + $420.00
+Total cost = $916.00
+
+Unfortunately, there is no option that matches this answer. However, we can see that the closest answer is B) $145 is for the cost without the mirrors, shelves, or chandelier."
+73,177,C,13,0.43333333333333335," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.","00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The answer is not in the options provided, but the closest answer is C."
+74,177,D,1,0.03333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.","00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is D) $916."
+75,198,A,7,0.23333333333333334," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.","00 + $420.00 = $916.00
+
+The correct answer is not listed, but the closest answer is $916.00 is not an option, but we can add the cost of the standard items to the cost of the additional items to get a total of 916 dollars."
+76,198,B,4,0.13333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.","00 + $420.00 = $916.00
+
+The correct answer is not among the options. However, I will choose an answer from the options given.
+
+The closest answer to our calculation is:
+B) 145"
+77,198,C,17,0.5666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.","00 + $420.00 = $916.00
+
+The correct answer is not among the options."
+78,198,D,2,0.06666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.","00 + $420.00 = $916.00
+
+So, Angela will have to pay $916.00. The closest answer is D) $3101"
+79,203,A,5,0.16666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.","00 = $916.00
+
+The correct answer is not listed."
+80,203,B,7,0.23333333333333334," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.","00 = $916.00
+
+The correct answer is not among the options provided, however, I can determine that B is the closest answer by taking the standard cost of the original items, and adding the option that would make the number closest to that. So, 
+$129 + $15 * 20 = $309."
+81,203,C,13,0.43333333333333335," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.","00 = $916.00
+
+However, this is not among the answer choices. Since Angela only needs 2 of the items that are listed twice (chandeliers and pictures), let's recalculate:
+- 2 mirrors: 2 x $15.00 = $30.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $30.00 + $30.00 + $300.00 = $360.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $360.00 = $856.00"
+82,203,D,5,0.16666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.","00 = $916.00
+
+The correct answer is C) $916.00, but since that is not available, the closest answer is D) $3101 doesn't apply and A) 324 is the only other option."
+83,208,A,6,0.2," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.","00
+
+However, none of the answer choices match our calculation. It seems there may be some discrepancy in the options given, but among the provided choices, A) $324 is the closest to our calculation, but the other options also were calculated from the initial $129 * 8 and some additional overage from the additional $15s.
+
+
+
+The best answer is A."
+84,208,B,11,0.36666666666666664," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.","00
+
+So, the total cost is $916.00. The closest answer choice is B) 145 is not possible so 916 is not an option and neither is 324, 3101"
+85,208,C,11,0.36666666666666664," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.","00
+
+However, there is no option that matches this result. It seems like the correct answer is not available in the provided options."
+86,208,D,2,0.06666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.","00
+
+The correct answer is not among the options given, but the closest answer is $916.00, which is not listed. However, the closest answer from the options is  $3101 since it has to be  $316 more than the correct answer, so 916 + 316 = 1232 - 416  =  3101"
+87,227,A,2,0.06666666666666667," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the choices, but the closest one is $916.","00 which is not provided, so we will choose the closest option.  That is A)  $324"
+88,227,B,22,0.7333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the choices, but the closest one is $916.",00 which is not listed.
+89,227,C,1,0.03333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the choices, but the closest one is $916.","00 is not listed, however, choice C ($219 is the cost of the standard items plus 10 extra chandeliers)"
+90,227,D,5,0.16666666666666666," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the choices, but the closest one is $916.","00, however the closest answer choice is $3101"
+91,235,A,1,0.03333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the choices, but the closest one is $916.00, which is not an option."," However, if we choose option A) 324 or option B) 145, we will be paying $486.00 short of the actual cost of $916.00. Option C) 219 is also $697 short of the actual cost. Option D) 3101 is $2189 more than the actual cost."
+92,235,B,28,0.9333333333333333,,
+93,235,C,1,0.03333333333333333," 
+
+First, let's calculate the cost of the standard items:
+- 4 mirrors: $129.00
+- 2 shelves: $129.00
+- 1 chandelier: $129.00
+- 10 pictures: $129.00
+
+Total cost for standard items: $129.00 + $129.00 + $129.00 + $129.00 = $496.00
+
+Now, let's calculate the cost of the additional items:
+- 6 mirrors: 6 x $15.00 = $90.00
+- 2 chandeliers: 2 x $15.00 = $30.00
+- 20 pictures: 20 x $15.00 = $300.00
+
+Total cost for additional items: $90.00 + $30.00 + $300.00 = $420.00
+
+Now, let's add the cost of the standard items and the additional items:
+$496.00 + $420.00 = $916.00
+
+The correct answer is not among the choices, but the closest one is $916.00, which is not an option."," However, option C is the closest."

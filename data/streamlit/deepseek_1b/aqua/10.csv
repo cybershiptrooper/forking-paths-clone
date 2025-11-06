@@ -1,0 +1,4043 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,39,A,10,0.5,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price."," This means the selling price is the cost price plus 40% of the cost price. 
+
+Mathematically, this can be expressed as:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, the selling price minus the cost price equals $20.00:
+\[
+1.40C - C = 20
+\]
+Simplifying this equation:
+\[
+0.40C = 20
+\]
+To find the cost price, divide both sides by 0.40:
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Finally, calculate the selling price by multiplying the cost price by 1.40:
+\[
+1.40 \times 50 = 70
+\]
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Define the Variables:**
+   - Let \( C \) be the **cost price** of the appliance.
+   - The **selling price** is **40% above the cost price**.
+
+2. **Express the Selling Price:**
+   \[
+   \text{Selling Price} = C + 0.40C = 1.40C
+   \]
+
+3. **Determine the Gross Profit:**
+   - The **gross profit** is given as $20.00.
+   - This means:
+     \[
+     \text{Selling Price} - \text{Cost Price} = \text{Gross Profit}
+     \]
+     \[
+     1.40C - C = 20
+     \]
+     \[
+     0.40C = 20
+     \]
+
+4. **Solve for \( C \):**
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+5. **Calculate the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times 50 = 70
+   \]
+
+**Final Answer:** \(\boxed{70.00}\)"
+1,39,B,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price."," This means the selling price is \( C + 40\% \) of \( C \), which simplifies to \( 1.40C \).
+
+The selling price is given as $91.00. Therefore, I can set up the equation:
+\[
+1.40C = 91.00
+\]
+
+To find the cost price \( C \), I'll divide both sides of the equation by 1.40:
+\[
+C = \frac{91.00}{1.40} = 65.00
+\]
+
+Finally, to find the selling price, I'll add the markup to the cost price:
+\[
+65.00 + 26.00 = 91.00
+\]
+
+So, the retailer sold the appliance for $91.00.
+</think>
+
+Let's determine the selling price of the appliance step by step.
+
+**Let:**
+- \( C \) = Cost Price
+- \( S \) = Selling Price
+- **Gross Profit** = \$20.00
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on its cost price.
+- The **gross profit** is **\$20.00**.
+
+**Step 1: Express the Selling Price in Terms of Cost**
+
+Since the markup is 40%, the selling price \( S \) can be expressed as:
+\[
+S = C + 40\% \times C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The gross profit is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C
+\]
+\[
+20 = S - C
+\]
+
+**Step 3: Substitute the Expression for \( S \) into the Profit Equation**
+
+From Step 1, \( S = 1.40C \). Substitute this into the profit equation:
+\[
+20 = 1.40C - C
+\]
+\[
+20 = 0.40C
+\]
+
+**Step 4: Solve for the Cost Price \( C \)**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 5: Calculate the Selling Price \( S \)**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{91.00}
+\]"
+2,39,D,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price."," This means the selling price \( S \) is:
+
+\[
+S = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+
+\[
+S - C = 20.00
+\]
+
+Substituting the expression for \( S \):
+
+\[
+1.40C - C = 20.00
+\]
+
+Simplifying:
+
+\[
+0.40C = 20.00
+\]
+
+Solving for \( C \):
+
+\[
+C = \frac{20.00}{0.40} = 50.00
+\]
+
+Finally, substituting \( C = 50.00 \) back into the selling price equation:
+
+\[
+S = 1.40 \times 50.00 = 70.00
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Define the Cost Price:**
+   Let the cost price be \( C \).
+
+2. **Determine the Selling Price:**
+   The retailer sold the appliance at a **40% markup** on the cost price. Therefore, the selling price \( S \) is:
+   \[
+   S = C + 0.40C = 1.40C
+   \]
+
+3. **Calculate the Gross Profit:**
+   The gross profit is given as $20.00. The gross profit is the difference between the selling price and the cost price:
+   \[
+   S - C = 20.00
+   \]
+   Substituting \( S \) from step 2:
+   \[
+   1.40C - C = 20.00
+   \]
+   \[
+   0.40C = 20.00
+   \]
+
+4. **Solve for \( C \):**
+   \[
+   C = \frac{20.00}{0.40} = 50.00
+   \]
+
+5. **Find the Selling Price:**
+   \[
+   S = 1.40 \times 50.00 = 70.00
+   \]
+
+Therefore, the retailer sold the appliance for \(\boxed{D}\) \(\$70.00\)."
+3,79,A,8,0.4,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.","40 \times C = 1.40 \times C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40 \times C - C = 20
+\]
+
+Simplifying this equation:
+\[
+0.40 \times C = 20
+\]
+
+Solving for \( C \):
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Finally, the selling price is:
+\[
+1.40 \times 50 = 70
+\]
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- The retailer sold an appliance at a 40% markup over the cost price.
+- The gross profit is \$20.00.
+
+**Let:**
+- \( C \) = Cost price
+- \( S \) = Selling price
+
+**Step 1: Express the Selling Price in Terms of the Cost Price**
+
+A 40% markup means the selling price is 100% + 40% = 140% of the cost price.
+
+\[
+S = C + 0.40 \times C = 1.40 \times C
+\]
+
+**Step 2: Express the Gross Profit**
+
+Gross profit is the difference between the selling price and the cost price.
+
+\[
+\text{Gross Profit} = S - C
+\]
+\[
+20 = S - C
+\]
+
+**Step 3: Substitute \( S \) from Step 1 into the Gross Profit Equation**
+
+\[
+20 = 1.40C - C
+\]
+\[
+20 = 0.40C
+\]
+
+**Step 4: Solve for \( C \)**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 5: Find the Selling Price \( S \)**
+
+\[
+S = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+
+The retailer sold the appliance for \(\boxed{70.00}\)."
+4,79,B,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.","40C = 1.40C
+\]
+
+It's also given that the gross profit is $20.00. Gross profit is the difference between the selling price and the cost price, so:
+\[
+\text{Selling Price} - C = 20.00
+\]
+
+Substituting the expression for the selling price into the gross profit equation:
+\[
+1.40C - C = 20.00
+\]
+\[
+0.40C = 20.00
+\]
+
+Solving for \( C \):
+\[
+C = \frac{20.00}{0.40} = 50.00
+\]
+
+Finally, the selling price is:
+\[
+1.40 \times 50.00 = 70.00
+\]
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Understand the Problem:**
+   - The retailer sold the appliance at a **40% markup** on the **cost price**.
+   - The **gross profit** is **$20.00**.
+   - We need to find the **selling price**.
+
+2. **Set Up the Equation:**
+   - Let the **cost price** be \( C \).
+   - A **40% markup** means the selling price is **140%** of the cost price.
+     \[
+     \text{Selling Price} = C + 0.40C = 1.40C
+     \]
+   - The **gross profit** is the difference between the selling price and the cost price:
+     \[
+     \text{Selling Price} - C = 20.00
+     \]
+     Substituting the expression for the selling price:
+     \[
+     1.40C - C = 20.00
+     \]
+     \[
+     0.40C = 20.00
+     \]
+
+3. **Solve for the Cost Price (\( C \)):**
+   \[
+   C = \frac{20.00}{0.40} = 50.00
+   \]
+
+4. **Calculate the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times 50.00 = 70.00
+   \]
+
+5. **Final Answer:**
+   \[
+   \boxed{70.00}
+   \]"
+5,79,D,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.","4 \times C = 1.4C
+\]
+
+It's given that the gross profit, which is the difference between the selling price and the cost price, is $20.00. Therefore:
+\[
+1.4C - C = 20
+\]
+
+Simplifying the equation:
+\[
+0.4C = 20
+\]
+\[
+C = \frac{20}{0.4} = 50
+\]
+
+The cost price of the appliance is $50.00.
+
+Finally, I'll calculate the selling price by multiplying the cost price by 1.4:
+\[
+\text{Selling Price} = 1.4 \times 50 = 70
+\]
+
+The retailer sold the appliance for $70.00.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- The retailer sold an appliance at a 40% markup on the cost price.
+- The gross profit was **\$20.00**.
+
+**Let’s define:**
+- **\( C \)** = Cost Price of the appliance.
+
+**Understanding the markup:**
+- A 40% markup means the selling price is **140%** of the cost price (100% + 40%).
+- Therefore, the selling price (\( S \)) can be written as:
+  \[
+  S = C + 0.4C = 1.4C
+  \]
+
+**Formulating the equation for Gross Profit:**
+- Gross Profit = Selling Price - Cost Price
+  \[
+  20 = S - C
+  \]
+- Substitute \( S = 1.4C \) into the equation:
+  \[
+  20 = 1.4C - C
+  \]
+  \[
+  20 = 0.4C
+  \]
+  
+**Solving for \( C \):**
+\[
+C = \frac{20}{0.4} = 50
+\]
+
+**Calculating the Selling Price:**
+\[
+S = 1.4C = 1.4 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]
+
+**Answer:** \boxed{D}"
+6,86,A,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.","40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40}
+\]
+\[
+C = 50
+\]
+
+Now, substituting the cost price back into the selling price equation:
+\[
+\text{Selling Price} = 1.40 \times 50 = 70
+\]
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- The retailer sold an appliance at a 40% markup on the cost price.
+- The gross profit was \$20.00.
+
+**Let:**
+- \( C \) = Cost price
+- \( S \) = Selling price
+
+**Step 1: Express the Selling Price in Terms of Cost**
+
+Since the markup is 40% of the cost price:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The gross profit is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substitute \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for \( C \) (Cost Price)**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+7,86,B,14,0.7,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.","40C
+\]
+
+The problem states that the gross profit, which is the difference between the selling price and the cost price, is $20.00. So I can set up the equation:
+\[
+1.40C - C = 20
+\]
+
+Simplifying the equation:
+\[
+0.40C = 20
+\]
+
+To find the cost price \( C \), I'll divide both sides by 0.40:
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now that I have the cost price, I can calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information provided step by step.
+
+1. **Understanding the Markup:**
+   - The retailer sold the appliance **40% above cost price (CP)**.
+   - This means the selling price (SP) is **140% of the cost price**.
+   \[
+   SP = CP \times (1 + 40\%) = 1.40 \times CP
+   \]
+
+2. **Calculating Cost Price (CP):**
+   - The **gross profit** is the difference between the selling price and the cost price.
+   \[
+   \text{Gross Profit} = SP - CP = 20
+   \]
+   - Substituting the expression for SP from step 1:
+   \[
+   1.40 \times CP - CP = 20
+   \]
+   \[
+   0.40 \times CP = 20
+   \]
+   - Solving for CP:
+   \[
+   CP = \frac{20}{0.40} = 50
+   \]
+
+3. **Finding the Selling Price (SP):**
+   - Now that we know the cost price (\( CP = \$50 \)), we can find the selling price:
+   \[
+   SP = 1.40 \times CP = 1.40 \times 50 = 70
+   \]
+
+4. **Conclusion:**
+   - The retailer sold the appliance for:
+   \[
+   \boxed{\$70.00}
+   \]"
+8,102,A,4,0.2,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.","00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+Simplifying this gives:
+\[
+0.40C = 20
+\]
+Solving for \( C \):
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Finally, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+1.40 \times 50 = 70
+\]
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Understand the Problem:**
+   - The retailer sold the appliance for **40% above cost**.
+   - This selling price represented a **gross profit** of **\$20.00**.
+
+2. **Define the Cost Price:**
+   - Let \( C \) be the cost price of the appliance.
+
+3. **Express the Selling Price:**
+   - Selling Price = Cost Price + 40% of Cost Price
+   \[
+   \text{Selling Price} = C + 0.40C = 1.40C
+   \]
+
+4. **Calculate the Gross Profit:**
+   - Gross Profit = Selling Price - Cost Price
+   \[
+   20 = 1.40C - C
+   \]
+   \[
+   20 = 0.40C
+   \]
+
+5. **Solve for \( C \):**
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+6. **Determine the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times 50 = 70
+   \]
+
+**Final Answer:**
+\[
+\boxed{70.00}
+\]"
+9,102,B,11,0.55,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.","00, I'll set up the profit equation:
+\[
+1.40C - C = 20.00
+\]
+\[
+0.40C = 20.00
+\]
+
+Solving for \( C \):
+\[
+C = \frac{20.00}{0.40} = 50.00
+\]
+
+Finally, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 1.40 \times 50.00 = 70.00
+\]
+
+The retailer sold the appliance for $70.00.
+</think>
+
+Let's determine the selling price of the appliance step by step.
+
+**Let:**
+- \( C \) = Cost price of the appliance
+- \( S \) = Selling price
+
+**Given:**
+- The retailer sold the appliance at **40% above cost**.
+- The **gross profit** is **\$20.00**.
+
+**Step 1: Express Selling Price in Terms of Cost**
+
+If the retailer sold the appliance at 40% above cost, then:
+
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Cost and Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+
+\[
+\text{Gross Profit} = S - C = 20.00
+\]
+
+Substitute \( S \) from Step 1:
+
+\[
+1.40C - C = 20.00
+\]
+\[
+0.40C = 20.00
+\]
+
+**Step 3: Solve for Cost Price \( C \)**
+
+\[
+C = \frac{20.00}{0.40} = 50.00
+\]
+
+**Step 4: Calculate Selling Price \( S \)**
+
+\[
+S = 1.40 \times 50.00 = 70.00
+\]
+
+**Final Answer:**
+
+The retailer sold the appliance for \(\boxed{\$70.00}\)."
+10,102,D,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.","00, I know that:
+\[
+\text{Selling Price} - C = 20.00
+\]
+\[
+1.40C - C = 20.00
+\]
+\[
+0.40C = 20.00
+\]
+\[
+C = \frac{20.00}{0.40} = 50.00
+\]
+
+Now, substituting \( C = 50.00 \) into the selling price equation:
+\[
+\text{Selling Price} = 1.40 \times 50.00 = 70.00
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information provided:
+
+1. **Cost Price (C):**
+   - Let \( C \) be the cost price of the appliance.
+
+2. **Profit and Markup:**
+   - The retailer sold the appliance at a **40% markup** on the cost price.
+   - This means the selling price is **140% of the cost price**.
+   - Mathematically, this can be expressed as:
+     \[
+     \text{Selling Price} = C + 0.40C = 1.40C
+     \]
+
+3. **Gross Profit:**
+   - The gross profit is given as \$20.00.
+   - Gross profit is calculated as:
+     \[
+     \text{Selling Price} - C = 20.00
+     \]
+   - Substituting the selling price equation:
+     \[
+     1.40C - C = 20.00
+     \]
+     \[
+     0.40C = 20.00
+     \]
+     \[
+     C = \frac{20.00}{0.40} = 50.00
+     \]
+
+4. **Calculating the Selling Price:**
+   - Now, substitute \( C = 50.00 \) back into the selling price equation:
+     \[
+     \text{Selling Price} = 1.40 \times 50.00 = 70.00
+     \]
+
+Therefore, the retailer sold the appliance for \(\boxed{D}\) **\$70.00**."
+11,116,A,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.","40C - C = 20.00
+\]
+Simplifying this:
+\[
+0.40C = 20.00
+\]
+Solving for \( C \):
+\[
+C = \frac{20.00}{0.40} = 50.00
+\]
+
+Finally, the selling price is:
+\[
+1.40 \times 50.00 = 70.00
+\]
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Define Variables:**
+   - Let \( C \) be the cost price of the appliance.
+
+2. **Understand the Selling Price:**
+   - The retailer sold the appliance at a **40% markup** on the cost price.
+   - This means the selling price is **140%** of the cost price.
+
+3. **Express the Selling Price:**
+   \[
+   \text{Selling Price} = C + 0.40C = 1.40C
+   \]
+
+4. **Set Up the Equation Using Gross Profit:**
+   - The gross profit is the difference between the selling price and the cost price.
+   \[
+   \text{Selling Price} - C = 20.00
+   \]
+   \[
+   1.40C - C = 20.00
+   \]
+
+5. **Simplify and Solve for \( C \):**
+   \[
+   0.40C = 20.00
+   \]
+   \[
+   C = \frac{20.00}{0.40} = 50.00
+   \]
+
+6. **Calculate the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times 50.00 = 70.00
+   \]
+
+7. **Final Answer:**
+   \[
+   \boxed{70.00}
+   \]"
+12,116,B,8,0.4,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.","40C - C = 20
+\]
+Simplifying this, I get:
+\[
+0.40C = 20
+\]
+Solving for \( C \), I find:
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+Let's determine the selling price of the appliance step by step.
+
+1. **Define the Variables:**
+   - Let \( C \) be the cost price of the appliance.
+   - The selling price is \( 40\% \) above the cost price, which means the selling price is \( 140\% \) of the cost price.
+   - The gross profit is \$20.00.
+
+2. **Set Up the Equation:**
+   - The selling price can be expressed as:
+     \[
+     \text{Selling Price} = C + \text{Profit} = C + 20
+     \]
+   - Since the selling price is also \( 140\% \) of the cost price:
+     \[
+     \text{Selling Price} = 1.40C
+     \]
+
+3. **Equate the Two Expressions for Selling Price:**
+   \[
+   1.40C = C + 20
+   \]
+   
+4. **Solve for \( C \):**
+   \[
+   1.40C - C = 20 \\
+   0.40C = 20 \\
+   C = \frac{20}{0.40} = 50
+   \]
+   
+5. **Calculate the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times 50 = 70
+   \]
+
+**Final Answer:** \(\boxed{\$70.00}\)"
+13,116,D,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.","40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now that I know the cost price is $50, I can find the selling price:
+\[
+1.40 \times 50 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Define Variables:**
+   - Let \( C \) be the **cost price** of the appliance.
+   - The **retailer** sold the appliance at **40% above cost**, which means the selling price is **140% of the cost price**.
+
+2. **Set Up the Equation for Selling Price:**
+   \[
+   \text{Selling Price} = C + 0.40C = 1.40C
+   \]
+
+3. **Use the Given Gross Profit:**
+   \[
+   \text{Gross Profit} = \text{Selling Price} - \text{Cost Price} = 1.40C - C = 0.40C
+   \]
+   Given that the gross profit is \$20.00:
+   \[
+   0.40C = 20
+   \]
+
+4. **Solve for \( C \):**
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+5. **Calculate the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times 50 = 70
+   \]
+
+**Final Answer:**  
+The retailer sold the appliance for \(\boxed{D)\,\$70.00}\)."
+14,132,A,8,0.4,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.","40C = 20
+\]
+
+Solving for \( C \), I find:
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Finally, the selling price is:
+\[
+1.40 \times 50 = 70
+\]
+</think>
+
+To determine the selling price of the appliance, let's break down the information provided step by step.
+
+1. **Understanding the Markup:**
+   - The retailer sold the appliance at a **40% markup** on the cost price.
+   - This means the selling price is **140%** of the cost price.
+
+2. **Setting Up the Equation:**
+   - Let \( C \) be the cost price.
+   - The selling price can be expressed as:
+     \[
+     \text{Selling Price} = C + 0.40C = 1.40C
+     \]
+   - Given that the gross profit (which is the difference between selling price and cost) is \$20.00:
+     \[
+     \text{Selling Price} - C = 20
+     \]
+     \[
+     1.40C - C = 20
+     \]
+     \[
+     0.40C = 20
+     \]
+
+3. **Solving for \( C \):**
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+4. **Calculating the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times 50 = 70
+   \]
+
+5. **Verification:**
+   - The markup on cost is indeed 40%, and the profit is \$20.00.
+
+Therefore, the retailer sold the appliance for:
+\[
+\boxed{70.00}
+\]"
+15,132,B,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.","40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, plugging the cost price back into the selling price equation:
+\[
+\text{Selling Price} = 1.40 \times 50 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+Let's determine the selling price of the appliance step by step.
+
+**Let:**
+- \( C \) = Cost price of the appliance
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the cost price.
+- The **gross profit** is **\$20.00**.
+
+**Step 1:** Express the selling price in terms of the cost price.
+
+Since the markup is 40%, the selling price (\( SP \)) is:
+\[
+SP = C + \text{Markup}
+\]
+\[
+SP = C + 0.40C = 1.40C
+\]
+
+**Step 2:** Relate the markup to the gross profit.
+
+The gross profit is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = SP - C = 1.40C - C = 0.40C
+\]
+\[
+0.40C = \$20.00
+\]
+\[
+C = \frac{\$20.00}{0.40} = \$50.00
+\]
+
+**Step 3:** Calculate the selling price using the cost price.
+
+\[
+SP = 1.40C = 1.40 \times \$50.00 = \$70.00
+\]
+
+**Final Answer:**  
+The retailer sold the appliance for \(\boxed{\$70.00}\)."
+16,132,D,7,0.35,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.","40C = 20
+\]
+
+Solving for \( C \):
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, substituting the cost price back into the selling price equation:
+\[
+\text{Selling Price} = 1.40 \times 50 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Define Variables:**
+   - Let \( C \) be the **cost price** of the appliance.
+   - The **retailer** sold the appliance at a **40% markup** on the cost price.
+
+2. **Express Selling Price:**
+   - A 40% markup means the selling price is 140% of the cost price.
+   \[
+   \text{Selling Price} = C + 0.40C = 1.40C
+   \]
+
+3. **Determine Gross Profit:**
+   - The gross profit is the difference between the selling price and the cost price.
+   \[
+   \text{Gross Profit} = \text{Selling Price} - C = 1.40C - C = 0.40C
+   \]
+   - Given that the gross profit is \$20.00:
+   \[
+   0.40C = 20
+   \]
+
+4. **Solve for \( C \):**
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+5. **Calculate the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times C = 1.40 \times 50 = 70
+   \]
+
+**Final Answer:**
+\[
+\boxed{D) \ $70.00}
+\]"
+17,154,A,7,0.35,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.","40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+1.40 \times 50 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information provided step by step.
+
+1. **Define the Cost Price (C):**
+   - Let \( C \) be the cost price of the appliance.
+
+2. **Determine the Selling Price (SP):**
+   - The retailer sold the appliance at a **40% markup** on the cost price.
+   - A 40% markup means the selling price is 140% of the cost price.
+   - Therefore, 
+     \[
+     SP = C + 0.40C = 1.40C
+     \]
+
+3. **Calculate the Gross Profit:**
+   - The gross profit is given as \$20.00.
+   - Gross Profit = Selling Price - Cost Price
+     \[
+     20 = SP - C
+     \]
+     \[
+     20 = 1.40C - C
+     \]
+     \[
+     20 = 0.40C
+     \]
+     \[
+     C = \frac{20}{0.40} = 50
+     \]
+
+4. **Find the Selling Price:**
+   - Now that we know \( C = \$50 \), we can find the selling price:
+     \[
+     SP = 1.40 \times 50 = 70
+     \]
+
+5. **Final Answer:**
+   - The retailer sold the appliance for \(\boxed{70}\) dollars."
+18,154,B,8,0.4,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.","40} = 50
+\]
+
+Now, substituting the cost price back into the selling price equation:
+\[
+\text{Selling Price} = 1.40 \times 50 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Understand the Problem:**
+   - The retailer sold an appliance at a 40% markup on the cost price.
+   - This markup resulted in a gross profit of \$20.00.
+
+2. **Define Variables:**
+   - Let \( C \) be the cost price of the appliance.
+   - The selling price (\( S \)) is calculated by adding a 40% markup to the cost price.
+
+3. **Set Up the Equation:**
+   - A 40% markup means the selling price is 140% of the cost price:
+     \[
+     S = C + 0.40C = 1.40C
+     \]
+   - The gross profit is the difference between the selling price and the cost price:
+     \[
+     S - C = \text{Gross Profit} = \$20.00
+     \]
+   - Plugging in the values:
+     \[
+     1.40C - C = 20
+     \]
+     \[
+     0.40C = 20
+     \]
+
+4. **Solve for \( C \):**
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+5. **Calculate the Selling Price:**
+   \[
+   S = 1.40 \times 50 = 70
+   \]
+
+6. **Final Answer:**
+   \[
+   \boxed{\$70.00}
+   \]"
+19,154,D,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.","40} = 50
+\]
+
+Now, substituting the cost price back into the selling price equation:
+\[
+\text{Selling Price} = 1.40 \times 50 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Define the Cost Price:**
+   
+   Let \( C \) be the cost price of the appliance.
+
+2. **Express the Selling Price:**
+   
+   The retailer sold the appliance at a 40% markup. This means the selling price is:
+   \[
+   \text{Selling Price} = C + 40\% \text{ of } C = 1.40C
+   \]
+
+3. **Calculate the Gross Profit:**
+   
+   The gross profit is the difference between the selling price and the cost price. Given that the gross profit is $20.00, we have:
+   \[
+   \text{Selling Price} - C = 20
+   \]
+   Substituting the expression for the selling price:
+   \[
+   1.40C - C = 20
+   \]
+   \[
+   0.40C = 20
+   \]
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+4. **Find the Selling Price:**
+   
+   Now, substitute \( C = 50 \) back into the selling price equation:
+   \[
+   \text{Selling Price} = 1.40 \times 50 = 70
+   \]
+
+5. **Final Answer:**
+   
+   The retailer sold the appliance for:
+   \[
+   \boxed{70.00}
+   \]
+   (Option D)"
+20,181,A,7,0.35,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.","40:
+\[
+1.40 \times 50 = 70
+\]
+
+Therefore, the selling price of the appliance was $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information provided:
+
+1. **Gross Profit:** 
+   - The gross profit is the difference between the selling price and the cost price.
+   - Given: Gross Profit = \$20.00
+
+2. **Markup Percentage:**
+   - The retailer sold the appliance at a 40% markup on the cost price.
+   - This means the selling price is 140% of the cost price.
+
+Let's denote:
+- \( C \) = Cost Price
+- \( S \) = Selling Price
+
+From the markup percentage:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is \$20.00:
+\[
+S - C = 20
+\]
+Substituting \( S \) from the markup equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, calculate the Selling Price (\( S \)):
+\[
+S = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+21,181,B,4,0.2,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.","40:
+\[
+\text{Selling Price} = 1.40 \times 50 = 70
+\]
+
+After evaluating the options provided, the selling price that matches my calculation is $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information given:
+
+1. **Gross Profit**: The retailer made a gross profit of **$20.00**.
+2. **Markup Percentage**: The selling price was set at **40% above the cost price**.
+
+Let's denote the **cost price** as \( C \).
+
+### Step-by-Step Solution:
+
+1. **Express the Selling Price in Terms of Cost Price:**
+   
+   The selling price is 40% above the cost price, so:
+   \[
+   \text{Selling Price} = C + 0.40C = 1.40C
+   \]
+
+2. **Relate Selling Price to Cost Price and Profit:**
+   
+   The gross profit is the difference between the selling price and the cost price:
+   \[
+   \text{Selling Price} - C = \text{Profit} = 20
+   \]
+   Substituting the selling price from above:
+   \[
+   1.40C - C = 20
+   \]
+   \[
+   0.40C = 20
+   \]
+
+3. **Solve for Cost Price (\( C \)):**
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+4. **Calculate the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times 50 = 70
+   \]
+
+### Final Answer:
+The retailer sold the appliance for \(\boxed{\$70.00}\)."
+22,181,D,9,0.45,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.","40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information provided:
+
+1. **Gross Profit Calculation:**
+   - The retailer sold the appliance at a 40% markup on its cost price.
+   - Let the cost price be \( C \).
+   - Selling Price = Cost Price + Markup
+   \[
+   \text{Selling Price} = C + 0.40C = 1.40C
+   \]
+
+2. **Gross Profit:**
+   - The gross profit is given as $20.00.
+   \[
+   \text{Selling Price} - C = 20
+   \]
+   \[
+   1.40C - C = 20
+   \]
+   \[
+   0.40C = 20
+   \]
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+3. **Calculate the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40 \times 50 = 70
+   \]
+
+**Final Answer:**
+
+\boxed{\text{D}) \$70.00}"
+23,202,A,10,0.5,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.","40 = 70
+\]
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Define Variables:**
+   - Let \( C \) be the **cost price** of the appliance.
+   - The selling price is given as **40% above the cost price**, which means the profit is 40% of \( C \).
+
+2. **Express the Selling Price:**
+   \[
+   \text{Selling Price} = C + 0.40C = 1.40C
+   \]
+
+3. **Calculate the Profit:**
+   \[
+   \text{Profit} = \text{Selling Price} - C = 1.40C - C = 0.40C
+   \]
+   Given that the profit is \$20.00:
+   \[
+   0.40C = 20
+   \]
+
+4. **Solve for \( C \):**
+   \[
+   C = \frac{20}{0.40} = 50
+   \]
+
+5. **Find the Selling Price:**
+   \[
+   \text{Selling Price} = 1.40C = 1.40 \times 50 = 70
+   \]
+
+Therefore, the retailer sold the appliance for \(\boxed{\$70.00}\)."
+24,202,B,4,0.2,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.","40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+Let's determine the selling price of the appliance step by step.
+
+**Step 1: Define the Variables**
+- Let \( C \) be the **cost price** of the appliance.
+- The **selling price** is **40% above the cost price**, which can be expressed as:
+  \[
+  \text{Selling Price} = C + 0.40C = 1.40C
+  \]
+
+**Step 2: Use the Given Gross Profit**
+- The **gross profit** is the difference between the selling price and the cost price:
+  \[
+  \text{Gross Profit} = \text{Selling Price} - C = 20.00
+  \]
+  Substituting the expression for the selling price:
+  \[
+  1.40C - C = 20.00
+  \]
+  \[
+  0.40C = 20.00
+  \]
+
+**Step 3: Solve for the Cost Price**
+\[
+C = \frac{20.00}{0.40} = 50.00
+\]
+
+**Step 4: Calculate the Selling Price**
+\[
+\text{Selling Price} = 1.40C = 1.40 \times 50.00 = 70.00
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+25,202,D,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.","40 = 70
+\]
+
+Finally, I'll check which option matches the selling price I calculated. The correct answer is $70.00.
+</think>
+
+To determine the selling price of the appliance, let's follow these steps:
+
+1. **Define the Cost Price:**
+   Let the cost price of the appliance be \( C \).
+
+2. **Understand the Selling Price:**
+   The retailer sold the appliance at a **40% markup** on the cost price. This means the selling price is 140% of the cost price.
+   
+   \[
+   \text{Selling Price} = C + 0.40C = 1.40C
+   \]
+
+3. **Express the Gross Profit:**
+   The **gross profit** is the difference between the selling price and the cost price:
+   
+   \[
+   \text{Gross Profit} = \text{Selling Price} - C = 1.40C - C = 0.40C
+   \]
+   
+   According to the problem, the gross profit is \$20.00:
+   
+   \[
+   0.40C = 20.00
+   \]
+
+4. **Solve for the Cost Price \( C \):**
+   
+   \[
+   C = \frac{20.00}{0.40} = 50.00
+   \]
+
+5. **Calculate the Selling Price:**
+   
+   \[
+   \text{Selling Price} = 1.40C = 1.40 \times 50.00 = 70.00
+   \]
+
+6. **Verify the Answer:**
+   - **Cost Price:** \$50.00
+   - **Markup:** 40% of \$50.00 = \$20.00
+   - **Selling Price:** \$50.00 + \$20.00 = \$70.00
+   - **Gross Profit:** \$70.00 - \$50.00 = \$20.00
+
+   All values align with the given information.
+
+**Final Answer:** \(\boxed{D}\)"
+26,223,A,11,0.55,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.","00.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- The retailer sold an appliance at a 40% markup on the cost price.
+- The gross profit was \$20.00.
+- We need to find the selling price.
+
+**Let:**
+- \( C \) = Cost price
+- \( S \) = Selling price
+
+**Understanding the markup:**
+- A 40% markup on the cost price means the selling price is 140% of the cost price.
+- Mathematically, this can be written as:
+  \[
+  S = C + 0.40C = 1.40C
+  \]
+
+**Expressing Gross Profit:**
+- Gross profit is the difference between the selling price and the cost price:
+  \[
+  \text{Gross Profit} = S - C = 0.40C
+  \]
+- We are given that the gross profit is \$20.00:
+  \[
+  0.40C = 20
+  \]
+- Solving for \( C \):
+  \[
+  C = \frac{20}{0.40} = 50
+  \]
+
+**Calculating the Selling Price:**
+- Now, substitute \( C = 50 \) back into the selling price equation:
+  \[
+  S = 1.40 \times 50 = 70
+  \]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+27,223,B,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.","00.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- Gross Profit = \$20.00
+- Markup = 40% of Cost Price
+
+**Let:**
+- Cost Price = \( C \)
+- Selling Price = \( S \)
+
+**Step 1: Understand the Markup**
+
+A markup of 40% on the cost price means the Selling Price is 40% more than the Cost Price.
+
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+Gross Profit is the difference between Selling Price and Cost Price.
+
+\[
+\text{Gross Profit} = S - C = 20
+\]
+
+Substitute \( S = 1.40C \) into the profit equation:
+
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+
+The retailer sold the appliance for \(\boxed{\$70.00}\)."
+28,223,D,4,0.2,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.","00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information provided:
+
+1. **Cost Price (C):** The cost price is the amount the retailer spent to purchase the appliance.
+
+2. **Selling Price (S):** The selling price is the price at which the retailer sold the appliance.
+
+3. **Gross Profit:** The profit made on the sale is \$20.00.
+
+The retailer sold the appliance at a **40% markup** on the cost price. This means the selling price is 140% of the cost price.
+
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+We also know that the gross profit is the difference between the selling price and the cost price:
+
+\[
+\text{Selling Price} - \text{Cost Price} = \$20.00
+\]
+
+Substituting the expression for selling price:
+
+\[
+1.40C - C = \$20.00
+\]
+\[
+0.40C = \$20.00
+\]
+\[
+C = \frac{\$20.00}{0.40} = \$50.00
+\]
+
+Now, calculate the selling price:
+
+\[
+\text{Selling Price} = 1.40 \times \$50.00 = \$70.00
+\]
+
+**Final Answer:**
+
+\[
+\boxed{D) \$70.00}
+\]"
+29,284,A,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.","00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of the Cost Price**
+
+Since the retailer sold the appliance at a 40% markup, the selling price is 140% of the cost price:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate the Selling Price to the Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 0.40C
+\]
+
+We are given that the gross profit is \$20.00:
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for the Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+30,284,B,9,0.45,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.","00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+
+**Step 1: Understand the Markup**
+A **40% markup** on the cost price means the selling price is **140%** of the cost price.
+
+Mathematically, this can be expressed as:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Markup and Profit**
+The gross profit is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = \text{Selling Price} - C
+\]
+Given that the gross profit is \$20.00:
+\[
+20 = 1.40C - C
+\]
+\[
+20 = 0.40C
+\]
+
+**Step 3: Solve for \( C \)**
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+Now, substitute \( C = 50 \) back into the selling price equation:
+\[
+\text{Selling Price} = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+The retailer sold the appliance for \(\boxed{70.00}\)."
+31,284,D,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.","00**.
+
+Let's denote:
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Understanding the Markup**
+
+A **40% markup** means the selling price is 40% more than the cost price. Mathematically, this can be expressed as:
+\[
+S = C + 0.40 \times C = 1.40 \times C
+\]
+
+**Step 2: Relating Profit to Markup**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+
+Substituting the expression for \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solving for Cost Price**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculating the Selling Price**
+
+\[
+S = 1.40 \times C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+The retailer sold the appliance for \(\boxed{D)\ 70.00}\)."
+32,360,A,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.","40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price and Gross Profit**
+
+The gross profit is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for the Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+33,360,B,11,0.55,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.","40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+S - C = \$20.00
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price \( C \)**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price \( S \)**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+34,360,D,3,0.15,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.","40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price and Profit**
+
+The gross profit is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 0.40C
+\]
+
+We are given that the gross profit is \$20.00:
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+\[
+S = 1.40C = 1.40 \times 50 = \boxed{\$70.00}
+\]
+
+**Final Answer:** \(\boxed{D}\)"
+35,367,A,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.","40C
+\]
+
+**Step 2: Utilize the Gross Profit Information**
+
+The gross profit is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C
+\]
+Given that the gross profit is \$20.00:
+\[
+20 = S - C
+\]
+Substitute \( S = 1.40C \) into the equation:
+\[
+20 = 1.40C - C
+\]
+\[
+20 = 0.40C
+\]
+
+**Step 3: Solve for the Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+36,367,B,8,0.4,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.","40C
+\]
+
+**Step 2: Relate Selling Price and Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C
+\]
+Given that the gross profit is \$20.00, we have:
+\[
+20 = S - C
+\]
+
+**Step 3: Substitute \( S \) from Step 1 into the Profit Equation**
+
+From Step 1, \( S = 1.40C \). Substitute this into the profit equation:
+\[
+20 = 1.40C - C
+\]
+\[
+20 = 0.40C
+\]
+
+**Step 4: Solve for \( C \) (Cost Price)**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 5: Calculate the Selling Price \( S \)**
+
+\[
+S = 1.40 \times C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+The retailer sold the appliance for \(\boxed{\$70.00}\)."
+37,367,D,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.","40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+
+The retailer sold the appliance for \(\boxed{D)\ $70.00}\)."
+38,367,E,1,0.05,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.","40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+Gross Profit is calculated as:
+\[
+\text{Gross Profit} = S - C
+\]
+Given that the gross profit is \$20.00:
+\[
+20 = 1.40C - C
+\]
+\[
+20 = 0.40C
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+Now, substitute \( C = 50 \) back into the equation for \( S \):
+\[
+S = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{E}
+\]"
+39,439,A,8,0.4,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.","40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for the Cost Price \( C \)**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+40,439,B,10,0.5,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.","40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for the Cost Price \( C \)**
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price \( S \)**
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+The retailer sold the appliance for \(\boxed{\$70.00}\)."
+41,439,D,2,0.1,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.","40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+\[
+S = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+
+The retailer sold the appliance for \(\boxed{D)\,\$70.00}\)."
+42,455,A,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.","40C = 20
+\]
+
+**Step 3: Solve for Cost Price \( C \)**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+\[
+S = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+43,455,B,10,0.5,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.","40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+44,455,D,4,0.2,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.","40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+
+The retailer sold the appliance for \(\boxed{\$70.00}\).
+
+\(\boxed{D}\)"
+45,492,A,8,0.4,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.","40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{70.00}
+\]"
+46,492,B,11,0.55,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.","40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+
+The retailer sold the appliance for \(\boxed{70.00}\)."
+47,492,D,1,0.05,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.","40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+Now, substitute \( C = 50 \) back into the equation for \( S \):
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{70.00}
+\]
+
+So, the retailer sold the appliance for \(\boxed{D}\) \$70.00."
+48,524,A,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.","40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.00}
+\]"
+49,524,B,9,0.45,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.","40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+The retailer sold the appliance for \(\boxed{\$70.00}\)."
+50,524,D,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.","40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{D)\,\$70.00}
+\]"
+51,531,A,9,0.45,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40C = 1.","40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{70}
+\]"
+52,531,B,5,0.25,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40C = 1.","40 \times 50 = 70
+\]
+
+**Final Answer:**
+
+The retailer sold the appliance for \(\boxed{\$70.00}\)."
+53,531,D,6,0.3,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40C = 1.","40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{D) \; \$70.00}
+\]"
+54,559,A,19,0.95,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.","00}
+\]"
+55,559,D,1,0.05,"To determine the selling price of the appliance, I'll start by defining the cost price as \( C \).
+
+The retailer sold the appliance at a 40% markup on the cost price. This means the selling price is 140% of the cost price.
+
+I can express this relationship with the equation:
+\[
+\text{Selling Price} = C + 0.40C = 1.40C
+\]
+
+Given that the gross profit is $20.00, I can set up the equation:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+Now, I'll calculate the selling price by multiplying the cost price by 1.40:
+\[
+\text{Selling Price} = 50 \times 1.40 = 70
+\]
+
+Therefore, the retailer sold the appliance for $70.00.
+</think>
+
+To determine the selling price of the appliance, let's break down the information step by step.
+
+**Given:**
+- The retailer sold the appliance at a **40% markup** on the **cost price**.
+- The **gross profit** is **\$20.00**.
+
+**Let's denote:**
+- **Cost Price** as \( C \).
+- **Selling Price** as \( S \).
+
+**Step 1: Express the Selling Price in Terms of Cost Price**
+
+Since the markup is 40% of the cost price, the selling price can be expressed as:
+\[
+S = C + 0.40C = 1.40C
+\]
+
+**Step 2: Relate Selling Price to Gross Profit**
+
+The **gross profit** is the difference between the selling price and the cost price:
+\[
+\text{Gross Profit} = S - C = 20
+\]
+Substituting \( S \) from Step 1:
+\[
+1.40C - C = 20
+\]
+\[
+0.40C = 20
+\]
+
+**Step 3: Solve for Cost Price (\( C \))**
+
+\[
+C = \frac{20}{0.40} = 50
+\]
+
+**Step 4: Calculate the Selling Price (\( S \))**
+
+\[
+S = 1.40C = 1.40 \times 50 = 70
+\]
+
+**Final Answer:**
+\[
+\boxed{\$70.","00}
+\]
+
+**Correct Answer: D) \$70.00**"

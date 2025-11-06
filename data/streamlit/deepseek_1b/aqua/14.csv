@@ -1,0 +1,1133 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,9,A,11,0.55,"First, determine Sachin's current age."," If Sachin will be 40 years old in 10 years, he is currently 30 years old.
+
+Once we know Sachin's current age, we can set up an equation based on the information that he was twice as old as Ajay 10 years ago. Let Ajay's current age be x. Then, 10 years ago, Ajay was x - 10 years old, and Sachin was 30 - 10 = 20 years old.
+
+According to the problem, Sachin was twice as old as Ajay 10 years ago:
+30 = 2(x - 10)
+
+Solving for x:
+30 = 2x - 20
+30 + 20 = 2x
+50 = 2x
+x = 25
+
+Therefore, Ajay is currently 25 years old.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- Sachin will be 40 years old in 10 years.
+- Sachin was twice as old as Ajay 10 years ago.
+
+**Step 1: Determine Sachin's Current Age**
+
+If Sachin will be 40 years old in 10 years, his current age is:
+\[
+40 - 10 = \boxed{30} \text{ years}
+\]
+
+**Step 2: Set Up the Equation Based on the Given Information**
+
+Let Ajay's current age be \( x \) years.
+
+10 years ago, Ajay was:
+\[
+x - 10 \text{ years old}
+\]
+
+At that time, Sachin was:
+\[
+30 - 10 = 20 \text{ years old}
+\]
+
+According to the problem, Sachin was twice as old as Ajay 10 years ago:
+\[
+20 = 2(x - 10)
+\]
+
+**Step 3: Solve for \( x \)**
+
+\[
+20 = 2x - 20
+\]
+\[
+20 + 20 = 2x
+\]
+\[
+40 = 2x
+\]
+\[
+x = \frac{40}{2} = \boxed{20}
+\]
+
+**Final Answer:** \(\boxed{20}\)"
+1,9,B,5,0.25,"First, determine Sachin's current age."," Since he will be 40 years old in 10 years, his current age is 40 minus 10, which is 30.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be \( A \). Therefore, 10 years ago, Ajay was \( A - 10 \) years old.
+
+According to the problem, 30 (Sachin's current age) is twice Ajay's age 10 years ago. This gives us the equation:
+\[
+30 = 2 \times (A - 10)
+\]
+
+Solving for \( A \):
+\[
+30 = 2A - 20
+\]
+\[
+50 = 2A
+\]
+\[
+A = 25
+\]
+
+Thus, Ajay is currently 25 years old.
+</think>
+
+We need to determine Ajay's current age based on the given information.
+
+**Given:**
+- Sachin will be 40 years old in 10 years.
+- Sachin was twice as old as Ajay 10 years ago.
+
+**Step 1: Determine Sachin's Current Age**
+
+Sachin will be 40 years old in 10 years. Therefore, his current age is:
+\[
+\text{Sachin's current age} = 40 - 10 = \boxed{30}
+\]
+
+**Step 2: Relate Sachin's and Ajay's Ages 10 Years Ago**
+
+Let Ajay's current age be \( A \).
+
+10 years ago, Ajay's age was:
+\[
+A - 10
+\]
+
+**Step 3: Set Up the Equation**
+
+According to the problem, Sachin was twice as old as Ajay 10 years ago:
+\[
+\text{Sachin's current age} = 2 \times \text{Ajay's age 10 years ago}
+\]
+\[
+30 = 2 \times (A - 10)
+\]
+
+**Step 4: Solve for \( A \)**
+\[
+30 = 2A - 20
+\]
+\[
+30 + 20 = 2A
+\]
+\[
+50 = 2A
+\]
+\[
+A = \frac{50}{2} = 25
+\]
+
+**Conclusion:**
+Ajay is currently \(\boxed{25}\) years old."
+2,9,C,1,0.05,"First, determine Sachin's current age."," Since he will be 40 years old in 10 years, his current age must be 40 minus 10, which is 30.
+
+Next, set up an equation based on the information given that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be represented by ""A"". 
+
+10 years ago, Sachin's age was 30 minus 10, which is 20. According to the problem, this age was twice Ajay's age at that time. Therefore, we can write the equation: 20 = 2 * A.
+
+Solving for A, we divide both sides by 2, which gives A = 10.
+
+However, upon reviewing the choices provided, 10 is not listed. This indicates there might be an error in the problem or the choices. It's possible that the correct answer is not among the options, but if we assume the question is correct, the closest possible answer from the choices would be 15.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- Sachin will be **40 years old** in 10 years.
+- Sachin was twice as old as Ajay **10 years ago**.
+
+**Let’s denote:**
+- **Sachin's current age** as **S**.
+- **Ajay's current age** as **A**.
+
+**Step 1: Find Sachin's Current Age**
+
+Sachin will be 40 years old in 10 years. Therefore, his current age is:
+\[
+S = 40 - 10 = \boxed{30}
+\]
+
+**Step 2: Set Up the Equation Based on the Given Information**
+
+10 years ago, Sachin's age was **20** (since \(30 - 10 = 20\)). At that time, he was twice as old as Ajay. Therefore:
+\[
+20 = 2 \times A
+\]
+
+**Step 3: Solve for Ajay's Current Age**
+
+\[
+20 = 2A \\
+A = \frac{20}{2} = 10
+\]
+
+**Conclusion:**
+Ajay is currently **10 years old**. However, none of the provided options (A) 18, (B) 25, (C) 15, (D) 20, or (E) 21 matches **10**. This discrepancy suggests there might be an error in the problem or the provided choices.
+
+**Final Answer:** \(\boxed{C}\) (Note: If forced to choose from the given options, **15** might be the closest, but based on calculations, Ajay is **10** years old.)"
+3,9,D,3,0.15,"First, determine Sachin's current age."," Since he will be 40 years old in 10 years, his current age is 40 minus 10, which is 30.
+
+Next, set up an equation based on the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A.
+
+10 years ago, Sachin's age was 30 minus 10, which is 20. At that time, Ajay was A minus 10 years old.
+
+According to the problem, 20 is twice Ajay's age 10 years ago:
+20 = 2*(A - 10)
+
+Solve for A:
+20 = 2A - 20
+Add 20 to both sides:
+40 = 2A
+Divide both sides by 2:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+**Solution:**
+
+Let's determine Ajay's current age step by step.
+
+1. **Determine Sachin's Current Age:**
+   
+   - It's given that **Sachin will be 40 years old in 10 years**.
+   
+   - **Sachin's current age** = 40 years - 10 years = **30 years**.
+
+2. **Set Up the Equation Based on the Given Information:**
+   
+   - ""Sachin was twice as old as Ajay 10 years back.""
+   
+   - **10 years ago**, Sachin's age was:
+     
+     \[
+     30 \text{ years} - 10 \text{ years} = 20 \text{ years}
+     \]
+     
+   - **At that time**, Ajay's age was:
+     
+     \[
+     \text{Ajay's current age} - 10 \text{ years}
+     \]
+     
+   - According to the problem, **Sachin was twice as old as Ajay 10 years ago**:
+     
+     \[
+     20 = 2 \times (\text{Ajay's age 10 years ago})
+     \]
+     
+     \[
+     20 = 2 \times (\text{Ajay's current age} - 10)
+     \]
+     
+3. **Solve for Ajay's Current Age:**
+   
+   \[
+   20 = 2 \times (\text{Ajay's current age} - 10)
+   \]
+   
+   Divide both sides by 2:
+   
+   \[
+   10 = \text{Ajay's current age} - 10
+   \]
+   
+   Add 10 to both sides:
+   
+   \[
+   \text{Ajay's current age} = 10 + 10 = 20 \text{ years}
+   \]
+
+**Final Answer:**
+\[
+\boxed{20}
+\]"
+4,73,A,14,0.7,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago."," Let Ajay's current age be \( x \). Therefore, 10 years ago, Ajay was \( x - 10 \) years old, and Sachin was \( 30 - 10 = 20 \) years old.
+
+Set up the equation based on the relationship given: \( 20 = 2(x - 10) \).
+
+Solve for \( x \):
+\[
+20 = 2x - 20 \\
+20 + 20 = 2x \\
+40 = 2x \\
+x = 20
+\]
+
+Thus, Ajay is currently 20 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1. **Determine Sachin's Current Age:**
+   
+   Sachin will be 40 years old in 10 years. Therefore, his current age is:
+   \[
+   \text{Sachin's Current Age} = 40 - 10 = 30 \text{ years}
+   \]
+
+2. **Set Up the Equation Based on the Given Relationship:**
+   
+   It's stated that **Sachin was twice as old as Ajay 10 years ago**. Let \( x \) be Ajay's current age. Then, 10 years ago, Ajay was \( x - 10 \) years old, and Sachin was \( 30 - 10 = 20 \) years old.
+   
+   According to the problem:
+   \[
+   20 = 2(x - 10)
+   \]
+   
+3. **Solve for \( x \):**
+   \[
+   20 = 2x - 20 \\
+   20 + 20 = 2x \\
+   40 = 2x \\
+   x = 20
+   \]
+
+4. **Conclusion:**
+
+   Ajay is currently \(\boxed{20}\) years old."
+5,73,B,4,0.2,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago."," This means that 10 years ago, Ajay's age was half of Sachin's age at that time. 
+
+Let Ajay's current age be A. Then, 10 years ago, Ajay was A - 10 years old. According to the problem, A - 10 = 30 / 2, which simplifies to A - 10 = 15.
+
+Solving for A gives A = 15 + 10 = 25.
+
+Therefore, Ajay is currently 25 years old.
+</think>
+
+Let's solve the problem step by step.
+
+**Problem Statement:**
+Sachin was twice as old as Ajay 10 years ago. How old is Ajay today if Sachin will be 40 years old in 10 years?
+
+**Solution:**
+
+1. **Determine Sachin's Current Age:**
+   
+   Sachin will be 40 years old in 10 years. Therefore, his current age is:
+   
+   \[
+   \text{Sachin's current age} = 40 - 10 = 30 \text{ years}
+   \]
+
+2. **Relate Sachin's Age to Ajay's Age 10 Years Ago:**
+   
+   It's given that Sachin was twice as old as Ajay 10 years ago. Let \( A \) be Ajay's current age. Then, 10 years ago:
+   
+   \[
+   \text{Ajay's age 10 years ago} = A - 10
+   \]
+   
+   According to the problem:
+   
+   \[
+   A - 10 = \frac{30}{2} = 15
+   \]
+
+3. **Solve for Ajay's Current Age:**
+   
+   \[
+   A - 10 = 15 \\
+   A = 15 + 10 \\
+   A = 25
+   \]
+
+**Final Answer:**
+
+Ajay is **25** years old today.
+
+\boxed{25}"
+6,73,D,2,0.1,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago."," Let Ajay's current age be \( x \). Ten years ago, Ajay was \( x - 10 \) years old. According to the problem, \( x - 10 = \frac{30}{2} \), which simplifies to \( x - 10 = 15 \).
+
+Finally, add 10 to both sides of the equation to solve for \( x \): \( x = 15 + 10 = 25 \).
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1. **Determine Sachin's Current Age:**
+   
+   - It's given that Sachin will be 40 years old in 10 years.
+   - Therefore, Sachin's current age is:
+     \[
+     40 \text{ years} - 10 \text{ years} = 30 \text{ years}
+     \]
+
+2. **Set Up the Equation for Their Ages 10 Years Ago:**
+   
+   - Let **\( x \)** be Ajay's current age.
+   - Ten years ago, Ajay's age was:
+     \[
+     x - 10
+     \]
+   - It's also given that at that time, Sachin was twice as old as Ajay:
+     \[
+     x - 10 = 2 \times (30 - 10)
+     \]
+     \[
+     x - 10 = 2 \times 20
+     \]
+     \[
+     x - 10 = 40
+     \]
+
+3. **Solve for \( x \):**
+   
+   \[
+   x = 40 + 10
+   \]
+   \[
+   x = 50
+   \]
+   
+Wait, this result doesn't match the given options. Let's re-examine the problem.
+
+**Re-evaluating the Problem:**
+
+Ah, I realize I might have misinterpreted the problem. Let's try setting up the equation correctly.
+
+**Correct Approach:**
+
+- **Current Age of Sachin:**
+  \[
+  40 \text{ years} - 10 \text{ years} = 30 \text{ years}
+  \]
+
+- **Age Relationship 10 Years Ago:**
+  \[
+  \text{Sachin's age 10 years ago} = 2 \times \text{Ajay's age 10 years ago}
+  \]
+  \[
+  (30 - 10) = 2 \times (x - 10)
+  \]
+  \[
+  20 = 2(x - 10)
+  \]
+  \[
+  10 = x - 10
+  \]
+  \[
+  x = 10 + 10
+  \]
+  \[
+  x = 20
+  \]
+
+**Final Answer:**
+
+\[
+\boxed{20}
+\]"
+7,82,A,11,0.55,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A."," Therefore, 10 years ago, Ajay was A - 10 years old.
+
+According to the problem, Sachin's age 10 years ago was twice Ajay's age at that time. So, A = 2 * (A - 10).
+
+Solving the equation:
+A = 2A - 20
+Subtract A from both sides:
+A - 2A = -20
+-A = -20
+Multiply both sides by -1:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+**Solution:**
+
+Let's determine Ajay's current age step by step.
+
+1. **Determine Sachin's Current Age:**
+   
+   It is given that Sachin will be 40 years old in 10 years. Therefore, his current age is:
+   
+   \[
+   \text{Sachin's current age} = 40 - 10 = 30 \text{ years}
+   \]
+
+2. **Relate Sachin's Age 10 Years Ago to Ajay's Age 10 Years Ago:**
+   
+   It's stated that ""Sachin was twice as old as Ajay 10 years back."" Let's denote Ajay's current age as \( A \) years.
+
+   - **Sachin's age 10 years ago:**
+     
+     \[
+     30 - 10 = 20 \text{ years}
+     \]
+   
+   - **Ajay's age 10 years ago:**
+     
+     \[
+     A - 10 \text{ years}
+     \]
+   
+   According to the problem:
+   
+   \[
+   20 = 2 \times (A - 10)
+   \]
+
+3. **Solve for \( A \):**
+   
+   \[
+   20 = 2A - 20 \\
+   20 + 20 = 2A \\
+   40 = 2A \\
+   A = \frac{40}{2} = 20 \text{ years}
+   \]
+
+**Final Answer:**
+
+\[
+\boxed{20}
+\]"
+8,82,B,7,0.35,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A."," Then, 10 years ago, Ajay was A - 10 years old.
+
+According to the problem, 10 years ago, Sachin's age was twice Ajay's age. So, we set up the equation: 30 = 2(A - 10).
+
+Solve for A:
+30 = 2A - 20
+Add 20 to both sides: 50 = 2A
+Divide both sides by 2: A = 25.
+
+Therefore, Ajay is currently 25 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+**Given:**
+- **Sachin** will be 40 years old in 10 years.
+- **Sachin** was twice as old as **Ajay** 10 years ago.
+
+**Step 1: Determine Sachin's Current Age**
+
+Sachin will be 40 years old in 10 years. Therefore, his current age is:
+\[
+\text{Sachin's current age} = 40 - 10 = 30 \text{ years}
+\]
+
+**Step 2: Set Up the Equation for 10 Years Ago**
+
+Let Ajay's current age be \( A \).
+
+10 years ago, Ajay's age was \( A - 10 \) years.
+
+According to the problem:
+\[
+\text{Sachin's age 10 years ago} = 2 \times \text{Ajay's age 10 years ago}
+\]
+\[
+30 = 2 \times (A - 10)
+\]
+
+**Step 3: Solve for \( A \)**
+
+\[
+30 = 2A - 20
+\]
+\[
+30 + 20 = 2A
+\]
+\[
+50 = 2A
+\]
+\[
+A = \frac{50}{2} = 25
+\]
+
+**Conclusion:**
+Ajay is currently \(\boxed{25}\) years old."
+9,82,D,2,0.1,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A."," According to the problem, 10 years ago, Sachin's age was 2A. So, subtract 10 from both their current ages: 30 - 10 = 20 and A - 10.
+
+Set up the equation 20 = 2(A - 10). Solve for A by dividing both sides by 2, resulting in A - 10 = 10. Finally, add 10 to both sides to find Ajay's current age: A = 20.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+**Given:**
+1. **Sachin** will be **40 years old** in **10 years**.
+2. **Sachin** was **twice as old** as **Ajay** **10 years ago**.
+
+**Step 1: Determine Sachin's Current Age**
+
+In 10 years, Sachin will be **40 years old**. Therefore, his current age is:
+\[
+\text{Sachin's Current Age} = 40 - 10 = 30 \text{ years}
+\]
+
+**Step 2: Relate Sachin's and Ajay's Ages 10 Years Ago**
+
+10 years ago, Sachin was twice as old as Ajay. Let \( A \) represent Ajay's current age. Therefore, 10 years ago, Ajay was:
+\[
+A - 10
+\]
+And Sachin was:
+\[
+30 - 10 = 20 \text{ years old}
+\]
+
+According to the problem:
+\[
+20 = 2 \times (A - 10)
+\]
+
+**Step 3: Solve for Ajay's Current Age**
+
+\[
+20 = 2A - 20
+\]
+\[
+20 + 20 = 2A
+\]
+\[
+40 = 2A
+\]
+\[
+A = \frac{40}{2} = 20
+\]
+
+**Final Answer:**
+\[
+\boxed{20}
+\]
+
+**Answer Option: \(\boxed{D}\)**"
+10,211,A,17,0.85,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A. Ten years ago, Ajay was A - 10 years old.
+
+According to the problem, Sachin's age 10 years ago was twice Ajay's age at that time:
+30 - 10 = 2 * (A - 10)
+
+Simplify the equation:
+20 = 2A - 20
+
+Add 20 to both sides:
+40 = 2A
+
+Divide both sides by 2:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1."," **Determine Sachin's Current Age:**
+   
+   - Sachin will be 40 years old in 10 years.
+   - Therefore, Sachin's current age is:
+     \[
+     40 - 10 = 30 \text{ years}
+     \]
+
+2. **Set Up the Equation for Their Ages 10 Years Ago:**
+   
+   - Let \( A \) be Ajay's current age.
+   - 10 years ago, Ajay's age was \( A - 10 \).
+   - According to the problem, Sachin was twice as old as Ajay 10 years ago:
+     \[
+     30 - 10 = 2 \times (A - 10)
+     \]
+     \[
+     20 = 2A - 20
+     \]
+
+3. **Solve for \( A \):**
+   
+   \[
+   20 = 2A - 20
+   \]
+   
+   Add 20 to both sides:
+   
+   \[
+   40 = 2A
+   \]
+   
+   Divide both sides by 2:
+   
+   \[
+   A = 20
+   \]
+
+**Final Answer:**
+
+\[
+\boxed{20}
+\]"
+11,211,B,2,0.1,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A. Ten years ago, Ajay was A - 10 years old.
+
+According to the problem, Sachin's age 10 years ago was twice Ajay's age at that time:
+30 - 10 = 2 * (A - 10)
+
+Simplify the equation:
+20 = 2A - 20
+
+Add 20 to both sides:
+40 = 2A
+
+Divide both sides by 2:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1."," **Determine Sachin's Current Age:**
+   
+   - **Given:** Sachin will be 40 years old in 10 years.
+   
+   - **Calculation:**
+     \[
+     \text{Sachin's current age} = 40 - 10 = 30 \text{ years}
+     \]
+
+2. **Set Up the Equation for Their Ages 10 Years Ago:**
+   
+   - Let **A** be Ajay's current age.
+   
+   - **Condition:** 10 years ago, Sachin was twice as old as Ajay.
+   
+   - **Expression:**
+     \[
+     \text{Sachin's age 10 years ago} = 30 - 10 = 20 \text{ years}
+     \]
+     \[
+     \text{Ajay's age 10 years ago} = A - 10
+     \]
+   
+   - **Equation:**
+     \[
+     20 = 2 \times (A - 10)
+     \]
+
+3. **Solve for Ajay's Current Age (A):**
+   
+   - **Expand the Equation:**
+     \[
+     20 = 2A - 20
+     \]
+   
+   - **Add 20 to Both Sides:**
+     \[
+     20 + 20 = 2A
+     \]
+     \[
+     40 = 2A
+     \]
+   
+   - **Divide Both Sides by 2:**
+     \[
+     A = 20
+     \]
+
+4. **Conclusion:**
+   
+   Ajay is currently **20 years old**.
+
+**Final Answer:** \(\boxed{20}\)"
+12,211,D,1,0.05,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A. Ten years ago, Ajay was A - 10 years old.
+
+According to the problem, Sachin's age 10 years ago was twice Ajay's age at that time:
+30 - 10 = 2 * (A - 10)
+
+Simplify the equation:
+20 = 2A - 20
+
+Add 20 to both sides:
+40 = 2A
+
+Divide both sides by 2:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1."," **Determine Sachin's Current Age:**
+   
+   It's given that Sachin will be **40 years old** in **10 years**. 
+   
+   \[
+   \text{ Sachin's current age} = 40 - 10 = 30 \text{ years}
+   \]
+
+2. **Set Up the Equation Using the Given Information:**
+   
+   It's also given that **Sachin was twice as old as Ajay 10 years ago**. Let's denote Ajay's current age as \( A \).
+
+   - **Ajay's age 10 years ago:** \( A - 10 \)
+   - **Sachin's age 10 years ago:** \( 30 - 10 = 20 \) years
+
+   According to the problem:
+   
+   \[
+   20 = 2 \times (A - 10)
+   \]
+
+3. **Solve for \( A \):**
+   
+   \[
+   20 = 2A - 20
+   \]
+   
+   Add 20 to both sides:
+   
+   \[
+   40 = 2A
+   \]
+   
+   Divide both sides by 2:
+   
+   \[
+   A = 20
+   \]
+
+**Therefore, Ajay is currently \(\boxed{20}\) years old.**
+
+**Answer:** \(\boxed{D}\)"
+13,279,A,20,1.0,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A. Ten years ago, Ajay was A - 10 years old.
+
+According to the problem, Sachin's age 10 years ago was twice Ajay's age at that time:
+30 - 10 = 2 * (A - 10)
+
+Simplify the equation:
+20 = 2A - 20
+
+Add 20 to both sides:
+40 = 2A
+
+Divide both sides by 2:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1. **Determine Sachin's Current Age:**
+   
+   - It is given that Sachin will be 40 years old in 10 years.
+   - Therefore, Sachin's current age is:
+     \[
+     40 - 10 = 30 \text{ years}
+     \]
+
+2."," **Set Up the Equation for Their Ages 10 Years Ago:**
+   
+   - Let Ajay's current age be \( A \) years.
+   - Ten years ago, Ajay was \( A - 10 \) years old.
+   - According to the problem, Sachin was twice as old as Ajay 10 years ago:
+     \[
+     30 - 10 = 2 \times (A - 10)
+     \]
+     
+     Simplifying the left side:
+     \[
+     20 = 2(A - 10)
+     \]
+     
+3. **Solve for \( A \):**
+     
+     \[
+     20 = 2A - 20
+     \]
+     
+     Add 20 to both sides:
+     \[
+     40 = 2A
+     \]
+     
+     Divide both sides by 2:
+     \[
+     A = 20
+     \]
+     
+     **Therefore, Ajay is currently **20** years old.**
+
+\boxed{20}"
+14,404,A,19,0.95,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A. Ten years ago, Ajay was A - 10 years old.
+
+According to the problem, Sachin's age 10 years ago was twice Ajay's age at that time:
+30 - 10 = 2 * (A - 10)
+
+Simplify the equation:
+20 = 2A - 20
+
+Add 20 to both sides:
+40 = 2A
+
+Divide both sides by 2:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1. **Determine Sachin's Current Age:**
+   
+   - It is given that Sachin will be 40 years old in 10 years.
+   - Therefore, Sachin's current age is:
+     \[
+     40 - 10 = 30 \text{ years}
+     \]
+
+2. **Set Up the Equation Based on the Given Information:**
+   
+   - It is also given that Sachin was twice as old as Ajay 10 years ago.
+   - Let Ajay's current age be \( A \).
+   - Ten years ago, Ajay's age was \( A - 10 \).
+   - Ten years ago, Sachin's age was \( 30 - 10 = 20 \) years.
+   - According to the problem:
+     \[
+     20 = 2 \times (A - 10)
+     \]
+
+3."," **Solve for \( A \):**
+   
+   \[
+   20 = 2A - 20
+   \]
+   
+   Add 20 to both sides:
+   \[
+   40 = 2A
+   \]
+   
+   Divide both sides by 2:
+   \[
+   A = 20
+   \]
+
+4. **Final Answer:**
+   
+   Ajay is currently **20 years old**.
+
+\[
+\boxed{20}
+\]"
+15,404,D,1,0.05,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A. Ten years ago, Ajay was A - 10 years old.
+
+According to the problem, Sachin's age 10 years ago was twice Ajay's age at that time:
+30 - 10 = 2 * (A - 10)
+
+Simplify the equation:
+20 = 2A - 20
+
+Add 20 to both sides:
+40 = 2A
+
+Divide both sides by 2:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1. **Determine Sachin's Current Age:**
+   
+   - It is given that Sachin will be 40 years old in 10 years.
+   - Therefore, Sachin's current age is:
+     \[
+     40 - 10 = 30 \text{ years}
+     \]
+
+2. **Set Up the Equation Based on the Given Information:**
+   
+   - It is also given that Sachin was twice as old as Ajay 10 years ago.
+   - Let Ajay's current age be \( A \).
+   - Ten years ago, Ajay's age was \( A - 10 \).
+   - Ten years ago, Sachin's age was \( 30 - 10 = 20 \) years.
+   - According to the problem:
+     \[
+     20 = 2 \times (A - 10)
+     \]
+
+3."," **Solve for Ajay's Current Age (\( A \)):**
+   
+   \[
+   20 = 2A - 20
+   \]
+   
+   \[
+   20 + 20 = 2A
+   \]
+   
+   \[
+   40 = 2A
+   \]
+   
+   \[
+   A = \frac{40}{2} = 20
+   \]
+
+**Ajay is currently \(\boxed{20}\) years old.**
+
+**Answer:** \(\boxed{D}\)"
+16,494,A,19,0.95,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A. Ten years ago, Ajay was A - 10 years old.
+
+According to the problem, Sachin's age 10 years ago was twice Ajay's age at that time:
+30 - 10 = 2 * (A - 10)
+
+Simplify the equation:
+20 = 2A - 20
+
+Add 20 to both sides:
+40 = 2A
+
+Divide both sides by 2:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1. **Determine Sachin's Current Age:**
+   
+   - It is given that Sachin will be 40 years old in 10 years.
+   - Therefore, Sachin's current age is:
+     \[
+     40 - 10 = 30 \text{ years}
+     \]
+
+2. **Set Up the Equation Based on the Given Information:**
+   
+   - It is also given that Sachin was twice as old as Ajay 10 years ago.
+   - Let Ajay's current age be \( A \).
+   - Ten years ago, Ajay's age was \( A - 10 \).
+   - Ten years ago, Sachin's age was \( 30 - 10 = 20 \) years.
+   - According to the problem:
+     \[
+     20 = 2 \times (A - 10)
+     \]
+
+3. **Solve for \( A \):**
+   
+   \[
+   20 = 2A - 20
+   \]
+   
+   \[
+   20 + 20 = 2A
+   \]
+   
+   \[
+   40 = 2A
+   \]
+   
+   \[
+   A = \frac{40}{2} = 20
+   \]
+
+4."," **Conclusion:**
+   
+   Ajay is currently **20 years old**.
+
+\(\boxed{20}\)"
+17,494,B,1,0.05,"First, determine Sachin's current age. Since he will be 40 years old in 10 years, subtract 10 from 40 to find his current age: 40 - 10 = 30 years old.
+
+Next, use the information that Sachin was twice as old as Ajay 10 years ago. Let Ajay's current age be A. Ten years ago, Ajay was A - 10 years old.
+
+According to the problem, Sachin's age 10 years ago was twice Ajay's age at that time:
+30 - 10 = 2 * (A - 10)
+
+Simplify the equation:
+20 = 2A - 20
+
+Add 20 to both sides:
+40 = 2A
+
+Divide both sides by 2:
+A = 20
+
+Therefore, Ajay is currently 20 years old.
+</think>
+
+Let's determine Ajay's current age step by step.
+
+1. **Determine Sachin's Current Age:**
+   
+   - It is given that Sachin will be 40 years old in 10 years.
+   - Therefore, Sachin's current age is:
+     \[
+     40 - 10 = 30 \text{ years}
+     \]
+
+2. **Set Up the Equation Based on the Given Information:**
+   
+   - It is also given that Sachin was twice as old as Ajay 10 years ago.
+   - Let Ajay's current age be \( A \).
+   - Ten years ago, Ajay's age was \( A - 10 \).
+   - Ten years ago, Sachin's age was \( 30 - 10 = 20 \) years.
+   - According to the problem:
+     \[
+     20 = 2 \times (A - 10)
+     \]
+
+3. **Solve for \( A \):**
+   
+   \[
+   20 = 2A - 20
+   \]
+   
+   \[
+   20 + 20 = 2A
+   \]
+   
+   \[
+   40 = 2A
+   \]
+   
+   \[
+   A = \frac{40}{2} = 20
+   \]
+
+4."," **Conclusion:**
+   
+   - Ajay is currently **20 years old**.
+
+**Final Answer:** \(\boxed{20}\)"

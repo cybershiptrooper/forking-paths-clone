@@ -1,0 +1,384 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,15,A,14,0.7,"First, determine how many hours Jordan spends playing video games in a week."," Since he plays for 2 hours each day and there are 7 days in a week, multiply 2 by 7 to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour. Multiply the number of hours by his hourly wage: 14 hours × $10/hour = $140.
+
+Therefore, the correct answer is D) 140.
+</think>
+
+To determine how much money Jordan would earn in one week by spending his video game time working instead of playing, follow these steps:
+
+1. **Calculate the Total Hours Jordan Spends Playing Video Games in a Week:**
+   
+   - **Daily Hours:** Jordan plays video games for **2 hours** every day.
+   - **Days in a Week:** There are **7 days** in a week.
+   
+   \[
+   \text{Total Hours} = 2\, \text{hours/day} \times 7\, \text{days} = 14\, \text{hours}
+   \]
+
+2. **Calculate His Earnings from Working Those Hours:**
+   
+   - **Hourly Wage:** Jordan earns **$10** per hour.
+   - **Total Earnings:** Multiply the total hours by his hourly wage.
+   
+   \[
+   \text{Total Earnings} = 14\, \text{hours} \times \$10/\text{hour} = \$140
+   \]
+
+3. **Final Answer:**
+   
+   Jordan would earn **\$140** in one week if he spent his video game time working instead.
+
+\[
+\boxed{140}
+\]"
+1,15,D,6,0.3,"First, determine how many hours Jordan spends playing video games in a week."," Since he plays 2 hours each day and there are 7 days in a week, the total video game time is 2 hours/day multiplied by 7 days, which equals 14 hours.
+
+Next, calculate his earnings from working instead of playing video games. He earns $10 per hour, so multiply the total hours by his hourly rate. 14 hours multiplied by $10/hour gives a total of $140.
+
+Finally, compare the calculated earnings with the provided answer choices to find the correct answer.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working instead, let's break down the problem step by step.
+
+### Step 1: Calculate Total Video Game Hours in a Week
+- **Video game time per day:** 2 hours
+- **Number of days in a week:** 7
+
+\[
+\text{Total Video Game Hours} = 2 \, \text{hours/day} \times 7 \, \text{days} = 14 \, \text{hours}
+\]
+
+### Step 2: Calculate Earnings from Working Instead of Playing Video Games
+- **Hourly wage:** \$10/hour
+- **Total Hours Worked:** 14 hours
+
+\[
+\text{Earnings} = 14 \, \text{hours} \times \$10/\text{hour} = \$140
+\]
+
+### Step 3: Match the Answer with the Provided Choice
+The calculated earnings of \$140 corresponds to **answer choice D**.
+
+\[
+\boxed{D}
+\]"
+2,68,A,12,0.6,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour."," Multiply the number of hours (14) by his hourly wage ($10) to find his total earnings, which is $140.
+</think>
+
+To determine how much money Jordan would earn in a week if he spent his video game time working instead of playing, follow these steps:
+
+1. **Calculate the total video game time in a week:**
+   
+   - **Video game time per day:** 2 hours
+   - **Number of days in a week:** 7 days
+   
+   \[
+   \text{Total video game time} = 2\ \text{hours/day} \times 7\ \text{days} = 14\ \text{hours}
+   \]
+
+2. **Determine his earnings from working 14 hours at $10 per hour:**
+   
+   \[
+   \text{Earnings} = 14\ \text{hours} \times \$10/\text{hour} = \$140
+   \]
+
+3. **Final Answer:**
+
+\[
+\boxed{140}
+\]"
+3,68,D,8,0.4,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour."," Multiply 14 hours by $10 per hour to find that he earns $140 in a week.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working, follow these steps:
+
+1. **Determine Jordan's Video Game Time in a Week:**
+   
+   - **Hours per day:** 2 hours
+   - **Days in a week:** 7 days
+   
+   Total video game hours in a week:
+   \[
+   2 \text{ hours/day} \times 7 \text{ days} = 14 \text{ hours}
+   \]
+
+2. **Calculate Earnings from Video Games:**
+   
+   - **Earnings per hour:** \$10
+   
+   Total earnings:
+   \[
+   14 \text{ hours} \times \$10/\text{hour} = \$140
+   \]
+
+3. **Final Answer:**
+   
+   \[
+   \boxed{140}
+   \]
+
+**Answer:**
+
+\boxed{D) 140}"
+4,103,A,4,0.2,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour. Multiply 14 hours by $10 per hour to find that he earns $140 in a week.
+
+Finally, compare the calculated earnings to the provided choices."," The correct answer is $140.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working instead, follow these steps:
+
+1. **Calculate the Total Video Game Time in a Week:**
+   
+   - **Daily Video Game Time:** 2 hours
+   - **Days in a Week:** 7 days
+   - **Total Video Game Time:** \( 2 \text{ hours/day} \times 7 \text{ days} = 14 \text{ hours} \)
+
+2. **Calculate Earnings from Working:**
+   
+   - **Hourly Wages:** \$10 per hour
+   - **Total Earnings:** \( 14 \text{ hours} \times \$10/\text{hour} = \$140 \)
+
+3. **Final Answer:**
+   
+   Therefore, Jordan would earn \(\boxed{140}\) dollars in one week."
+5,103,D,16,0.8,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour. Multiply 14 hours by $10 per hour to find that he earns $140 in a week.
+
+Finally, compare the calculated earnings to the provided choices."," The correct answer is D) 140.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working instead of playing, follow these steps:
+
+1. **Calculate the total video game time in a week:**
+   - **Video game time per day:** 2 hours
+   - **Days in a week:** 7
+
+   \[
+   \text{Total video game time in a week} = 2 \, \text{hours/day} \times 7 \, \text{days} = 14 \, \text{hours}
+   \]
+
+2. **Calculate the earnings from working those hours:**
+   - **Hourly wage:** \$10/hour
+   - **Total earnings:** 
+
+   \[
+   \text{Total earnings} = 14 \, \text{hours} \times \$10/\text{hour} = \$140
+   \]
+
+3. **Match the result to the provided choices:**
+
+   The correct answer is \(\boxed{140}\)."
+6,141,A,7,0.35,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour. Multiply 14 hours by $10 per hour to find that he earns $140 in a week.
+
+Finally, compare the calculated earnings to the provided choices. The correct answer is $140.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working instead, follow these steps:
+
+1."," **Calculate Total Video Game Time in a Week:**
+   
+   - **Video Game Time per Day:** 2 hours
+   - **Number of Days in a Week:** 7 days
+   
+   \[
+   \text{Total Video Game Time} = 2 \text{ hours/day} \times 7 \text{ days} = 14 \text{ hours}
+   \]
+
+2. **Calculate Earnings from Working Those Hours:**
+   
+   - **Hourly Wage:** \$10 per hour
+   - **Total Earnings:** Multiply the total hours by the hourly wage.
+   
+   \[
+   \text{Total Earnings} = 14 \text{ hours} \times \$10/\text{hour} = \$140
+   \]
+
+3. **Determine the Correct Answer:**
+   
+   Among the provided choices, the correct amount Jordan would earn in a week is:
+
+   \[
+   \boxed{140}
+   \]"
+7,141,D,13,0.65,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour. Multiply 14 hours by $10 per hour to find that he earns $140 in a week.
+
+Finally, compare the calculated earnings to the provided choices. The correct answer is $140.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working instead, follow these steps:
+
+1."," **Calculate Total Video Game Hours in a Week:**
+   
+   - **Daily Video Game Time:** 2 hours
+   - **Number of Days in a Week:** 7 days
+   
+   \[
+   \text{Total Video Game Hours} = 2 \text{ hours/day} \times 7 \text{ days} = 14 \text{ hours}
+   \]
+
+2. **Calculate Earnings from Working Those Hours:**
+   
+   - **Hourly Wage:** \$10/hour
+   - **Total Hours Worked:** 14 hours
+   
+   \[
+   \text{Earnings} = 14 \text{ hours} \times \$10/\text{hour} = \$140
+   \]
+
+3. **Identify the Correct Choice:**
+
+   - **Option D) \$140**
+
+**Final Answer:**
+
+\boxed{D}"
+8,225,A,4,0.2,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour. Multiply 14 hours by $10 per hour to find that he earns $140 in a week.
+
+Finally, compare the calculated earnings to the provided choices. The correct answer is $140.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working instead, follow these steps:
+
+1. **Calculate the total video game time in a week:**
+   
+   - **Video game time per day:** 2 hours
+   - **Number of days in a week:** 7 days
+   
+   \[
+   \text{Total video game time} = 2 \text{ hours/day} \times 7 \text{ days} = 14 \text{ hours}
+   \]
+
+2."," **Determine his earnings from working 14 hours:**
+   
+   - **Hourly wage:** \$10/hour
+   - **Total earnings:** 
+     
+   \[
+   \text{Total earnings} = 14 \text{ hours} \times \$10/\text{hour} = \$140
+   \]
+
+3. **Final Answer:**
+   
+   \[
+   \boxed{140}
+   \]"
+9,225,D,16,0.8,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour. Multiply 14 hours by $10 per hour to find that he earns $140 in a week.
+
+Finally, compare the calculated earnings to the provided choices. The correct answer is $140.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working instead, follow these steps:
+
+1. **Calculate the total video game time in a week:**
+   
+   - **Video game time per day:** 2 hours
+   - **Number of days in a week:** 7 days
+   
+   \[
+   \text{Total video game time} = 2 \text{ hours/day} \times 7 \text{ days} = 14 \text{ hours}
+   \]
+
+2."," **Calculate his earnings from working those 14 hours:**
+   
+   - **Hourly earnings:** \$10/hour
+   - **Total earnings:** 
+   
+   \[
+   \text{Total earnings} = 14 \text{ hours} \times \$10/\text{hour} = \$140
+   \]
+
+3. **Compare with the given choices:**
+   
+   - **Option A:** 98  
+   - **Option B:** 0.3332  
+   - **Option C:** 2  
+   - **Option D:** 140  
+
+   The correct answer is **D) 140**.
+
+\boxed{140}"
+10,299,A,7,0.35,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour. Multiply 14 hours by $10 per hour to find that he earns $140 in a week.
+
+Finally, compare the calculated earnings to the provided choices. The correct answer is $140.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working instead, follow these steps:
+
+1. **Calculate the total video game time in a week:**
+   
+   - **Video game time per day:** 2 hours
+   - **Number of days in a week:** 7 days
+   
+   \[
+   \text{Total video game time} = 2 \text{ hours/day} \times 7 \text{ days} = 14 \text{ hours}
+   \]
+
+2. **Calculate the earnings from working 14 hours:**
+   
+   - **Hourly wage:** \$10 per hour
+   - **Total earnings:** 
+   
+   \[
+   \text{Total earnings} = 14 \text{ hours} \times \$10/\text{hour} = \$140
+   \]
+
+3."," **Compare with the provided choices:**
+
+   The correct answer is:
+
+   \[
+   \boxed{140}
+   \]"
+11,299,D,13,0.65,"First, determine how many hours Jordan spends playing video games in a week. Since he plays for 2 hours every day and there are 7 days in a week, multiply 2 hours by 7 days to get 14 hours.
+
+Next, calculate his earnings from working those 14 hours at $10 per hour. Multiply 14 hours by $10 per hour to find that he earns $140 in a week.
+
+Finally, compare the calculated earnings to the provided choices. The correct answer is $140.
+</think>
+
+To determine how much money Jordan would earn in one week if he spent his video game time working instead, follow these steps:
+
+1. **Calculate the total video game time in a week:**
+   
+   - **Video game time per day:** 2 hours
+   - **Number of days in a week:** 7 days
+   
+   \[
+   \text{Total video game time} = 2 \text{ hours/day} \times 7 \text{ days} = 14 \text{ hours}
+   \]
+
+2. **Calculate the earnings from working 14 hours:**
+   
+   - **Hourly wage:** \$10 per hour
+   - **Total earnings:** 
+   
+   \[
+   \text{Total earnings} = 14 \text{ hours} \times \$10/\text{hour} = \$140
+   \]
+
+3."," **Compare with the provided choices:**
+
+   - **Option D:** \$140
+
+**Final Answer:**
+
+\boxed{140}"

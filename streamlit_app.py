@@ -9,6 +9,7 @@ from transformers import AutoTokenizer
 import Rbeast
 
 from utils.streamlit_utils import text_colors_html
+from utils.utils import MODEL_METADATA
 
 COLORS = ['#C4DADE', '#DDE8ED', '#F9F0E7', '#E7D9CC', '#ECF2F5  ', '#B9D9D5'] # ocean days
 # COLORS = ['#97B3AE', '#D2E0D3', '#F0DDD6', '#F2C3B9', '#D6CBBF  ', '#F0EEEA'] # lazy sunday
@@ -24,31 +25,34 @@ st.markdown('**Do models consider multiple paths when solving a problem? Are the
 
 model_selection, dataset_selection, example_selection = st.columns(3)
 
+with open('config.json') as f:
+    config = json.load(f)
+streamlit_folder = config['save_locations']['streamlit_folder']
+
 model_name = model_selection.selectbox(
     'Select a model:',
-    ['llama_3b', 'deepseek_1b'],
+    os.listdir(streamlit_folder),
     index=1
 )
 
-if model_name == 'llama_3b':
-    tokenizer = AutoTokenizer.from_pretrained('meta-llama/Llama-3.2-3B-Instruct')
-elif model_name == 'deepseek_1b':
-    tokenizer = AutoTokenizer.from_pretrained('deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B')
+
+inv_model_netadata = {v['nickname']: k for k, v in MODEL_METADATA.items()}
+tokenizer = AutoTokenizer.from_pretrained(inv_model_netadata[model_name])
 
 dataset_name = dataset_selection.selectbox(
     'Select a task:',
-    ['aqua', 'gpqa', 'gsm8k', 'math', 'wildjailbreak'],
-    index=1
+    os.listdir(f'{streamlit_folder}/{model_name}'),
+    index=3
 )
 
-example_ids = sorted([filename.split('.')[0] for filename in os.listdir(f'data/forking_paths/{model_name}/{dataset_name}')])
+example_ids = sorted([filename.split('.')[0] for filename in os.listdir(f'{streamlit_folder}/{model_name}/{dataset_name}')])
 example_index = example_selection.selectbox(
-    'Selection questio ID:',
+    'Selection question ID:',
     example_ids,
     index=0
 )
 
-with open(f'data/collection/{model_name}/{dataset_name}.json') as f:
+with open(f'{streamlit_folder}/{model_name}/{dataset_name}/base_data.json') as f:
     base_data = json.load(f)[int(example_index)]
 
 question_text, response_text = st.columns(2)
@@ -73,15 +77,9 @@ response_text.html(text_colors_html(
     c_map=sns.light_palette("#C4DADE", as_cmap=True, reverse=True)
 ))
 
-with open(f'data/forking_paths/{model_name}/{dataset_name}/{example_index}.json') as f:
-    forking_paths_data = json.load(f)
 
-df = pd.DataFrame(forking_paths_data)
-count_df = df.groupby(['t', 'clean_answer'])['norm_cumulative_logprob'].count().reset_index()
-norm_count = 20 if model_name == 'deepseek_1b' else 30
-count_df['prob'] = count_df['norm_cumulative_logprob'] / norm_count
-
-outcome_set = count_df.groupby('clean_answer')['norm_cumulative_logprob'].sum().sort_values(ascending=False).index.values
+outcome_df = pd.read_csv(f"{streamlit_folder}/{model_name}/{dataset_name}/{example_index}.csv")
+outcome_set = outcome_df.groupby('outcome')['outcome_probability'].sum().sort_values(ascending=False).index.values
 
 layout =  go.Layout(
     title = None,
@@ -141,8 +139,8 @@ def get_name(outcome):
 fig.add_traces([
     go.Scatter( 
         name=get_name(outcome),   #OTHER_TOK else outcome, 
-        x = count_df[count_df['clean_answer'] == outcome]['t'], 
-        y = count_df[count_df['clean_answer'] == outcome]['prob'], 
+        x = outcome_df[outcome_df['outcome'] == outcome]['t'], 
+        y = outcome_df[outcome_df['outcome'] == outcome]['outcome_probability'], 
         stackgroup='one',
         fillcolor=COLORS[oi], # f'rgba{colors[oi] + (.7,)}',
         line={
@@ -156,8 +154,8 @@ fig.add_traces([
 
 st.plotly_chart(fig)
 
-x = count_df[count_df['clean_answer'] == outcome_set[0]]['t'].values
-y = count_df[count_df['clean_answer'] == outcome_set[0]]['prob'].values
+x = outcome_df[outcome_df['outcome'] == outcome_set[0]]['t'].values
+y = outcome_df[outcome_df['outcome'] == outcome_set[0]]['outcome_probability'].values
 range_y = y.max() - y.min()
 alpha2 = 2.0  + (1000 ** (1.0 - range_y))
 
@@ -218,14 +216,13 @@ fig.add_trace(
 
 st.plotly_chart(fig)
 
-t = st.select_slider("Timestep:", options=count_df.t.unique(), value=x[np.argmax(o.trend.__dict__['cpOccPr'])])
-possible_outcomes = df[df['t'] == t]['clean_answer'].unique()
+t = st.select_slider("Timestep:", options=outcome_df.t.unique(), value=x[np.argmax(o.trend.__dict__['cpOccPr'])])
+possible_outcomes = outcome_df[outcome_df['t'] == t]['outcome'].unique()
 outcome = st.selectbox("Outcome:", possible_outcomes)
 
-example = df[(df['t'] == t) & (df['clean_answer'] == outcome)].sample(1)
-output_text = example['output_text'].values[0]
-continued_text = example['post_stump_output_text'].values[0]
-change_point = output_text.find(continued_text)
+example = outcome_df[(outcome_df['t'] == t) & (outcome_df['outcome'] == outcome)].iloc[0]
+sample_rollout = example['sample_rollout']
+prefix_text = example['prefix']
 st.html(
-    f"{output_text[:change_point]}<b>{output_text[change_point:]}</b>"
+    f"{prefix_text}<b>{sample_rollout}</b>"
 )

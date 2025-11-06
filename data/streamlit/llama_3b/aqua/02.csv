@@ -1,0 +1,1524 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,12,A,7,0.23333333333333334," 
+
+Let's assume the total work is 1 unit."," 
+
+Mr. Brown paints 1 house in 6 days, so in 1 day he paints 1/6 of a house.
+
+Mr. Black paints 1 house in 8 days, so in 1 day he paints 1/8 of a house.
+
+Mr. Blue paints 1 house in 12 days, so in 1 day he paints 1/12 of a house.
+
+After 8 days, Mr. Brown has painted 8 * (1/6) = 4/3 houses, Mr. Black has painted 8 * (1/8) = 1 house, and Mr. Blue has painted 8 * (1/12) = 2/3 houses.
+
+Total houses painted is 4/3 + 1 + 2/3 = 7/3 houses.
+
+Now, Mr. Black works for 6 more days and paints 6 * (1/8) = 3/4 houses. So the total houses painted now is 7/3 + 3/4 = 31/12 houses.
+
+To paint the remaining 1 - 31/12 = 1/12 of the house, Mr. Blue needs to work (1/12) / (1/12) = 1 day.
+
+The answer is A) 7 days."
+1,12,B,10,0.3333333333333333," 
+
+Let's assume the total work is 1 unit."," We know that Mr.Brown can complete 1/6 of the work in a day, Mr.Black can complete 1/8 of the work in a day, and Mr.Blue can complete 1/12 of the work in a day. 
+
+After 8 days, Mr.Brown has completed 8*(1/6) = 4/3 units of work. Mr.Black has completed 8*(1/8) = 1 unit of work. 
+
+Now, Mr.Brown has gone on vacation, and Mr.Black works for 6 days, completing 6*(1/8) = 3/4 unit of work.
+
+The total work completed is 4/3 + 1 + 3/4 = 13/12 units.
+
+Now, Mr.Blue has to complete the remaining 1 - 13/12 = -1/12 units of work (This is a negative number because there is remaining work) but in reality we should say 1 - 13/12 = 1 - 1 + 1/12 = 1/12, meaning Mr_blue has to complete 1/12 of work.
+
+We know Mr.Blue can complete 1/12 of the work in a day. So, to complete 1/12 of the work, it will take Mr.Blue 1 day.
+
+The answer is B) 8. The amount of time that Mr.Brown has worked is not relevant to this."
+2,12,C,4,0.13333333333333333," 
+
+Let's assume the total work is 1 unit."," We know that Mr. Brown can paint 1 house in 6 days. So, the work of 1 house is 1/6 units per day. 
+
+Mr. Brown's work = 3 houses * (1/6) = 1/2 unit in 8 days. 
+So, 1/2 unit of work is done in 8 days. 
+
+Remaining work = 1 - 1/2 = 1/2 unit. 
+
+Mr. Black can paint 1 house in 8 days. So, Mr. Black's work = 1/8 units per day. 
+
+After 6 days of Mr. Black's work, the work done = 6 * (1/8) = 3/8 units. 
+
+Remaining work = 1 - 3/8 = 5/8 units. 
+
+Since Mr. Blue can paint 1 house in 12 days, his work = 1/12 units per day. 
+
+Time taken by Mr. Blue to complete 5/8 units of work =  (5/8) / (1/12) = 10 days.
+
+So, The correct answer is (C) 10."
+3,12,D,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit."," 
+
+Mr. Brown can paint 1 house in 6 days, so in 8 days, he can paint 1.33 houses (8/6 = 1.33). 
+
+Mr.Brown leaves, and Mr. Black paints for 6 days, so Mr. Black paints 0.75 houses (6/8 = 0.75).
+
+Total painted houses after 8 days: 1.33 + 0.75 = 2.08 houses.
+
+Since 3 houses need to be painted, 0.92 houses remain (3 - 2.08 = 0.92).
+
+Now it's Mr. Blue's turn. He can paint 1 house in 12 days, so he can paint 0.08 houses in 1 day (1/12 = 0.08). 
+
+To paint 0.92 houses, Mr. Blue will take 11.5 days (0.92 / 0.08 = 11.5).
+
+However, the closest answer choice is 11 days."
+4,12,E,7,0.23333333333333334," 
+
+Let's assume the total work is 1 unit."," 
+
+Mr.Brown completes 1/6 of the work in a day, Mr.Black completes 1/8 of the work in a day, and Mr.Blue completes 1/12 of the work in a day.
+
+After 8 days, Mr.Brown completes 8 * (1/6) = 4/3 units of the work, Mr.Black completes 8 * (1/8) = 1 unit of the work, and Mr.Blue completes 8 * (1/12) = 2/3 units of the work.
+
+The total work completed after 8 days is 4/3 + 1 + 2/3 = 11/3 units.
+
+The remaining work is 1 - 11/3 = 2/3 units.
+
+Mr.Black works for 6 days, completing 6 * (1/8) = 3/4 units of the work.
+
+So, 2/3 - 3/4 = -1/12 units of work is left.
+
+Mr.Blue completes 1/12 units of work in a day, so it will take Mr.Blue 12 days to complete the remaining 1/12 unit of work.
+
+The answer is E) 12 days."
+5,15,A,9,0.3," 
+
+Let's assume the total work is 1 unit. 
+
+Mr."," Brown can paint a house in 6 days, so he paints 1/6 of the house per day. 
+Mr. Black can paint a house in 8 days, so he paints 1/8 of the house per day.
+Mr. Blue can paint a house in 12 days, so he paints 1/12 of the house per day.
+
+In the first 8 days, Mr. Brown paints 8*(1/6) = 4/3 units of the house. 
+Then Mr. Black works for 6 days and paints 6*(1/8) = 3/4 units of the house. 
+So, 4/3+3/4=17/12 units of the house is done.
+
+Now 1-17/12 = 5/12 units of the house is left. Mr. Blue needs to paint 5/12 units of the house. 
+Since Mr. Blue paints 1/12 of the house per day, it will take him 5 days to complete the remaining work.
+
+The correct answer is A)7."
+6,15,B,13,0.43333333333333335," 
+
+Let's assume the total work is 1 unit. 
+
+Mr."," Brown can paint 1 house in 6 days, so in 8 days he can paint 8/6 = 1 2/3 house. 
+
+Mr. Brown goes on vacation, so Mr. Black takes over. Mr. Black can paint 1 house in 8 days, so in 6 days he can paint 6/8 = 3/4 house. 
+
+Now, 1 2/3 + 3/4 = 7/4 = 1 3/4 house is left to be painted. 
+
+Mr. Blue can paint 1 house in 12 days, so in 1 3/4 = 3/4 of the house he can paint 3/4 * 12 = 9 days. 
+
+The answer is B)8."
+7,15,C,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr."," Brown can paint in 6 days, so his work rate is 1/6 of a unit per day. Mr. Black can paint in 8 days, so his work rate is 1/8 of a unit per day. Mr. Blue can paint in 12 days, so his work rate is 1/12 of a unit per day.
+
+In the first 8 days, Mr. Brown works at a rate of 1/6 of a unit per day. Mr. Black works for 6 days at a rate of 1/8 of a unit per day. So together, in the first 8 days, they complete 8*(1/6) + 6*(1/8) = 8/6 + 3/4 = 5/2 + 3/4 = 11/4 = 2.75 units of work.
+
+This leaves 1 - 2.75 = 0.25 units of work left.
+
+Now, only Mr. Blue is working. He works at a rate of 1/12 of a unit per day. To complete 0.25 units of work, it will take Mr. Blue 0.25 / (1/12) = 3 days.
+
+So the correct answer is C) 10"
+8,15,D,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr."," Brown's work rate is 1/6 units per day. 
+Mr. Black's work rate is 1/8 units per day. 
+Mr. Blue's work rate is 1/12 units per day. 
+
+The total work rate is 1/6 + 1/8 + 1/12. 
+To add fractions, we need to find the least common denominator. The LCM of 6, 8, and 12 is 24. 
+
+So, the total work rate is 4/24 + 3/24 + 2/24 = 9/24 = 3/8 units per day.
+
+In 8 days, Mr. Brown completes 8 * 1/6 = 4/3 units of work. 
+The remaining work is 1 - 4/3 = 5/3 units.
+
+Mr. Black completes 6 * 1/8 = 3/4 units of work in 6 days. 
+The remaining work is 5/3 - 3/4 = (20 - 9)/12 = 11/12 units.
+
+Mr. Blue's work rate is 1/12 units per day. 
+To complete 11/12 units, he will need 11/12 / 1/12 = 11 days.
+
+The answer is D."
+9,15,E,5,0.16666666666666666," 
+
+Let's assume the total work is 1 unit. 
+
+Mr."," Brown paints 1 house in 6 days, so he can do 1/6 of the work in 1 day. 
+Mr. Black paints 1 house in 8 days, so he can do 1/8 of the work in 1 day. 
+Mr. Blue paints 1 house in 12 days, so he can do 1/12 of the work in 1 day.
+
+After 8 days, the amount of work done is:
+- Mr. Brown: 8 x 1/6 = 4/3
+- Mr. Black: 8 x 1/8 = 1
+- Mr. Blue: 8 x 1/12 = 2/3
+
+Total work done after 8 days = 4/3 + 1 + 2/3 = 7/3
+
+The remaining work is 1 - 7/3 = 4/3
+
+Now Mr. Black is working for 6 days, so the work done by Mr. Black is:
+6 x 1/8 = 3/4
+
+The remaining work after Mr. Black's work is:
+4/3 - 3/4 = 1/12
+
+Since Mr. Blue can do 1/12 of the work in 1 day, he will take 12 days to complete the remaining work. 
+
+So, the answer is E) 12 days."
+10,42,A,8,0.26666666666666666," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day."," 
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+After 8 days, the work done by Mr. Brown is 8*(1/6) = 4/3. 
+The work left is 1 - 4/3 = 2/3.
+Mr. Black works for 6 days, so the work done by Mr. Black is 6 * (1/8) = 3/4.
+The work left is 2/3 - 3/4 = -1/12. Since the work left is negative, it means that there is still work to be done.
+
+However, this isn't the case. The work done by Mr. Black is 3/4 of the total work, leaving 1/4 of the work to be done. Mr. Brown is not working, but Mr. Blue is not working either. So the total work is 1/4.
+
+The work done by Mr. Blue in 8 days is 8 * (1/12) = 2/3.
+Since 1/4 of the work is left, Mr. Blue will take 1/4 / (1/12) = 3 days to complete the remaining work. 
+
+Therefore, the answer is A) 11, 8 (Days) + 3 (Days) = 11"
+11,42,B,15,0.5," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day."," 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day.
+
+After 8 days, Mr. Brown has done 8 * (1/6) = 4/3 of the work, Mr. Black has done 8 * (1/8) = 1 of the work and Mr. Blue has done 8 * (1/12) = 2/3 of the work.
+
+Now, Mr. Black works for 6 more days and completes the remaining work. Mr. Black can paint 1/8 of the work in a day, so in 6 days he will complete 6 * (1/8) = 3/4 of the work.
+
+So, the remaining work is 1 - (4/3 + 3/4) = 1 - (8/12 + 9/12) = 1 - 17/12 = 5/12.
+
+Mr. Blue's work per day is 1/12, so to complete 5/12 of the work, he will need 5 days.
+
+However, we must consider Mr. Brown's work as well. After 8 days, Mr. Brown had worked 4/3 of the work. Mr. Brown's work per day is 1/6, so in 5 days he will complete 5 * (1/6) = 5/6 of the remaining work. Thus, in total, Mr. Brown works 4/3 + 5/6 = 17/6 of the work in 5 days, while Mr. Blue works 5/12 of the work in 5 days. 
+
+We know 17/6 + 5/12 = 17/6 + 5/12 = 29/12. 
+
+Since Mr. Brown and Mr. Blue are working together 5 days, we can say that 29/12 of the work is done in 5 days. 
+
+Since Mr. Brown and Mr. Blue are working together for 5 days, we can say that 5/12 of the work is left. 
+
+Therefore, Mr. Blue will need 5 / (1/12) = 5 * 12 = 60 days to finish the contract.
+
+However, only 5 days have passed so far. Hence, he will need 60 - 5 = 55 more days to finish the contract.
+
+Since there are 3 houses, the total number of days taken to complete all the houses is 60 + 3 = 63.
+
+Since 8 days were already used, 63 - 8 = 55 days were used after Mr. Brown's vacation."
+12,42,C,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day."," 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day.
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+In the first 8 days, Mr. Brown and Mr. Black worked together to paint 8*(1/6+1/8) = 8*(7/24) = 7/3 = 2.33 of the work.
+
+So, 1 - 2.33 = 0.67 or 2/3 of the work is left.
+
+Mr. Black works alone for 6 days and can paint 6*(1/8) = 3/4 of the work.
+
+Adding this to the work already done, Mr. Black completes 2.33 + 3/4 = 11/4 = 2.75 of the work, leaving 1/4 of the work.
+
+Since Mr. Blue can paint 1/12 of the work in one day, he will need 12*(1/4) = 3 days to finish the remaining work.
+
+So the correct answer is C) 3 + 8 days Mr. Brown took = 11"
+13,42,D,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day."," 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+After 8 days, Mr. Brown has painted 8 x 1/6 = 4/3 of the work. 
+
+Then Mr. Black paints for 6 days, so he paints 6 x 1/8 = 3/4 of the work. 
+
+So, the total work completed is 4/3 + 3/4 = 25/12. 
+
+This leaves 1 - 25/12 = 11/12 of the work. 
+
+Mr. Blue can paint 1/12 of the work in 1 day, so he can paint the remaining 11/12 of the work in 11 days.
+
+The answer is D) 11."
+14,42,E,5,0.16666666666666666," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day."," 
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+After 8 days, Mr. Brown has painted 8 * (1/6) = 4/3 of the work, Mr. Black has painted 8 * (1/8) = 1, and Mr. Blue has painted 8 * (1/12) = 2/3 of the work. 
+So, 4/3 + 1 + 2/3 = 11/3 of the work is done, leaving 1 - 11/3 = 2/3 of the work left. 
+
+Since Mr. Black works for 6 days, he completes 6 * (1/8) = 3/4 of the remaining work, leaving 2/4 = 1/2 of the work left. 
+
+Mr. Blue can complete the remaining 1/2 of the work in 1 * (1/12) = 1/12 of a day, so it will take him 12 days to complete the contract. 
+
+The correct answer is (E) 12."
+15,45,A,6,0.2," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr."," Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+After 8 days, Mr. Brown has painted 8 * (1/6) = 4/3 units of work.
+
+Now, Mr. Black takes over and paints for 6 days, completing 6 * (1/8) = 3/4 units of work. 
+
+Total work done so far = 4/3 + 3/4 = 25/12 units.
+
+Since the total work is 1 unit, 1 - 25/12 = 7/12 units of work is left.
+
+Mr. Blue can paint 1/12 of the work in 1 day, so he will take 12 days to complete the remaining 7/12 of the work.
+
+Therefore, the answer is A) 12."
+16,45,B,16,0.5333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr."," Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+Since they are working together on day 1, the total work done is (1/6 + 1/8 + 1/12) = 1/3 of the work.
+
+Now, after 8 days, Mr. Brown goes on vacation, and Mr. Black works for 6 days. So, Mr. Black completes 6/8 of the work, leaving 2/3 of the work to be done.
+
+Since Mr. Brown and Mr. Black are not working together, we need to calculate the individual work rates for these 6 days.
+
+Mr. Black can paint 1/8 of the work in 1 day, so in 6 days he can paint (6/8) * (1/8) = 3/32 of the work. 
+
+The remaining 2/3 of the work (2/3 - 3/32) can be painted by Mr. Blue in x days. 
+
+Now we can set up the equation:
+
+(2/3 - 3/32) = (1/12) * x 
+
+To find the common denominator of 12, we multiply both sides by 96 (32*3):
+
+(2/3 - 3/32) * (32/32) = (1/12) * (96/96)
+32/32 - 3/32 = 8/96
+(32-3)/32 = 8/96
+29/32 = 2/12x
+
+Cross-multiply:
+29 * 12 = 2 * 32x
+348 = 64x
+x = 348/64
+x = 429/64 days
+
+x ≈ 6.72 days
+
+The approximate number is not given in the choices, but the least of the given options is 7."
+17,45,C,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr."," Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+In the first 8 days, Mr. Brown and Mr. Black paint 1/6 + 1/8 = 7/24 of the work. 
+
+After Mr. Brown's vacation, Mr. Black paints for 6 more days and paints 6*(1/8) = 3/4 of the work, leaving 1 - 3/4 = 1/4 of the work for Mr. Blue to paint. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, he can paint 1/4 of the work in 4 days. 
+
+The answer is C) 10."
+18,45,D,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr."," Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown and Mr. Black work together. 
+
+Mr. Brown works for 8 days, so he completes 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black works for 8 days, so he completes 8 * (1/8) = 1 of the work. 
+
+So together, they complete 4/3 + 1 = 7/3 of the work. 
+
+Now, 1 - 7/3 = 4/3 of the work is left. 
+
+Mr. Black works for 6 more days, so he completes 6 * (1/8) = 3/4 of the work. 
+
+So, Mr. Black completes 1 - 3/4 = 1/4 of the remaining work. 
+
+Mr. Blue needs to complete the remaining 1/4 of the work, which will take 1/4 * 12 = 3 days. 
+
+Therefore, the total time Mr. Blue works is 8 + 3 = 11 days. 
+
+The answer is D) 11."
+19,45,E,5,0.16666666666666666," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr."," Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+Let's analyze the situation:
+
+Day 1-8: Mr. Brown paints 8/6 = 4/3 of the work. 
+
+After 8 days, 1 - 4/3 = 2/3 of the work remains. 
+
+Mr. Black takes over after 8 days and works for 6 days. He paints 6/8 = 3/4 of the work in 6 days. 
+
+So, 3/4 of the work is done by Mr. Black. 
+
+Now, 2/3 - 3/4 = -1/12 of the work remains. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, it will take him 12 days to complete the remaining work. 
+
+Therefore, the correct answer is E) 12 days."
+20,72,A,7,0.23333333333333334," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day."," 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+After 8 days, Mr. Brown has painted 8 * (1/6) = 4/3 units of the work. 
+
+Mr. Black then paints for 6 days, so he paints 6 * (1/8) = 3/4 units of the work. 
+
+The total work done so far is 4/3 + 3/4 = 25/12 units. 
+
+The remaining work is 1 - 25/12 = 7/12 units. 
+
+Since Mr. Blue paints 1/12 of the work in 1 day, he will take 7/12 days to complete the remaining work. 
+
+7/12 * 12 = 7 days 
+
+The answer is A)7"
+21,72,B,10,0.3333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day."," 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown has painted 8 * (1/6) = 4/3 units of work, Mr. Black has painted 8 * (1/8) = 1 unit of work, and Mr. Blue has painted 8 * (1/12) = 2/3 units of work. 
+
+So, 4/3 + 1 + 2/3 = 11/3 = 3.67 units of work is done.
+
+The remaining work is 1 - 3.67 = -0.67 which is 2/3 of the total work.
+
+Now, Mr. Black works for the next 6 days, painting 6 * (1/8) = 3/4 of the remaining work, so the remaining work is 2/3 - 3/4 = -1/12 of the total work.
+
+This means Mr. Blue must paint 1/12 of the work in 1 day to finish the contract. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, it will take him 12 days."
+22,72,C,7,0.23333333333333334," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day."," 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+Let's first calculate how much work Mr. Black can do in 8 days. Since Mr. Brown leaves after 8 days, Mr. Black works alone for 8 days. 
+
+Mr. Black's work in 8 days: 8 x (1/8) = 1
+
+Now, there's 1 unit of work left for Mr. Blue and Mr. Brown to do since Mr. Black has finished his part. 
+
+Since Mr. Brown leaves, we have only Mr. Blue's contribution from now on. 
+
+Mr. Blue can paint 1/12 of the work in 1 day. 
+
+Time taken by Mr. Blue to finish the remaining work: 
+Time = (1 - 1) / (1/12) 
+Time = 0 / (1/12) 
+Time = 0 
+
+However, since the work cannot be zero, Mr. Brown must have done some work in the first 8 days to give some work to Mr. Blue. Let's rework it. 
+
+Since Mr. Brown leaves after 8 days, Mr. Brown has contributed some work. Mr. Brown's work in 8 days: 
+8 x (1/6) = 4/3 
+
+Mr. Blue will have to do the remaining work. 
+Remaining work = 1 - 4/3 
+= 1/3 
+
+Time taken by Mr. Blue to finish the remaining 1/3 of the work: 
+Time = (1/3) / (1/12) 
+Time = 4 
+
+The answer is C)10"
+23,72,D,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day."," 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+After 8 days, Mr. Brown has painted 8 * (1/6) = 4/3 units of work.
+
+Now, Mr. Black works for 6 days, so he can do 6 * (1/8) = 3/4 units of work.
+
+Now, the total work done is (4/3) + (3/4) = 25/12 units.
+
+Since 25/12 is 2 1/12, there is 1/12 of the work left. 
+
+Mr. Blue can do 1/12 of the work in 1 day. Therefore, he will take 12 days to complete the remaining work.
+
+The answer is D)12."
+24,72,E,4,0.13333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day."," 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+Mr. Brown paints for 8 days and completes 8*(1/6) = 4/3 of the work. 
+
+The remaining work is 1 - 4/3 = 1/3 of the work. 
+
+Mr. Black paints for 6 days and completes 6*(1/8) = 3/4 of the work. 
+
+So, the remaining work is 1/3 - 3/4 = 1/12 of the work. 
+
+It will take Mr. Blue 12 days to complete this remaining 1/12 of the work. 
+
+Therefore, the correct answer is E)12."
+25,75,A,7,0.23333333333333334," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr."," Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+After 8 days, the work done by Mr. Brown is 8 * 1/6 = 4/3 of the work. 
+
+After Mr. Brown goes on vacation, Mr. Black takes over. Mr. Black works for 6 days and completes 6 * 1/8 = 3/4 of the work. 
+
+The remaining work is 1 - 4/3 - 3/4 = 1/12 of the work. 
+
+Since Mr. Blue can complete 1/12 of the work in 1 day, it will take him 1 day to complete the remaining work. 
+
+Therefore, the correct answer is A)7."
+26,75,B,14,0.4666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr."," Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+In the first 8 days, the work done by the three painters is:
+Mr. Brown: 8 * (1/6) = 4/3
+Mr. Black: 8 * (1/8) = 1
+Mr. Blue: 8 * (1/12) = 2/3
+Total work done in 8 days: 4/3 + 1 + 2/3 = 7/3
+
+Since 7/3 is more than 1, the work is not complete. Mr. Black works for 6 more days:
+Mr. Brown: 0
+Mr. Black: 6 * (1/8) = 3/4
+Mr. Blue: 0
+Total work done in 6 more days: 3/4
+
+The total work done is 7/3 + 3/4 = 31/12
+
+Since 31/12 is approximately 2.58, it is more than 1. So it will take Mr. Blue some time to finish the contract.
+
+The remaining work is: 1 - 31/12 = 7/12
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, the remaining work will be completed in 7 days.
+
+The total time taken by Mr. Blue is 8 + 7 = 15 days.
+
+However, none of the choices match this. We should consider that 7/12 can be painted by Mr. Blue in 1 day if he works alone. Therefore the correct answer is 12"
+27,75,C,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr."," Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+After 8 days, Mr. Brown has painted 8 * (1/6) = 4/3 units of work, Mr. Black has painted 8 * (1/8) = 1 unit of work, and Mr. Blue has painted 8 * (1/12) = 2/3 units of work.
+
+So, the remaining work is 1 - (4/3 + 1 + 2/3) = 1 - 3 = 2/3 units of work.
+
+Mr. Black paints 1/8 of the work in 1 day, so 2/3 units of work would take (2/3) / (1/8) = 16 days for Mr. Black to complete. 
+
+The answer is C. 10 days is not a correct choice because it was not calculated."
+28,75,D,4,0.13333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr."," Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+In the remaining 4 days, Mr. Black paints 6 * (1/8) = 3/4 of the work. 
+
+The work done by Mr. Brown and Mr. Black in 8 days is 4/3 + 3/4 = 25/12. 
+
+The remaining work is 1 - 25/12 = 11/12. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, it will take him 11 days to complete the remaining work. 
+
+So, the correct answer is D) 11."
+29,75,E,4,0.13333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr."," Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day.
+
+After Mr. Brown works for 8 days, the amount of work done by Mr. Brown is 8 * (1/6) = 4/3 units.
+
+Mr. Black then works for 6 days, so he completes 6 * (1/8) = 3/4 units of work.
+
+The total amount of work done by both Mr. Brown and Mr. Black is (4/3) + (3/4) = 25/12 units.
+
+Now, only 1 - (25/12) = 1 - 25/12 = -7/12 units of work is left.
+
+Mr. Blue can complete this remaining work in 1 / (1/12) = 12 days.
+
+The answer is E) 12"
+30,102,A,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day."," 
+
+In the first 8 days, Mr. Brown paints 8*(1/6) = 4/3 of the work. 
+
+After Mr. Brown goes on vacation, Mr. Black works for 6 days and paints 6*(1/8) = 3/4 of the work. 
+
+So, after 8 days, Mr. Brown and Mr. Black together have painted 4/3 + 3/4 = 31/12 of the work.
+
+Since Mr. Brown and Mr. Black together have painted 31/12 of the work, Mr. Blue will have to paint 1 - 31/12 = 1/12 of the work. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, he will take 1 day to complete the remaining work. 
+
+The answer is (A) 7"
+31,102,B,14,0.4666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day."," 
+
+In the first 8 days, Mr. Brown worked for 8 days and Mr. Black worked for 8 days. In total, they completed (8 * 1/6) + (8 * 1/8) = 8/6 + 1 = 2 1/3 of the work.
+
+Now, Mr. Brown is on vacation and Mr. Black works for 6 days. In total, Mr. Black completes 6 * 1/8 = 3/4 of the remaining work. 
+
+So, the remaining work is 1 - 2 1/3 - 3/4 = 1 - 8/12 - 9/12 = 1 - 17/12 = -5/12 which is impossible. The question implies that the work cannot be negative so there must have been a mistake in the given choices, however, this also means that the total time for Mr. Black to complete the work would not be 6 days."
+32,102,C,9,0.3," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day."," 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 units of the work. 
+
+After Mr. Brown goes on vacation, Mr. Black takes over and works for 6 days. Mr. Black can paint 1/8 of the work in 1 day, so in 6 days, he can paint 6 * (1/8) = 3/4 units of the work. 
+
+So, in total, Mr. Brown and Mr. Black have painted 4/3 + 3/4 = 31/12 units of the work in 14 days. 
+
+This means 1 - 31/12 = 1 - 8/12 = 4/12 = 1/3 of the work remains. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, he can paint the remaining 1/3 of the work in 3 days. 
+
+The answer is C)10."
+33,102,D,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day."," 
+
+After 8 days, Mr. Brown has done 8 * (1/6) = 4/3 of the work. Mr. Brown goes on vacation and Mr. Black works for 6 days, so he completes (6 * (1/8)) = 3/4 of the remaining work. 
+
+The remaining work is 1 - (4/3 + 3/4) = 1 - 25/12 = 11/12. 
+
+Since Mr. Blue can do 1/12 of the work in 1 day, he needs 11 days to complete the remaining work. 
+
+The answer is D)11."
+34,102,E,3,0.1," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day."," 
+
+In the first 8 days, Mr. Brown has painted 8*(1/6) = 4/3 units of work. 
+
+Remaining work is 1 - 4/3 = 1/3. 
+
+Mr. Black then works for 6 days and paints 6*(1/8) = 3/4 units of work. 
+
+Total work done by Mr. Black is 3/4 + 4/3 = 25/12 units. 
+
+However, 3/4 is more than 1/3. So, there is still some work left. We need to find out how much. 
+
+So, remaining work is 1 - 25/12 = -7/12. Since we can't have negative work, this means that Mr. Black has painted more work than the remaining work. So, we will only consider the work done by Mr. Black as 1/3 unit. 
+
+Remaining work is 1 - 1/3 = 2/3. 
+
+Mr. Blue can paint 1/12 of the work in 1 day. 
+
+Mr.Blue will take 2*(12) = 24 days to complete the remaining 2/3 of the work. 
+
+Therefore, the correct answer is E)12."
+35,112,A,8,0.26666666666666666," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr."," Brown and Mr. Black paint (8 * (1/6)) + (8 * (1/8)) = 4/6 + 1 = 5/6 of the work. 
+
+So, 1/6 of the work is left to be painted. 
+
+In the next 6 days, Mr. Black paints 6 * (1/8) = 3/4 of the remaining work. 
+
+The remaining work is 1 - 3/4 = 1/4. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, he will need (1/4) / (1/12) = 12 days to paint the remaining work. 
+
+Therefore, the correct answer is 12 days."
+36,112,B,13,0.43333333333333335," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr."," Brown, Mr. Black, and Mr. Blue will each paint for 8 days, so they will complete 8*(1/6 + 1/8 + 1/12) of the work. 
+
+8*(1/6 + 1/8 + 1/12) = 8*(4/24 + 3/24 + 2/24) = 8*9/24 = 3/2 or 1 1/2 units of work.
+
+1 - 1 1/2 = 1/2 unit of work is left to paint. Mr. Black works for 6 more days, so he can complete 6*(1/8) = 3/4 of the remaining work. 
+
+3/4 of 1/2 unit is 3/8, so 3/8 of 1/2 unit is 3/16 of the total work. 
+
+The remaining work is 1/2 - 3/16 = 8/16 - 3/16 = 5/16 of the total work. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, he can paint 5/16 of the work in 5/12 days. 
+
+5/12 of the work is 5/16 of the total work, so 5/12 of the work is (5/12)*(12/12) = 5/12 of the work is completed by Mr. Blue in 5/12 days."
+37,112,C,4,0.13333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr."," Brown can paint 8 * (1/6) = 4/3 of the work. 
+
+The remaining work is 1 - 4/3 = 1/3. 
+
+After Mr. Brown goes on vacation, Mr. Black paints for 6 more days. Mr. Black can paint 1/8 of the work in 1 day, so in 6 days, he can paint 6 * (1/8) = 3/4 of the work. 
+
+The remaining work is 1 - 3/4 = 1/4. 
+
+Mr. Blue can paint 1/12 of the work in 1 day, so to paint 1/4 of the work, it will take him 1/4 * 12 = 3 days. 
+
+The answer is C) 10."
+38,112,D,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr."," Brown paints 8 * 1/6 = 4/3 units of the work. 
+
+Mr. Black takes over and paints for 6 days, so he paints 6 * 1/8 = 3/4 of the work. 
+
+The work done by Mr. Black and Mr. Brown together is 4/3 + 3/4 = 25/12 units of the work. 
+
+The work left is 1 - 25/12 = 11/12 units of the work. 
+
+Mr. Blue can paint 1/12 of the work in 1 day. 
+
+To paint 11/12 of the work, it will take him 11 days. 
+
+The answer is D) 11."
+39,112,E,4,0.13333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr."," Brown paints 8 * 1/6 = 4/3 of the work, Mr. Black paints 8 * 1/8 = 1 of the work, and Mr. Blue paints 8 * 1/12 = 2/3 of the work. 
+
+The sum of the work done by Mr. Brown, Mr. Black, and Mr. Blue in the first 8 days is 4/3 + 1 + 2/3 = 3, which is 1 house. 
+
+After Mr. Brown goes on vacation, Mr. Black works for 6 days and paints 6 * 1/8 = 3/4 of the work. 
+
+The remaining work is 1 - 3/4 = 1/4. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, he would take 4 days to complete 1/4 of the work. 
+
+So, it will take Mr. Blue 4 days to complete the remaining work. 
+
+The total number of days required to complete the contract is 8 days (Mr. Brown and Mr. Black) + 4 days (Mr. Blue) = 12 days. 
+
+The correct answer is E) 12."
+40,131,A,12,0.4," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work."," 
+
+Mr. Black then paints for 6 days and 6 * (1/8) = 3/4 of the work. 
+
+So, at the end of 14 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, he will need 7 days to complete the remaining work. 
+
+The answer is A) 7."
+41,131,B,13,0.43333333333333335," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work."," 
+
+Mr. Black paints 8 * (1/8) = 1 of the work. 
+
+The remaining work is 1 - (4/3 + 1) = -1/3 of the work. 
+
+Mr. Black paints 6 * (1/8) = 3/4 of the work, so all the remaining work is completed by Mr. Blue. 
+
+Since Mr. Blue paints 1/12 of the work in 1 day, he will take 12/1/12 = 12 days to complete the remaining 1/4 of the work. 
+
+Therefore, the total time it takes Mr. Blue to complete the contract is 8 days (for Mr. Brown) + 6 days (for Mr. Black) + 12 days (for Mr. Blue) = 26 days. 
+
+However, the answer is not among the options, so the question must be incorrect or there must be an error in the question."
+42,131,C,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work."," 
+
+The remaining work is 1 - 4/3 = 1/3. 
+
+Now Mr. Black works for 6 days, so he paints 6 * (1/8) = 3/4 of the remaining work. 
+
+The remaining work is 1/3 - 3/4 = -1/12, but since you can't have a negative work, that means that the remaining work is 1 - 3/4 = 1/4. 
+
+Now Mr. Blue starts working, and he can paint 1/12 of the work in 1 day. So he will need 4 days to complete the remaining work. 
+
+Answer: C)10"
+43,131,E,3,0.1," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work."," 
+
+Now, Mr. Black paints for 6 days and finishes the remaining 4/3 - 4/3 = 0 (this is impossible), or Mr. Brown and Mr. Black together can finish 1/6 + 1/8  = 7/24 of the work in 1 day. 
+
+So, Mr. Black paints for 6 days and finishes 6 * 7/24 = 7/4 of the work, leaving 4/3 - 7/4 = 1/12 of the work. 
+
+Therefore, Mr. Blue will need 12 days to finish the remaining work. 
+
+The correct answer is E)12."
+44,134,A,12,0.4," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr."," Black paints 8 * (1/8) = 1 of the work in those 8 days. 
+
+So, in the first 8 days, Mr. Brown paints 4/3 of the work and Mr. Black paints 1 of the work. 
+
+This means 4/3 of the work is done and 1/3 is left. 
+
+Mr. Black then paints for 6 more days, so he paints 6 * (1/8) = 3/4 of the work. 
+
+In total, Mr. Black paints 1 + 3/4 = 7/4 of the work in 8 days. 
+
+Since 4/3 of the work was done in the first 8 days and 7/4 of the work was done by Mr. Black, the remaining 1/3 - 7/4 = -11/12 of the work is left. 
+
+However, this calculation does not add up since it should be less than zero for Mr. Blue to complete the remaining work. This means Mr. Black completed more work than what is remaining. 
+
+The correct approach would be to calculate how much work was done by Mr. Blue in the first 8 days. 
+
+Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black paints 8 * (1/8) = 1 of the work in those 8 days. 
+
+So, in the first 8 days, Mr. Brown paints 4/3 of the work and Mr. Black paints 1 of the work. 
+
+This means 4/3 of the work is done and 1/3 is left. 
+
+Mr. Black then paints for 6 more days, so he paints 6 * (1/8) = 3/4 of the work. 
+
+In total, Mr. Black paints 1 + 3/4 = 7/4 of the work in 8 days. 
+
+Since 4/3 of the work was done in the first 8 days and 7/4 of the work was done by Mr. Black, the remaining 1/3 - 7/4 = -1/12 of the work is left. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, Mr. Blue will paint the remaining 1/12 of the work in 1 day. 
+
+The correct answer is A) 7."
+45,134,B,11,0.36666666666666664," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr."," Black paints 8 * (1/8) = 1 of the work, leaving 4/3 - 1 = 1/3 of the work. 
+
+Mr. Black then paints for 6 more days and paints 6 * (1/8) = 3/4 of the work. 
+
+So 3/4 + 1/3 = 13/12 of the work is done. 
+
+The remaining 1 - 13/12 = 1/12 of the work is left for Mr. Blue. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, it will take him 1 day to complete the remaining work. 
+
+So the answer is A) 9, however, I think it would be 8 + 1 = 9"
+46,134,C,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr."," Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, the total work done in the first 8 days is 4/3 + 3/4 = 25/12. 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Now, only Mr. Blue is working and he can paint 1/12 of the work in 1 day. To paint 7/12 of the work, he will take 7 days. 
+
+The answer is C) 10 days is incorrect since Mr. Blue has less than 10 days to finish the work."
+47,134,D,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr."," Black then paints for 6 days, so he paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 14 days (8 + 6), 4/3 + 3/4 of the work is done. 
+
+To add these fractions, we need to find the least common multiple of 3 and 4, which is 12. 
+
+So, (4/3) * (4/4) = 16/12 and (3/4) * (3/3) = 9/12. 
+
+16/12 + 9/12 = 25/12. 
+
+So, 25/12 of the work is done after 14 days. 
+
+The remaining work is 1 - 25/12 = 12/12 - 25/12 = -13/12, but we can't have negative work. 
+
+So, 13/12 of the work is left, and Mr. Blue can paint 1/12 of the work in 1 day. 
+
+So, 13/12 * 12 = 13 days. 
+
+The answer is D) 13."
+48,134,E,3,0.1," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr."," Black paints 8 * (1/8) = 1 of the work in the next 6 days. 
+
+So, after 14 days, 4/3 + 1 = 7/3 of the work is done. 
+
+Now, only 1 - 7/3 = 4/3 of the work is left. 
+
+Mr. Blue can paint 1/12 of the work in 1 day. 
+
+To paint 4/3 of the work, Mr. Blue needs (4/3) / (1/12) = 16 days.
+
+So, Mr. Blue will need 16 days to complete the contract.
+
+The correct answer is E) 16 days"
+49,154,A,15,0.5," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work."," 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 has been completed. 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Mr. Blue can complete the remaining work in 7/12 / (1/12) = 7 days. 
+
+Therefore, the answer is A) 7."
+50,154,B,10,0.3333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work."," 
+
+The total work done by Mr. Brown and Mr. Black is 4/3 + 3/4 = (16+9)/12 = 25/12 of the work. 
+
+So, 1 - 25/12 = 12/12 - 25/12 = -13/12 of the work remains for Mr. Blue. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, he will take 12 * 12 = 144 days to complete the remaining 1/12 of the work, which is the entire contract. 
+
+So, Mr. Blue needs 13 days to complete the contract."
+51,154,C,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work."," 
+
+The total work done by Mr. Brown and Mr. Black in 14 days is 4/3 + 3/4 = 25/12. 
+
+Now, 4/12 of the work is left, which is 1 - 25/12 = 6/12 = 1/2. 
+
+Mr. Blue can paint 1/12 of the work in 1 day, so to paint 1/2 of the work, he will need 2 days. 
+
+The total time taken by Mr. Blue to complete the contract is 8 + 2 = 10 days."
+52,154,D,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work."," 
+
+So after 14 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+Since 1 - 25/12 = 11/12 of the work is left for Mr. Blue to complete. 
+
+As Mr. Blue can paint 1/12 of the work in 1 day, he will complete the remaining work in 11 days, so the answer is D)11."
+53,154,E,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work."," 
+
+So, after 14 days, Mr. Brown has gone on vacation, and the remaining work is 1 - 4/3 - 3/4 = 1/12 of the work. 
+
+Since Mr. Blue can paint 1/12 of the work in 1 day, it will take him 12 days to complete the remaining work. 
+
+Therefore, the correct answer is E) 12."
+54,182,A,16,0.5333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done."," 
+
+Now 7/12 of the work remains. 
+
+Mr. Blue can do 1 house in 12 days, so it will take him 7/12 * 12 = 7 days to finish the remaining work. 
+
+The answer is A) 7."
+55,182,B,7,0.23333333333333334," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done."," 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Since Mr. Brown is on vacation, Mr. Black continues to paint for 6 more days, painting 6 * (1/8) = 3/4 of the work. 
+
+So, the total work done by Mr. Black is 3/4 + 3/4 = 3/2 of the work. 
+
+Now, (7/12) * (2/3) = 7/18 of the work remains to be done. 
+
+Mr. Blue paints 1/12 of the work in 1 day, so he will need 7 * 12 = 84 days to complete the remaining work. 
+
+However, this would be the number of days required to paint the whole work if Mr. Brown was not on vacation. 
+
+Since the work is already (3/2) done by Mr. Black, Mr. Blue only needs to paint (7/18) of the work, 
+
+(7/12) * (2/3) = 7/18. 
+
+Therefore, Mr. Blue will need (7/18) * 12 = 7 days to complete the remaining work."
+56,182,C,5,0.16666666666666666," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done."," 
+
+The remaining work is 1 - 25/12 = 12/12 - 25/12 = -13/12, which doesn't make sense. We made a mistake in our calculations. 
+
+Let's try another approach. 
+
+Let's assume the total work is 3 units. 
+
+Mr. Brown can paint 1/6 of the work in 1 day, so in 8 days, he can paint 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black can paint 1/8 of the work in 1 day, so in 6 days, he can paint 6 * (1/8) = 3/4 of the work. 
+
+So, in 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+Now, the remaining work is 3 - 25/12 = 9/12 - 25/12 = -16/12, which doesn't make sense again. We made another mistake. Let's re-calculate the work done by Mr. Brown and Mr. Black in 8 days. 
+
+Mr. Brown can paint 1/6 of the work in 1 day, so in 8 days, he can paint 8 * (1/6) = 4/3 units of work. 
+
+Mr. Black can paint 1/8 of the work in 1 day, so in 8 days, he can paint 8 * (1/8) = 1 unit of work. 
+
+So, in 8 days, 4/3 + 1 = 7/3 units of work is done. 
+
+The remaining work is 3 - 7/3 = 2/3 units. 
+
+Mr. Blue can paint 1/12 of the work per day, so he needs 3 * 12 = 36 days to paint 2/3 units of work. 
+
+The answer is C) 10."
+57,182,D,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done."," 
+
+1 - 25/12 = 11/12 of the work is left. 
+
+In 1 day, Mr. Blue can paint 1/12 of the work, so he will take 11 days to complete the remaining 11/12 of the work. 
+
+The answer is D)11."
+58,200,A,25,0.8333333333333334," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12."," 
+
+To complete the remaining work, Mr. Blue needs to paint 7/12 of the work in 1 day. 
+
+So, Mr. Blue will need 7/12 / (1/12) = 7 days to complete the contract."
+59,200,B,3,0.1," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12."," 
+
+Mr. Blue can paint 1/12 of the work in 1 day. So, he will take 7 days to paint 7/12 of the work. 
+
+So, Mr. Blue will complete the contract in 7 days. 
+
+Therefore, The correct option is B)8"
+60,200,E,2,0.06666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12."," 
+
+Now Mr. Blue can paint 1/12 of the work in 1 day. 
+
+So it will take Mr. Blue 7 days to complete the remaining work. 
+
+The answer is E) 12 (initial 8 days + 7 days for Blue)."
+61,203,A,27,0.9," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Mr."," Blue paints 1/12 of the work in 1 day. 
+
+To paint 7/12 of the work, Mr.Blue will take 7 days. 
+
+The answer is A) 7."
+62,203,C,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Mr."," Blue can paint 1/12 of the work in 1 day. So, to paint 7/12 of the work, he needs 7 days. 
+
+The answer is C)10."
+63,203,D,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Mr."," Blue can paint 1/12 of the work in 1 day, so he will need 7 days to complete the remaining 7/12 of the work. 
+
+The answer is D) 7"
+64,203,E,1,0.03333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Mr."," Blue will paint 1/12 of the work in 1 day, so he will take 12 * 7 = 84 days to complete the remaining 7/12 of the work. 
+
+However, since we want to know how many days he will take to finish the whole contract, we can divide 84 by 7 to get the number of days he will take to finish the whole contract: 84/7 = 12. 
+
+So, the answer is 12.
+
+The correct answer is E."
+65,231,A,26,0.8666666666666667," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Mr. Blue can paint 1/12 of the work in 1 day, so he will take 7 days to complete the remaining work."," 
+
+Therefore, the answer is A)7."
+66,231,B,4,0.13333333333333333," 
+
+Let's assume the total work is 1 unit. 
+
+Mr. Brown can paint 1 house in 6 days, so he can paint 1/6 of the work in 1 day. 
+
+Mr. Black can paint 1 house in 8 days, so he can paint 1/8 of the work in 1 day. 
+
+Mr. Blue can paint 1 house in 12 days, so he can paint 1/12 of the work in 1 day. 
+
+In the first 8 days, Mr. Brown paints 8 * (1/6) = 4/3 of the work. 
+
+Mr. Black then paints 6 * (1/8) = 3/4 of the work. 
+
+So, after 8 days, 4/3 + 3/4 = 25/12 of the work is done. 
+
+The remaining work is 1 - 25/12 = 7/12. 
+
+Mr. Blue can paint 1/12 of the work in 1 day, so he will take 7 days to complete the remaining work."," 
+
+The total number of days Mr. Blue takes to complete the contract is 8 + 7 = 15 days. 
+
+However, this is not one of the answer choices."
+67,240,A,30,1.0,,

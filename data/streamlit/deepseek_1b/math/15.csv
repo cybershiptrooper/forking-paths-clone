@@ -1,0 +1,1298 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,36,A,6,0.3,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+","Next, I can express \(120^\circ\) as \(180^\circ - 60^\circ\). Using the cosine of a difference formula, \(\cos(A - B)\), I substitute \(A = 180^\circ\) and \(B = 60^\circ\).
+
+Applying the formula, \(\cos(180^\circ - 60^\circ) = -\cos 60^\circ\).
+
+Since \(\cos 60^\circ = \frac{1}{2}\), it follows that \(-\cos 60^\circ = -\frac{1}{2}\).
+
+Therefore, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Identify the Quadrant:**
+   
+   \(120^\circ\) is in the **second quadrant**. In the second quadrant, only sine is positive, and cosine is negative.
+
+2. **Use Reference Angle:**
+
+   The reference angle for \(120^\circ\) is:
+   \[
+   180^\circ - 120^\circ = 60^\circ
+   \]
+   
+   The cosine of \(120^\circ\) will have the same magnitude as \(\cos 60^\circ\) but will be negative.
+
+3. **Calculate \(\cos 60^\circ\):**
+
+   \[
+   \cos 60^\circ = \frac{1}{2}
+   \]
+
+4. **Apply the Sign Based on the Quadrant:**
+
+   Since \(120^\circ\) is in the second quadrant, \(\cos 120^\circ\) is negative.
+
+5. **Final Answer:**
+
+   \[
+   \cos 120^\circ = -\frac{1}{2}
+   \]
+
+**Answer:** \(\boxed{-\dfrac{1}{2}}\)"
+1,36,B,14,0.7,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+","Next, I'll use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since the reference angle is \(60^\circ\) and the cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+Therefore, the final answer is \(-\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is located in the **second quadrant**.
+   - In the second quadrant, **cosine** values are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is calculated as:
+     \[
+     \text{Reference angle} = 180^\circ - 120^\circ = 60^\circ
+     \]
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\)
+   - Since the cosine value is negative in the second quadrant:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+4. **Final Answer:**
+   \[
+   \boxed{-\dfrac{1}{2}}
+   \]"
+2,45,A,9,0.45,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept."," The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\). I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values are negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+
+4. **Apply the Sign Based on the Quadrant:**
+   - Since \(120^\circ\) is in the second quadrant, \(\cos 120^\circ\) is **negative**.
+   - Therefore, \(\cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}\).
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+3,45,B,11,0.55,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept."," The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since \(120^\circ\) is in the second quadrant with a negative cosine value, \(\cos 120^\circ = -\frac{1}{2}\).
+
+Finally, comparing this with the given choices, the correct answer is \(-\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Determine the Quadrant:**
+   
+   The angle \(120^\circ\) is in the **second quadrant**. In the second quadrant, **cosine** values are **negative**.
+
+2. **Find the Reference Angle:**
+   
+   The reference angle for \(120^\circ\) is:
+   \[
+   180^\circ - 120^\circ = 60^\circ
+   \]
+
+3. **Use the Reference Angle to Find the Cosine Value:**
+   
+   We know that:
+   \[
+   \cos 60^\circ = \frac{1}{2}
+   \]
+
+4. **Apply the Sign Based on the Quadrant:**
+   
+   Since \(120^\circ\) is in the second quadrant and cosine is negative there:
+   \[
+   \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+   \]
+
+5. **Match the Result to the Given Choices:**
+   
+   Among the provided choices:
+   \[
+   \text{B) } -\frac{1}{2}
+   \]
+
+**Final Answer:**
+\[
+\boxed{B}
+\]"
+4,78,A,8,0.4,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+","I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since \(120^\circ\) is in the second quadrant, \(\cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Determine the Quadrant:**
+   
+   \(120^\circ\) is located in the **second quadrant**. In the second quadrant, **cosine** values are **negative**.
+
+2. **Find the Reference Angle:**
+   
+   The reference angle for \(120^\circ\) is calculated as:
+   \[
+   180^\circ - 120^\circ = 60^\circ
+   \]
+
+3. **Use the Reference Angle to Find the Cosine:**
+   
+   \[
+   \cos 120^\circ = -\cos 60^\circ
+   \]
+   
+   Since \(\cos 60^\circ = \frac{1}{2}\), we have:
+   \[
+   \cos 120^\circ = -\frac{1}{2}
+   \]
+
+4. **Verify the Value:**
+   
+   You can verify this using the unit circle. The point corresponding to \(120^\circ\) is \(\left(-\frac{1}{2}, \frac{\sqrt{3}}{2}\right)\). Therefore:
+   \[
+   \cos 120^\circ = -\frac{1}{2}
+   \]
+
+**Final Answer:**
+\[
+\boxed{-\frac{1}{2}}
+\]"
+5,78,B,12,0.6,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+","I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+So, the final answer is \(-\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Determine the Quadrant:**
+   
+   \(120^\circ\) is in the **second quadrant**, where cosine values are **negative**.
+
+2. **Use the Reference Angle:**
+   
+   The reference angle for \(120^\circ\) is:
+   \[
+   180^\circ - 120^\circ = 60^\circ
+   \]
+
+3. **Find the Cosine of the Reference Angle:**
+   
+   \[
+   \cos 60^\circ = \frac{1}{2}
+   \]
+
+4. **Apply the Sign Based on the Quadrant:**
+   
+   Since \(120^\circ\) is in the second quadrant, \(\cos 120^\circ\) is **negative**.
+   \[
+   \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+   \]
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+6,98,A,11,0.55,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+","Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}\).
+
+Therefore, the correct answer is \(-\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Determine the Quadrant:**
+   - \(120^\circ\) is located in the **second quadrant**.
+   - In the second quadrant, the cosine values are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is calculated as:
+     \[
+     \text{Reference Angle} = 180^\circ - 120^\circ = 60^\circ
+     \]
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - We know that \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+4. **Final Answer:**
+   \[
+   \boxed{-\frac{1}{2}}
+   \]
+
+**Answer:** \(\boxed{-\frac{1}{2}}\)"
+7,98,B,9,0.45,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+","Since the cosine value is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), we can follow these steps:
+
+1. **Understand the Quadrant:**
+   
+   \(120^\circ\) is in the **second quadrant** of the unit circle. In the second quadrant, cosine values are **negative**.
+
+2. **Find the Reference Angle:**
+   
+   The reference angle for \(120^\circ\) is calculated as:
+   \[
+   180^\circ - 120^\circ = 60^\circ
+   \]
+   
+3. **Use the Reference Angle to Find the Cosine:**
+   
+   We know that:
+   \[
+   \cos 60^\circ = \frac{1}{2}
+   \]
+   
+   Since cosine is negative in the second quadrant:
+   \[
+   \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+   \]
+   
+4. **Final Answer:**
+   
+   Therefore,
+   \[
+   \boxed{-\dfrac{1}{2}}
+   \]"
+8,126,A,9,0.45,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+","</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Determine the Quadrant:**
+   
+   - \(120^\circ\) lies in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   
+   - The reference angle for \(120^\circ\) is:
+     \[
+     180^\circ - 120^\circ = 60^\circ
+     \]
+
+3. **Use the Reference Angle to Find the Cosine:**
+   
+   - \(\cos 60^\circ = \frac{1}{2}\)
+   - Since cosine is negative in the second quadrant:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+9,126,B,11,0.55,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+","</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Determine the Quadrant:**
+   
+   \(120^\circ\) is located in the **second quadrant**, where **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   
+   The reference angle for \(120^\circ\) is calculated as:
+   \[
+   180^\circ - 120^\circ = 60^\circ
+   \]
+   
+3. **Use Known Values:**
+   
+   We know that:
+   \[
+   \cos 60^\circ = \frac{1}{2}
+   \]
+   
+4. **Apply the Sign Based on the Quadrant:**
+   
+   Since \(120^\circ\) is in the second quadrant, the cosine value will be **negative**:
+   \[
+   \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+   \]
+   
+Therefore, the value of \(\cos 120^\circ\) is \(\boxed{-\dfrac{1}{2}}\)."
+10,128,A,7,0.35,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+","To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Identify the Quadrant:**
+   
+   - \(120^\circ\) is located in the **second quadrant**.
+   - In the second quadrant, cosine values are **negative**.
+
+2. **Find the Reference Angle:**
+   
+   - The reference angle for \(120^\circ\) is:
+     \[
+     180^\circ - 120^\circ = 60^\circ
+     \]
+   
+3. **Use the Reference Angle to Find the Cosine Value:**
+   
+   - We know that \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+11,128,B,13,0.65,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+","To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, cosine values are **negative**.
+
+2. **Find the Reference Angle:**
+   
+   - The reference angle for \(120^\circ\) is calculated as:
+     \[
+     180^\circ - 120^\circ = 60^\circ
+     \]
+
+3. **Use the Reference Angle:**
+   
+   - \(\cos 60^\circ = \frac{1}{2}\)
+
+4. **Apply the Sign Based on the Quadrant:**
+   
+   - Since \(120^\circ\) is in the second quadrant and cosine is negative there:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+12,145,A,10,0.5,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+","1. **Identify the Quadrant:**
+   
+   - \(120^\circ\) is located in the **second quadrant**.
+   - In the second quadrant, **cosine** values are **negative**.
+
+2. **Find the Reference Angle:**
+   
+   - The reference angle is the acute angle formed with the x-axis.
+   - Formula: \(\text{Reference Angle} = 180^\circ - \theta\)
+   - Calculation: \(180^\circ - 120^\circ = 60^\circ\)
+
+3. **Use the Reference Angle:**
+   
+   - \(\cos 120^\circ = -\cos 60^\circ\)
+   - \(\cos 60^\circ = \frac{1}{2}\)
+
+4. **Final Result:**
+   
+   \[
+   \cos 120^\circ = -\frac{1}{2}
+   \]
+
+**Answer:**
+
+\(\boxed{-\dfrac{1}{2}}\)"
+13,145,B,10,0.5,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+","1. **Determine the Quadrant:**
+   
+   - The angle \(120^\circ\) is in the **second quadrant**.
+
+2. **Find the Reference Angle:**
+   
+   - The reference angle for \(120^\circ\) is calculated as:
+     \[
+     180^\circ - 120^\circ = 60^\circ
+     \]
+
+3. **Use the Reference Angle to Find the Cosine Value:**
+   
+   - In the second quadrant, cosine values are **negative**.
+   - \(\cos 60^\circ = \frac{1}{2}\)
+   - Therefore:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\frac{1}{2}}
+\]"
+14,147,A,7,0.35,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1."," **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values are negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Compute the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+
+4. **Apply the Sign Based on the Quadrant:**
+   - Since \(120^\circ\) is in the second quadrant, \(\cos 120^\circ\) is negative.
+   - \(\cos 120^\circ = -\frac{1}{2}\).
+
+**Final Answer:**
+
+\[\boxed{-\dfrac{1}{2}}\]"
+15,147,B,13,0.65,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1."," **Determine the Quadrant:**
+   
+   \(120^\circ\) is in the **second quadrant**.
+
+2. **Find the Reference Angle:**
+   
+   The reference angle is calculated as:
+   \[
+   180^\circ - 120^\circ = 60^\circ
+   \]
+
+3. **Use the Reference Angle to Find the Cosine:**
+   
+   In the second quadrant, cosine values are **negative**. Therefore:
+   \[
+   \cos 120^\circ = -\cos 60^\circ
+   \]
+
+4. **Evaluate \(\cos 60^\circ\):**
+   
+   \[
+   \cos 60^\circ = \frac{1}{2}
+   \]
+
+5. **Combine the Results:**
+   
+   \[
+   \cos 120^\circ = -\frac{1}{2}
+   \]
+
+**Final Answer:**
+
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+16,155,A,3,0.15,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+","   
+   \(120^\circ\) is located in the **second quadrant** of the unit circle. In the second quadrant, **cosine** values are **negative**.
+
+2. **Find the Reference Angle:**
+   
+   The reference angle for \(120^\circ\) is calculated as:
+   \[
+   180^\circ - 120^\circ = 60^\circ
+   \]
+   
+3. **Use the Reference Angle to Find the Cosine:**
+   
+   Since \(\cos 60^\circ = \frac{1}{2}\), and cosine is negative in the second quadrant:
+   \[
+   \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+   \]
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+17,155,B,17,0.85,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+","   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, cosine values are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle is the acute angle formed with the x-axis.
+   - \[
+     \text{Reference angle} = 180^\circ - 120^\circ = 60^\circ
+     \]
+   
+3. **Use the Reference Angle to Compute Cosine:**
+   - \[
+     \cos 120^\circ = -\cos 60^\circ
+     \]
+   - \[
+     \cos 60^\circ = \frac{1}{2}
+     \]
+   - Therefore:
+   \[
+     \cos 120^\circ = -\frac{1}{2}
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+18,172,A,14,0.7,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+","   - In the second quadrant, **cosine** values are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle is the acute angle formed with the x-axis.
+   - \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+
+4. **Apply the Sign Based on the Quadrant:**
+   - Since cosine is negative in the second quadrant:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+Therefore, the final answer is:
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+19,172,B,6,0.3,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+","   - In the second quadrant, **cosine values are negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+   - \(\cos 60^\circ = \frac{1}{2}\).
+
+3. **Apply the Sign from the Quadrant:**
+   - Since \(120^\circ\) is in the second quadrant, where cosine is negative, we have:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\frac{1}{2}}
+\]"
+20,189,A,8,0.4,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+","2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+   - \(\cos 60^\circ = \frac{1}{2}\).
+
+3. **Apply the Sign Based on the Quadrant:**
+   - Since \(120^\circ\) is in the second quadrant and cosine is negative there:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+21,189,B,12,0.6,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+","2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+   - \(\cos 60^\circ = \frac{1}{2}\).
+
+3. **Apply the Quadrant Sign:**
+   - Since \(120^\circ\) is in the second quadrant, \(\cos 120^\circ = -\cos 60^\circ\).
+   - \(\cos 120^\circ = -\frac{1}{2}\).
+
+Therefore, the final answer is:
+
+\[\boxed{-\frac{1}{2}}\]"
+22,191,A,12,0.6,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2."," **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle:**
+   - \(\cos 120^\circ = -\cos 60^\circ\).
+   - \(\cos 60^\circ = \frac{1}{2}\).
+
+4. **Combine the Results:**
+   - \(\cos 120^\circ = -\frac{1}{2}\).
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+23,191,B,8,0.4,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2."," **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is calculated as:
+     \[
+     180^\circ - 120^\circ = 60^\circ
+     \]
+   - So, \(\cos 120^\circ = \cos (180^\circ - 60^\circ)\).
+
+3. **Use the Cosine of the Reference Angle:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+
+4. **Apply the Sign Based on the Quadrant:**
+   - Since \(120^\circ\) is in the second quadrant where cosine is negative:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+Therefore, the final answer is:
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+24,198,A,12,0.6,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+","   - The reference angle for \(120^\circ\) is:
+     \[
+     180^\circ - 120^\circ = 60^\circ
+     \]
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\)
+   - Since cosine is negative in the second quadrant:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+So, the final answer is:
+\[
+\boxed{-\frac{1}{2}}
+\]"
+25,198,B,8,0.4,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+","   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\)
+   - Since the cosine is negative in the second quadrant:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\frac{1}{2}}
+\]"
+26,233,A,14,0.7,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+","3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+Therefore, the value of \(\cos 120^\circ\) is \(\boxed{-\frac{1}{2}}\)."
+27,233,B,6,0.3,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+","3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+**Final Answer:**
+\[
+\boxed{B}
+\]"
+28,235,A,10,0.5,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3."," **Use the Reference Angle:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+
+4. **Apply the Sign Based on the Quadrant:**
+   - Since \(120^\circ\) is in the second quadrant and cosine is negative there, we have:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\frac{1}{2}}
+\]"
+29,235,B,9,0.45,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3."," **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+**Final Answer:**
+\[
+\boxed{-\frac{1}{2}}
+\]"
+30,235,C,1,0.05,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3."," **Use the Reference Angle to Find the Cosine Value:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+Therefore, \(\cos 120^\circ = \boxed{-\dfrac{1}{2}}\)."
+31,247,A,13,0.65,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+","   - \(\cos 60^\circ = \frac{1}{2}\).
+
+4. **Apply the Sign Based on the Quadrant:**
+   - Since \(120^\circ\) is in the second quadrant and cosine is negative there, 
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}.
+     \]
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+32,247,B,7,0.35,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+","   - \(\cos 60^\circ = \frac{1}{2}\)
+
+4. **Apply the Sign Based on the Quadrant:**
+   - Since \(120^\circ\) is in the second quadrant and cosine is negative there:
+     \[
+     \cos 120^\circ = -\cos 60^\circ = -\frac{1}{2}
+     \]
+
+5. **Final Answer:**
+   \[
+   \boxed{-\dfrac{1}{2}}
+   \]
+
+Therefore, the correct choice is \(\boxed{-\dfrac{1}{2}}\)."
+33,266,A,7,0.35,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+","   - Since \(120^\circ\) is in the second quadrant, \(\cos 120^\circ = -\cos 60^\circ\).
+
+4. **Calculate the Final Value:**
+   \[
+   \cos 120^\circ = -\frac{1}{2}
+   \]
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+34,266,B,13,0.65,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+","   - Since \(120^\circ\) is in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+**Final Answer:**
+\[
+\boxed{-\frac{1}{2}}
+\]"
+35,296,A,2,0.1,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+","Therefore, the final answer is:
+
+\[
+\boxed{-\dfrac{1}{2}}
+\]"
+36,296,B,18,0.9,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+","Therefore, the final answer is:
+
+\[
+\boxed{-\frac{1}{2}}
+\]"
+37,301,B,20,1.0,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+**Final Answer:**
+","\[
+\boxed{-\frac{1}{2}}
+\]"
+38,303,B,20,1.0,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+**Final Answer:**
+\[
+","\boxed{-\frac{1}{2}}
+\]"
+39,314,B,20,1.0,"To compute \(\cos 120^\circ\), I start by recognizing that \(120^\circ\) is in the second quadrant where cosine values are negative.
+
+Next, I use the reference angle concept. The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+I know that \(\cos 60^\circ = \frac{1}{2}\).
+
+Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+</think>
+
+To compute \(\cos 120^\circ\), follow these steps:
+
+1. **Understand the Quadrant:**
+   - \(120^\circ\) is in the **second quadrant**.
+   - In the second quadrant, **cosine values** are **negative**.
+
+2. **Find the Reference Angle:**
+   - The reference angle for \(120^\circ\) is \(180^\circ - 120^\circ = 60^\circ\).
+
+3. **Use the Reference Angle to Find the Cosine:**
+   - \(\cos 60^\circ = \frac{1}{2}\).
+   - Since cosine is negative in the second quadrant, \(\cos 120^\circ = -\frac{1}{2}\).
+
+**Final Answer:**
+\[
+\boxed{-\dfrac{1}{2}}
+",\]

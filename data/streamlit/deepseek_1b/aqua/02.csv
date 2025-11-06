@@ -1,0 +1,2047 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,185,A,6,0.3,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1."," From the first equation: S + 30 = 2A - 60 ⇒ S = 2A - 90
+2. Substitute S into the second equation:
+  A + 10 = 3(2A - 90 - 10) ⇒ A + 10 = 3(2A - 100)
+  A + 10 = 6A - 300 ⇒ -5A = -310 ⇒ A = 62
+3. Substitute A = 62 into S = 2A - 90 ⇒ S = 2(62) - 90 ⇒ 124 - 90 = 34
+
+**Verification:**
+- After Arun gives $30: Arjun has 32, Sajal has 64 (twice as much).
+- After Sajal gives $10: Arjun has 72, Sajal has 24 (three times as much).
+
+The calculations are consistent with the problem statements.
+</think>
+
+Let's solve the problem step by step.
+
+**Let:**
+- **A** = Amount of money Arjun has initially.
+- **S** = Amount of money Sajal has initially.
+
+**First Scenario:**
+- Arjun gives **$30** to Sajal.
+- Arjun's remaining money: **A - 30**
+- Sajal's money: **S + 30**
+- According to the problem:
+  \[
+  S + 30 = 2 \times (A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60
+  \]
+  \[
+  S = 2A - 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives **$10** to Arjun.
+- Arjun's money: **A + 10**
+- Sajal's remaining money: **S - 10**
+- According to the problem:
+  \[
+  A + 10 = 3 \times (S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30
+  \]
+  \[
+  A = 3S - 40 \quad \text{(Equation 2)}
+  \]
+
+**Now, solve the system of equations:**
+
+From **Equation 1**:
+\[
+S = 2A - 90
+\]
+Substitute **Equation 1** into **Equation 2**:
+\[
+A = 3(2A - 90) - 40
+\]
+\[
+A = 6A - 270 - 40
+\]
+\[
+A = 6A - 310
+\]
+\[
+-5A = -310
+\]
+\[
+A = 62
+\]
+
+**Find S:**
+\[
+S = 2(62) - 90 = 124 - 90 = 34
+\]
+
+**Verification:**
+1. **After Arun gives $30:**
+   - Arjun: \(62 - 30 = 32\)
+   - Sajal: \(34 + 30 = 64\) (which is twice Arjun's amount)
+   
+2. **After Sajal gives $10:**
+   - Arjun: \(62 + 10 = 72\)
+   - Sajal: \(34 - 10 = 24\) (which is three times Arjun's amount)
+
+**Final Answer:**
+\[
+\boxed{A) \; 62, \; 34}
+\]"
+1,185,B,12,0.6,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1."," **From the first scenario:**
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. **From the second scenario:**
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. **Use substitution or elimination to solve the system of equations.**
+   - Multiply the first equation by 3:
+     6A - 3S = 270
+   - Subtract the second equation:
+     6A - 3S - (A - 3S) = 270 - (-40)
+     5A = 310
+     A = 62
+
+4. **Substitute A = 62 into the first equation:**
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62, and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplify:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplify:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+
+We can solve Equation 1 and Equation 2 using substitution or elimination. Here, we'll use elimination.
+
+1. **Multiply Equation 1 by 3:**
+   \[
+   3(2A - S) = 3 \times 90 \quad \Rightarrow \quad 6A - 3S = 270 \quad \text{(Equation 3)}
+   \]
+
+2. **Subtract Equation 2 from Equation 3:**
+   \[
+   (6A - 3S) - (A - 3S) = 270 - (-40) \\
+   5A = 310 \\
+   A = 62
+   \]
+
+3. **Substitute \( A = 62 \) into Equation 1:**
+   \[
+   2(62) - S = 90 \\
+   124 - S = 90 \\
+   S = 34
+   \]
+
+**Final Answer:**
+
+Arjun has \(\boxed{A}\) and Sajal has \(\boxed{S}\).
+
+\[
+\boxed{
+\begin{aligned}
+&\text{Arjun: } 62 \\
+&\text{Sajal: } 34
+\end{aligned}
+}
+\]
+
+**Answer Choices:**
+\[
+\boxed{B}
+\]"
+2,185,C,1,0.05,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1."," From the first equation:
+   S = 2A - 60
+
+2. Substitute S in the second equation:
+   A + 10 = 3(2A - 60 - 10)
+   A + 10 = 3(2A - 70)
+   A + 10 = 6A - 210
+   -5A = -220
+   A = 44
+
+3. Substitute A back into the first equation:
+   S = 2(44) - 60
+   S = 28
+
+**Conclusion:**
+Arjun initially has $44, and Sajal has $28.
+</think>
+
+Let's solve the problem step by step.
+
+**Let:**
+- \( A \) be the amount of money Arjun initially has.
+- \( S \) be the amount of money Sajal initially has.
+
+**First Scenario:**
+- Arjun gives **\$30** to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  \[
+  S = 2A - 60 - 30
+  \]
+  \[
+  S = 2A - 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives **\$10** to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  \[
+  A + 10 = 3S - 30
+  \]
+  \[
+  A = 3S - 40 \quad \text{(Equation 2)}
+  \]
+
+**Now, solve the system of equations:**
+
+From **Equation 1**:
+\[
+S = 2A - 90
+\]
+
+Substitute \( S \) in **Equation 2**:
+\[
+A = 3(2A - 90) - 40
+\]
+\[
+A = 6A - 270 - 40
+\]
+\[
+A = 6A - 310
+\]
+\[
+-5A = -310
+\]
+\[
+A = 62
+\]
+
+Now, substitute \( A = 62 \) back into **Equation 1**:
+\[
+S = 2(62) - 90
+\]
+\[
+S = 124 - 90
+\]
+\[
+S = 34
+\]
+
+**Final Answer:**
+Arjun has **\$62** and Sajal has **\$34**.
+
+\[
+\boxed{A}
+\]"
+3,185,E,1,0.05,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1."," From the first scenario:
+   S + 30 = 2A - 60
+   Simplifying:
+   2A = S + 90
+   A = (S + 90)/2
+
+2. From the second scenario:
+   A + 10 = 3S - 30
+   Substituting A from above:
+   (S + 90)/2 + 10 = 3S - 30
+   Simplifying:
+   S + 90 + 20 = 6S - 60
+   110 = 5S
+   S = 22
+
+3. Substituting S = 22 into A = (S + 90)/2:
+   A = (22 + 90)/2 = 112/2 = 56
+
+**Verification:**
+- After Arjun gives $30 to Sajal:
+  Arjun: 56 - 30 = $26
+  Sajal: 22 + 30 = $52
+  52 = 2 * 26 ✔️
+  
+- After Sajal gives $10 to Arjun:
+  Arjun: 56 + 10 = $66
+  Sajal: 22 - 10 = $12
+  66 = 3 * 12 ✔️
+
+**Answer:**
+Arjun has $56 and Sajal has $22.
+
+Wait, but the options provided are:
+A) 62, 35
+B) 62, 34
+C) 34, 62
+D) 42, 62
+E) 62, 42
+
+Hmm, none of these match my calculations. Did I make an error in setting up the equations?
+</think>
+
+Let's solve the problem step by step.
+
+**Let:**
+- \( A \) = Amount Arjun has
+- \( S \) = Amount Sajal has
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's money becomes \( A - 30 \)
+- Sajal's money becomes \( S + 30 \)
+- According to the problem: \( S + 30 = 2(A - 30) \)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money becomes \( A + 10 \)
+- Sajal's money becomes \( S - 10 \)
+- According to the problem: \( A + 10 = 3(S - 10) \)
+
+**Now, let's solve these equations:**
+
+1. **From the first scenario:**
+   \[
+   S + 30 = 2A - 60
+   \]
+   Simplifying:
+   \[
+   2A = S + 90 \quad \Rightarrow \quad A = \frac{S + 90}{2}
+   \]
+
+2. **From the second scenario:**
+   \[
+   A + 10 = 3S - 30
+   \]
+   Substituting \( A \) from the previous step:
+   \[
+   \frac{S + 90}{2} + 10 = 3S - 30
+   \]
+   Multiply both sides by 2 to eliminate the denominator:
+   \[
+   S + 90 + 20 = 6S - 60
+   \]
+   Simplify:
+   \[
+   S + 110 = 6S - 60
+   \]
+   \[
+   110 + 60 = 6S - S
+   \]
+   \[
+   170 = 5S \quad \Rightarrow \quad S = 34
+   \]
+
+3. **Now, substitute \( S = 34 \) back into the equation for \( A \):**
+   \[
+   A = \frac{34 + 90}{2} = \frac{124}{2} = 62
+   \]
+
+**Final Answer:**
+Arjun has **62** dollars and Sajal has **34** dollars.
+
+**Answer: E) 62, 42**"
+4,221,A,5,0.25,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2."," From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Multiply the first equation by 3:
+   6A - 3S = 270
+
+4. Subtract the second equation:
+   6A - 3S - (A - 3S) = 270 - (-40)
+   5A = 310
+   A = 62
+
+5. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer: Arjun has $62 and Sajal has $34.**
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+### **First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+### **Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+### **Solving the Equations:**
+1. **Equation 1:** \( 2A - S = 90 \)
+2. **Equation 2:** \( A - 3S = -40 \)
+
+   - Multiply Equation 1 by 3:
+     \[
+     6A - 3S = 270 \quad \text{(Equation 3)}
+     \]
+   - Subtract Equation 2 from Equation 3:
+     \[
+     6A - 3S - (A - 3S) = 270 - (-40)
+     \]
+     \[
+     5A = 310
+     \]
+     \[
+     A = 62
+     \]
+   
+   - Substitute \( A = 62 \) into Equation 1:
+     \[
+     2(62) - S = 90
+     \]
+     \[
+     124 - S = 90
+     \]
+     \[
+     S = 34
+     \]
+
+### **Final Answer:**
+- Arjun has \$62.
+- Sajal has \$34.
+
+\[
+\boxed{A) \ 62,\ 34}
+\]"
+5,221,B,15,0.75,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2."," From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Now, solve the system of equations:
+   Multiply the first equation by 3:
+   6A - 3S = 270
+
+   Subtract the second equation:
+   (6A - 3S) - (A - 3S) = 270 - (-40)
+   5A = 310
+   A = 62
+
+4. Substitute A = 62 into the first equation:
+   2*62 - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplify:
+  \[
+  S + 30 = 2A - 60
+  \]
+  \[
+  2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplify:
+  \[
+  A + 10 = 3S - 30
+  \]
+  \[
+  A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+
+From Equation 1:
+\[
+2A - S = 90
+\]
+Let's express \( S \) in terms of \( A \):
+\[
+S = 2A - 90
+\]
+
+Substitute \( S = 2A - 90 \) into Equation 2:
+\[
+A - 3(2A - 90) = -40
+\]
+\[
+A - 6A + 270 = -40
+\]
+\[
+-5A = -310
+\]
+\[
+A = 62
+\]
+
+Now, substitute \( A = 62 \) back into \( S = 2A - 90 \):
+\[
+S = 2(62) - 90 = 124 - 90 = 34
+\]
+
+**Final Answer:**
+Arjun has \$62 and Sajal has \$34.
+
+\[
+\boxed{62,\ 34}
+\]"
+6,257,A,8,0.4,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3."," Use substitution or elimination to solve the system:
+   Multiply the first equation by 3: 6A - 3S = 270
+   Add to the second equation: 7A = 230
+   So, A = 230 / 7 ≈ 32.857, which is not an integer.
+
+**Checking the Options:**
+None of the options have A = 32.857. Therefore, the correct answer must be one of the given choices.
+
+**Final Answer:**
+The correct answer is A) 62, 35
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplify:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplify:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the Equations:**
+From Equation 1:
+\[
+2A - S = 90 \quad \Rightarrow \quad S = 2A - 90
+\]
+
+Substitute \( S \) into Equation 2:
+\[
+A - 3(2A - 90) = -40
+\]
+\[
+A - 6A + 270 = -40
+\]
+\[
+-5A = -310 \quad \Rightarrow \quad A = 62
+\]
+
+Substitute \( A = 62 \) back into Equation 1:
+\[
+2(62) - S = 90 \quad \Rightarrow \quad 124 - S = 90 \quad \Rightarrow \quad S = 34
+\]
+
+**Answer:**
+Arjun has 62 dollars and Sajal has 34 dollars. 
+
+\[
+\boxed{A}
+\]"
+7,257,B,12,0.6,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3."," We now have a system of equations:
+   2A - S = 90
+   A - 3S = -40
+
+4. Solving the system:
+   - Multiply the second equation by 2: 2A - 6S = -80
+   - Subtract the first equation from this: (-5S = 10)
+   - So, S = -2
+
+5. Substitute S = -2 into the first equation:
+   2A - (-2) = 90
+   Simplify: 2A + 2 = 90
+   So, A = 44
+
+6. However, these values do not make sense as they result in negative money. Therefore, we need to re-examine the problem for any possible mistakes or alternative interpretations.
+
+Upon reviewing, we realize that the problem might involve different interpretations, such as integer constraints or specific amounts leading to whole numbers. Re-examining the equations and possible interpretations, we find that the correct amounts are:
+
+Arjun has $62, and Sajal has $34.
+</think>
+
+Let's solve the problem step by step.
+
+**Let:**
+- \( A \) = Amount of money Arjun has initially.
+- \( S \) = Amount of money Sajal has initially.
+
+**First Scenario:**
+- Arjun gives \$30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplify:
+  \[
+  S + 30 = 2A - 60 \\
+  2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives \$10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplify:
+  \[
+  A + 10 = 3S - 30 \\
+  A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+We have:
+\[
+\begin{cases}
+2A - S = 90 \quad \text{(Equation 1)} \\
+A - 3S = -40 \quad \text{(Equation 2)}
+\end{cases}
+\]
+
+Let's solve Equation 2 for \( A \):
+\[
+A = 3S - 40
+\]
+
+Substitute \( A \) from above into Equation 1:
+\[
+2(3S - 40) - S = 90 \\
+6S - 80 - S = 90 \\
+5S = 170 \\
+S = 34
+\]
+
+Now, substitute \( S = 34 \) back into \( A = 3S - 40 \):
+\[
+A = 3(34) - 40 \\
+A = 102 - 40 \\
+A = 62
+\]
+
+**Verification:**
+1. **First Scenario:**
+   - Arjun after giving: \( 62 - 30 = 32 \)
+   - Sajal after receiving: \( 34 + 30 = 64 \)
+   - Check: \( 64 = 2 \times 32 \) ✔️
+
+2. **Second Scenario:**
+   - Arjun after receiving: \( 62 + 10 = 72 \)
+   - Sajal after giving: \( 34 - 10 = 24 \)
+   - Check: \( 72 = 3 \times 24 \) ✔️
+
+**Final Answer:**
+\[
+\boxed{62,\ 34}
+\]"
+8,312,A,13,0.65,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4."," Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   Simplify: S = 34
+
+**Final Answer:**
+Arjun has $62, and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives \( \$30 \) to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \\
+  2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives \( \$10 \) to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \\
+  A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+
+1. From Equation 1:
+   \[
+   2A - S = 90
+   \]
+   
+2. From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+   
+   Multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270
+   \]
+   
+   Subtract Equation 2:
+   \[
+   6A - 3S - (A - 3S) = 270 - (-40) \\
+   5A = 310 \\
+   A = 62
+   \]
+   
+3. Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \\
+   124 - S = 90 \\
+   S = 34
+   \]
+
+**Final Answer:**
+Arjun has \(\boxed{62}\) dollars, and Sajal has \(\boxed{34}\) dollars."
+9,312,B,7,0.35,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4."," Substitute A = 62 into 2A - S = 90:
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplify:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplify:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(2)}
+  \]
+
+**Solving the System of Equations:**
+From equation (1):
+\[
+2A - S = 90
+\]
+From equation (2):
+\[
+A - 3S = -40
+\]
+
+Multiply equation (1) by 3:
+\[
+6A - 3S = 270 \quad \text{(3)}
+\]
+
+Subtract equation (2) from equation (3):
+\[
+5A = 310 \quad \Rightarrow \quad A = 62
+\]
+
+Substitute \( A = 62 \) into equation (1):
+\[
+124 - S = 90 \quad \Rightarrow \quad S = 34
+\]
+
+**Final Answer:**
+\[
+\boxed{62,\ 34}
+\]"
+10,688,A,17,0.85,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1."," From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2. From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+3. Multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270
+   \]
+4. Subtract Equation 2 from this result:
+   \[
+   5A = 310 \quad \Rightarrow \quad A = 62
+   \]
+5. Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \quad \Rightarrow \quad 124 - S = 90 \quad \Rightarrow \quad S = 34
+   \]
+
+**Final Answer:**
+Arjun has \(\boxed{62}\) dollars and Sajal has \(\boxed{34}\) dollars."
+11,688,B,3,0.15,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1."," From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2. From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+   Multiply Equation 2 by 3:
+   \[
+   3A - 9S = -120
+   \]
+   Subtract Equation 2 from this result:
+   \[
+   (3A - 9S) - (A - 3S) = -120 - (-40)
+   \]
+   Simplifying:
+   \[
+   2A - 6S = -80 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(already Equation 2)}
+   \]
+   To solve, express \( A \) in terms of \( S \) from Equation 1:
+   \[
+   2A = 90 + S \quad \Rightarrow \quad A = \frac{90 + S}{2}
+   \]
+   Substitute into Equation 2:
+   \[
+   \frac{90 + S}{2} - 3S = -40
+   \]
+   Multiply through by 2:
+   \[
+   90 + S - 6S = -80 \quad \Rightarrow \quad -5S = -170 \quad \Rightarrow \quad S = 34
+   \]
+   Substitute \( S = 34 \) into Equation 1:
+   \[
+   2A - 34 = 90 \quad \Rightarrow \quad 2A = 124 \quad \Rightarrow \quad A = 62
+   \]
+
+**Final Answer:**
+Arjun has \(\boxed{62}\) and Sajal has \(\boxed{34}\)."
+12,712,A,19,0.95,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1. From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2."," From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+3. Multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270
+   \]
+4. Subtract Equation 2 from this result:
+   \[
+   5A = 310 \quad \Rightarrow \quad A = 62
+   \]
+5. Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \quad \Rightarrow \quad 124 - S = 90 \quad \Rightarrow \quad S = 34
+   \]
+
+**Final Answer:**
+Arjun has \(\boxed{62}\) and Sajal has \(\boxed{34}\)."
+13,712,B,1,0.05,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1. From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2."," From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+3. Multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270
+   \]
+4. Subtract Equation 2 from this result:
+   \[
+   5A = 310 \quad \Rightarrow \quad A = 62
+   \]
+5. Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \quad \Rightarrow \quad S = 34
+   \]
+
+**Final Answer:**
+Arjun has \$62 and Sajal has \$34.
+
+\[
+\boxed{62,\ 34}
+\]"
+14,736,A,18,0.9,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1. From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2. From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+3."," Multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270 \quad \text{(Equation 3)}
+   \]
+4. Subtract Equation 2 from Equation 3:
+   \[
+   5A = 310 \quad \Rightarrow \quad A = 62
+   \]
+5. Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \quad \Rightarrow \quad 124 - S = 90 \quad \Rightarrow \quad S = 34
+   \]
+
+**Final Answer:**
+Arjun has \(\boxed{62}\) and Sajal has \(\boxed{34}\)."
+15,736,B,2,0.1,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1. From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2. From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+3."," To solve this system, let's multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270
+   \]
+4. Subtract Equation 2 from this result:
+   \[
+   6A - 3S - (A - 3S) = 270 - (-40) \quad \Rightarrow \quad 5A = 310 \quad \Rightarrow \quad A = 62
+   \]
+5. Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \quad \Rightarrow \quad 124 - S = 90 \quad \Rightarrow \quad S = 34
+   \]
+
+**Final Answer:**
+\[
+\boxed{62,\ 34}
+\]"
+16,766,A,18,0.9,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1. From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2. From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+3. Multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270
+   \]
+4."," Subtract Equation 2 from the multiplied Equation 1:
+   \[
+   6A - 3S - (A - 3S) = 270 - (-40)
+   \]
+   \[
+   5A = 310 \quad \Rightarrow \quad A = 62
+   \]
+5. Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \quad \Rightarrow \quad 124 - S = 90 \quad \Rightarrow \quad S = 34
+   \]
+
+**Final Answer:**
+Arjun has \boxed{62} and Sajal has \boxed{34}."
+17,766,B,2,0.1,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1. From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2. From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+3. Multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270
+   \]
+4."," Subtract Equation 2:
+   \[
+   5A = 310 \quad \Rightarrow \quad A = 62
+   \]
+5. Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \quad \Rightarrow \quad 124 - S = 90 \quad \Rightarrow \quad S = 34
+   \]
+
+**Final Answer:**
+Arjun has \(\boxed{62}\) and Sajal has \(\boxed{34}\).
+
+**Answer:**  
+The correct choice is \(\boxed{B}\)."
+18,803,A,16,0.8,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1. From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2. From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+3. Multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270
+   \]
+4. Subtract Equation 2 from this result:
+   \[
+   5A = 310 \quad \Rightarrow \quad A = 62
+   \]
+5."," Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \quad \Rightarrow \quad 124 - S = 90 \quad \Rightarrow \quad S = 34
+   \]
+
+**Final Answer:**
+Arjun has \$62 and Sajal has \$34.
+
+**Answer:**
+\boxed{A)62,34}"
+19,803,B,4,0.2,"Let's define the initial amounts of money Arjun and Sajal have as A and S, respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: A - 30
+- Sajal's money: S + 30
+- According to the problem, Sajal will have twice as much as Arjun:
+  S + 30 = 2(A - 30)
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: A + 10
+- Sajal's remaining money: S - 10
+- According to the problem, Arjun will have thrice as much as Sajal:
+  A + 10 = 3(S - 10)
+
+**Solving the Equations:**
+1. From the first equation:
+   S + 30 = 2A - 60
+   Simplify: 2A - S = 90
+
+2. From the second equation:
+   A + 10 = 3S - 30
+   Simplify: A - 3S = -40
+
+3. Solve the system of equations:
+   - Multiply the first equation by 3: 6A - 3S = 270
+   - Subtract the second equation: 5A = 310
+   - A = 62
+
+4. Substitute A = 62 into the first equation:
+   2(62) - S = 90
+   124 - S = 90
+   S = 34
+
+**Final Answer:**
+Arjun has $62 and Sajal has $34.
+</think>
+
+Let's define the initial amounts of money Arjun and Sajal have as \( A \) and \( S \), respectively.
+
+**First Scenario:**
+- Arjun gives $30 to Sajal.
+- Arjun's remaining money: \( A - 30 \)
+- Sajal's money: \( S + 30 \)
+- According to the problem, Sajal will have twice as much as Arjun:
+  \[
+  S + 30 = 2(A - 30)
+  \]
+  Simplifying:
+  \[
+  S + 30 = 2A - 60 \quad \Rightarrow \quad 2A - S = 90 \quad \text{(Equation 1)}
+  \]
+
+**Second Scenario:**
+- Sajal gives $10 to Arjun.
+- Arjun's money: \( A + 10 \)
+- Sajal's remaining money: \( S - 10 \)
+- According to the problem, Arjun will have thrice as much as Sajal:
+  \[
+  A + 10 = 3(S - 10)
+  \]
+  Simplifying:
+  \[
+  A + 10 = 3S - 30 \quad \Rightarrow \quad A - 3S = -40 \quad \text{(Equation 2)}
+  \]
+
+**Solving the System of Equations:**
+1. From Equation 1:
+   \[
+   2A - S = 90
+   \]
+2. From Equation 2:
+   \[
+   A - 3S = -40
+   \]
+3. Multiply Equation 1 by 3:
+   \[
+   6A - 3S = 270
+   \]
+4. Subtract Equation 2 from this result:
+   \[
+   5A = 310 \quad \Rightarrow \quad A = 62
+   \]
+5."," Substitute \( A = 62 \) into Equation 1:
+   \[
+   2(62) - S = 90 \quad \Rightarrow \quad 124 - S = 90 \quad \Rightarrow \quad S = 34
+   \]
+
+**Final Answer:**
+Arjun has \$62 and Sajal has \$34.
+
+\[
+\boxed{A) \ 62, \ 35} \quad \text{(Incorrect)}
+\]
+\[
+\boxed{B) \ 62, \ 34}
+\]
+\[
+\boxed{C) \ 34, \ 62}
+\]
+\[
+\boxed{D) \ 42, \ 62}
+\]
+\[
+\boxed{E) \ 62, \ 42}
+\]
+
+**Correct Answer:**
+\[
+\boxed{B) \ 62, \ 34}
+\]"
+20,893,A,20,1.0,,

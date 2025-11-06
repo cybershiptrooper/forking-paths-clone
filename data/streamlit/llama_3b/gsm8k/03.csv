@@ -1,0 +1,44 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,22,B,1,0.03333333333333333," 
+
+Jonathan has 2 dozen measuring cups, which is 2 x 12 = 24 measuring cups."," He also has 2/3 as many measuring spoons as measuring cups, which is 2/3 x 24 = 16 measuring spoons.
+
+Jonathan then receives 6 measuring spoons as a gift from Pedro. So, the total number of measuring spoons Jonathan has now is 16 + 6 = 22 measuring spoons.
+
+Now, let's subtract the number of measuring cups (24) from the number of measuring spoons (22) to find the number of utensils Jonathan has remaining: 22 - 24 = -2.
+
+The correct answer is B) -1"
+1,22,C,8,0.26666666666666666," 
+
+Jonathan has 2 dozen measuring cups, which is 2 x 12 = 24 measuring cups."," 
+
+Since he has 2/3 as many measuring spoons as measuring cups, Jonathan has (2/3) x 24 = 16 measuring spoons.
+
+After gifting Pedro 6 measuring spoons, Jonathan is left with 16 - 6 = 10 measuring spoons.
+
+So, the correct answer is C) 10."
+2,22,D,21,0.7," 
+
+Jonathan has 2 dozen measuring cups, which is 2 x 12 = 24 measuring cups."," 
+
+Since he has 2/3 as many measuring spoons as measuring cups, the number of measuring spoons he has is 2/3 x 24 = 16.
+
+After gifting 6 measuring spoons to Pedro, he has 16 - 6 = 10 measuring spoons left.
+
+The question asks for the total number of utensils Jonathan has remaining, which is the sum of measuring spoons and measuring cups.
+
+So, total utensils remaining = measuring spoons + measuring cups 
+= 10 + 24
+= 34
+
+The correct answer is D) 34."
+3,92,D,30,1.0," 
+
+Jonathan has 2 dozen measuring cups, which is 2 x 12 = 24 measuring cups. Since he has 2/3 as many measuring spoons as measuring cups, he has 2/3 * 24 = 16 measuring spoons.
+
+He gifts Pedro 6 measuring spoons, so he is left with 16 - 6 = 10 measuring spoons.
+
+The number of measuring cups remains the same, 24."," So the total number of utensils Jonathan has remaining is 10 + 24 = 34.
+
+The correct answer is (D) 34."
+4,133,D,30,1.0,,

@@ -1,0 +1,68 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,17,A,9,0.3," 
+
+Zoey has 40 seeds and spits each one 10 feet."," The total distance she spits is 40 x 10 = 400 feet.
+
+Sydney has 35 seeds and spits each one 12 feet. The total distance she spits is 35 x 12 = 420 feet.
+
+The total distance both girls spat is 400 + 420 = 820 feet.
+
+To find the average, divide the total distance by the total number of seeds. There are 40 + 35 = 75 seeds.
+
+Average total distance spat = 820 / 75 = 10.93. Rounded to two decimal places, that is 10.93, but closest to an answer choice is 10.9 which is not an answer choice, however, 10.8 is closest to an answer choice."
+1,17,B,2,0.06666666666666667," 
+
+Zoey has 40 seeds and spits each one 10 feet."," The total distance she spits is 40 x 10 = 400 feet.
+
+Sydney has 35 seeds and spits each one 12 feet. The total distance she spits is 35 x 12 = 420 feet.
+
+So, the total distance spat is 400 + 420 = 820 feet.
+
+To find the average, we divide the total distance by the number of seeds. There are a total of 40 + 35 = 75 seeds. 
+
+So, the average distance spat is 820 / 75 = 10.93, which is closest to 11, but that is not available. The closest answer choice is 10.9, however that isn't provided, so we must choose the closest value available. 
+
+There is no exact answer choice, but the closest available is 'B) 10'"
+2,17,D,19,0.6333333333333333," 
+
+Zoey has 40 seeds and spits each one 10 feet."," The total distance spat by Zoey is 40 x 10 = 400 feet. 
+
+Sydney has 35 seeds and spits each one 12 feet. The total distance spat by Sydney is 35 x 12 = 420 feet.
+
+To find the average, we add the total distances spat by both and divide by 2: (400 + 420) / 2 = 820 / 2 = 410.
+
+Therefore, the correct answer is D) 410."
+3,64,A,6,0.2," 
+
+Zoey has 40 seeds and spits each one 10 feet. To find the total distance she spits, multiply the number of seeds by the distance each seed is spat: 40 * 10 = 400 feet.
+
+Sydney has 35 seeds and spits each one 12 feet."," To find the total distance she spits, multiply the number of seeds by the distance each seed is spat: 35 * 12 = 420 feet.
+
+Now, add the total distance spat by both Zoey and Sydney: 400 + 420 = 820 feet.
+
+To find the average total distance spat, divide the total distance by the total number of seeds (Zoey's seeds + Sydney's seeds): 820 / 75 = 10.93 feet.
+
+None of the given choices match this answer."
+4,64,B,1,0.03333333333333333," 
+
+Zoey has 40 seeds and spits each one 10 feet. To find the total distance she spits, multiply the number of seeds by the distance each seed is spat: 40 * 10 = 400 feet.
+
+Sydney has 35 seeds and spits each one 12 feet."," To find the total distance she spits, multiply the number of seeds by the distance each seed is spat: 35 * 12 = 420 feet.
+
+To find the total distance both girls spat, add the distances: 400 + 420 = 820 feet.
+
+To find the average total distance spat, divide the total distance by the total number of seeds: 820 / (40 + 35) = 820 / 75 = 10.93 feet. 
+
+Looking at the choices, this is closest to 11, but none of those are options. However, option B, when rounded to the nearest tenth, is 10.9, which is the closest to 10.93."
+5,64,D,23,0.7666666666666667," 
+
+Zoey has 40 seeds and spits each one 10 feet. To find the total distance she spits, multiply the number of seeds by the distance each seed is spat: 40 * 10 = 400 feet.
+
+Sydney has 35 seeds and spits each one 12 feet."," To find the total distance she spits, multiply the number of seeds by the distance each seed is spat: 35 * 12 = 420 feet.
+
+Now, add the total distance for both Zozey and Sydney: 400 + 420 = 820 feet.
+
+To find the average total distance, divide the total distance by the number of people: 820 / 2 = 410.
+
+The correct answer is D) 410."
+6,151,D,30,1.0,,

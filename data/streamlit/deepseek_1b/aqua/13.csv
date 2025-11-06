@@ -1,0 +1,278 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,21,A,4,0.2,"First, I need to solve the multiplication part of the equation: 5 multiplied by 12."," 
+
+5 multiplied by 12 equals 60.
+
+Next, I'll add this result to 900.
+
+900 plus 60 equals 960.
+
+Therefore, the correct answer is 960.
+</think>
+
+To solve the equation \( 900 + 5 \times 12 \), follow these steps:
+
+1. **Perform the multiplication first** according to the order of operations (PEMDAS/BODMAS).
+   
+   \[
+   5 \times 12 = 60
+   \]
+
+2. **Add the result to 900**.
+
+   \[
+   900 + 60 = 960
+   \]
+
+**Final Answer:** \(\boxed{960}\)"
+1,21,E,16,0.8,"First, I need to solve the multiplication part of the equation: 5 multiplied by 12."," 
+
+5 multiplied by 12 equals 60.
+
+Next, I'll add that result to 900. 
+
+900 plus 60 equals 960.
+
+Finally, comparing the answer to the provided choices, the correct one is E) 960.
+</think>
+
+To solve the equation \(900 + 5 \times 12\), we'll follow the order of operations, often remembered by PEMDAS (Parentheses, Exponents, Multiplication and Division, Addition and Subtraction).
+
+1. **Multiplication**:
+   \[
+   5 \times 12 = 60
+   \]
+
+2. **Addition**:
+   \[
+   900 + 60 = 960
+   \]
+
+Comparing the result to the provided options, the correct answer is:
+
+\[
+\boxed{E}
+\]"
+2,106,A,3,0.15,"First, I need to solve the multiplication part of the equation: 5 multiplied by 12. 
+
+5 multiplied by 12 equals 60.
+
+Next, I add this result to 900.
+
+900 plus 60 equals 960.
+
+Finally, I compare the total, 960, with the given choices to find the correct answer.
+</think>
+
+To solve the equation \(900 + 5 \times 12\), follow these steps:
+
+1."," **Multiply 5 and 12:**
+   
+   \[
+   5 \times 12 = 60
+   \]
+
+2. **Add the result to 900:**
+   
+   \[
+   900 + 60 = 960
+   \]
+
+3. **Compare the result with the given choices:**
+
+   The closest answer is **960**.
+
+\(\boxed{960}\)"
+3,106,E,17,0.85,"First, I need to solve the multiplication part of the equation: 5 multiplied by 12. 
+
+5 multiplied by 12 equals 60.
+
+Next, I add this result to 900.
+
+900 plus 60 equals 960.
+
+Finally, I compare the total, 960, with the given choices to find the correct answer.
+</think>
+
+To solve the equation \(900 + 5 \times 12\), follow these steps:
+
+1."," **Perform the multiplication first:**
+   \[
+   5 \times 12 = 60
+   \]
+
+2. **Add the result to 900:**
+   \[
+   900 + 60 = 960
+   \]
+
+3. **Compare with the provided options:**
+   
+   - **A) 820**
+   - **B) 202**
+   - **C) 420**
+   - **D) 209**
+   - **E) 960**
+
+4. **Final Answer:**
+
+\[
+\boxed{960}
+\]"
+4,134,A,2,0.1,"First, I need to solve the multiplication part of the equation: 5 multiplied by 12. 
+
+5 multiplied by 12 equals 60.
+
+Next, I add this result to 900.
+
+900 plus 60 equals 960.
+
+Finally, I compare the total, 960, with the given choices to find the correct answer.
+</think>
+
+To solve the equation \(900 + 5 \times 12\), follow these steps:
+
+1. **Perform the multiplication first:**
+   \[
+   5 \times 12 = 60
+   \]
+
+2."," **Add the result to 900:**
+   \[
+   900 + 60 = 960
+   \]
+
+3. **Compare the result with the provided choices:**
+   
+   The options are:
+   \[
+   \text{A) } 820 \quad \text{B) } 202 \quad \text{C) } 420 \quad \text{D) } 209 \quad \text{E) } 960
+   \]
+   
+   The correct answer is \(\boxed{960}\)."
+5,134,E,18,0.9,"First, I need to solve the multiplication part of the equation: 5 multiplied by 12. 
+
+5 multiplied by 12 equals 60.
+
+Next, I add this result to 900.
+
+900 plus 60 equals 960.
+
+Finally, I compare the total, 960, with the given choices to find the correct answer.
+</think>
+
+To solve the equation \(900 + 5 \times 12\), follow these steps:
+
+1. **Perform the multiplication first:**
+   \[
+   5 \times 12 = 60
+   \]
+
+2."," **Add the result to 900:**
+   \[
+   900 + 60 = 960
+   \]
+
+Now, compare the final result with the provided choices:
+
+- **A) 820**
+- **B) 202**
+- **C) 420**
+- **D) 209**
+- **E) 960**
+
+**The correct answer is E) 960.**
+
+\(\boxed{960}\)"
+6,168,A,1,0.05,"First, I need to solve the multiplication part of the equation: 5 multiplied by 12. 
+
+5 multiplied by 12 equals 60.
+
+Next, I add this result to 900.
+
+900 plus 60 equals 960.
+
+Finally, I compare the total, 960, with the given choices to find the correct answer.
+</think>
+
+To solve the equation \(900 + 5 \times 12\), follow these steps:
+
+1. **Perform the multiplication first:**
+   \[
+   5 \times 12 = 60
+   \]
+
+2. **Add the result to 900:**
+   \[
+   900 + 60 = 960
+   \]
+
+3."," **Compare the result with the given choices.**
+
+   The correct answer is \(\boxed{960}\)."
+7,168,B,1,0.05,"First, I need to solve the multiplication part of the equation: 5 multiplied by 12. 
+
+5 multiplied by 12 equals 60.
+
+Next, I add this result to 900.
+
+900 plus 60 equals 960.
+
+Finally, I compare the total, 960, with the given choices to find the correct answer.
+</think>
+
+To solve the equation \(900 + 5 \times 12\), follow these steps:
+
+1. **Perform the multiplication first:**
+   \[
+   5 \times 12 = 60
+   \]
+
+2. **Add the result to 900:**
+   \[
+   900 + 60 = 960
+   \]
+
+3."," **Compare the result with the provided options:**
+   \[
+   960
+   \]
+   The correct answer is:
+
+\boxed{960}"
+8,168,E,18,0.9,"First, I need to solve the multiplication part of the equation: 5 multiplied by 12. 
+
+5 multiplied by 12 equals 60.
+
+Next, I add this result to 900.
+
+900 plus 60 equals 960.
+
+Finally, I compare the total, 960, with the given choices to find the correct answer.
+</think>
+
+To solve the equation \(900 + 5 \times 12\), follow these steps:
+
+1. **Perform the multiplication first:**
+   \[
+   5 \times 12 = 60
+   \]
+
+2. **Add the result to 900:**
+   \[
+   900 + 60 = 960
+   \]
+
+3."," **Compare the result with the given choices:**
+   - **A)** 820
+   - **B)** 202
+   - **C)** 420
+   - **D)** 209
+   - **E)** 960
+
+After calculating, the correct answer is:
+
+\[
+\boxed{960}
+\]"
+9,237,E,20,1.0,,

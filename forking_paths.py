@@ -119,7 +119,7 @@ def main(
 
     with open('config.json') as f:
         config = json.load(f)
-        data_dir = config["save_locations"]["selection_folder"] # input
+        data_dir = config["save_locations"]["collection_folder"] # input
         forking_paths_dir = config["save_locations"]["forking_paths_folder"] # output
         answer_model_name = config["experiment_parameters"]["answer_model"]
 

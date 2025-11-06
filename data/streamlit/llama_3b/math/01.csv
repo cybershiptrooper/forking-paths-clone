@@ -1,0 +1,19 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,29,B,8,0.26666666666666666," 
+
+A hexagonal prism has 6 sides (sides of the hexagon) and 6 rectangular sides (the sides of the prism)."," 
+
+Since each hexagon has 6 sides, the number of edges of the hexagon is 6. Multiply by 2 to get the number of edges of the rectangular sides - 6 * 2 = 12.
+
+The total number of edges is 6 + 12 = 18.
+
+The correct answer is B) 18."
+1,29,C,5,0.16666666666666666," 
+
+A hexagonal prism has 6 sides (sides of the hexagon) and 6 rectangular sides (the sides of the prism)."," In a hexagon, each internal angle is 120 degrees, and each external angle is 60 degrees. If you cut the prism in half, the top and bottom both have 6 rectangular sides, and the middle has 6 triangular faces. The top and bottom have 3 sides each, and the middle has 3 triangular faces. Each triangle has 3 edges, so the total number of edges is (3 + 3) * 3 + 6 * 6 = 9 + 36 = 45/3."
+2,29,D,17,0.5666666666666667," 
+
+A hexagonal prism has 6 sides (sides of the hexagon) and 6 rectangular sides (the sides of the prism)."," The total number of edges is therefore 6 + 6 = 12.
+
+Answer: D) 12"
+3,55,D,30,1.0,,

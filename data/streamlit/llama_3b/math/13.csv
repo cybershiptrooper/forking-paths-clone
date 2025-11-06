@@ -1,0 +1,411 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,18,A,3,0.1," 
+
+We can make triangles with sides of lengths 2, 4, 6."," By the triangle inequality theorem, we know that the sum of the lengths of any two sides of a triangle must be greater than the length of the third side. 
+
+1.   If we choose a side of length 2, we can only make triangles with sides of lengths 4, 6, and 6. 
+
+   There are three ways to choose sides of lengths 4 and 6. Hence, we can make three triangles of sides 2, 4, 6.
+
+2.   If we choose a side of length 4, we can make triangles with sides of lengths 2, 6, 6 and 4, 4, 6.
+
+   There are two ways to choose sides of lengths 2 and 6, and two ways to choose sides of lengths 4 and 6. Hence, we can make six triangles of sides 2, 4, 6.
+
+3.   If we choose a side of length 6, we can make triangles with sides of lengths 2, 4, 4.
+
+   There is only one way to choose sides of lengths 2 and 4. Hence, we can make one triangle of sides 2, 4, 6.
+
+In total, Kendra can make 10 different triangles. However, the answer is not among the options. 
+
+A triangle with sides of lengths 2, 4, 6 and a triangle with sides of lengths 2, 4, 6 are congruent.
+
+Therefore, we have to divide by 2, we will get 5 non-congruent triangles.
+
+The answer is not among the choices, so let's check option A.
+
+From the given options, only option A gives the correct answer, which is 5."
+1,18,B,6,0.2," 
+
+We can make triangles with sides of lengths 2, 4, 6."," There are 3 possible triangles of this type. 
+
+We can make a triangle with sides of lengths 2, 4, 6 by joining one 2-inch stick to two 4-inch sticks. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+Next, we can make a triangle with sides of lengths 2, 4, 8 by joining one 2-inch stick to a 6-inch stick and a 4-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can also make a triangle with sides of lengths 2, 6, 6 by joining two 2-inch sticks and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+Now, we can make a triangle with sides of lengths 2, 4, 8 by joining a 2-inch stick to a 6-inch stick and an 8-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 2, 6, 8 by joining a 2-inch stick to a 6-inch stick and an 8-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 4, 4, 6 by joining two 4-inch sticks and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 4, 4, 8 by joining two 4-inch sticks and an 8-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 4, 6, 6 by joining two 4-inch sticks and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 6, 6, 8 by joining two 6-inch sticks and an 8-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 2, 4, 10 by joining a 2-inch stick to an 8-inch stick and a 6-inch stick. However, since we do not have any 10-inch stick, we can't make this triangle.
+
+We can make a triangle with sides of lengths 2, 8, 8 by joining a 2-inch stick to two 8-inch sticks. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 6, 6, 8 by joining two 6-inch sticks and an 8-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 8, 8, 8 by joining three 8-inch sticks. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 2, 6, 10 by joining a 2-inch stick to a 6-inch stick and a 4-inch stick (but we do not have a 10-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 4, 8, 8 by joining a 4-inch stick to two 8-inch sticks. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 6, 8, 8 by joining a 6-inch stick to two 8-inch sticks. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 2, 8, 10 by joining a 2-inch stick to an 8-inch stick and a 6-inch stick (but we do not have a 10-inch stick), or a 4-inch stick and a 6-inch stick. Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 3, 4, 5 by joining a 2-inch stick and a 3-inch stick and a 9-inch stick (but we do not have a 9-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 3, 5, 6 by joining a 2-inch stick and a 3-inch stick and a 9-inch stick (but we do not have a 9-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 3, 4, 6 by joining a 2-inch stick, a 3-inch stick and a 6-inch stick (but we do not have a 3-inch stick and a 2-inch stick). Therefore, we can't make this triangle.
+
+Since we can't use a 3-inch stick, we try a 4-inch stick and a 2-inch stick and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 3, 4, 6 by joining a 4-inch stick and a 3-inch stick and a 6-inch stick (but we do not have a 3-inch stick and a 4-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 3, 5, 6 by joining a 4-inch stick, a 2-inch stick and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 3, 4, 5 by joining a 4-inch stick and a 3-inch stick and a 6-inch stick (but we do not have a 5-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 4, 4, 5 by joining two 4-inch sticks and a 5-inch stick (but we do not have a 5-inch stick). Therefore, we can't make this triangle.
+
+Since we can't use a 5-inch stick, we try a 4-inch stick and a 2-inch stick and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 3, 4, 6 by joining a 2-inch stick and a 3-inch stick and a 6-inch stick (but we do not have a 3-inch stick and a 2-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 3, 5, 6 by joining a 2-inch stick and a 3-inch stick and a 6-inch stick (but we do not have a 3-inch stick and a 5-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 3, 4, 8 by joining a 2-inch stick and a 3-inch stick and an 8-inch stick (but we do not have a 3-inch stick and an 8-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 3, 6, 8 by joining a 2-inch stick, a 3-inch stick and a 6-inch stick (but we do not have a 3-inch stick and a 6-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 3, 4, 6 by joining a 2-inch stick, a 3-inch stick and a 6-inch stick (but we do not have a 3-inch stick and a 2-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 4, 4, 6 by joining two 4-inch sticks and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 4, 5, 6 by joining a 2-inch stick and a 4-inch stick and a 6-inch stick (but we do not have a 5-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 4, 6, 8 by joining a 2-inch stick, a 4-inch stick and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 4, 6, 8 by joining a 2-inch stick and a 4-inch stick and a 6-inch stick (but we do not have a 6-inch stick and an 8-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 4, 8, 8 by joining two 4-inch sticks and two 8-inch sticks. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 5, 6, 6 by joining a 2-inch stick, a 3-inch stick and a 6-inch stick (but we do not have a 5-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 5, 6, 8 by joining a 2-inch stick, a 3-inch stick and a 6-inch stick (but we do not have a 5-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 5, 7, 8 by joining a 2-inch stick and a 3-inch stick and a 8-inch stick (but we do not have a 7-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 6, 6, 8 by joining two 6-inch sticks and an 8-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 6, 8, 8 by joining a 2-inch stick, a 6-inch stick and a 8-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 7, 8, 8 by joining a 2-inch stick and a 6-inch stick and an 8-inch stick (but we do not have a 7-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 7, 8, 8 by joining a 2-inch stick, a 5-inch stick and an 8-inch stick (but we do not have a 7-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 7, 7, 7 by joining three 7-inch sticks (but we do not have a 7-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 7, 8, 10 by joining a 2-inch stick, a 6-inch stick and a 8-inch stick (but we do not have a 7-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 8, 8, 8 by joining three 8-inch sticks. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 8, 9, 9 by joining a 2-inch stick, a 6-inch stick and an 8-inch stick (but we do not have a 9-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 3, 3, 6 by joining a 2-inch stick, a 3-inch stick and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 4, 4, 6 by joining two 4-inch sticks and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 4, 6, 8 by joining a 2-inch stick, a 4-inch stick and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 5, 5, 6 by joining two 5-inch sticks and a 6-inch stick (but we do not have a 5-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 5, 6, 8 by joining a 2-inch stick, a 5-inch stick and a 6-inch stick (but we do not have a 5-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 6, 6, 8 by joining two 6-inch sticks and a 6-inch stick. Since we have 6 sticks of each length, we can make 6 of these triangles.
+
+We can make a triangle with sides of lengths 6, 8, 9 by joining a 2-inch stick, a 6-inch stick and an 8-inch stick (but we do not have a 9-inch stick). Therefore, we can't make this triangle.
+
+We can make a triangle with sides of lengths 7, 7, 8 by joining two 7"
+2,18,C,17,0.5666666666666667," 
+
+We can make triangles with sides of lengths 2, 4, 6."," There is only one such triangle (2, 4, 6). 
+
+We can make triangles with sides of lengths 2, 2, 4. There is only one such triangle (2, 2, 4). 
+
+We can make triangles with sides of lengths 2, 2, 6. There is only one such triangle (2, 2, 6). 
+
+We can make triangles with sides of lengths 2, 4, 4. There is only one such triangle (2, 4, 4). 
+
+We can make triangles with sides of lengths 4, 4, 6. There is only one such triangle (4, 4, 6). 
+
+We can make triangles with sides of lengths 2, 2, 2 isn't a valid side length with sticks of length 2, 4, and 6. 
+
+Now let's consider the possible combinations of sides of lengths 2, 4, and 6. 
+
+We can make triangles with sides of lengths 2, 4, 6. There is only one such triangle (2, 4, 6). 
+
+We can make triangles with sides of lengths 2, 2, 4, and 6. There are no such triangles.
+
+We can make triangles with sides of lengths 2, 2, 4 and 6. There are no such triangles.
+
+We can make triangles with sides of lengths 2, 4, 6 and 4. There is only one such triangle (2, 4, 6). 
+
+We can make triangles with sides of lengths 2, 6 and 6. There is only one such triangle (2, 6, 6). 
+
+We can make triangles with sides of lengths 4, 4, 4 and 6. There is only one such triangle (4, 4, 4). 
+
+We can make triangles with sides of lengths 2, 2, 4 and 6. There are no such triangles.
+
+Now, we want to find how many non-congruent triangles can be made with the given sticks. To do this, let's first list all the possible non-congruent triangles and then count them. 
+
+Here are all non-congruent triangles that can be made with the sticks: 
+
+2, 4, 6 
+2, 4, 2 
+4, 6, 6 
+2, 2, 6 
+2, 2, 4 
+4, 4, 4 
+2, 6, 6
+
+There are 7 non-congruent triangles. 
+
+The correct answer is C) 7."
+3,18,D,4,0.13333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6."," We can make triangles with sides of lengths 2, 4, 4. We cannot make a triangle with sides of lengths 2, 2, 4. We can make triangles with sides of lengths 4, 6, 4. We cannot make a triangle with sides of lengths 4, 4, 6. We cannot make a triangle with sides of lengths 6, 6, 4. We can make triangles with sides of lengths 6, 6, 6. 
+
+Therefore, we can make 3, 1, 1, 1, 1, and 1 non-congruent triangles. That is 6 triangles.
+
+The correct answer is D) 8."
+4,44,B,7,0.23333333333333334," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8."," We can also make triangles with sides of lengths 2, 6, 8, 2, 8, 10, 4, 6, 8, 4, 8, 10. Since we know that in any triangle the sum of the lengths of any two sides is greater than the length of the third side, the length of the third side must be greater than the difference of the lengths of the other two sides and less than the sum of the lengths of the other two sides. 
+
+Since the length of the third side of the triangle is greater than the difference of the lengths of the other two sides, if we have a side of length 2, it must be joined with a side of length 6, and if we have a side of length 4, it must be joined with a side of length 8. We can also have a side of length 6 joined with a side of length 8, and if we have a side of length 8, it must be joined with a side of length 10. So, we can make the triangles with the sides of lengths 2, 6, 8, 4, 8, 10.
+
+However, we can also have a side of length 5 joined with a side of length 2, which is not possible. We can make a side of length 10 joined with a side of length 4, which is also not possible. So, we can make the triangles with the sides of lengths 2, 4, 6 and 2, 6, 8.
+
+Therefore, the number of non-congruent triangles Kendra can make is 3.
+
+The correct option is B."
+5,44,C,21,0.7," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8."," We can make triangles with sides of lengths 2, 4, 8 and 2, 6, 6. We can make triangles with sides of lengths 2, 6, 8 and 4, 4, 6. We can make triangles with sides of lengths 4, 4, 6. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 6, 6, 8.
+
+So, there are 7 possible triangles."
+6,44,D,2,0.06666666666666667," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8."," We can also make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. For the triangle with side lengths 4, 6, 6, we can make 3 triangles: one with sides of lengths 2, 4, 6 and two with sides of lengths 2, 2, 4.
+
+If we try to make triangles with sides of lengths 2, 2, 6, we can't make a triangle. Similarly, if we try to make triangles with sides of lengths 2, 2, 8, we can't make a triangle. If we try to make triangles with sides of lengths 2, 4, 4, we can make 2 triangles: one with sides of lengths 2, 4, 6 and one with sides of lengths 4, 4, 6. If we try to make triangles with sides of lengths 2, 6, 6,  we can't make a triangle. If we try to make triangles with sides of lengths 2, 6, 8, we can't make a triangle. If we try to make triangles with sides of lengths 4, 6, 6, we can make 2 triangles: one with sides of lengths 2, 4, 6 and one with sides of lengths 2, 2, 4. If we try to make triangles with sides of lengths 4, 6, 8, we can make 1 triangle: one with sides of lengths 2, 4, 6. If we try to make triangles with sides of lengths 4, 8, 8, we can't make a triangle. If we try to make triangles with sides of lengths 6, 6, 6, we can make 1 triangle: one with sides of lengths 2, 4, 6.
+
+Thus, there are 3 + 1 + 1 + 1 + 1 + 1 + 1 = 8 non-congruent triangles.
+
+The correct answer is D."
+7,70,B,3,0.1," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8."," We can make triangles with sides of lengths 2, 4, 6 and 2, 2, 6.
+
+Therefore, the total number of non-congruent triangles is 5.
+
+The correct answer is (B) 3"
+8,70,C,24,0.8," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8."," We can't make triangles with sides of lengths 2, 2, 6 because we can't make a side of length 6 with two sticks of length 2.
+
+There are 7 non-congruent triangles: 
+2, 4, 6
+2, 4, 8
+2, 6, 8
+2, 6, 10
+4, 6, 8
+4, 6, 10
+4, 8, 10
+
+Therefore, the answer is C) 7.
+
+The correct answer is C."
+9,70,D,3,0.1," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8."," We can make triangles with sides of lengths 4, 6, 8 and 6, 6, 6. We can make triangles with sides of lengths 4, 4, 6 or 4, 4, 8. We can make triangles with sides of lengths 6, 6, 6. We can make triangles with sides of lengths 6, 8, 8. We can make triangles with sides of lengths 8, 8, 8.
+
+We can make a total of $6 + 3 + 1 + 2 + 1 + 2 + 1 = 15$ triangles, but some of these triangles are congruent. Therefore, the answer is not A. The answer is D."
+10,87,A,3,0.1," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8."," 
+
+In total, Kendra can make 4 non-congruent triangles.
+
+Choices A and B are not correct as Kendra can make 4 triangles. Choice C is also not correct because Kendra can make 4 triangles.
+
+Choice D is also not correct because Kendra can make 4 triangles."
+11,87,B,3,0.1," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8."," We can make triangles with sides of lengths 2, 2, 6 and 2, 6, 6. 
+
+The pattern for the number of triangles is: 1, 2, 3, 4, 5, 6. 
+
+There are 6 non-congruent triangles.
+
+However, choice A does not match this answer. 
+
+Looking at choice A, we can try to simplify the expression by using the formula (n*(n+4))/2, where n is the number of sticks."
+12,87,C,22,0.7333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8."," We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 4, 4, 6 and 4, 6, 6.
+
+Thus, Kendra can make 7 triangles. The correct answer is (C)."
+13,87,D,2,0.06666666666666667," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8."," We can make triangles with sides of lengths 4, 4, 6. We can make triangles with sides of lengths 6, 6, 6.
+
+We can make triangles with sides of lengths 2, 2, 6 and 2, 4, 4. We can make triangles with sides of lengths 2, 3, 5, 2, 4, 4. We can make triangles with sides of lengths 2, 5, 5, 2, 6, 6. We can make triangles with sides of lengths 3, 3, 4, 2, 4, 4. We can make triangles with sides of lengths 3, 3, 5, 2, 6, 6.
+
+We can make triangles with sides of lengths 2, 2, 2, 3, 5, 3. We can make triangles with sides of lengths 2, 2, 2, 4, 4, 4 and 2, 2, 4, 4, 4, 4.
+
+We can make triangles with sides of lengths 2, 2, 2, 2, 3, 3 and 2, 2, 2, 3, 3, 3.
+
+We can make triangles with sides of lengths 2, 2, 2, 2, 2, 2 and 2, 2, 2, 2, 2, 2.
+
+So the answer is D) 8."
+14,113,A,1,0.03333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8."," We can make triangles with sides of lengths 2, 4, 4 and 2, 2, 2.
+
+A triangle with sides of lengths 2, 2, 4 is not valid. A triangle with sides of lengths 2, 3, 4 is not valid. A triangle with sides of lengths 2, 4, 6 and 2, 6, 6 is not valid. We can make two triangles with sides of lengths 2, 2, 6, 4, 4, 6, 6, 6, 6, and 4, 4, 8, 6, 6, 8, and 2, 2, 6, 2, 2, 8, and 2, 2, 4, 2, 2, 8. We can make two triangles with sides of lengths 2, 4, 4, 4, 4, 4, 4, 4, 4, and 2, 4, 2, 2, 2, 2, 2, 2, 2, 2. There are also two triangles with sides of lengths 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, and 4, 4, 4, 6, 6, 6, 6, 6, 6, 6.
+
+We can make only three triangles with sides of lengths 2, 2, 6, 2, 4, 8, 2, 4, 4, 2, 2, 6, 6, 6, 4, 4, 6, 2, 2, 4, 2, 2, 4, 2, 4, 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 6, 6, 4, 4, 6, 6, 4, 4, 6, 4, 6, and 6, 6, 4, 6, 4, 4, 6, 6, 4, 2, 2, 2, 2, 2, 6, 6, 6, 6, 6, 4, 6, 4, 6, 6, 6, 4, 4, 6, 6, 6, 6, 4, and 6, 6, 2, 2, 4, 6, 6, 6, 6, 6, 4, 2, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 4, 4, 4, 6, 6, 6, 4, 6, 6, 6, 6, 2, 2, 4, 4, 6, 4, 4, and 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 6, 6, 6, 6, 6. 
+
+Therefore, the correct answer is A) $\frac{(14-6y)(14-6y) - (6 y)(14-6y)^2}{36}$"
+15,113,B,2,0.06666666666666667," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8."," We can make triangles with sides of lengths 2, 2, 8 and 2, 6, 6 and 4, 6, 6.
+
+A total of 9 triangles can be made. 
+
+So, the correct answer is option (B) 3."
+16,113,C,22,0.7333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8."," We can make triangles with sides of lengths 4, 4, 6 and 4, 4, 8.
+
+There are 7 different non-congruent triangles. 
+
+The answer is C."
+17,113,D,5,0.16666666666666666," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8."," We can make triangles with sides of lengths 2, 4, 4.
+
+We can make triangles with sides of lengths 2, 2, 6, 2, 4, 4, 4 and 4, 4, 4, 4, 4, 4.
+
+However, some of these are congruent. For example, the triangles with sides of lengths 2, 4, 6 and 4, 6, 8 are congruent. Then there are 8 distinct triangles, so the answer is 8.
+
+The correct answer is D."
+18,130,A,1,0.03333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4."," We cannot make triangles with sides of lengths 2, 2, 4.
+
+Since we cannot make triangles with sides of lengths 2, 2, 4, we have 6 choices for the 2-inch sticks, so we have (6 + 3) choices for the 4-inch sticks and (2 + 3) choices for the 6-inch sticks, so Kendra can make 6 + 3 + 2 + 3 = 14 - 6y triangles. But we overcounted the triangles with sides of lengths 2, 4, 6, 2, 4, 6, 2, 2, 6 and 2, 2, 6, 2, 6, 6. Since the triangles with sides of lengths 2, 4, 6 and 2, 2, 6, 2, 6 are congruent, we have to subtract 4 from this total. Furthermore, we overcounted the triangles with sides of lengths 2, 6, 8 and 4, 6, 8. Since the triangles with sides of lengths 2, 6, 8 and 4, 6, 8 are congruent, we have to subtract 2 from this total. We also overcounted the triangles with sides of lengths 2, 4, 8 and 2, 2, 8, so we have to subtract 2 from this total. We also overcounted the triangles with sides of lengths 2, 4, 6. Since the triangles with sides of lengths 2, 4, 6, 2, 4, 6, 2, 2, 6 and 2, 2, 6, 2, 6, 6 are congruent, we have to subtract 6 from this total. We also overcounted the triangles with sides of lengths 4, 6, 8. Since the triangles with sides of lengths 2, 4, 6, 2, 4, 6, 2, 2, 6 and 2, 2, 6, 2, 6, 6 are congruent, we have to subtract 6 from this total. We also overcounted the triangles with sides of lengths 2, 2, 6, 2, 2, 8, 2, 4, 4. Since the triangles with sides of lengths 2, 4, 6, 2, 4, 6, 2, 2, 6 and 2, 2, 6, 2, 6, 6 are congruent, we have to subtract 6 from this total. We also overcounted the triangles with sides of lengths 2, 2, 4, 2, 2, 8, 4, 4, 4. Since the triangles with sides of lengths 2, 4, 6, 2, 4, 6, 2, 2, 6 and 2, 2, 6, 2, 6, 6 are congruent, we have to subtract 6 from this total. We also overcounted the triangles with sides of lengths 2, 2, 6, 2, 2, 8, 2, 4, 4, 2, 4, 8. Since the triangles with sides of lengths 2, 4, 6, 2, 4, 6, 2, 2, 6 and 2, 2, 6, 2, 6, 6 are congruent, we have to subtract 6 from this total. We also overcounted the triangles with sides of lengths 2, 2, 6, 2, 2, 8, 2, 4, 4, 2, 4, 8, 2, 4, 4, 6. Since the triangles with sides of lengths 2, 4, 6, 2, 4, 6, 2, 2, 6 and 2, 2, 6, 2, 6, 6 are congruent, we have to subtract 6 from this total. We also overcounted the triangles with sides of lengths 2, 2, 6, 2, 2, 8, 2, 4, 4, 2, 4, 8, 2, 4, 4, 6, 2, 6. Since the triangles with sides of lengths 2, 4, 6, 2, 4, 6, 2, 2, 6 and 2, 2, 6, 2, 6, 6 are congruent, we have to subtract 6 from this total.
+
+When we subtract all the overcounts, we get 14 - 6y - 4 - 2 - 2 - 6 - 6 - 6 - 6 - 6 - 6 - 6 - 6 - 6 - 6 = 14 - 6y - 48/6 = 14 - 6y - 8.
+
+We can factor the numerator and denominator of the fraction out to get (14 - 8 - 6y) / 6 = (6 - 6y) / 6.
+
+We can divide the numerator and denominator by 6 to get (6 - 6y) / 6 = 1 - y.
+
+The answer is A."
+19,130,C,19,0.6333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4."," We can make triangles with sides of lengths 4, 4, 6 and 4, 4, 8. We can make triangles with sides of lengths 2, 2, 2.
+
+Therefore, the answer is C) 7.
+
+The best answer is C."
+20,130,D,10,0.3333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4."," We can make triangles with sides of lengths 6, 6, 6.
+
+There are a total of 8 different triangles. The answer is (D)."
+21,147,A,3,0.1," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6."," However, we cannot make triangles with sides of lengths 2, 2, 4 since we need two sticks of length 2 and we can only make one triangle with two sticks of the same length 2. We also cannot make triangles with sides of lengths 6, 6, 6. We also cannot make triangles with sides of lengths 3, 5 and 6 and we cannot make triangles with sides of lengths 4, 7, 8. Lastly, we cannot make triangles with sides of lengths 2, 2, 8.
+
+There are 11 possible triangles."
+22,147,B,2,0.06666666666666667," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6."," We can make triangles with sides of lengths 4, 4, 6.
+
+Since the order of the sides does not matter, we can make 3 non-congruent triangles.
+
+However, choice B is the only choice that is appropriate and corresponds to our answer of 3."
+23,147,C,21,0.7," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6."," We can make triangles with sides of lengths 6, 6, 6.
+
+Thus, the number of non-congruent triangles is 7. 
+
+The correct answer is (C) 7."
+24,147,D,4,0.13333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6."," We can make triangles with sides of lengths 4, 4, 6. We can make triangles with sides of lengths 4, 4, 8 and 2, 2, 4.
+
+There are 11 triangles in total.
+
+The correct answer is D) 11, but this is not an option."
+25,164,A,1,0.03333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6. We can make triangles with sides of lengths 4, 4, 6."," We can make triangles with sides of lengths 2, 2, 2."
+26,164,B,2,0.06666666666666667," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6. We can make triangles with sides of lengths 4, 4, 6."," We can make triangles with sides of lengths 4, 4, 8. We can make triangles with sides of lengths 2, 2, 2. We can make triangles with sides of lengths 3, 3, 4. We can make triangles with sides of lengths 3, 3, 6. We can make triangles with sides of lengths 3, 4, 4. We can make triangles with sides of lengths 3, 4, 6. We can make triangles with sides of lengths 3, 6, 6. We can make triangles with sides of lengths 4, 4, 6. We can make triangles with sides of lengths 4, 4, 8. We can make triangles with sides of lengths 4, 6, 6. We can make triangles with sides of lengths 6, 6, 6.
+
+Thus, the correct number of non-congruent triangles is 11. The correct answer is (B) 3"
+27,164,C,20,0.6666666666666666," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6. We can make triangles with sides of lengths 4, 4, 6."," We can make triangles with sides of lengths 3, 3, 4. We can make triangles with sides of lengths 3, 3, 5. We can make triangles with sides of lengths 3, 4, 5. We can make triangles with sides of lengths 2, 3, 5. We can make triangles with sides of lengths 4, 4, 5.
+
+Therefore, the number of non-congruent triangles is 11. However, option C does not provide the correct answer."
+28,164,D,7,0.23333333333333334," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6. We can make triangles with sides of lengths 4, 4, 6."," We can make triangles with sides of lengths 6, 6, 6. Therefore, there are 8 non-congruent triangles. The correct answer is D) 8."
+29,181,A,3,0.1," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6. We can make triangles with sides of lengths 4, 4, 6. We can make triangles with sides of lengths 4, 4, 8."," We can make triangles with sides of lengths 6, 6, 8.
+
+We must be careful to count the number of congruent triangles.  A triangle with sides of lengths 2, 2, 6,  is not the same as a triangle with sides of lengths 2, 2, 8. However, a triangle with sides of lengths 2, 6, 8 is the same as a triangle with sides of lengths 2, 8, 6. 
+
+This means that we have to remove these duplicate triangles from the count. We must also be careful to count the triangles with sides of lengths 2, 4, 8. We can make three triangles with sides of lengths 2, 4, 8. However, these three are congruent.  We must remove the duplicates.
+
+There are 7 congruent triangles with sides of lengths 2, 4, 6 and 2, 6, 8. There are 3 congruent triangles with sides of lengths 2, 4, 8. There is one triangle with sides of lengths 4, 6, 8. There is 1 triangle with sides of lengths 2, 2, 6. There is 1 triangle with sides of lengths 2, 4, 4. There is 1 triangle with sides of lengths 2, 6, 6. There is 1 triangle with sides of lengths 4, 4, 6. There is 1 triangle with sides of lengths 4, 4, 8. There is 1 triangle with sides of lengths 6, 6, 8.
+
+The total number of non-congruent triangles is 7 + 3 + 1 + 1 + 1 + 1 + 1 + 1 = 15. However, we are not done yet. There are also triangles with sides of lengths 2, 2, 4. We must add 3 to the total. There are also triangles with sides of lengths 4, 4, 6. We must add 1 to the total. There are also triangles with sides of lengths 2, 4, 4. We must add 1 to the total. We must also add 1 for the triangle with sides of lengths 2, 6, 4. We must also add 1 for the triangle with sides of lengths 2, 4, 2.
+
+So the total number of non-congruent triangles is 15 + 3 + 1 + 1 + 1 + 1 + 1 = 22. The correct answer is A) \frac{(14-6y)(14-6y) - (6 y)(14-6y)^2} {36}."
+30,181,B,2,0.06666666666666667," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6. We can make triangles with sides of lengths 4, 4, 6. We can make triangles with sides of lengths 4, 4, 8."," We can make triangles with sides of lengths 6, 6, 8. We can make triangles with sides of lengths 6, 8, 8. We can make triangles with sides of lengths 8, 8, 8. 
+
+Now, we need to count the number of unique combinations of sticks. We can count the number of sticks of each length: 2 sticks of length 2, 2 sticks of length 4, and 1 stick of length 6. Then we can write the number of non-congruent triangles as: (2 + 2 + 1) * (2 + 2 + 1) * (2 + 1) - (1 * 2 * 2) - (1 * 2 * 2) - (1 * 2 * 1) - (1 * 1 * 2) - (1 * 1 * 1) = 5 * 5 * 3 - 4 - 4 - 2 - 2 - 1 - 1 = 75 - 14 = 61. Then dividing by 36 we get 61 / 36 = 61/36. The correct answer is B."
+31,181,C,19,0.6333333333333333," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6. We can make triangles with sides of lengths 4, 4, 6. We can make triangles with sides of lengths 4, 4, 8."," We can make triangles with sides of lengths 2, 2, 2.
+
+There are 7 non-congruent triangles in total.
+
+The correct answer is C) 7."
+32,181,D,6,0.2," 
+
+We can make triangles with sides of lengths 2, 4, 6. We can make triangles with sides of lengths 2, 4, 6 and 2, 4, 8. We can make triangles with sides of lengths 2, 6, 8 and 4, 6, 8. We can make triangles with sides of lengths 4, 6, 8. We can make triangles with sides of lengths 2, 2, 6 and 2, 2, 8. We can make triangles with sides of lengths 2, 4, 4. We can make triangles with sides of lengths 2, 6, 6. We can make triangles with sides of lengths 4, 4, 6. We can make triangles with sides of lengths 4, 4, 8."," We can make triangles with sides of lengths 6, 6, 6. We can make triangles with sides of lengths 4, 4, 4.
+
+Thus, there are 11 non-congruent triangles, which isn't listed among the answers. So, the correct answer is D."

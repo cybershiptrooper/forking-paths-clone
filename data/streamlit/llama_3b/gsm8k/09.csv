@@ -1,0 +1,535 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,14,B,9,0.3," 
+
+First, we need to find the cost of one bus trip."," Since it is 10% of the cost of one night at the hotel, we can find it by multiplying the cost of one night at the hotel by 0.1. 
+
+The cost of one night at the hotel is $80. 
+The cost of one bus trip = 0.1 * 80 = $8. 
+
+Now, we know the cost of one bus trip. To find the cost of all bus trips, we can multiply the cost of one bus trip by 7. 
+Cost of all bus trips = 8 * 7 = $56. 
+
+Now, we can add the cost of the hotel and the cost of all bus trips to find the total cost. 
+Total cost = Cost of one night at the hotel + Cost of all bus trips 
+Total cost = 80 + 56 = $136
+
+Unfortunately, none of the options match this answer."
+1,14,C,21,0.7," 
+
+First, we need to find the cost of one bus trip."," Since it's 10% of the price of a hotel night, we can find the cost of one bus trip by multiplying 80 by 0.1 (which is the decimal form of 10%). 
+
+Cost of one bus trip = 80 * 0.1 = 8
+
+Since Helen rode the bus 7 times, the total cost of the bus trips is:
+
+Total cost of bus trips = 8 * 7 = 56
+
+Now, we add the cost of the hotel nights (3 nights) to the total cost of the bus trips:
+
+Total cost = 56 + 240 = 296
+
+So, Helen paid $296 for the hotel and bus travels during that trip. The correct answer is C) 296."
+2,69,B,7,0.23333333333333334," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.","1 * $80
+= $8
+
+Now, we know that Helen rode the bus 7 times. So, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+Adding this to the cost of 3 nights at the hotel:
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+However, none of the given choices match this answer. We can try to find the closest answer by reevaluating our steps.
+
+We can simplify the total cost of the bus trips by calculating 10% of 80 and then multiplying by 7. Since 10% is 1/10, we can multiply 80 by 1/10 and then by 7.
+
+Cost of one bus trip = 80 * 1/10 = 8
+Total cost of bus trips = 8 * 7
+Total cost = 56
+
+Since 56 is not among the choices, we should go back to our original calculation for the bus trips and try another approach.
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Total cost of bus trips = 7 * $8
+= $56
+
+Now let's look at our answer, 56+24 = 80. Since 80 is among the choices, we can try that.
+
+The answer is 80, or choice B."
+3,69,C,19,0.6333333333333333," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.","1 * $80
+= $8
+
+Now, since Helen rode the bus 7 times, we can find the total cost of bus travels:
+
+Total cost of bus travels = $8 * 7
+= $56
+
+Now, add the cost of the hotel for 3 nights:
+
+Total cost = Cost of hotel for 3 nights + Total cost of bus travels
+= $80 * 3 + $56
+= $240 + $56
+= $296
+
+The correct answer is C) $296."
+4,69,D,4,0.13333333333333333," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.","1 * $80
+= $8
+
+Now, we know that Helen rode the bus 7 times. So, the cost of the bus travels will be:
+
+Cost of bus travels = 7 * $8
+= $56
+
+Now, we add the cost of the hotel for 3 nights and the cost of the bus travels:
+
+Total cost = Cost of hotel for 3 nights + Cost of bus travels
+= $80 * 3 + $56
+= $240
+
+Therefore, the correct answer is D) 240."
+5,92,B,6,0.2," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8."," Helen rode the bus 7 times. So, the total cost of the bus trips is:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+Now, Helen also paid for 2 nights at the hotel (because she rode the bus 7 times, implying she started at one night, and rode 6 more nights, and ended at the last night of the trip). So, the cost of the hotel is:
+
+Cost of the hotel = 2 * $80
+= $160
+
+Now, we can find the total cost by adding the cost of the hotel and the bus trips:
+
+Total cost = $160 + $56
+= $216
+
+However, that answer is not among the choices provided, but there is an option (B) 268. If you look carefully, you will realize that the answer is actually the sum of two nights of the hotel (which is $160) plus two bus trips. 
+
+Cost of bus trips for 6 times = 6 * $8 = $48
+Total cost = $160 + $48 = $208. Then  $208 + $60 = $268"
+6,92,C,23,0.7666666666666667," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8."," Since Helen rode the bus 7 times, the total cost of the bus trips is:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+Helen also stayed in the hotel for 3 nights, and each night costs $80. So, the total cost of the hotel is:
+
+Total cost of hotel stays = 3 * $80
+= $240
+
+Now, we can add the costs of the hotel and bus trips to get the total cost of Helen's trip:
+
+Total cost = Total cost of hotel stays + Total cost of bus trips
+= $240 + $56
+= $296
+
+Therefore, the correct answer is C) $296."
+7,92,D,1,0.03333333333333333," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8."," To find the total cost of 7 bus trips, we multiply the cost of one bus trip by 7:
+
+Cost of 7 bus trips = $8 * 7
+= $56
+
+Helen also spent one night at the hotel, which cost $80.
+
+Total cost for hotel and bus travels = Cost of 7 bus trips + Cost of 1 night at the hotel
+= $56 + $80
+= $136
+
+Unfortunately, none of the choices match the total cost of $136. However, we can try to look for a reasonable choice among the options given.
+
+Choices:
+A) 624 
+B) 268
+C) 296
+D) 240
+
+Among these, D) 240 is closest to $136."
+8,140,A,3,0.1," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80."," Therefore, the total cost of the trip will be:
+
+Total cost of the trip = Total cost of hotel + Total cost of bus trips
+= $80 + $56
+= $136
+
+However, this is not among the options provided. This is because none of the options account for the cost of the bus trips. The question likely meant to ask for the cost of the hotel and the bus trips combined but instead of giving you a specific total, it asks you to calculate it.
+
+Among the given options, only one includes the cost of the hotel and the bus trips (A) $624 =  $80 * 7 + $8 * 7 = $56 + $56 = $112 + $80 = $192 + $32 =  $224 = $224 + $400 =  $624."
+9,140,B,26,0.8666666666666667," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80."," So, the total cost for the hotel and bus travels will be:
+
+Total cost = Cost of hotel + Total cost of bus trips
+= $80 + $56
+= $136
+
+Unfortunately, none of the options match our answer. It seems that there might have been an error in the options provided."
+10,140,C,1,0.03333333333333333," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80."," So, the total cost of the hotel and bus travels is:
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+None of the options match this answer, but the closest value is $136 is not given, therefore we have to select the closest answer that we have.
+
+The closest answer is $136 is not there, but, answer choice C) 296 is the closest value."
+11,200,B,27,0.9," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80. So, the total cost of the trip will be the sum of the cost of the hotel and the cost of the bus trips:
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+However, none of the given choices match this answer."," Therefore, the correct answer cannot be determined from the given options."
+12,200,C,2,0.06666666666666667," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80. So, the total cost of the trip will be the sum of the cost of the hotel and the cost of the bus trips:
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+However, none of the given choices match this answer."," It seems I made an error in my calculation. Let's recheck the calculation.
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Total cost of bus trips = 7 * $8
+= $56
+
+Cost of hotel for 3 nights = $80
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+Since none of the given choices match, it seems I made a calculation error. Let's recheck the calculation again.
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Total cost of bus trips = 7 * $8
+= $56
+
+Cost of hotel for 1 night = $80
+
+Since Helen stayed for 3 nights, the cost of the hotel for 3 nights is:
+Cost of hotel for 3 nights = 3 * $80
+= $240
+
+Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+Total cost of bus trips = 7 * $8
+= $56
+
+So the correct total cost is:
+Total cost = Cost of hotel for 3 nights + Cost of bus trips
+= $240 + $56
+= $296"
+13,200,D,1,0.03333333333333333," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80. So, the total cost of the trip will be the sum of the cost of the hotel and the cost of the bus trips:
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+However, none of the given choices match this answer."," But we can try to find the correct answer by re-examining the choices:
+
+Choices:
+A) 624
+B) 268
+C) 296
+D) 240
+
+We already know that the total cost is $136. Let's calculate the difference between each choice and $136:
+
+A) 624 - 136 = 488
+B) 268 - 136 = 132
+C) 296 - 136 = 160
+D) 240 - 136 = 104
+
+We can see that choice B) 268 is closest to 0 (132) rather than 136.
+
+Since we can't have a negative amount, we need to re-examine our calculation of the cost per bus trip. 
+
+Cost of one bus trip = 10% of $80 
+= 0.1 * $80 
+= $8 
+However,  $8 is not 10% of $80, 10% of $80 is actually  $8. So the answer can not be 268. 
+
+Now let's re-evaluate the cost of the bus trips. If 10% is $8 that would mean 100% is $80. If 100% is $80 we can calculate 10% by dividing $80 by 10. 
+
+$80 / 10 = $8 
+
+Now we can calculate the total cost of the bus trips. 
+
+Total cost of bus trips = 7 * $8
+= $56 
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136 
+
+This is not among the choices. But we can see that 7 times 10% of $80 is $56. We can try to find the total cost by making 7 * 100% = 700% of $8. 
+
+We know that 10% is $8 so 700% will be 7 * 100% of $8 
+=  $56 
+
+The three options provided are $624, $268, $296 and $240. They are all multiples of $56. 
+
+Choice D, $240, is 4.2857 times $56. 
+
+$56 * 4.2857 
+= $240 
+
+Choice A, $624, is 11.1429 times $56. 
+
+$56 * 11.1429 
+= $624 
+
+Choice B, $268, is 4.7857 times $56. 
+
+$56 * 4.7857 
+= $266.78 
+
+Choice C, $296, is 5.2857 times $56. 
+
+$56 * 5.2857 
+= $299 
+
+So choice D, $240, is the only multiple of $56 that is available among the options."
+14,236,A,3,0.1," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80. So, the total cost of the trip will be the sum of the cost of the hotel and the cost of the bus trips:
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+However, none of the given choices match this answer. Let's recheck the calculation.
+
+Total cost = $80 + $56
+= $136
+
+Since none of the options match, we can try to find the closest option.", The closest option to $136 is $136 is A) 624.
+15,236,B,23,0.7666666666666667," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80. So, the total cost of the trip will be the sum of the cost of the hotel and the cost of the bus trips:
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+However, none of the given choices match this answer. Let's recheck the calculation.
+
+Total cost = $80 + $56
+= $136
+
+Since none of the options match, we can try to find the closest option."," Option B ($268) is the closest, but it is higher than our calculated answer. However, let's test option A ($624) by checking if we can get the answer by adding the bus cost to the hotel cost, and dividing $624 by 9, which is $80.
+
+$624 ÷ 9 = $70 per night for hotel, and $70 ÷ 8 = $8.75 per bus trip. 
+Then $8.75 x 8 is $70. Hence, $624 is indeed equal to the cost of the hotel and bus."
+16,236,C,2,0.06666666666666667," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80. So, the total cost of the trip will be the sum of the cost of the hotel and the cost of the bus trips:
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+However, none of the given choices match this answer. Let's recheck the calculation.
+
+Total cost = $80 + $56
+= $136
+
+Since none of the options match, we can try to find the closest option."," 
+
+The closest option is $136, but it's not an option. However, we can recheck the calculation of the total cost by using option B ($268). 
+
+If we subtract the cost of 3 nights of the hotel ($240) from option B, we get:
+
+$268 - $240 = $28
+
+Since $28 is not equal to $56 (the cost of the bus trips), option B is not the correct answer.
+
+Now, we can recheck option C ($296). If we subtract the cost of 3 nights of the hotel ($240) from option C, we get:
+
+$296 - $240 = $56
+
+Since $56 matches the cost of the bus trips, option C could be the correct answer."
+17,236,D,2,0.06666666666666667," 
+
+First, we need to find the cost of one bus trip. Since it's 10% of the price of one night at the hotel, and one night at the hotel costs $80, we can calculate the cost of one bus trip as follows:
+
+Cost of one bus trip = 10% of $80
+= 0.1 * $80
+= $8
+
+Now, we know the cost of one bus trip is $8. Since Helen rode the bus 7 times, the total cost of the bus trips will be:
+
+Total cost of bus trips = 7 * $8
+= $56
+
+The cost of the hotel for 3 nights is $80. So, the total cost of the trip will be the sum of the cost of the hotel and the cost of the bus trips:
+
+Total cost = Cost of hotel + Cost of bus trips
+= $80 + $56
+= $136
+
+However, none of the given choices match this answer. Let's recheck the calculation.
+
+Total cost = $80 + $56
+= $136
+
+Since none of the options match, we can try to find the closest option."," 
+
+The closest option is D) 240."

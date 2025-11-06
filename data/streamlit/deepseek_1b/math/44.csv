@@ -1,0 +1,4137 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,57,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+","The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \), and for this equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, I get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Finally, I use the distance formula to calculate the distance between the vertex \( (4, -1) \) and the point \( (0, 2) \). The distance formula is:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the values, I get:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+**Step 1: Find the Vertex of the Parabola**
+
+The general form of a quadratic equation is:
+\[
+f(x) = ax^2 + bx + c
+\]
+For the given equation \( f(x) = x^2 - 8x + 15 \), the coefficients are:
+\[
+a = 1, \quad b = -8, \quad c = 15
+\]
+
+The x-coordinate of the vertex is given by:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+Substitute \( x = 4 \) back into the equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+**Step 2: Calculate the Distance Between the Vertex and the Given Point**
+
+The vertex is at \( (4, -1) \) and the given point is \( (0, 2) \).
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+**Final Answer:**
+\[
+\boxed{5}
+\]"
+1,79,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \)."," For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex is found using the formula \( x = -\frac{b}{2a} \). Plugging in the values from the equation:
+
+\[ x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4 \]
+
+Next, to find the y-coordinate of the vertex, I substitute \( x = 4 \) back into the original equation:
+
+\[ f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1 \]
+
+So, the vertex of the parabola is at the point \( (4, -1) \).
+
+Now, I need to calculate the distance between this vertex \( (4, -1) \) and the point \( (0, 2) \). The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+
+\[ d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2} \]
+
+Substituting the coordinates:
+
+\[ d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5 \]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### 1. Find the Vertex of the Parabola
+
+The general form of a quadratic equation is:
+\[ f(x) = ax^2 + bx + c \]
+
+For the given equation:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex is given by:
+\[ x = -\frac{b}{2a} \]
+
+Plugging in the values:
+\[ x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4 \]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[ f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1 \]
+
+So, the vertex is at the point \( (4, -1) \).
+
+### 2. Find the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula:
+\[ d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2} \]
+
+Where:
+- \( (x_1, y_1) = (4, -1) \)
+- \( (x_2, y_2) = (0, 2) \)
+
+Substitute the values:
+\[ d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5 \]
+
+### **Final Answer**
+
+The distance between the vertex and the point \( (0, 2) \) is \(\boxed{5}\)."
+2,107,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+","The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, I get:
+
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+To find the corresponding y-coordinate, I substitute \( x = 4 \) back into the original equation:
+
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at the point \( (4, -1) \).
+
+Next, I use the distance formula to calculate the distance between the vertex \( (4, -1) \) and the point \( (0, 2) \). The distance formula is:
+
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5 units.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The general form of a quadratic equation is:
+\[
+f(x) = ax^2 + bx + c
+\]
+For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex is given by:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+To find the y-coordinate of the vertex, substitute \( x = 4 \) back into the original equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substitute the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex and the point \( (0, 2) \) is \(\boxed{5}\)."
+3,133,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \)."," Plugging in the values, we get \( x = -\frac{-8}{2 \times 1} = 4 \).
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+
+\( f(4) = (4)^2 - 8 \times 4 + 15 = 16 - 32 + 15 = -1 \).
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+
+\( \text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2} \)
+
+Plugging in the values:
+
+\( \text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5 \).
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+1. **Find the Vertex of the Parabola:**
+
+   The equation is in the form \( f(x) = ax^2 + bx + c \).
+
+   - \( a = 1 \), \( b = -8 \), \( c = 15 \)
+   
+   The x-coordinate of the vertex is given by:
+   \[
+   x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+   \]
+   
+   Substitute \( x = 4 \) back into the equation to find the y-coordinate:
+   \[
+   f(4) = (4)^2 - 8 \times 4 + 15 = 16 - 32 + 15 = -1
+   \]
+   
+   So, the vertex is at \( (4, -1) \).
+
+2. **Calculate the Distance Between the Two Points:**
+
+   The two points are \( (4, -1) \) and \( (0, 2) \).
+   
+   Use the distance formula:
+   \[
+   \text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+   \]
+   
+   Plugging in the values:
+   \[
+   \text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+   \]
+   
+3. **Final Answer:**
+   \[
+   \boxed{5}
+   \]"
+4,142,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+","\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+To find the y-coordinate, substitute \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Next, I calculate the distance between the vertex \( (4, -1) \) and the point \( (0, 2) \) using the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + 3^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the parabola defined by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### 1. Find the Vertex of the Parabola
+
+The given equation is in the standard form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+**a. Find the x-coordinate of the vertex:**
+
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+**b. Find the y-coordinate of the vertex by substituting \( x = 4 \) back into the equation:**
+
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### 2. Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+where \( (x_1, y_1) = (4, -1) \) and \( (x_2, y_2) = (0, 2) \).
+
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### **Final Answer**
+
+\(\boxed{5}\)"
+5,144,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+","x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at the point \( (4, -1) \).
+
+Now, I have two points: the vertex \( (4, -1) \) and the point \( (0, 2) \). To find the distance between these two points, I use the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the graph of the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the standard form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola given by \( f(x) = ax^2 + bx + c \) is found using:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate of the vertex by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in the plane is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Here:
+- \( (x_1, y_1) = (4, -1) \)
+- \( (x_2, y_2) = (0, 2) \)
+
+Substitute the values:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+6,162,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+","\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+Now, I will use the distance formula to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). The distance formula is:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the graph of the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is a quadratic function in the form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola given by \( f(x) = ax^2 + bx + c \) is:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+**x-coordinate of the vertex:** \( 4 \)
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the original equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+**y-coordinate of the vertex:** \( -1 \)
+
+**Vertex:** \( (4, -1) \)
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Here:
+- \( (x_1, y_1) = (4, -1) \) (Vertex)
+- \( (x_2, y_2) = (0, 2) \)
+
+Plugging in the values:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer:
+
+\[
+\boxed{5}
+\]"
+7,164,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+","To find the y-coordinate, substitute \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Next, I'll use the distance formula to calculate the distance between \( (4, -1) \) and \( (0, 2) \):
+\[
+\text{Distance} = \sqrt{(4 - 0)^2 + (-1 - 2)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+\[
+a = 1, \quad b = -8, \quad c = 15
+\]
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at:
+\[
+(4, -1)
+\]
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in a plane is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Here, the points are \( (4, -1) \) and \( (0, 2) \). Plugging in the values:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+8,189,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+","\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I can use the distance formula to calculate the distance between \( (4, -1) \) and \( (0, 2) \). The distance formula is:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To determine the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The general form of a quadratic equation is:
+\[
+f(x) = ax^2 + bx + c
+\]
+For the given equation:
+\[
+a = 1,\quad b = -8,\quad c = 15
+\]
+
+The x-coordinate of the vertex is given by:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+9,191,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+","f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The general form of a quadratic equation is:
+\[
+f(x) = ax^2 + bx + c
+\]
+For the given equation:
+\[
+a = 1,\quad b = -8,\quad c = 15
+\]
+
+The x-coordinate of the vertex is given by:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substitute the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + 3^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+10,226,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+","\]
+So, the vertex of the parabola is at \( (4, -1) \).
+
+Now, to calculate the distance between the vertex \( (4, -1) \) and the point \( (0, 2) \), I'll use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola defined by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the standard form \( f(x) = ax^2 + bx + c \), where:
+\[
+a = 1, \quad b = -8, \quad c = 15
+\]
+
+The **vertex** of a parabola given by \( f(x) = ax^2 + bx + c \) has coordinates:
+\[
+x = -\frac{b}{2a}
+\]
+\[
+y = f\left(-\frac{b}{2a}\right)
+\]
+
+**Calculating the x-coordinate of the vertex:**
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+**Calculating the y-coordinate by substituting \( x = 4 \) into the equation:**
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( D \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in a plane is given by the distance formula:
+\[
+D = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Here:
+\[
+(x_1, y_1) = (4, -1) \quad \text{and} \quad (x_2, y_2) = (0, 2)
+\]
+
+**Substitute the values into the distance formula:**
+\[
+D = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+11,228,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+","So, the vertex of the parabola is at \( (4, -1) \).
+
+Now, to calculate the distance between the vertex \( (4, -1) \) and the point \( (0, 2) \), I use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5 units.
+</think>
+
+To find the distance between the vertex of the parabola defined by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+1. **Find the Vertex of the Parabola:**
+
+   The given equation is a quadratic in the form \( f(x) = ax^2 + bx + c \), where:
+   - \( a = 1 \)
+   - \( b = -8 \)
+   - \( c = 15 \)
+
+   The x-coordinate of the vertex is given by:
+   \[
+   x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+   \]
+
+   To find the y-coordinate of the vertex, plug \( x = 4 \) back into the equation:
+   \[
+   f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+   \]
+
+   Therefore, the vertex of the parabola is at \( (4, -1) \).
+
+2. **Calculate the Distance Between \( (4, -1) \) and \( (0, 2) \):**
+
+   Use the distance formula:
+   \[
+   \text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+   \]
+
+   Substituting the coordinates:
+   \[
+   \text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+   \]
+
+3. **Final Answer:**
+
+   The distance between the vertex \( (4, -1) \) and the point \( (0, 2) \) is \( 5 \).
+
+\[
+\boxed{5}
+\]"
+12,243,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+","Now, I can use the distance formula to calculate the distance between \( (4, -1) \) and \( (0, 2) \):
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is in the form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex is given by:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+To find the y-coordinate, substitute \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+where:
+- \( (x_1, y_1) = (4, -1) \)
+- \( (x_2, y_2) = (0, 2) \)
+
+Plugging in the values:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+13,273,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \)."," I'll use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is a quadratic function in the form:
+\[ f(x) = ax^2 + bx + c \]
+where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[ x = -\frac{b}{2a} \]
+Substituting the values:
+\[ x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4 \]
+
+Now, find the y-coordinate by plugging \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at:
+\[ (4, -1) \]
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in a plane is given by the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+14,278,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+","\[
+\text{Distance} = \sqrt{(4 - 0)^2 + (-1 - 2)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5 units.
+</think>
+
+To find the distance between the vertex of the graph of the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is a quadratic function in the form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where:
+\[
+a = 1, \quad b = -8, \quad c = 15
+\]
+
+The **x-coordinate** of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the original equation to find the **y-coordinate** of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at:
+\[
+(4, -1)
+\]
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula to find the distance between two points \( (x_1, y_1) \) and \( (x_2, y_2) \):
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+15,280,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+","\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+The distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The general form of a quadratic equation is:
+\[
+f(x) = ax^2 + bx + c
+\]
+For the given equation:
+\[
+a = 1, \quad b = -8, \quad c = 15
+\]
+
+The x-coordinate of the vertex is given by:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( D \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+D = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates of the vertex \( (4, -1) \) and the given point \( (0, 2) \):
+\[
+D = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+16,310,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+","\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### 1. **Find the Vertex of the Parabola**
+
+The general form of a quadratic equation is:
+\[
+f(x) = ax^2 + bx + c
+\]
+For the given equation:
+\[
+a = 1, \quad b = -8, \quad c = 15
+\]
+
+The x-coordinate of the vertex is:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+### 2. **Calculate the Distance Between the Vertex and the Point \( (0, 2) \)**
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Where:
+\[
+(x_1, y_1) = (4, -1), \quad (x_2, y_2) = (0, 2)
+\]
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### **Final Answer**
+
+\[
+\boxed{5}
+\]"
+17,312,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+","Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the graph of the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+1. **Find the Vertex of the Parabola:**
+
+   The given equation is in the standard form:
+   \[
+   f(x) = ax^2 + bx + c
+   \]
+   where:
+   \[
+   a = 1, \quad b = -8, \quad c = 15
+   \]
+   
+   The x-coordinate of the vertex is given by:
+   \[
+   x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+   \]
+   
+   To find the y-coordinate of the vertex, substitute \( x = 4 \) back into the equation:
+   \[
+   f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+   \]
+   
+   So, the vertex of the parabola is at \( (4, -1) \).
+
+2. **Calculate the Distance Between the Vertex and the Point \( (0, 2) \):**
+
+   Use the distance formula between two points \( (x_1, y_1) \) and \( (x_2, y_2) \):
+   \[
+   \text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+   \]
+   
+   Here, \( (x_1, y_1) = (4, -1) \) and \( (x_2, y_2) = (0, 2) \).
+   
+   Substituting the values:
+   \[
+   \text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+   \]
+   
+   Therefore, the distance is **5** units.
+
+**Final Answer:**
+\boxed{5}"
+18,318,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+","\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the graph of the function \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given quadratic function is in the form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex is given by:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the original equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Two Points
+
+The two points are:
+- Vertex: \( (4, -1) \)
+- Given Point: \( (0, 2) \)
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substitute the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+19,320,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+","\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+The distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The general form of a quadratic equation is:
+\[
+f(x) = ax^2 + bx + c
+\]
+For the given equation, \( f(x) = x^2 - 8x + 15 \), we have:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex is given by:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+20,379,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+","\]
+
+Therefore, the distance between the vertex and the point \( (0, 2) \) is 5.
+</think>
+
+To find the distance between the vertex of the graph of the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+The equation is in the form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex is given by:
+\[
+x = -\frac{b}{2a} = -\frac{-8}{2 \times 1} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Two Points
+The two points are:
+- Vertex: \( (4, -1) \)
+- Given point: \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Plugging in the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Conclusion
+The distance between the vertex of the parabola and the point \( (0, 2) \) is:
+
+\(\boxed{5}\)"
+21,381,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+","Therefore, the distance between the vertex and the point \( (0, 2) \) is 5 units.
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+This is a quadratic function in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+**a. Find the x-coordinate of the vertex:**
+The x-coordinate \( x_v \) of the vertex of a parabola is given by:
+\[
+x_v = -\frac{b}{2a}
+\]
+Substituting the values:
+\[
+x_v = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+**b. Find the y-coordinate of the vertex by substituting \( x_v \) back into the equation:**
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Where:
+- \( (x_1, y_1) = (4, -1) \) (vertex)
+- \( (x_2, y_2) = (0, 2) \) (point)
+
+Substitute the values:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex and the point \( (0, 2) \) is \(\boxed{5}\)."
+22,383,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+","To find the distance between the vertex of the graph of the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is a quadratic function in the form:
+\[
+f(x) = x^2 - 8x + 15
+\]
+This is a parabola that opens upwards since the coefficient of \( x^2 \) is positive.
+
+#### Finding the Vertex:
+The x-coordinate of the vertex of a parabola given by \( f(x) = ax^2 + bx + c \) is:
+\[
+x = -\frac{b}{2a}
+\]
+For the given equation:
+- \( a = 1 \)
+- \( b = -8 \)
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the corresponding y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+We can use the **distance formula** to find the distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \):
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Here:
+- \( (x_1, y_1) = (4, -1) \)
+- \( (x_2, y_2) = (0, 2) \)
+
+Plugging in the values:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+23,433,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+","**Step 1: Find the Vertex of the Parabola**
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+This is a quadratic function in the standard form \( f(x) = ax^2 + bx + c \), where:
+\[
+a = 1,\quad b = -8,\quad c = 15
+\]
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex of the parabola is at:
+\[
+(4, -1)
+\]
+
+**Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)**
+
+Use the distance formula between two points \( (x_1, y_1) \) and \( (x_2, y_2) \):
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+**Final Answer:**
+\[
+\boxed{5}
+\]"
+24,447,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+","The given quadratic equation is in the form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where:
+\[
+a = 1, \quad b = -8, \quad c = 15
+\]
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+To find the y-coordinate of the vertex, substitute \( x = 4 \) back into the original equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in a plane is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+25,452,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+","\[
+f(x) = x^2 - 8x + 15
+\]
+This is a quadratic equation in the form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The **x-coordinate** of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+Plugging in the values of \( a \) and \( b \):
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the **y-coordinate** of the vertex by substituting \( x = 4 \) back into the original equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at:
+\[
+(4, -1)
+\]
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The formula for the distance between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Here, the two points are:
+- Vertex: \( (4, -1) \)
+- Given point: \( (0, 2) \)
+
+Plugging these into the distance formula:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+\[
+\boxed{5}
+\]"
+26,454,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+","f(x) = x^2 - 8x + 15
+\]
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+27,470,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+","\]
+
+This is a quadratic function in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the original equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substitute the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+28,472,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+","This is a quadratic equation in the form:
+\[
+f(x) = ax^2 + bx + c
+\]
+where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola given by \( f(x) = ax^2 + bx + c \) is:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Here:
+- \( (x_1, y_1) = (4, -1) \)
+- \( (x_2, y_2) = (0, 2) \)
+
+Plugging in the values:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex of the parabola and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+29,496,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+","- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola given by \( f(x) = ax^2 + bx + c \) is found using the formula:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Given Point
+
+We have two points:
+- Vertex: \( (4, -1) \)
+- Given point: \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in a plane is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the values:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex \( (4, -1) \) and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+30,504,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+","- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Substitute the values of \( a \) and \( b \):
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate of the vertex by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in a plane is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Here, \( (x_1, y_1) = (4, -1) \) and \( (x_2, y_2) = (0, 2) \).
+
+Substitute the values into the distance formula:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+31,512,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+","- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola given by \( f(x) = ax^2 + bx + c \) is:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate of the vertex by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+32,521,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+","The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+Thus, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Given Point
+
+The vertex is at \( (4, -1) \), and the given point is \( (0, 2) \).
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substitute the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+33,536,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+","\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( D \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in a plane is given by the distance formula:
+\[
+D = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Applying this to the points \( (4, -1) \) and \( (0, 2) \):
+\[
+D = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+34,538,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+","x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, substitute \( x = 4 \) back into the original equation to find the y-coordinate:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Given Point
+
+We need to find the distance between the points \( (4, -1) \) and \( (0, 2) \).
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+35,549,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+","\]
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+36,551,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+","Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate of the vertex by substituting \( x = 4 \) back into the original equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula between two points \( (x_1, y_1) \) and \( (x_2, y_2) \):
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex \( (4, -1) \) and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+37,557,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+","\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and \( (0, 2) \)
+
+Use the distance formula between two points \( (x_1, y_1) \) and \( (x_2, y_2) \):
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Here, the two points are \( (4, -1) \) and \( (0, 2) \).
+
+Plugging in the values:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+38,559,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+","x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate of the vertex by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Applying this formula with the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+39,585,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+","\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the original equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at the point \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in a plane is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Applying this formula to the points \( (4, -1) \) and \( (0, 2) \):
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex \( (4, -1) \) and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+40,587,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+","To find the y-coordinate (\( y \)) of the vertex, substitute \( x = 4 \) back into the original equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( D \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+D = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+D = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+41,608,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+","\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+42,610,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+","f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+Use the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates of the vertex \( (4, -1) \) and the point \( (0, 2) \):
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+43,645,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+","\]
+
+So, the vertex of the parabola is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+We can use the distance formula to find the distance between two points \( (x_1, y_1) \) and \( (x_2, y_2) \):
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Let:
+- \( (x_1, y_1) = (4, -1) \) (vertex)
+- \( (x_2, y_2) = (0, 2) \) (given point)
+
+Plug in the values:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex of the parabola and the point \( (0, 2) \) is \(\boxed{5}\)."
+44,647,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+","So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Applying this to the points \( (4, -1) \) and \( (0, 2) \):
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+45,662,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+","### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in a plane is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+46,685,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+","The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) in the plane is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the given points \( (4, -1) \) and \( (0, 2) \):
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex \( (4, -1) \) and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+47,726,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+","\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substitute the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+The distance between the vertex and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+48,728,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+","d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substitute the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+49,754,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+","\]
+
+Substitute the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+50,756,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+","Substituting the coordinates \( (4, -1) \) and \( (0, 2) \):
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+51,762,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+","\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+52,764,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+","d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+\boxed{5}
+\]"
+53,819,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+","\]
+
+### Final Answer
+
+The distance between the vertex \( (4, -1) \) and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+54,821,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+","### Final Answer
+
+\[
+\boxed{5}
+\]"
+55,825,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+","The distance between the vertex \( (4, -1) \) and the point \( (0, 2) \) is:
+\[
+\boxed{5}
+\]"
+56,827,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+\]
+
+Next, I substitute \( x = 4 \) back into the original equation to find the y-coordinate of the vertex:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+So, the vertex is at \( (4, -1) \).
+
+Now, I need to calculate the distance between the point \( (4, -1) \) and \( (0, 2) \). Using the distance formula:
+\[
+\text{Distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+Substituting the coordinates:
+\[
+\text{Distance} = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+</think>
+
+To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), follow these steps:
+
+### Step 1: Find the Vertex of the Parabola
+
+The given equation is:
+\[
+f(x) = x^2 - 8x + 15
+\]
+
+This is a quadratic equation in the form \( f(x) = ax^2 + bx + c \), where:
+- \( a = 1 \)
+- \( b = -8 \)
+- \( c = 15 \)
+
+The x-coordinate of the vertex of a parabola is given by:
+\[
+x = -\frac{b}{2a}
+\]
+
+Plugging in the values:
+\[
+x = -\frac{-8}{2 \times 1} = \frac{8}{2} = 4
+\]
+
+Now, find the y-coordinate by substituting \( x = 4 \) back into the equation:
+\[
+f(4) = (4)^2 - 8(4) + 15 = 16 - 32 + 15 = -1
+\]
+
+So, the vertex is at \( (4, -1) \).
+
+### Step 2: Calculate the Distance Between the Vertex and the Point \( (0, 2) \)
+
+The distance \( d \) between two points \( (x_1, y_1) \) and \( (x_2, y_2) \) is given by the distance formula:
+\[
+d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+\]
+
+Substituting the coordinates:
+\[
+d = \sqrt{(0 - 4)^2 + (2 - (-1))^2} = \sqrt{(-4)^2 + (3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5
+\]
+
+### Final Answer
+
+\[
+","\boxed{5}
+\]"
+57,832,A,20,1.0,"To find the distance between the vertex of the parabola given by the equation \( f(x) = x^2 - 8x + 15 \) and the point \( (0, 2) \), I first need to determine the coordinates of the vertex.
+
+The general form of a quadratic equation is \( f(x) = ax^2 + bx + c \). For the given equation, \( a = 1 \), \( b = -8 \), and \( c = 15 \).
+
+The x-coordinate of the vertex can be found using the formula \( x = -\frac{b}{2a} \). Plugging in the values, we get:
+\[
+x = -\frac{-8}{2 \times 1} = 4
+",\]

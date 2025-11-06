@@ -1,0 +1,73 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,88,B,16,0.5333333333333333," 
+
+First, we need to solve the expressions inside the parentheses:
+(272 - 32) = 240
+(124 + 176) = 300
+
+Now, we multiply the results:
+240 * 300 = 72000
+
+Next, we calculate the denominator:
+(17 * 15 - 15) = 255
+
+Now, we divide the numerator by the denominator:
+72000 / 255 = 284.","31
+
+None of the answer options match this result."
+1,88,C,3,0.1," 
+
+First, we need to solve the expressions inside the parentheses:
+(272 - 32) = 240
+(124 + 176) = 300
+
+Now, we multiply the results:
+240 * 300 = 72000
+
+Next, we calculate the denominator:
+(17 * 15 - 15) = 255
+
+Now, we divide the numerator by the denominator:
+72000 / 255 = 284.","31 ≈ 284.31 (We round it as 284 since our choice options do not include decimal values)
+
+Now let's look at the choices:
+A)0 - Incorrect
+B)2.25 - Incorrect
+C)284 - Correct
+D)400 - Incorrect
+E)None of these - Incorrect"
+2,88,E,11,0.36666666666666664," 
+
+First, we need to solve the expressions inside the parentheses:
+(272 - 32) = 240
+(124 + 176) = 300
+
+Now, we multiply the results:
+240 * 300 = 72000
+
+Next, we calculate the denominator:
+(17 * 15 - 15) = 255
+
+Now, we divide the numerator by the denominator:
+72000 / 255 = 284.","12
+
+Since 284.12 is not listed among the choices, the correct answer is:
+
+E) None of these"
+3,98,B,29,0.9666666666666667,,
+4,98,E,1,0.03333333333333333," 
+
+First, we need to solve the expressions inside the parentheses:
+(272 - 32) = 240
+(124 + 176) = 300
+
+Now, we multiply the results:
+240 * 300 = 72000
+
+Next, we calculate the denominator:
+(17 * 15 - 15) = 255
+
+Now, we divide the numerator by the denominator:
+72000 / 255 = 284.31
+
+None of the options match this result.", The correct answer is E) None of these.

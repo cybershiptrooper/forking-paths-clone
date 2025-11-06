@@ -1,0 +1,1813 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,10,A,4,0.2,"First, determine the bus fare for one child."," Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult and child fares together: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+Let's calculate the total bus fare for 4 adults and 3 children between Ranchi and Patna.
+
+1. **Adult Fare Calculation:**
+   - **Adult fare per person:** Rs. 140
+   - **Total for 4 adults:**  
+     \( 4 \text{ adults} \times \text{Rs. }140/\text{person} = \text{Rs. }560 \)
+
+2. **Child Fare Calculation:**
+   - **Child fare per person:**  
+     \( \frac{\text{Adult fare}}{2} = \frac{\text{Rs. }140}{2} = \text{Rs. }70/\text{person} \)
+   - **Total for 3 children:**  
+     \( 3 \text{ children} \times \text{Rs. }70/\text{person} = \text{Rs. }210 \)
+
+3. **Total Bus Fare:**  
+   \[
+   \text{Total} = \text{Total for adults} + \text{Total for children} = \text{Rs. }560 + \text{Rs. }210 = \text{Rs. }770
+   \]
+
+**Final Answer:**  
+\(\boxed{\text{Rs. }770}\)"
+1,10,B,6,0.3,"First, determine the bus fare for one child."," Since the child fare is half of an adult fare, which is Rs. 140, the child fare would be Rs. 70.
+
+Next, calculate the total cost for 4 adults. Multiply the adult fare by 4: 4 * Rs. 140 = Rs. 560.
+
+Then, calculate the total cost for 3 children. Multiply the child fare by 3: 3 * Rs. 70 = Rs. 210.
+
+Finally, add the total costs of adults and children to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Determine the Adult Fare:**
+   - **Adult fare** = Rs. 140
+
+2. **Determine the Child Fare:**
+   - **Child fare** = \(\frac{1}{2}\) of adult fare = \(\frac{1}{2} \times 140 =\) **Rs. 70**
+
+3. **Calculate the Total Cost for Adults:**
+   - Total adult fare = \(4 \times 140 =\) **Rs. 560**
+
+4. **Calculate the Total Cost for Children:**
+   - Total child fare = \(3 \times 70 =\) **Rs. 210**
+
+5. **Determine the Total Bus Fare:**
+   - **Total fare** = Total adult fare + Total child fare  
+   - **Total fare** = \(560 + 210 =\) **Rs. 770**
+
+**Final Answer:**  
+\(\boxed{Rs.\,770}\)"
+2,10,E,10,0.5,"First, determine the bus fare for one child."," Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults: 4 multiplied by Rs. 140 equals Rs. 560.
+
+Then, calculate the total fare for 3 children: 3 multiplied by Rs. 70 equals Rs. 210.
+
+Finally, add the two amounts together to find the total bus fare: Rs. 560 plus Rs. 210 equals Rs. 770.
+</think>
+
+**Solution:**
+
+1. **Determine the Child Fare:**
+   
+   The bus fare for one adult is **Rs. 140**. 
+   
+   The child fare is half of the adult fare.
+   
+   \[
+   \text{Child Fare} = \frac{1}{2} \times \text{Adult Fare} = \frac{1}{2} \times 140 = \boxed{70 \text{ Rs}}
+   \]
+
+2. **Calculate the Total Fare for Adults:**
+   
+   There are **4 adults**.
+   
+   \[
+   \text{Total Adult Fare} = 4 \times 140 = \boxed{560 \text{ Rs}}
+   \]
+
+3. **Calculate the Total Fare for Children:**
+   
+   There are **3 children**.
+   
+   \[
+   \text{Total Child Fare} = 3 \times 70 = \boxed{210 \text{ Rs}}
+   \]
+
+4. **Calculate the Total Bus Fare:**
+   
+   Add the total adult fare and the total child fare.
+   
+   \[
+   \text{Total Bus Fare} = 560 + 210 = \boxed{770 \text{ Rs}}
+   \]
+
+**Answer:** **Rs. 770**
+
+\boxed{E}"
+3,17,A,2,0.1,"First, determine the bus fare for one child. Since the adult fare is Rs."," 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × Rs. 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × Rs. 70 = Rs. 210.
+
+Finally, add the total fares for adults and children to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+Let's calculate the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna.
+
+1. **Fare for One Adult:**
+   \[
+   \text{Adult fare} = \text{Rs. } 140
+   \]
+
+2. **Fare for One Child:**
+   \[
+   \text{Child fare} = \frac{1}{2} \times \text{Adult fare} = \frac{1}{2} \times 140 = \text{Rs. } 70
+   \]
+
+3. **Total Fare for 4 Adults:**
+   \[
+   \text{Total adult fare} = 4 \times 140 = \text{Rs. } 560
+   \]
+
+4. **Total Fare for 3 Children:**
+   \[
+   \text{Total child fare} = 3 \times 70 = \text{Rs. } 210
+   \]
+
+5. **Overall Total Fare:**
+   \[
+   \text{Total fare} = \text{Total adult fare} + \text{Total child fare} = 560 + 210 = \text{Rs. } 770
+   \]
+
+**Final Answer:**
+
+\(\boxed{\text{Rs. } 770}\)"
+4,17,B,11,0.55,"First, determine the bus fare for one child. Since the adult fare is Rs."," 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × Rs. 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × Rs. 70 = Rs. 210.
+
+Finally, add the total fares for adults and children together: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+**Solution:**
+
+1. **Determine the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \(\frac{1}{2} \times\) Adult fare
+   - Child fare = \(\frac{1}{2} \times 140 = \text{Rs. }70\)
+
+2. **Calculate Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \(4 \times 140 = \text{Rs. }560\)
+
+3. **Calculate Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \(3 \times 70 = \text{Rs. }210\)
+
+4. **Calculate Total Bus Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \(560 + 210 = \text{Rs. }770\)
+
+**Final Answer:**  
+\(\boxed{\text{Rs. }770}\)"
+5,17,E,7,0.35,"First, determine the bus fare for one child. Since the adult fare is Rs."," 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by the number of adults: 4 * 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by the number of children: 3 * 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: 560 + 210 = Rs. 770.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- Fare for 1 adult = Rs. 140
+- Fare for 1 child = (1/2) * Fare of 1 adult = (1/2) * 140 = Rs. 70
+
+**Calculations:**
+
+1. **Total Fare for Adults:**
+   - Number of adults = 4
+   - Total fare = 4 * 140 = Rs. 560
+
+2. **Total Fare for Children:**
+   - Number of children = 3
+   - Total fare = 3 * 70 = Rs. 210
+
+3. **Total Bus Fare:**
+   - Total fare = Fare for Adults + Fare for Children
+   - Total fare = 560 + 210 = Rs. 770
+
+**Final Answer:**
+
+\boxed{E}\ \text{Rs. 770}"
+6,34,A,1,0.05,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs."," 70.
+
+Next, calculate the total fare for 4 adults: 4 adults × Rs. 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children: 3 children × Rs. 70 = Rs. 210.
+
+Finally, add the total fares for adults and children: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Adult Fare:**
+   - **Fare per adult:** Rs. 140.
+
+2. **Calculate the Child Fare:**
+   - **Child fare is half of the adult fare.**
+   - Child fare = \( \frac{1}{2} \times \text{Adult fare} = \frac{1}{2} \times 140 = \boxed{70} \) Rs.
+
+3. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \boxed{560} \) Rs.
+
+4. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \boxed{210} \) Rs.
+
+5. **Calculate the Overall Total Fare:**
+   - **Total fare = Total adult fare + Total child fare**
+   - Total fare = \( 560 + 210 = \boxed{770} \) Rs.
+
+**Final Answer:** \(\boxed{770}\) Rs."
+7,34,B,14,0.7,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs."," 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 * 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 * 70 = Rs. 210.
+
+Finally, add the total fares for adults and children to find the overall fare: 560 + 210 = Rs. 770.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- Bus fare for 1 adult = Rs. 140
+- Bus fare for 1 child = Half of the adult fare = \( \frac{140}{2} = \) Rs. 70
+
+**Calculations:**
+1. **Total Fare for 4 Adults:**
+   \[
+   4 \text{ adults} \times 140 \text{ Rs/adult} = 560 \text{ Rs}
+   \]
+
+2. **Total Fare for 3 Children:**
+   \[
+   3 \text{ children} \times 70 \text{ Rs/child} = 210 \text{ Rs}
+   \]
+
+3. **Total Bus Fare for 4 Adults and 3 Children:**
+   \[
+   560 \text{ Rs} + 210 \text{ Rs} = 770 \text{ Rs}
+   \]
+
+**Final Answer:**
+\[
+\boxed{770}
+\]"
+8,34,E,5,0.25,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs."," 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, find the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to get the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+**Solution:**
+
+1. **Determine the Child's Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \text{Rs.}\ 70 \)
+
+2. **Calculate Total Fare for 4 Adults:**
+   - Total adult fare = \( 4 \times 140 = \text{Rs.}\ 560 \)
+
+3. **Calculate Total Fare for 3 Children:**
+   - Total child fare = \( 3 \times 70 = \text{Rs.}\ 210 \)
+
+4. **Compute the Overall Bus Fare:**
+   - **Total Bus Fare** = Total adult fare + Total child fare
+   - **Total Bus Fare** = \( 560 + 210 = \text{Rs.}\ 770 \)
+
+**Final Answer:**
+
+\boxed{E} \text{ Rs. } 770"
+9,49,A,1,0.05,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults."," Multiply the adult fare by 4: 4 * 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 * 70 = Rs. 210.
+
+Finally, add the total adult fare and the total child fare to get the overall bus fare: 560 + 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Adult Fare:**
+   - **Adult fare per person:** Rs. 140
+   - **Total adult fare for 4 adults:** 
+     \[
+     4 \text{ adults} \times Rs. \, 140/\text{adult} = Rs. \, 560
+     \]
+
+2. **Calculate the Child Fare:**
+   - **Child fare per person:** 
+     \[
+     \frac{1}{2} \times Rs. \, 140/\text{adult} = Rs. \, 70/\text{child}
+     \]
+   - **Total child fare for 3 children:** 
+     \[
+     3 \text{ children} \times Rs. \, 70/\text{child} = Rs. \, 210
+     \]
+
+3. **Calculate the Total Bus Fare:**
+   \[
+   Rs. \, 560 \, (\text{adults}) + Rs. \, 210 \, (\text{children}) = Rs. \, 770
+   \]
+
+**Final Answer:**  
+\[
+\boxed{Rs. \, 770}
+\]"
+10,49,B,12,0.6,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults."," Multiplying the adult fare by 4 gives Rs. 140 × 4 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiplying the child fare by 3 gives Rs. 70 × 3 = Rs. 210.
+
+Finally, add the total fares for adults and children together to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   
+   The bus fare for one adult is Rs. 140. Since the child fare is half of the adult fare:
+   
+   \[
+   \text{Child Fare} = \frac{1}{2} \times \text{Adult Fare} = \frac{1}{2} \times 140 = \text{Rs. }70
+   \]
+
+2. **Calculate the Total Fare for Adults:**
+   
+   For 4 adults:
+   
+   \[
+   \text{Total Adult Fare} = 4 \times 140 = \text{Rs. }560
+   \]
+
+3. **Calculate the Total Fare for Children:**
+   
+   For 3 children:
+   
+   \[
+   \text{Total Child Fare} = 3 \times 70 = \text{Rs. }210
+   \]
+
+4. **Calculate the Overall Total Fare:**
+   
+   Add the total fares for adults and children:
+   
+   \[
+   \text{Total Bus Fare} = \text{Total Adult Fare} + \text{Total Child Fare} = 560 + 210 = \text{Rs. }770
+   \]
+
+**Final Answer:**  
+\boxed{\text{Rs. }770}"
+11,49,E,7,0.35,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults."," Multiply the adult fare by 4: 4 * 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 * 70 = Rs. 210.
+
+Finally, add the total adult fare and the total child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+Let's solve the problem step by step.
+
+1. **Determine the Child's fares:**
+   - Adult fare = **Rs. 140**
+   - Child fare = \( \frac{1}{2} \times \) Adult fare = \( \frac{1}{2} \times 140 = **Rs. 70** \)
+
+2. **Calculate the total fare for adults:**
+   - Number of adults = 4
+   - Total adult fare = 4 × **Rs. 140** = **Rs. 560**
+
+3. **Calculate the total fare for children:**
+   - Number of children = 3
+   - Total child fare = 3 × **Rs. 70** = **Rs. 210**
+
+4. **Find the total bus fare for both adults and children:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = **Rs. 560** + **Rs. 210** = **Rs. 770**
+
+**Final Answer:**
+\[
+\boxed{E}
+\]"
+12,67,A,1,0.05,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs."," 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and total child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+
+   The bus fare for one child is half of the adult fare.
+   
+   \[
+   \text{Child Fare} = \frac{\text{Adult Fare}}{2} = \frac{140}{2} = \boxed{70} \text{ Rs}
+   \]
+
+2. **Calculate the Total Adult Fare for 4 Adults:**
+
+   \[
+   \text{Total Adult Fare} = 4 \times 140 = \boxed{560} \text{ Rs}
+   \]
+
+3. **Calculate the Total Child Fare for 3 Children:**
+
+   \[
+   \text{Total Child Fare} = 3 \times 70 = \boxed{210} \text{ Rs}
+   \]
+
+4. **Calculate the Total Bus Fare:**
+
+   \[
+   \text{Total Bus Fare} = \text{Total Adult Fare} + \text{Total Child Fare} = 560 + 210 = \boxed{770} \text{ Rs}
+   \]
+
+**Final Answer:**
+
+\boxed{770}"
+13,67,B,8,0.4,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs."," 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total fares for adults and children to find the overall bus fare: 560 + 210 = Rs. 770.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- Bus fare for 1 adult between Ranchi and Patna = **Rs. 140**
+
+**Child fare:**
+- The child fare is half of the adult fare.
+  
+  \[
+  \text{Child fare} = \frac{1}{2} \times \text{Adult fare} = \frac{1}{2} \times 140 = \text{Rs. }70
+\]
+
+**Calculating Total Fare:**
+
+1. **For 4 Adults:**
+   
+   \[
+   \text{Total adult fare} = 4 \times 140 = \text{Rs. }560
+   \]
+
+2. **For 3 Children:**
+   
+   \[
+   \text{Total child fare} = 3 \times 70 = \text{Rs. }210
+   \]
+
+3. **Total Bus Fare:**
+   
+   \[
+   \text{Total fare} = \text{Total adult fare} + \text{Total child fare} = 560 + 210 = \text{Rs. }770
+   \]
+
+**Final Answer:**
+
+\[
+\boxed{\text{Rs. }770}
+\]"
+14,67,E,11,0.55,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs."," 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Adult Fare:**
+   - **Given:** The bus fare for one adult is Rs. 140.
+   - **Calculation:** 
+     \[
+     \text{Total Adult Fare} = 4 \text{ adults} \times \text{Rs. }140/\text{adult} = 4 \times 140 = \text{Rs. }560
+     \]
+
+2. **Child Fare:**
+   - **Given:** The child fare is half of the adult fare.
+     \[
+     \text{Child Fare} = \frac{1}{2} \times 140 = \text{Rs. }70
+     \]
+   - **Total Child Fare:**
+     \[
+     \text{Total Child Fare} = 3 \text{ children} \times \text{Rs. }70/\text{child} = 3 \times 70 = \text{Rs. }210
+     \]
+
+3. **Total Bus Fare:**
+   \[
+   \text{Total Fare} = \text{Total Adult Fare} + \text{Total Child Fare} = \text{Rs. }560 + \text{Rs. }210 = \text{Rs. }770
+   \]
+
+**Final Answer:**
+\[
+\boxed{E}
+\]"
+15,83,A,5,0.25,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children."," Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and the total child fare to find the overall bus fare: 560 + 210 = Rs. 770.
+</think>
+
+Let's calculate the total bus fare step by step.
+
+1. **Adult Fare:**
+   - Fare for 1 adult = Rs. 140
+
+2. **Child Fare:**
+   - Fare for 1 child = Half of adult fare = \( \frac{140}{2} = \) Rs. 70
+
+3. **Total Fare for Adults:**
+   - 4 adults × Rs. 140 = 4 × 140 = Rs. 560
+
+4. **Total Fare for Children:**
+   - 3 children × Rs. 70 = 3 × 70 = Rs. 210
+
+5. **Overall Total Fare:**
+   - Total fare = Fare for Adults + Fare for Children
+   - Total fare = Rs. 560 + Rs. 210 = Rs. 770
+
+\(\boxed{Rs. \ 770}\)"
+16,83,B,10,0.5,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children."," Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total fares for adults and children to find the overall fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child's Fare:**
+   
+   The adult fare is Rs. 140. Since the child's fare is half of the adult fare:
+   \[
+   \text{Child fare} = \frac{140}{2} = \text{Rs. }70
+   \]
+
+2. **Calculate the Total Fare for Adults:**
+   
+   For 4 adults:
+   \[
+   4 \text{ adults} \times \text{Rs. }140/\text{adult} = \text{Rs. }560
+   \]
+
+3. **Calculate the Total Fare for Children:**
+   
+   For 3 children:
+   \[
+   3 \text{ children} \times \text{Rs. }70/\text{child} = \text{Rs. }210
+   \]
+
+4. **Calculate the Total Bus Fare:**
+   
+   Add the total fares for adults and children:
+   \[
+   \text{Total fare} = \text{Rs. }560 + \text{Rs. }210 = \text{Rs. }770
+   \]
+
+**Final Answer:**
+\[
+\boxed{\text{Rs. }770}
+\]"
+17,83,E,5,0.25,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children."," Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and the total child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+**Solution:**
+
+1. **Determine the Child's Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \(\frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = 4 × 140 = **Rs. 560**
+
+3. **Calculate Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = 3 × 70 = **Rs. 210**
+
+4. **Determine the Total Bus Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = 560 + 210 = **Rs. 770**
+
+**Final Answer:**  
+\(\boxed{E}\) Rs. 770"
+18,100,A,4,0.2,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs."," 210.
+
+Finally, add the total adult fare and the total child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, let's break down the costs step by step.
+
+1. **Adult Fare:**
+   - **Adult fare per person:** Rs. 140
+   - **Total for 4 adults:** \( 4 \times 140 = \boxed{Rs.\ 560} \)
+
+2. **Child Fare:**
+   - **Child fare per person:** \( \frac{140}{2} = \boxed{Rs.\ 70} \)
+   - **Total for 3 children:** \( 3 \times 70 = \boxed{Rs.\ 210} \)
+
+3. **Total Bus Fare:**
+   - **Sum of adult and child fares:** \( 560 + 210 = \boxed{Rs.\ 770} \)
+
+**Final Answer:** \(\boxed{Rs.\ 770}\)"
+19,100,B,12,0.6,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs."," 210.
+
+Finally, add the total fares for adults and children to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Adult Fare:**
+   - **Adult fare per person:** Rs. 140
+   - **Total fare for 4 adults:** \( 4 \times 140 = \text{Rs. } 560 \)
+
+2. **Calculate the Child Fare:**
+   - **Child fare per person:** \( \frac{140}{2} = \text{Rs. } 70 \)
+   - **Total fare for 3 children:** \( 3 \times 70 = \text{Rs. } 210 \)
+
+3. **Calculate the Total Bus Fare:**
+   - **Total fare:** \( 560 + 210 = \text{Rs. } 770 \)
+
+**Final Answer:** \(\boxed{770}\)"
+20,100,E,4,0.2,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs."," 210.
+
+Finally, add the total adult fare and the total child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Determine the Child's Fare:**
+   - Adult fare = **Rs. 140**
+   - Child fare = ½ of adult fare = \( \frac{140}{2} = \) **Rs. 70**
+
+2. **Calculate Total Adult Fare:**
+   - Number of adults = 4
+   - Total adult fare = 4 × **Rs. 140** = **Rs. 560**
+
+3. **Calculate Total Child Fare:**
+   - Number of children = 3
+   - Total child fare = 3 × **Rs. 70** = **Rs. 210**
+
+4. **Compute the Overall Total Fare:**
+   - **Total fare** = **Total adult fare + Total child fare**
+   - **Total fare** = **Rs. 560 + Rs. 210** = **Rs. 770**
+
+**Final Answer:**  
+\boxed{E} \ Rs. 770"
+21,124,B,15,0.75,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs."," 560 + Rs. 210 = Rs. 770.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- Bus fare for 1 adult from Ranchi to Patna = **Rs. 140**
+
+**Child's Fare:**
+- Child's fare is half of the adult fare.
+  
+\[
+\text{Child fare} = \frac{1}{2} \times \text{Adult fare} = \frac{1}{2} \times 140 = \text{Rs. }70
+\]
+
+**Calculations:**
+1. **Total Fare for 4 Adults:**
+   
+\[
+\text{Total for 4 adults} = 4 \times 140 = \text{Rs. }560
+\]
+
+2. **Total Fare for 3 Children:**
+   
+\[
+\text{Total for 3 children} = 3 \times 70 = \text{Rs. }210
+\]
+
+3. **Total Bus Fare for 4 Adults and 3 Children:**
+   
+\[
+\text{Total fare} = \text{Total for 4 adults} + \text{Total for 3 children} = 560 + 210 = \text{Rs. }770
+\]
+
+**Final Answer:**
+
+\boxed{\text{Rs. }770}"
+22,124,E,5,0.25,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs."," 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = ₹140
+   - Child fare = 1/2 × Adult fare = (1/2) × 140 = **₹70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = 4 × 140 = **₹560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = 3 × 70 = **₹210**
+
+4. **Calculate the Overall Total Fare:**
+   - **Total fare** = Total adult fare + Total child fare
+   - **Total fare** = ₹560 + ₹210 = **₹770**
+
+**Final Answer:**  
+\boxed{E} \text{ Rs. } 770"
+23,131,A,2,0.1,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs."," 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Determine the child fare:**
+   
+   The adult fare is Rs. 140. Since the child fare is half of the adult fare:
+   
+   \[
+   \text{Child fare} = \frac{1}{2} \times 140 = \boxed{70} \text{ Rs}
+   \]
+
+2. **Calculate the total fare for adults:**
+   
+   \[
+   4 \text{ adults} \times 140 \text{ Rs} = 560 \text{ Rs}
+   \]
+
+3. **Calculate the total fare for children:**
+   
+   \[
+   3 \text{ children} \times 70 \text{ Rs} = 210 \text{ Rs}
+   \]
+
+4. **Add both amounts to get the total bus fare:**
+   
+   \[
+   560 \text{ Rs} + 210 \text{ Rs} = \boxed{770} \text{ Rs}
+   \]
+
+**Final Answer:** \(\boxed{770}\) Rs"
+24,131,B,13,0.65,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs."," 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, let's break it down step by step.
+
+1. **Adult Fare:**
+   - Given that the adult fare is **Rs. 140**.
+
+2. **Child Fare:**
+   - The child fare is half of the adult fare.
+   - **Child fare = (1/2) × 140 = Rs. 70**
+
+3. **Calculating Total Fare:**
+   - **Total Adult Fare:** 4 × 140 = **Rs. 560**
+   - **Total Child Fare:** 3 × 70 = **Rs. 210**
+
+4. **Overall Total Fare:**
+   - **Total = 560 + 210 = Rs. 770**
+
+**Final Answer:** \(\boxed{770}\)"
+25,131,E,5,0.25,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs."," 210 = Rs. 770.
+</think>
+
+Certainly! Let's solve the problem step by step.
+
+**Given:**
+- **Adult fare** between Ranchi and Patna = **Rs. 140**
+- **Child fare** = **Half the adult fare**
+
+**Calculation:**
+
+1. **Child Fare:**
+   \[
+   \text{Child Fare} = \frac{1}{2} \times \text{Adult Fare} = \frac{1}{2} \times 140 = \text{Rs. }70
+   \]
+
+2. **Total Adult Fare for 4 Adults:**
+   \[
+   \text{Total Adult Fare} = 4 \times 140 = \text{Rs. }560
+   \]
+
+3. **Total Child Fare for 3 Children:**
+   \[
+   \text{Total Child Fare} = 3 \times 70 = \text{Rs. }210
+   \]
+
+4. **Total Bus Fare for 4 Adults and 3 Children:**
+   \[
+   \text{Total Fare} = \text{Total Adult Fare} + \text{Total Child Fare} = 560 + 210 = \text{Rs. }770
+   \]
+
+**Final Answer:**
+\[
+\boxed{\text{Rs. }770}
+\]
+
+**Correct Option:**
+\[
+\boxed{E}
+\]"
+26,138,A,4,0.2,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs."," 770.
+</think>
+
+Let's calculate the total bus fare step by step.
+
+**Given:**
+- **Adult fare:** Rs. 140
+- **Child fare:** Half of the adult fare
+
+**1. Calculate the Child Fare:**
+\[
+\text{Child fare} = \frac{1}{2} \times \text{Adult fare} = \frac{1}{2} \times 140 = \boxed{70} \text{ Rs}
+\]
+
+**2. Calculate the Total Fare for Adults:**
+\[
+\text{Total adult fare} = 4 \times 140 = 560 \text{ Rs}
+\]
+
+**3. Calculate the Total Fare for Children:**
+\[
+\text{Total child fare} = 3 \times 70 = 210 \text{ Rs}
+\]
+
+**4. Calculate the Overall Total Fare:**
+\[
+\text{Total fare} = \text{Total adult fare} + \text{Total child fare} = 560 + 210 = \boxed{770} \text{ Rs}
+\]
+
+**Final Answer:** \(\boxed{770}\) Rs"
+27,138,B,11,0.55,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs."," 770.
+</think>
+
+Let's solve the problem step by step.
+
+**Given:**
+- Bus fare for **1 adult** from Ranchi to Patna = **Rs. 140**
+- Bus fare for **1 child** is **half** of the adult fare.
+
+**Step 1: Calculate the child fare.**
+\[
+\text{Child fare} = \frac{1}{2} \times \text{Adult fare} = \frac{1}{2} \times 140 = \text{Rs. }70
+\]
+
+**Step 2: Calculate the total fare for 4 adults.**
+\[
+\text{Total adult fare} = 4 \times 140 = \text{Rs. }560
+\]
+
+**Step 3: Calculate the total fare for 3 children.**
+\[
+\text{Total child fare} = 3 \times 70 = \text{Rs. }210
+\]
+
+**Step 4: Calculate the overall total bus fare.**
+\[
+\text{Total bus fare} = \text{Total adult fare} + \text{Total child fare} = 560 + 210 = \text{Rs. }770
+\]
+
+**Final Answer:**
+\[
+\boxed{\text{Rs. }770}
+\]"
+28,138,E,5,0.25,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs."," 770.
+</think>
+
+**Solution:**
+
+1. **Determine the Child Fare:**
+   - Adult fare = **Rs. 140**
+   - Child fare = 1/2 of Adult fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Compute the Total Bus Fare:**
+   - **Total fare = Total adult fare + Total child fare**
+   - **Total fare = 560 + 210 = Rs. 770**
+
+**Final Answer:**  
+\boxed{\text{E) Rs. 770}}"
+29,173,A,4,0.2,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1."," **Calculate the Child Fare:**
+   - Adult fare = **Rs. 140**
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \text{Rs. }70 \)
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \text{Rs. }560 \)
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \text{Rs. }210 \)
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \text{Rs. }770 \)
+
+**Final Answer:** \(\boxed{\text{Rs. }770}\)"
+30,173,B,6,0.3,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1."," **Calculate the Child Fare:**
+   
+   \[
+   \text{Child Fare} = \frac{\text{Adult Fare}}{2} = \frac{140}{2} = \text{Rs. }70
+   \]
+
+2. **Calculate the Total Fare for Adults:**
+   
+   \[
+   \text{Total Adult Fare} = 4 \times 140 = \text{Rs. }560
+   \]
+
+3. **Calculate the Total Fare for Children:**
+   
+   \[
+   \text{Total Child Fare} = 3 \times 70 = \text{Rs. }210
+   \]
+
+4. **Calculate the Overall Total Bus Fare:**
+   
+   \[
+   \text{Total Bus Fare} = \text{Total Adult Fare} + \text{Total Child Fare} = 560 + 210 = \text{Rs. }770
+   \]
+
+**Final Answer:**
+
+\boxed{\text{Rs. }770}"
+31,173,E,10,0.5,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1."," **Calculate the Fare for One Adult:**
+   
+   The fare for one adult is given as Rs. 140.
+
+2. **Determine the Fare for One Child:**
+   
+   The child fare is half of the adult fare.
+   \[
+   \text{Child Fare} = \frac{\text{Adult Fare}}{2} = \frac{140}{2} = \text{Rs. }70
+   \]
+
+3. **Calculate the Total Fare for 4 Adults:**
+   
+   Multiply the adult fare by 4.
+   \[
+   \text{Total Adult Fare} = 4 \times 140 = \text{Rs. }560
+   \]
+
+4. **Calculate the Total Fare for 3 Children:**
+   
+   Multiply the child fare by 3.
+   \[
+   \text{Total Child Fare} = 3 \times 70 = \text{Rs. }210
+   \]
+
+5. **Determine the Overall Total Fare:**
+   
+   Add the total adult fare and the total child fare.
+   \[
+   \text{Overall Total Fare} = \text{Rs. }560 + \text{Rs. }210 = \text{Rs. }770
+   \]
+
+**Final Answer:**
+\[
+\boxed{770}
+\]
+
+ANSWER: \boxed{E}"
+32,187,A,1,0.05,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs."," 140
+   - Child fare = \(\frac{1}{2} \times 140 = \text{Rs. }70\)
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \(4 \times 140 = \text{Rs. }560\)
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \(3 \times 70 = \text{Rs. }210\)
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = Rs. 560 + Rs. 210 = \(\boxed{\text{Rs. }770}\)
+
+**Answer:** \(\boxed{\text{Rs. }770}\)"
+33,187,B,14,0.7,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs."," 140
+   - Child fare = \( \frac{140}{2} = \text{Rs. }70 \)
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \text{Rs. }560 \)
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \text{Rs. }210 \)
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \text{Rs. }770 \)
+
+**Final Answer:** \(\boxed{\text{Rs. }770}\)"
+34,187,E,5,0.25,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs."," 140
+   - Child fare = \(\frac{1}{2} \times \text{Adult fare} = \frac{1}{2} \times 140 = \text{Rs. }70\)
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \(4 \times 140 = \text{Rs. }560\)
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \(3 \times 70 = \text{Rs. }210\)
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \(560 + 210 = \text{Rs. }770\)
+
+**Final Answer:** \(\boxed{E}\) Rs. 770"
+35,237,B,10,0.5,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs."," 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - **Total fare** = Total adult fare + Total child fare
+   - **Total fare** = Rs. 560 + Rs. 210 = **Rs. 770**
+
+**Final Answer:** \(\boxed{Rs.\,770}\)"
+36,237,E,10,0.5,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs."," 70**
+
+2. **Calculate Total Adult Fare:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate Total Child Fare:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - **Total Fare** = Total adult fare + Total child fare
+   - **Total Fare** = Rs. 560 + Rs. 210 = **Rs. 770**
+
+**Final Answer:**
+\(\boxed{E}\)"
+37,243,A,2,0.1,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2."," **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = Number of adults × Adult fare
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = Number of children × Child fare
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs. 770**
+
+So, the total bus fare for 4 adults and 3 children is **Rs. 770**.
+
+\[
+\boxed{Rs.\ 770}
+\]"
+38,243,B,10,0.5,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2."," **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = Rs. 560 + Rs. 210 = **Rs. 770**
+
+**Final Answer:** \(\boxed{Rs.\ 770}\)"
+39,243,E,8,0.4,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2."," **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = 4 × 140 = **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = 3 × 70 = **Rs. 210**
+
+4. **Calculate the Total Bus Fare:**
+   - **Total fare** = Total adult fare + Total child fare
+   - **Total fare** = 560 + 210 = **Rs. 770**
+
+**Final Answer:** \(\boxed{E}\) Rs. 770"
+40,282,A,1,0.05,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs."," 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - **Total Fare = Total adult fare + Total child fare**
+   - **Total Fare = Rs. 560 + Rs. 210 = Rs. 770**
+
+**Final Answer:**  
+\(\boxed{\text{Rs. }770}\)"
+41,282,B,10,0.5,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs."," 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs. 770**
+
+**Final Answer:**
+
+\boxed{770}"
+42,282,E,9,0.45,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs."," 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - **Total fare = Total adult fare + Total child fare**
+   - Total fare = \( 560 + 210 = \) **Rs. 770**
+
+**Final Answer:**  
+\boxed{E} \text{ Rs. 770}"
+43,289,A,1,0.05,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3."," **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs. 770**
+
+Therefore, the total bus fare for 4 adults and 3 children is:
+
+\[
+\boxed{770}
+\]"
+44,289,B,12,0.6,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3."," **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs. 770**
+
+**Final Answer:**
+
+\[
+\boxed{770}
+\]"
+45,289,E,7,0.35,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3."," **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = Rs. 560 + Rs. 210 = **Rs. 770**
+
+**Final Answer:** \(\boxed{E}\)"
+46,327,B,12,0.6,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs."," 210**
+
+4. **Calculate the Total Bus Fare:**
+   - Total bus fare = Total adult fare + Total child fare
+   - Total bus fare = \( 560 + 210 = \) **Rs. 770**
+
+**Final Answer:**  
+\(\boxed{Rs. \ 770}\)"
+47,327,E,8,0.4,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs."," 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = Rs. 560 + Rs. 210 = **Rs. 770**
+
+**Final Answer:** \(\boxed{E}\)"
+48,334,A,3,0.15,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4."," **Calculate the Overall Total Fare:**
+   - **Total fare** = Total adult fare + Total child fare
+   - **Total fare** = \( 560 + 210 = \) **Rs. 770**
+
+Therefore, the total bus fare for 4 adults and 3 children is:
+
+\[
+\boxed{Rs. \ 770}
+\]"
+49,334,B,11,0.55,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4."," **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs. 770**
+
+**Final Answer:** \(\boxed{Rs. \ 770}\)"
+50,334,E,6,0.3,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4."," **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs. 770**
+
+**Final Answer:** \(\boxed{E}\)"
+51,376,A,2,0.1,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs."," 770**
+
+Therefore, the total bus fare for 4 adults and 3 children is:
+
+\[
+\boxed{770}
+\]"
+52,376,B,11,0.55,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs."," 770**
+
+**Final Answer:**
+\[
+\boxed{770}
+\]"
+53,376,E,7,0.35,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs."," 770**
+
+**Final Answer:**  
+\(\boxed{E}\) Rs. 770"
+54,396,E,20,1.0,"First, determine the bus fare for one child. Since the adult fare is Rs. 140, the child fare is half of that, which is Rs. 70.
+
+Next, calculate the total fare for 4 adults. Multiply the adult fare by 4: 4 × 140 = Rs. 560.
+
+Then, calculate the total fare for 3 children. Multiply the child fare by 3: 3 × 70 = Rs. 210.
+
+Finally, add the total adult fare and child fare to find the overall bus fare: Rs. 560 + Rs. 210 = Rs. 770.
+</think>
+
+To determine the total bus fare for 4 adults and 3 children traveling from Ranchi to Patna, follow these steps:
+
+1. **Calculate the Child Fare:**
+   - Adult fare = Rs. 140
+   - Child fare = \( \frac{1}{2} \times \) Adult fare
+   - Child fare = \( \frac{1}{2} \times 140 = \) **Rs. 70**
+
+2. **Calculate the Total Fare for Adults:**
+   - Number of adults = 4
+   - Total adult fare = \( 4 \times 140 = \) **Rs. 560**
+
+3. **Calculate the Total Fare for Children:**
+   - Number of children = 3
+   - Total child fare = \( 3 \times 70 = \) **Rs. 210**
+
+4. **Calculate the Overall Total Fare:**
+   - Total fare = Total adult fare + Total child fare
+   - Total fare = \( 560 + 210 = \) **Rs. 770**
+
+**Final Answer:**  
+\boxed{E} \text{ Rs.", 770}

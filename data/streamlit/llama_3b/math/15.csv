@@ -1,0 +1,370 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,107,A,2,0.06666666666666667," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5."," Let's try $3^{4.5}$.
+
+$3^{4.5} = 3^4 * 3^{0.5}$
+$= 81 * \sqrt3$
+$\approx 81 * 1.732$
+$\approx 140.53$
+
+Since $3^4$ is too low and $3^{4.5}$ is too high, we know that the answer must be between 4 and 4.5. Let's try $3^{4.25}$.
+
+$3^{4.25} = 3^4 * 3^{0.25}$
+$= 81 * \sqrt[4]{3}$
+$\approx 81 * 1.316$
+$\approx 106.025$
+
+Since $3^4$ is too low and $3^{4.25}$ is too low, we know that the answer must be between 4 and 4.25. Let's try $3^{4.2}$.
+
+$3^{4.2} = 3^4 * 3^{0.2}$
+$= 81 * \sqrt[5]{3}$
+$\approx 81 * 1.1487$
+$\approx 92.8$
+
+Since $3^4$ is too low and $3^{4.2}$ is too low, we know that the answer must be between 4 and 4.2. Let's try $3^{4.15}$.
+
+$3^{4.15} = 3^4 * 3^{0.15}$
+$= 81 * \sqrt[20]{3}$
+$\approx 81 * 1.1487^4$
+$\approx 81 * 1.082$
+$\approx 87.43$
+
+Since $3^4$ is too low and $3^{4.15}$ is too low, we know that the answer must be between 4 and 4.15. Let's try $3^{4.1}$.
+
+$3^{4.1} = 3^4 * 3^{0.1}$
+$= 81 * \sqrt[10]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.326$
+$\approx 107.08$
+
+Since $3^4$ is too low and $3^{4.1}$ is too high, we know that the answer must be between 4 and 4.1. Let's try $3^{4.05}$.
+
+$3^{4.05} = 3^4 * 3^{0.05}$
+$= 81 * \sqrt[20]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.323$
+$\approx 106.62$
+
+Since $3^4$ is too low and $3^{4.05}$ is too low, we know that the answer must be between 4 and 4.05. Let's try $3^{4.075}$.
+
+$3^{4.075} = 3^4 * 3^{0.075}$
+$= 81 * \sqrt[20]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.323$
+$\approx 106.72$
+
+Since $3^4$ is too low and $3^{4.075}$ is too low, we know that the answer must be between 4 and 4.075. Let's try $3^{4.075}$.
+
+$3^{4.075} = 3^4 * 3^{0.075}$
+$= 81 * \sqrt[20]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.323$
+$\approx 106.72$
+
+Since $3^4$ is too low and $3^{4.075}$ is too low, we know that the answer must be between 4 and 4.075. We can stop there as we are getting close to our answer.
+
+Let's try $3^{4.075}$.
+
+$3^{4.075} = 3^4 * 3^{0.075}$
+$= 81 * \sqrt[20]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.323$
+$\approx 106.72$
+
+Since $3^{4.075}$ is approximately 106.72, let's try $3^{4.1}$.
+
+$3^{4.1} = 3^4 * 3^{0.1}$
+$= 81 * \sqrt[10]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.326$
+$\approx 107.08$
+
+Since $3^{4.075}$ is approximately 106.72 and $3^{4.1}$ is approximately 107.08, we know that the answer must be between 4.075 and 4.1. Let's try $3^{4.07}$.
+
+$3^{4.07} = 3^4 * 3^{0.07}$
+$= 81 * \sqrt[10]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.327$
+$\approx 107.25$
+
+Since $3^{4.075}$ is approximately 106.72 and $3^{4.07}$ is approximately 107.25, we know that the answer must be between 4.075 and 4.07. Let's try $3^{4.085}$.
+
+$3^{4.085} = 3^4 * 3^{0.085}$
+$= 81 * \sqrt[10]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.327$
+$\approx 107.29$
+
+Since $3^{4.075}$ is approximately 106.72 and $3^{4.085}$ is approximately 107.29, we know that the answer must be between 4.075 and 4.085. Let's try $3^{4.08}$.
+
+$3^{4.08} = 3^4 * 3^{0.08}$
+$= 81 * \sqrt[10]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.327$
+$\approx 107.32$
+
+Since $3^{4.075}$ is approximately 106.72 and $3^{4.08}$ is approximately 107.32, we know that the answer must be between 4.075 and 4.08. Let's try $3^{4.075}$.
+
+$3^{4.075} = 3^4 * 3^{0.075}$
+$= 81 * \sqrt[20]{3}$
+$\approx 81 * 1.1487^2$
+$\approx 81 * 1.327$
+$\approx 106.72$
+
+Since $3^{4.08}$ is approximately 107.32 and $3^{4.075}$ is approximately 106.72, we know that the answer must be between 4.075 and 4.08.
+
+The only choice that is between 106.72 and 107.32 is choice A) 3.  
+
+The best answer is A."
+1,107,B,19,0.6333333333333333," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5."," 
+
+The final answer is $\frac{5}{4}=\boxed{1.25}$"
+2,107,C,4,0.13333333333333333," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5."," 
+
+Since the choices don't offer any option with a fractional exponent, we need to look at the choices given to us.
+
+Since $\log_3{243}$ is between 5 and 6 and $\log_3{27}$ is between 3 and 4, we know that the answer must be between 4 and 5.
+
+Given that choice (B) $\frac{3}{2}$ is between 3 and 4, we can look at choice (C) which is 9 and is the correct answer.
+
+The best answer is C."
+3,107,D,5,0.16666666666666666," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5."," 
+
+Now, we know that the answer must be greater than 4 and less than 5. 
+
+The answer choices are all integers. So, we can try the middle choice, $\frac{3}{2}$. 
+
+$\log_327 = \log_{3^{2.5}} 3$
+
+New base is $3^{2.5}$. 
+
+$\log_{3^{2.5}} 3 = \frac{1}{2.5}$
+
+$\frac{1}{2.5} = 0.4$ (too low)
+
+Since 0.4 is too low, the answer must be greater than 0.4 and less than 0.845. 
+
+The answer choices are all multiples of 0.01, so we can try 0.845.
+
+$\log_327 = \log_{3} 3^{0.845}$
+
+$\log_{3} 3^{0.845} = 0.845$
+
+Therefore, $\log_327 = 0.845$.
+
+The correct answer is D) $\boxed{0.845}$."
+4,119,A,5,0.16666666666666666," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5. 
+
+Now, let's try to find the exact value."," 
+
+$\log_327 = \frac{\log 27}{\log 3} = \frac{\log 3^3}{\log 3} = \frac{3\log 3}{\log 3} = 3$
+
+However, we know that $3^4$ is too low and $3^5$ is too low, so the answer must be between 4 and 5. 
+
+Let's try to find the exact value using a different method.
+
+$\log_327 = \frac{\log 27}{\log 3} = \frac{\log 3^3}{\log 3} = \frac{3\log 3}{\log 3} = 3$
+
+However, we know that $3^4$ is too low and $3^5$ is too low, so the answer must be between 4 and 5.
+
+Let's try to find the exact value using a different method.
+
+$\log_327 = \frac{\log 27}{\log 3} = \frac{\log 3^3}{\log 3} = \frac{3\log 3}{\log 3} = 3$
+
+However, we know that $3^4$ is too low and $3^5$ is too low, so the answer must be between 4 and 5.
+
+Let's try to find the exact value using a different method.
+
+$\log_327 = \frac{\log 27}{\log 3} = \frac{\log 3^3}{\log 3} = \frac{3\log 3}{\log 3} = 3$
+
+However, we know that $3^4$ is too low and $3^5$ is too low, so the answer must be between 4 and 5.
+
+Let's try to find the exact value using a different method.
+
+$\log_a{b}=\frac{\log_c{b}}{\log_c{a}}$
+
+$\log_327=\frac{\log_{10}27}{\log_{10}3}$
+
+$\log_327=\frac{\log_{10}3^3}{\log_{10}3}$
+
+$\log_327=\frac{3\log_{10}3}{\log_{10}3}$
+
+$\log_327=3$
+
+The final answer is 3."
+5,119,B,15,0.5," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5. 
+
+Now, let's try to find the exact value."," 
+
+$\log_327 = x$
+
+$3^x = 32$
+
+$3^x = 3^{\frac{5}{2}}$
+
+Since the bases are the same, we can equate the exponents.
+
+$x = \frac{5}{2}$
+
+So, the answer is B) $\frac{5}{2}$."
+6,119,C,1,0.03333333333333333," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5. 
+
+Now, let's try to find the exact value."," 
+
+$\log_327 = x \Rightarrow 3^x = 32$
+
+$3^4 \times 3 = 3^5 \Rightarrow 81 \times 3 = 243$ (too low)
+$3^4 \times 3 \times 3 = 3^6 \Rightarrow 81 \times 3 \times 3 = 729$ (too high)
+
+Since $243$ is too low and $729$ is too high, we know that the answer must be between 5 and 6. 
+
+Now, let's try to find the exact value. 
+
+$\log_327 = x \Rightarrow 3^x = 32$
+
+We can write $32$ as $3^5 \times \frac{32}{243}$. 
+
+$\log_327 = x \Rightarrow 3^x = 3^5 \times \frac{32}{243}$
+
+Since the bases are equal, the exponents must be equal. 
+
+$\log_327 = 5 + \log_{27} \frac{32}{243}$
+
+$\log_327 = 5 + \log_{27} \frac{1}{9}$
+
+Since $\log_{27} \frac{1}{9} = -2$ (because $27^{-2} = \frac{1}{27^2} = \frac{1}{9}$)
+
+$\log_327 = 5 - 2$ 
+
+$\log_327 = 3$
+
+The answer is C."
+7,119,D,9,0.3," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5. 
+
+Now, let's try to find the exact value."," 
+
+$3^4 = 81$
+$3^5 = 243$
+$\frac{243}{81} = 3$
+$\frac{3^5}{3^4} = 3$
+
+Since $3^4$ is too low, we know that $\log_327 = 4 + \frac{3}{3^4} = 4 + \frac{3}{81} = 4 + 0.037 = 4.037$.
+
+$\frac{3}{3^4} = \frac{3}{81} = 0.037$.
+
+$4 + 0.037 = 4.037$.
+
+Round $4.037$ to 2 decimal places. $4.037 \approx 4.04$.
+
+The answer is not listed, however, if we round to 3 decimal places, we get $4.037 \approx 4.037$.
+
+The closest answer is $\boxed{D}$"
+8,168,B,18,0.6," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5. 
+
+Now, let's try to find the exact value. 
+
+$3^4 = 81$ and $3^5 = 243$. 
+
+$\frac{243}{81} = 3$. 
+
+So, $\log_327 = \frac{5}{4} = 1.",25 = 1.25 \times 4 = 5/4$.
+9,168,D,12,0.4," 
+
+To evaluate $\log_327$, we need to find the exponent to which 3 must be raised to get 32.
+
+$3^3 = 27$ (too low)
+$3^4 = 81$ (too low)
+$3^5 = 243$ (too low)
+$3^6 = 729$ (too high)
+
+Since $3^4$ is too low and $3^5$ is too low, we know that the answer must be between 4 and 5. 
+
+Now, let's try to find the exact value. 
+
+$3^4 = 81$ and $3^5 = 243$. 
+
+$\frac{243}{81} = 3$. 
+
+So, $\log_327 = \frac{5}{4} = 1.","25 = 0.845$. 
+
+The correct answer is (D) 0.845."

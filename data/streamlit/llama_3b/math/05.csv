@@ -1,0 +1,24 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,2,A,26,0.8666666666666667, A.,"   $\left(9.2 \times 10^{2}\right)\left(8 \times 10^{6}\right)$ can be written as $\left(9.2 \times 8\right)\left(10^{2}\right)\left(10^{6}\right).$ Next, simplify the expression by multiplying the numbers and the 10's: $ \left(7.36\right)\left(10^{2+6}\right)=7.36\times 10^{8}.$ The exponent represents the number of zeroes in the number.
+Choice B is incorrect. Choice C is incorrect. Choice D is incorrect and may result from counting the zeroes in the given quantities rather than the product.
+The best answer is A."
+1,2,B,1,0.03333333333333333, A.,"   Multiplying the numbers without the powers of 10 gives 7,460. Multiplying the powers of 10 gives $2 \cdot 6=12$. Multiplying the results gives $7,460 \cdot 10^{12}$, so the number of zeros in this product is 12. Because there are 11 digits in the coefficient of the result, the answer is 11.
+The best answer is B."
+2,2,C,3,0.1, A.,"   We can start by writing the given product in standard form. If we multiply the numbers and add the exponents in the two factors, we get $7.2 \times 10^{2+6}=7.2 \times 10^{8}$. The number of zeroes in this number is 7.Choices A, B, and D are incorrect and may result from conceptual or calculation errors.
+The best answer is C."
+3,8,A,26,0.8666666666666667, A.   $\left(9.,"2 \times 10^{2}\right)\left(8 \times 10^{6}\right)$ $= 7.36 \times 10^{8}$  $\left(9.2 \times 8 = 7.36\right)$. The number of trailing zeros is the number of factors of $10$ in the number, which is the number of factors of $2$ minus the number of factors of $5$. $7.36$ has $1$ factor of $2$ and $1$ factor of $5$, so it has $1$ trailing zero. Therefore, the correct answer is $\left(A\right)$.
+The best answer is A."
+4,8,B,2,0.06666666666666667, A.   $\left(9.,"2 \times 10^2\right)\left(8 \times 10^6\right)=\left(92 \times 10^2\right)\left(8 \times 10^6\right)=736 \times 10^{2+6}=736 \times 10^8$   Therefore, there are 8 zeroes in the product.
+The correct answer is (B)."
+5,8,C,2,0.06666666666666667, A.   $\left(9.,"2 \times 10^2\right)\left(8 \times 10^6\right)$ $8 \left(9.2\right) 10^{2+6}$ $8\left(9.2\right)10^8$ $8\left(0.9 2\right)10^8$ $\frac{8\left(9.2\right)}{10}$ $\frac{72.8}{10}$ $\frac{72.8}{10}$ $7.28$ There are 3 zeroes in the product.
+So, the correct answer is (C)."
+6,35,A,28,0.9333333333333333, A.   $\left(9.2 \times 10^2\right)\left(8 \times 10^6\right)$ $= 9.,"2 \times 8 \times 10^{2+6}$ $= 7.36 \times 10^8$ So  there are 8 zeroes. The correct answer is (A).
+The best answer is A."
+7,35,B,1,0.03333333333333333, A.   $\left(9.2 \times 10^2\right)\left(8 \times 10^6\right)$ $= 9.,2 \times 8 \times 10^{2 + 6}$ $= 74.6 \times 10^8$ $= 7.46 \times 10^{8}$ There are 8 zeroes in 7.46 × 10^{8}.  The correct answer is (B).
+8,35,C,1,0.03333333333333333, A.   $\left(9.2 \times 10^2\right)\left(8 \times 10^6\right)$ $= 9.,"2 \times 8 \times 10^{2+6}=(7.36) \times 10^8$ $= 73,600,000$ So, there are 7 zeroes in the product. Therefore, (C) is the correct answer.
+The best answer is C."
+9,54,A,28,0.9333333333333333, A.   $\left(9.2 \times 10^2\right)\left(8 \times 10^6\right)$ $= 9.2 \times 8 \times 10^{2+6}$ $= 7.,"36 \times 10^8$ $= 7.36 \times 10^8$ Now, 7.36 × 10$^{8}$ can be written as 7.36 × 1 × 10$^{8}$, and 7.36 × 1 × 10$^{8}$ can be written as 7300 × 10$^{7}$, and 7300 × 10$^{7}$ can be written as 7300 × 1 × 10$^{7}$. Therefore, 7.36 × 10$^{8}$ can be written as 7300 × 10$^{7}$.
+The best answer is A."
+10,54,C,2,0.06666666666666667, A.   $\left(9.2 \times 10^2\right)\left(8 \times 10^6\right)$ $= 9.2 \times 8 \times 10^{2+6}$ $= 7.,"36 \times 10^8$ Because the base is the same, the number of zeros is the same as the number of factors of 10 in the exponent. $7.36 \times 10^8$ has 7 factors of 10.
+The best answer is C."
+11,77,A,30,1.0,,

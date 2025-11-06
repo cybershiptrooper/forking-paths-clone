@@ -1,0 +1,240 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,13,A,4,0.2,Tyrion uses a face mask every time he goes out.," He goes out three times a day.
+
+To find out how many face masks he uses in two days, we multiply the number of visits per day by the number of masks used per visit.
+
+Therefore, 3 visits/day * 2 days = 6 face masks.
+</think>
+
+To determine how many face masks Tyrion uses every 2 days, let's break down the problem step by step.
+
+1. **Visits per Day:** Tyrion goes out 3 times a day.
+2. **Masks per Visit:** Tyrion changes his face mask two times every time he goes out. This means he uses 2 face masks per visit.
+
+Now, let's calculate the total number of face masks used in 2 days:
+
+- **Visits in 2 Days:**  
+  \[
+  3 \text{ visits/day} \times 2 \text{ days} = 6 \text{ visits}
+  \]
+
+- **Face Masks Used:**  
+  \[
+  6 \text{ visits} \times 2 \text{ masks/visit} = 12 \text{ masks}
+  \]
+
+Therefore, Tyrion uses **12** face masks every 2 days.
+
+\[
+\boxed{12}
+\]"
+1,13,B,13,0.65,Tyrion uses a face mask every time he goes out.," Since he goes out three times a day, that means he uses one mask per go.
+
+To find out how many masks he uses in two days, I need to calculate the total number of times he goes out over the two-day period.
+
+2 days multiplied by 3 go-outs per day equals 6 go-outs in total.
+
+Therefore, Tyrion uses 6 face masks over two days.
+</think>
+
+**Solution:**
+
+Let's determine how many face masks Tyrion uses every 2 days.
+
+1. **Face Masks Per Outage:**
+   - Tyrion uses **1 face mask** every time he goes out.
+
+2. **Number of Outages Per Day:**
+   - Tyrion goes **3 times** a day.
+
+3. **Total Outages Over 2 Days:**
+   \[
+   \text{Total Outages} = \text{Outages Per Day} \times \text{Number of Days} = 3 \times 2 = 6
+   \]
+
+4. **Total Face Masks Used:**
+   \[
+   \text{Total masks} = \text{Total Outages} \times \text{Face Masks Per Outage} = 6 \times 1 = 6
+   \]
+
+**Answer:** \(\boxed{6}\)"
+2,13,C,3,0.15,Tyrion uses a face mask every time he goes out.," Since he changes his face mask two times every time he goes out, he uses two masks each day. 
+
+If he goes out three times a day, the total number of face masks he uses in a day is 2 masks per visit multiplied by 3 visits, which equals 6 masks per day.
+
+To find out how many masks he uses over two days, we multiply the daily usage by 2. 
+
+Therefore, 6 masks per day multiplied by 2 days equals 12 masks in total.
+</think>
+
+To determine how many face masks Tyrion uses every 2 days, let's break down the problem step by step.
+
+1. **Face Masks Used Per Visit:**
+   Tyrion changes his face mask two times every time he goes out. This means:
+   \[
+   \text{Face masks per visit} = 2
+   \]
+
+2. **Visits Per Day:**
+   Tyrion goes out **3 times a day**. 
+   \[
+   \text{Visits per day} = 3
+   \]
+
+3. **Face Masks Used Per Day:**
+   \[
+   \text{Face masks per day} = \text{Face masks per visit} \times \text{Visits per day} = 2 \times 3 = 6
+   \]
+
+4. **Face Masks Used Over 2 Days:**
+   \[
+   \text{Face masks over 2 days} = \text{Face masks per day} \times 2 = 6 \times 2 = 12
+   \]
+
+**Final Answer:** \(\boxed{12}\)"
+3,105,B,20,1.0,"Tyrion uses a face mask every time he goes out. He goes out three times a day, so he uses three face masks each day.
+
+To find out how many face masks he uses in two days, I'll multiply the number of face masks he uses each day by two.
+
+3 face masks/day * 2 days = 6 face masks.
+
+Therefore, Tyrion uses 6 face masks every 2 days.
+</think>
+
+**Solution:**
+
+Tyrion uses a face mask every time he goes out."," He goes out **3 times** a day.
+
+**Calculation:**
+
+- **Face masks used per day:**  
+  \( 3 \) masks/day
+
+- **Face masks used in 2 days:**  
+  \( 3 \text{ masks/day} \times 2 \text{ days} = 6 \text{ masks} \)
+
+**Final Answer:**
+
+\boxed{6}"
+4,117,A,1,0.05,"Tyrion uses a face mask every time he goes out. He goes out three times a day, so he uses three face masks each day.
+
+To find out how many face masks he uses in two days, I'll multiply the number of face masks he uses each day by two.
+
+3 face masks/day * 2 days = 6 face masks.
+
+Therefore, Tyrion uses 6 face masks every 2 days.
+</think>
+
+**Solution:**
+
+Tyrion uses a face mask every time he goes out. He goes out **3 times a day**.
+
+1."," **Face masks used per day:**
+   \[
+   3 \text{ masks/day}
+   \]
+
+2. **Face masks used in 2 days:**
+   \[
+   3 \text{ masks/day} \times 2 \text{ days} = 6 \text{ masks}
+   \]
+
+Therefore, Tyrion uses \(\boxed{6}\) face masks every 2 days."
+5,117,B,18,0.9,"Tyrion uses a face mask every time he goes out. He goes out three times a day, so he uses three face masks each day.
+
+To find out how many face masks he uses in two days, I'll multiply the number of face masks he uses each day by two.
+
+3 face masks/day * 2 days = 6 face masks.
+
+Therefore, Tyrion uses 6 face masks every 2 days.
+</think>
+
+**Solution:**
+
+Tyrion uses a face mask every time he goes out. He goes out **3 times a day**.
+
+1."," **Face masks used in 1 day:**
+   
+   \[
+   3 \text{ masks/day} \times 1 \text{ day} = 3 \text{ masks}
+   \]
+
+2. **Face masks used in 2 days:**
+   
+   \[
+   3 \text{ masks/day} \times 2 \text{ days} = 6 \text{ masks}
+   \]
+
+**Final Answer:**
+
+\boxed{6}"
+6,117,C,1,0.05,"Tyrion uses a face mask every time he goes out. He goes out three times a day, so he uses three face masks each day.
+
+To find out how many face masks he uses in two days, I'll multiply the number of face masks he uses each day by two.
+
+3 face masks/day * 2 days = 6 face masks.
+
+Therefore, Tyrion uses 6 face masks every 2 days.
+</think>
+
+**Solution:**
+
+Tyrion uses a face mask every time he goes out. He goes out **3 times a day**.
+
+1."," **Calculate the number of face masks used per day:**
+   
+   \[
+   3 \text{ face masks/day} \times 3 \text{ times/day} = 9 \text{ face masks/day}
+   \]
+
+2. **Calculate the number of face masks used in 2 days:**
+   
+   \[
+   9 \text{ face masks/day} \times 2 \text{ days} = 18 \text{ face masks}
+   \]
+
+However, looking at the provided options, there seems to be a discrepancy in the initial calculation. Let's verify the problem statement again.
+
+**Revised Calculation:**
+
+If Tyrion changes his face mask two times every time he goes out and goes out **3 times a day**, then:
+
+\[
+2 \text{ face masks/change} \times 3 \text{ times/day} = 6 \text{ face masks/day}
+\]
+
+3. **Calculate the number of face masks used in 2 days:**
+   
+   \[
+   6 \text{ face masks/day} \times 2 \text{ days} = 12 \text{ face masks}
+   \]
+
+**Final Answer:**
+
+\[
+\boxed{C}
+\]"
+7,142,B,20,1.0,"Tyrion uses a face mask every time he goes out. He goes out three times a day, so he uses three face masks each day.
+
+To find out how many face masks he uses in two days, I'll multiply the number of face masks he uses each day by two.
+
+3 face masks/day * 2 days = 6 face masks.
+
+Therefore, Tyrion uses 6 face masks every 2 days.
+</think>
+
+**Solution:**
+
+Tyrion uses a face mask every time he goes out. He goes out **3 times a day**.
+
+1. **Face masks used per day:**
+   \[
+   3 \text{ masks/day}
+   \]
+
+2."," **Face masks used over 2 days:**
+   \[
+   3 \text{ masks/day} \times 2 \text{ days} = 6 \text{ masks}
+   \]
+
+**Answer:** \boxed{6}"

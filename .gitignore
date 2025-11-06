@@ -12,5 +12,6 @@ wheels/
 # vscode
 .vscode
 
-data/
+data/collection
+data/forking_paths
 playground.ipynb

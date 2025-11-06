@@ -1,0 +1,110 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,50,A,2,0.06666666666666667," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons."," So, that's 3 balloons for each of the 5 people, which is 3 + 3 + 3 + 3 + 3 = 15 more balloons.
+
+Now, we add the initial 10 balloons to the 15 new balloons to get the total number of balloons: 10 + 15 = 25.
+
+However, the answer choices don't include 25. We can recheck the math by recalculating the total number of balloons or looking at the answer choices again.
+
+In the choices, there is one more option we can consider: A) 16. If we take the answer A) 16, we can see that there must be 4 balloons left over after Maria's mom gave more. Since there are five people, let's calculate how many balloons would be left if there were 15 - 4 = 11 balloons.
+
+If there are 4 balloons left, then the initial 10 balloons would have been 10. Now, let's add the 4 balloons to the initial 10 balloons to get the total number of balloons. 10 + 4 = 14. 
+
+If there are 14 balloons, let's see if we can get 16 by giving 2 to Maria's mom. We can give 2 to Maria's mom to get 14 + 2 = 16."
+1,50,B,12,0.4," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons."," There were 5 people (Maria and her 4 friends) so she gave 3 x 5 = 15 balloons.
+
+In total, now they have 10 + 15 = 25 balloons.
+
+The answer is not among the options provided."
+2,50,C,6,0.2," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons."," There are 5 people (Maria and her 4 friends) so they got 3 x 5 = 15 more balloons. Now, we add the initial balloons to the new ones: 10 + 15 = 25.
+
+The answer is not among the given choices."
+3,50,D,10,0.3333333333333333," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons."," So each person gets 3 more, and since there are 5 people, that's 3 x 5 = 15 more balloons.
+
+Adding those to the initial 10 balloons, the total is 10 + 15 = 25 balloons.
+
+However, the choices given don't include 25. The closest one is 24."
+4,94,A,3,0.1," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons. Since there are 5 people (Maria and her 4 friends), that's 3 * 5 = 15 more balloons.
+
+So, the total number of balloons is 10 + 15 = 25."," However, the answer options do not include 25, so that is your answer"
+5,94,B,11,0.36666666666666664," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons. Since there are 5 people (Maria and her 4 friends), that's 3 * 5 = 15 more balloons.
+
+So, the total number of balloons is 10 + 15 = 25."," However, this is not among the answer choices. Let's recheck the question: ""How many total balloons did the girls have?"" It says ""the girls."" It should be ""the girls"" instead of ""the friends."" 
+
+So, let's recalculate. 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave 3 more balloons to each person. Since there are 5 people (Maria and her 4 friends), that's 3 * 5 = 15 more balloons.
+
+So, the total number of balloons is 10 + 15 = 25."
+6,94,C,4,0.13333333333333333," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons. Since there are 5 people (Maria and her 4 friends), that's 3 * 5 = 15 more balloons.
+
+So, the total number of balloons is 10 + 15 = 25."," However, that is not an option, but the closest answer is C) 18"
+7,94,D,12,0.4," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons. Since there are 5 people (Maria and her 4 friends), that's 3 * 5 = 15 more balloons.
+
+So, the total number of balloons is 10 + 15 = 25."," However, this is not among the choices. 
+
+Since Maria also had a water balloon for herself, the correct total number of balloons is 25 + 1 = 26. 26 is not an option. However, 24 + 2 = 26."
+8,103,A,1,0.03333333333333333," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons. Since there are 5 people (Maria and her 4 friends), that's 3 * 5 = 15 more balloons.
+
+So, the total number of balloons is 10 + 15 = 25. Unfortunately, this is not among the choices."," We need to reevaluate our method to get an answer from the options given.
+
+Let's recalculate:
+Maria and her 4 friends start with 2 balloons each. 5 people * 2 balloons = 10.
+
+Maria's mom gives each person 3 more. 5 people * 3 = 15.
+
+The total is 10 + 15 = 25. We need to go back to the choices and see if 25 is the closest.
+
+A) 16
+B) 9
+C) 18
+D) 24
+
+The closest answer is A) 16"
+9,103,B,27,0.9,,
+10,103,D,2,0.06666666666666667," 
+
+Initially, Maria and her 4 friends had 2 balloons each, so that's 2 + 2 + 2 + 2 + 2 = 10 balloons.
+
+Then, Maria's mom gave each person 3 more balloons. Since there are 5 people (Maria and her 4 friends), that's 3 * 5 = 15 more balloons.
+
+So, the total number of balloons is 10 + 15 = 25. Unfortunately, this is not among the choices."," However, the closest answer to 25 is 24.
+
+The correct answer is D) 24."

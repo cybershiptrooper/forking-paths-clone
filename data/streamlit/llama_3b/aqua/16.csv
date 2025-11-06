@@ -1,0 +1,968 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,22,A,1,0.03333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.","50 with a profit of 10%.
+
+Cost price(x) + Profit = 1.1x = 27.50
+Cost price of the book (x) = 27.50 / 1.1
+x = 25 Rs.
+
+If it were sold for Rs 25.75, then we can see it is 1 Rs less than the cost price.
+
+Since the amount is less than the cost price, it is a loss.
+Loss = 25 - 25.50 = 0.50
+Loss percentage = (Loss / Cost price) * 100
+= (0.5/25)*100 = 2%"
+1,22,B,16,0.5333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.","50 with a profit of 10%. 
+So, 
+Selling price = Cost price + Profit
+27.50 = x + 10% of x
+27.50 = x + 0.1x
+27.50 = 1.1x
+x = 27.50 / 1.1
+x = 25.00
+
+Now, if the book was sold for Rs.25.75, 
+Selling price = Cost price
+25.75 = 25.00
+
+Here, Selling price < Cost price
+So, this will be a loss
+Loss = Cost price - Selling price
+= 25.00 - 25.75
+= -0.75
+
+To find the loss percentage, we need to divide the loss by the cost price and multiply by 100
+Loss percentage = (Loss / Cost price) * 100
+= (-0.75 / 25.00) * 100
+= -3%
+
+Thus, selling at the cost price will result in a 3% loss."
+2,22,C,1,0.03333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.","50 with a profit of 10%. So, we can write:
+27.50 = x + 10% of x
+27.50 = x + 0.1x
+27.50 = 1.1x
+x = 27.50 / 1.1
+x = 25
+
+Now, if the book was sold for Rs. 25.75, we can calculate the loss as follows:
+Loss = 25.50 - 25.75 = -0.25
+
+Now, let's find the percentage of loss:
+Loss percentage = (Loss / Cost price) * 100
+= (-0.25 / 25) * 100
+= -1%
+
+However, since the loss percentage is negative, it indicates a loss, and we need to find the absolute value of the loss percentage. So, we can say:
+Loss percentage = 1%
+
+Since the loss percentage is 1%, the correct answer is:
+
+C) 1% Loss"
+3,22,D,12,0.4," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.","50 with a profit of 10%. 
+
+So, 
+Selling price of book = cost price + 10% of cost price = 1.1x
+27.50 = 1.1x
+x = 27.50 / 1.1
+x = 25
+
+Now, if the book were sold for Rs 25.75, 
+25.75 = 25 + 0.75
+So, 0.75 is the loss.
+Loss percentage = (Loss / Cost price) * 100
+= (0.75 / 25) * 100
+= 3% Loss
+
+So, the correct answer is 'D'"
+4,48,B,17,0.5666666666666667," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.","50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+To find the cost price, we can divide both sides by 1.1:
+
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+If the book were sold for Rs 25.75, the profit would be:
+
+Profit = Selling price - Cost price
+= 25.75 - 25
+= 0.75
+
+To find the percentage profit, we can divide the profit by the cost price and multiply by 100:
+
+Percentage profit = (Profit / Cost price) * 100
+= (0.75 / 25) * 100
+= 3%
+
+Therefore, if the book were sold for Rs 25.75, the percentage of profit would be 3%. The correct answer is:
+
+B) 3% Profit."
+5,48,C,1,0.03333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.","50 = x + (10/100)x
+27.50 = x + 0.1x
+27.50 = 1.1x
+x = 250
+
+So, the cost price of the book is Rs 250.
+
+If the book was sold for Rs 25.75, we can calculate the loss as follows:
+
+Loss = Cost price - Selling price
+Loss = 250 - 25.75
+Loss = 224.25
+
+To find the percentage loss, we can divide the loss by the cost price and multiply by 100:
+
+Percentage loss = (Loss / Cost price) * 100
+= (224.25 / 250) * 100
+= 89.7%
+
+However, this option is not available in the multiple-choice options. Since none of the options match this result, we can try to find the closest one.
+
+We can also find the closest option by finding the difference between the selling price and cost price. 
+
+In this case, we can see that 250 - 25.75 = 224.25, so the loss is 224.25. The closest option is 224.25, which is close to 224, which is 3/4 of 250.
+
+However, the best match is with C i.e. 2% loss"
+6,48,D,11,0.36666666666666664," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.","50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book is sold for Rs 25.75, it is actually a loss.
+
+To find the percentage loss, we can calculate:
+
+Loss = Cost price - Selling price
+= 25 - 25.75
+= -0.75
+
+Percentage loss = (Loss / Cost price) * 100
+= (-0.75 / 25) * 100
+= -3%
+
+Since the result is negative, it means there is a loss of 3%. 
+
+The correct answer is:
+D) 3% Loss."
+7,48,E,1,0.03333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.","50 = x + (10/100)x
+27.50 = 1.1x
+
+To find the cost price, we can divide both sides by 1.1:
+
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, let's calculate the percentage of loss:
+
+Selling price = Cost price - Loss
+25.75 = 25 - Loss
+
+Loss = 25 - 25.75
+Loss = -0.75
+
+To find the percentage of loss, we can divide the loss by the cost price and multiply by 100:
+
+Percentage loss = (-0.75 / 25) * 100
+Percentage loss = (-3/10) * 100
+Percentage loss = 30%
+
+Since the actual loss is 30%, which is more than 10%, it's not a profit. Hence, the answer is 30% Loss."
+8,60,B,16,0.5333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.","50 = x + (0.10x)
+27.50 = 1.10x
+
+To find x, divide both sides by 1.10:
+x = 27.50 / 1.10
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit or loss:
+
+Selling price = Cost price + Profit
+25.75 = 25 + Profit
+
+The profit is:
+Profit = 25.75 - 25
+Profit = 0.75
+
+To find the percentage of profit:
+Percentage of profit = (Profit / Cost price) × 100
+= (0.75 / 25) × 100
+= 3%
+
+Therefore, the book was sold at a 3% profit. The correct answer is B) 3% Profit."
+9,60,D,14,0.4666666666666667," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.","50 = x + 0.10x
+27.50 = 1.10x
+
+To find the cost price, divide both sides by 1.10:
+x = 27.50 / 1.10
+x = 25
+
+So, the cost price (CP) of the book is Rs 25.
+
+Now, if it were sold for Rs 25.75, then the loss would be:
+Loss = Selling price - Cost price
+Loss = 25.75 - 25
+Loss = 0.75
+
+To find the percentage of loss:
+Percentage of loss = (Loss / Cost price) * 100
+= (0.75/25) * 100
+= 3%
+
+The correct answer is D) 3% Loss."
+10,67,B,15,0.5," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.","1x
+27.50 = 1.1x
+Now we can solve for x:
+x = 27.50 / 1.1
+x = 25
+
+So the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit percentage as follows:
+
+Profit = Selling price - Cost price
+= 25.75 - 25
+= 0.75
+
+Profit percentage = (Profit / Cost price) × 100
+= (0.75 / 25) × 100
+= 3%
+
+Therefore, the correct answer is B) 3% Profit."
+11,67,D,15,0.5," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.","1x
+27.50 = 1.1x
+
+To find the cost price (x), we can divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, let's calculate the selling price if it were sold for Rs 25.75. We can set up the equation:
+
+Selling price = Cost price
+25.75 = 25
+
+Since the selling price (Rs 25.75) is more than the cost price (Rs 25), there would be a loss.
+
+The amount of loss is:
+Loss = Cost price - Selling price
+Loss = 25 - 25.75
+Loss = -0.75
+
+To find the percentage of loss, we can divide the loss by the cost price and multiply by 100:
+Percentage of loss = (Loss / Cost price) x 100
+= (-0.75 / 25) x 100
+= -3%
+
+So, if the book were sold for Rs 25.75, there would be a loss of 3%.
+
+The correct answer is D) 3% Loss."
+12,72,B,20,0.6666666666666666," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.","50 = 1.1x
+
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit as:
+
+Profit = Selling price - Cost price
+Profit = 25.75 - 25
+Profit = 0.75
+
+To find the percentage profit, we can use the formula:
+
+Percentage profit = (Profit / Cost price) * 100
+= (0.75 / 25) * 100
+= 3%
+
+Therefore, if the book were sold for Rs 25.75, the percentage of profit would be 3%. 
+
+The correct answer is B) 3% Profit."
+13,72,D,10,0.3333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.","50 = 1.1x
+
+To find the cost price, we can divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+If it were sold for Rs 25.75, then the loss would be:
+Loss = Selling price - Cost price
+= 25.75 - 25
+= 0.75
+
+To find the percentage loss, we can divide the loss by the cost price and multiply by 100:
+Percentage loss = (Loss / Cost price) * 100
+= (0.75 / 25) * 100
+= 3%
+
+Therefore, the correct answer is:
+D) 3% Loss."
+14,77,B,19,0.6333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.","1x
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price is Rs 25.
+
+Now, if it were sold for Rs 25.75, we can calculate the profit as:
+
+Profit = Selling price - Cost price
+Profit = 25.75 - 25
+Profit = 0.75
+
+To find the percentage of profit, we can use the formula:
+Percentage of profit = (Profit / Cost price) × 100
+= (0.75 / 25) × 100
+= 3%
+
+Therefore, if the book were sold for Rs 25.75, the percentage of profit would be 3%. The correct answer is:
+
+B) 3% Profit"
+15,77,D,11,0.36666666666666664," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.","1x
+
+To find the cost price (x), we can divide both sides by 1.1:
+
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we need to find the percentage of loss.
+
+Loss = Selling price - Cost price
+Loss = 25.75 - 25
+Loss = 0.75
+
+To find the percentage of loss, we can divide the loss by the cost price and multiply by 100:
+
+Percentage of loss = (Loss / Cost price) * 100
+= (0.75 / 25) * 100
+= 3%
+
+Therefore, the correct answer is D) 3% Loss."
+16,89,B,19,0.6333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.","1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if it were sold for Rs 25.75, we can calculate the percentage of profit:
+
+Selling price = Cost price + Profit
+25.75 = 25 + p
+
+where p is the profit.
+
+Subtract the cost price from both sides:
+p = 25.75 - 25
+p = 0.75
+
+Now, calculate the percentage of profit:
+Percentage of profit = (Profit / Cost price) * 100
+= (0.75 / 25) * 100
+= 3%
+
+Therefore, the correct answer is B) 3% Profit"
+17,89,D,11,0.36666666666666664," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.","1:
+x = 25
+
+Now, we can see the cost price is Rs 25.
+
+If the book were sold for Rs 25.75, it would be a loss. 
+
+Loss = Cost price - Selling price
+Loss = 25 - 25.75
+Loss = -0.75
+
+To find the percentage of loss:
+Percentage of loss = (Loss / Cost price) * 100
+= (-0.75 / 25) * 100
+= -3%
+
+So, the correct answer is D) 3% Loss."
+18,96,B,16,0.5333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.","50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if it were sold for Rs 25.75, we can calculate the new profit percentage as follows:
+
+New selling price = Cost price + Profit
+25.75 = 25 + P
+
+Subtract 25 from both sides:
+0.75 = P
+
+New profit percentage = (Profit / Cost price) * 100
+= (0.75 / 25) * 100
+= 3%
+
+Therefore, the correct answer is:
+
+B) 3% Profit"
+19,96,C,1,0.03333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.","50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, let's calculate the loss:
+Loss = Selling price - Cost price
+Loss = 25.75 - 25
+Loss = -0.25
+
+To find the percentage of loss, divide the loss by the cost price and multiply by 100:
+Percentage loss = (Loss / Cost price) * 100
+= (-0.25 / 25) * 100
+= -1%
+
+However, since the problem is asking for the percentage of loss, we'll consider the absolute value, and we get 1% loss.
+
+The correct answer is C) 1% Loss"
+20,96,D,13,0.43333333333333335," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.","50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, then it would be a loss, since the selling price is less than the cost price.
+
+Loss = Cost price - Selling price
+= 25 - 25.75
+= -0.75
+
+To find the percentage loss:
+Loss percentage = (Loss / Cost price) * 100
+= (-0.75 / 25) * 100
+= -3%
+
+Since the loss percentage is negative, it's actually a loss.
+
+The correct answer is D) 3% Loss."
+21,101,B,16,0.5333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.","1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+If the book were sold for Rs 25.75, the profit would be:
+Profit = Selling price - Cost price
+= 25.75 - 25
+= 0.75
+
+To find the percentage profit:
+Percentage profit = (Profit / Cost price) * 100
+= (0.75 / 25) * 100
+= 3%
+
+Therefore, the correct answer is B) 3% Profit."
+22,101,D,14,0.4666666666666667," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.","1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+If the book were sold for Rs 25.75, then we need to find the percentage of loss.
+
+Loss = Selling price - Cost price
+Loss = 25.75 - 25
+Loss = 0.75
+
+To find the percentage of loss, divide the loss by the cost price and multiply by 100:
+(0.75 / 25) * 100
+= 3%
+
+Therefore, the correct option is:
+D) 3% Loss"
+23,133,B,20,0.6666666666666666," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.","75, the selling price is greater than the cost price.
+
+The profit percentage = ((Selling price - Cost price) / Cost price) * 100
+= ((25.75 - 25) / 25) * 100
+= (0.75 / 25) * 100
+= 3%
+
+Since the profit percentage is greater than 0%, the transaction is a profit."
+24,133,D,10,0.3333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.","75, we can calculate the loss:
+Loss = Selling price - Cost price
+= 25.75 - 25
+= 0.75
+
+To find the percentage loss, divide the loss by the cost price and multiply by 100:
+(0.75 / 25) * 100
+= 3%
+
+The correct answer is D) 3% Loss."
+25,158,B,27,0.9," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit or loss as follows:
+
+Selling price = Cost price + Profit or Loss
+25.","75 = 25 + Profit or Loss
+
+Since the selling price (25.75) is greater than the cost price (25), there is a profit.
+
+The amount of profit is:
+Profit = Selling price - Cost price
+= 25.75 - 25
+= 0.75
+
+Now, we can calculate the percentage of profit:
+Percentage of profit = (Profit / Cost price) × 100
+= (0.75 / 25) × 100
+= 3%
+
+So, if the book were sold for Rs 25.75, there would have been a 3% profit."
+26,158,D,3,0.1," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit or loss as follows:
+
+Selling price = Cost price + Profit or Loss
+25.","75 = 25 + profit or loss
+
+The difference between the selling price and cost price is:
+Profit or Loss = 25.75 - 25 = 0.75
+
+To find the percentage of profit or loss, we can divide the profit or loss by the cost price and multiply by 100:
+
+Loss = (0.75 / 25) * 100
+= 3%
+
+So, if the book were sold for Rs 25.75, there would be a loss of 3%.
+
+The correct answer is D) 3% Loss."
+27,174,B,29,0.9666666666666667," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit or loss as follows:
+
+Selling price = Cost price + Profit or Loss
+25.75 = 25 + Profit or Loss
+
+Since the selling price (25.","75) is more than the cost price (25), there is a profit.
+
+To find the percentage profit:
+
+Profit = Selling price - Cost price
+= 25.75 - 25
+= 0.75
+
+Percentage profit = (Profit / Cost price) x 100%
+= (0.75 / 25) x 100%
+= 3%
+
+So, the percentage profit would have been 3%. 
+
+The correct answer is B) 3% Profit."
+28,174,D,1,0.03333333333333333," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit or loss as follows:
+
+Selling price = Cost price + Profit or Loss
+25.75 = 25 + Profit or Loss
+
+Since the selling price (25.","75) is less than the cost price (25), it is a loss. 
+
+To find the percentage loss, we can use the formula:
+
+Loss percentage = (Loss / Cost price) × 100
+= (25.75 - 25) / 25 × 100
+= 0.75 / 25 × 100
+= 3%
+
+So, if the book were sold for Rs 25.75, the percentage of loss would be 3%. The correct answer is option D) 3% Loss."
+29,203,B,30,1.0," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit or loss as follows:
+
+Selling price = Cost price + Profit or Loss
+25.75 = 25 + Profit or Loss
+
+Since the selling price (25.75) is greater than the cost price (25), there is a profit.
+
+Profit = Selling price - Cost price
+Profit = 25.","75 - 25
+Profit = 0.75
+
+Now, we can calculate the percentage of profit:
+Profit percentage = (Profit / Cost price) × 100
+Profit percentage = (0.75 / 25) × 100
+Profit percentage = 3%
+
+So, the correct answer is B) 3% Profit."
+30,213,B,30,1.0," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit or loss as follows:
+
+Selling price = Cost price + Profit or Loss
+25.75 = 25 + Profit or Loss
+
+Since the selling price (25.75) is greater than the cost price (25), there is a profit.
+
+Profit = Selling price - Cost price
+Profit = 25.75 - 25
+Profit = 0.","75
+
+To find the percentage of profit, divide the profit by the cost price and multiply by 100:
+Percentage of profit = (Profit / Cost price) * 100
+= (0.75 / 25) * 100
+= 3%
+
+Therefore, the correct answer is B) 3% Profit."
+31,253,B,30,1.0," 
+
+Let the cost price of the book be x.
+
+Given that the book was sold for Rs 27.50 with a profit of 10%, we can set up the equation:
+
+Selling price = Cost price + Profit
+27.50 = x + (10% of x)
+27.50 = x + 0.1x
+27.50 = 1.1x
+
+Now, divide both sides by 1.1:
+x = 27.50 / 1.1
+x = 25
+
+So, the cost price of the book is Rs 25.
+
+Now, if the book were sold for Rs 25.75, we can calculate the profit or loss as follows:
+
+Selling price = Cost price + Profit or Loss
+25.75 = 25 + Profit or Loss
+
+Since the selling price (25.75) is greater than the cost price (25), there is a profit.
+
+Profit = Selling price - Cost price
+Profit = 25.75 - 25
+Profit = 0.75
+
+To find the percentage of profit, divide the profit by the cost price and multiply by 100:
+Percentage of profit = (Profit / Cost price) * 100
+= (0.","75 / 25) * 100
+= 3%
+
+So, the answer is B) 3% Profit."
+32,279,B,30,1.0,,

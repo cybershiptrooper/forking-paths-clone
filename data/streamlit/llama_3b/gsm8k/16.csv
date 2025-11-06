@@ -1,0 +1,117 @@
+,t,outcome,num_rollouts,outcome_probability,prefix,sample_rollout
+0,14,A,6,0.2," 
+
+Elvis travels west for 5 hours at 18mph."," To find the distance, we multiply speed and time, which is 18 * 5 = 90 miles. 
+
+Then, he travels east for 8 hours at the same speed of 18mph. To find the distance, we multiply speed and time again, which is 18 * 8 = 144 miles.
+
+Since he was driving west and then east, they cancel each other out in terms of distance from his original location. 
+
+So, he is 0 miles away from his house."
+1,14,B,22,0.7333333333333333," 
+
+Elvis travels west for 5 hours at 18mph."," Distance = speed * time = 18 * 5 = 90 miles.
+
+Then, he travels east for 8 hours at 18mph. Distance = speed * time = 18 * 8 = 144 miles.
+
+Since he traveled 90 miles west and then 144 miles east, we need to find the difference between these two distances.
+
+Distance from his house now = 144 - 90 = 54 miles.
+
+So, Elvis is 54 miles from his house now.
+
+The correct answer is B) 54."
+2,14,D,2,0.06666666666666667," 
+
+Elvis travels west for 5 hours at 18mph."," Distance = Speed * Time. So, distance traveled west = 18mph * 5 hours = 90 miles.
+
+He then turns around and travels east for 8 hours at 18mph. Distance = Speed * Time. So, distance traveled east = 18mph * 8 hours = 144 miles.
+
+The total distance traveled is 90 miles + 144 miles = 234 miles.
+
+Since he was driving west for 5 hours and then turned around and drove east for 8 hours, Elvis effectively traveled the same distance (90 miles) west and the same distance (144 miles) back east. 
+
+So, we can subtract 90 miles from 234 miles to get the distance from his starting point.
+
+Distance = 234 miles - 90 miles = 144 miles.
+
+The answer is not among the options, but if we look at the options we will see that the only option which is equal to 144 is D) 96"
+3,44,A,4,0.13333333333333333," 
+
+Elvis travels west for 5 hours at 18mph. Distance = Speed * Time = 18 * 5 = 90 miles.
+
+Then, he travels east for 8 hours at 18mph."," Distance = Speed * Time = 18 * 8 = 144 miles.
+
+Since he was driving west for 5 hours and then traveled the same distance east (144 miles), he is now back at the starting point, which is 0 miles away from his house.
+
+So, the correct answer is A) 0 miles, but it is not an option."
+4,44,B,23,0.7666666666666667," 
+
+Elvis travels west for 5 hours at 18mph. Distance = Speed * Time = 18 * 5 = 90 miles.
+
+Then, he travels east for 8 hours at 18mph."," Distance = Speed * Time = 18 * 8 = 144 miles.
+
+However, he is now 90 miles away from his house and then traveled 144 miles back to be back to his house, so he is 144 - 90 = 54 miles away from his house now.
+
+The answer is B) 54."
+5,44,C,1,0.03333333333333333," 
+
+Elvis travels west for 5 hours at 18mph. Distance = Speed * Time = 18 * 5 = 90 miles.
+
+Then, he travels east for 8 hours at 18mph."," Distance = Speed * Time = 18 * 8 = 144 miles.
+
+However, since Elvis traveled 90 miles to the west and then 144 miles back to the east, he is now 90 miles east of his house. 
+
+The answer is C) 90"
+6,44,D,2,0.06666666666666667," 
+
+Elvis travels west for 5 hours at 18mph. Distance = Speed * Time = 18 * 5 = 90 miles.
+
+Then, he travels east for 8 hours at 18mph."," This means he is now 90 miles east of his original position, and 8 hours * 18mph = 144 miles east of where he started. 
+
+Since he was 90 miles west and is now 144 miles east, that is 90 + 144 = 234 miles.
+
+The correct answer is D) 234 miles."
+7,82,A,1,0.03333333333333333," 
+
+Elvis travels west for 5 hours at 18mph. Distance = Speed * Time = 18 * 5 = 90 miles.
+
+Then, he travels east for 8 hours at 18mph. Distance = Speed * Time = 18 * 8 = 144 miles.
+
+Since he traveled 90 miles west and then 144 miles east, we need to find the net distance."," Since he is back at his starting location, we need to find the distance he is from his house. However, the choices are in miles. To find which answer is correct, we need to see which of the choices is the closest to 90 - 144 = -54 miles.
+
+The closest answer is A) 30"
+8,82,B,27,0.9," 
+
+Elvis travels west for 5 hours at 18mph. Distance = Speed * Time = 18 * 5 = 90 miles.
+
+Then, he travels east for 8 hours at 18mph. Distance = Speed * Time = 18 * 8 = 144 miles.
+
+Since he traveled 90 miles west and then 144 miles east, we need to find the net distance."," To do this, we subtract the distance he traveled west from the distance he traveled east: 144 - 90 = 54 miles.
+
+So, Elvis is 54 miles away from his house now. The correct answer is B) 54."
+9,82,C,1,0.03333333333333333," 
+
+Elvis travels west for 5 hours at 18mph. Distance = Speed * Time = 18 * 5 = 90 miles.
+
+Then, he travels east for 8 hours at 18mph. Distance = Speed * Time = 18 * 8 = 144 miles.
+
+Since he traveled 90 miles west and then 144 miles east, we need to find the net distance."," The 90 miles he traveled west cancels out the 90 miles he traveled east, so he ends up 0 miles from his house. But, looking at the choices and the answer for C is closest to 0."
+10,82,D,1,0.03333333333333333," 
+
+Elvis travels west for 5 hours at 18mph. Distance = Speed * Time = 18 * 5 = 90 miles.
+
+Then, he travels east for 8 hours at 18mph. Distance = Speed * Time = 18 * 8 = 144 miles.
+
+Since he traveled 90 miles west and then 144 miles east, we need to find the net distance."," Since west and east cancel out, the net distance is 0.
+
+So, the correct answer is A) 0, but that isn't an option. 
+
+However, considering the original question asked for the distance from his house and assuming he traveled a straight path and the return was along the same route, we can infer he was 90 miles away from his house and the 90 miles he traveled east brought him back to his house, hence 90 miles east of his house initially and 90 miles to the west of his house, so the total distance of 90 + 90 = 180 miles.
+
+However, still this isn't an option...
+
+Since he is now on the east side of the starting point but 90 miles east of his house and 90 miles to the west of his house we can assume he is 180 miles away.
+
+Looking at the given choices, it is the closest answer that is near 180, however, it is the only one which is 180 miles, which isn't listed, but we can infer the closest to the exact distance is 180 - 18 (distance to travel east to be back to his house) = 162 miles and since 18 isn't in the options we pick the closest option that is higher than 162, which is 180 - 18 = 162 miles + 18 = 180 miles, but 180 isn't an option so we pick 96 miles as the only closest option"
+11,129,B,30,1.0,,
