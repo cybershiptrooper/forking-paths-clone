@@ -129,6 +129,7 @@ def main(
     model_nickname = MODEL_METADATA[model_name]['nickname']
     with open(f'{data_dir}/{model_nickname}/{dataset_name.lower()}.json') as f:
         dataset = json.load(f)
+        num_examples = len(dataset) if dataset_size is None else min(dataset_size, len(dataset))
 
     # create output dir
     output_dir = f'{forking_paths_dir}/{model_nickname}/{dataset_name.lower()}'
@@ -138,7 +139,6 @@ def main(
         # load LLM
         base_llm = LLM(model=model_name, dtype="bfloat16")
         # process dataset!
-        num_examples = len(dataset) if dataset_size is None else min(dataset_size, len(dataset))
         for prompt_index in range(num_examples):
             # skip if already processed
             result_path = os.path.join(output_dir, f'{prompt_index:02d}.json')
@@ -201,7 +201,7 @@ def main(
         if not os.path.exists(result_path):
             print(f"Skipping prompt #{prompt_index}, no forking paths results found.")
             continue
-        
+
         with open(result_path) as f:
             branches = json.load(f)
         
