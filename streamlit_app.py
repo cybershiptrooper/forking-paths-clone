@@ -15,6 +15,7 @@ from utils.utils import MODEL_METADATA
 
 COLORS = ['#C4DADE', '#DDE8ED', '#F9F0E7', '#E7D9CC', '#ECF2F5  ', '#B9D9D5'] # ocean days
 # COLORS = ['#97B3AE', '#D2E0D3', '#F0DDD6', '#F2C3B9', '#D6CBBF  ', '#F0EEEA'] # lazy sunday
+LOGPROB_COLORSCALE = sns.light_palette("#C4DADE", as_cmap=True, reverse=True)
 
 st.set_page_config(
     layout='wide',       # 'centered' or 'wide'
@@ -76,7 +77,7 @@ response_text.html(text_colors_html(
     np.exp(base_data['output_logprobs']), 
     print_newln=True, 
     width='100%',
-    c_map=sns.light_palette("#C4DADE", as_cmap=True, reverse=True)
+    c_map=LOGPROB_COLORSCALE
 ))
 
 
