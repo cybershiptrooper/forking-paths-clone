@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 import random
-from typing import List
+from typing import List, Optional
 from vllm import LLM, SamplingParams
 
 from utils.answer_utils import parse_answer
@@ -107,7 +107,6 @@ def generate_branches(
 def main(
     model_name : str = "gpt2",
     dataset_name : str = "AQuA",
-    dataset_size : int = 10,
     # forking paths parameters
     num_branches : int = 30,
     max_new_tokens : int = 10000,
@@ -115,6 +114,8 @@ def main(
     # control parameters
     seed : int = 42,
     # script paramaters
+    start_index : Optional[int] = None,
+    end_index : Optional[int] = None,
     only_parse_answers : bool = False
 ):
     set_seed(seed)
@@ -129,7 +130,9 @@ def main(
     model_nickname = MODEL_METADATA[model_name]['nickname']
     with open(f'{data_dir}/{model_nickname}/{dataset_name.lower()}.json') as f:
         dataset = json.load(f)
-        num_examples = len(dataset) if dataset_size is None else min(dataset_size, len(dataset))
+    
+    start_index = 0 if start_index is None else start_index
+    end_index = len(dataset) if end_index is None else min(end_index, len(dataset))
 
     # create output dir
     output_dir = f'{forking_paths_dir}/{model_nickname}/{dataset_name.lower()}'
@@ -139,7 +142,7 @@ def main(
         # load LLM
         base_llm = LLM(model=model_name, dtype="bfloat16")
         # process dataset!
-        for prompt_index in range(num_examples):
+        for prompt_index in range(start_index, end_index):
             # skip if already processed
             result_path = os.path.join(output_dir, f'{prompt_index:02d}.json')
             if os.path.exists(result_path):
@@ -194,7 +197,7 @@ def main(
     answer_llm = LLM(model=answer_model_name, dtype="bfloat16")
 
     # parse results
-    for prompt_index in range(num_examples):
+    for prompt_index in range(start_index, end_index):
         # not the prettiest, but re-read the results we just generated
         print(f"Parsing answers for prompt #{prompt_index}")
         result_path = os.path.join(output_dir, f'{prompt_index:02d}.json')
@@ -232,12 +235,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate forking paths with vLLM")
     parser.add_argument("--model_name", type=str, default="gpt2", help="Model name")
     parser.add_argument("--dataset_name", type=str, default="AQuA", help="Dataset name")
-    parser.add_argument("--dataset_size", type=int, default=None, help="Number of examples to process (leave as None to process entire dataset)")
     parser.add_argument("--num_branches", type=int, default=30, help="Number of branches to generate")
     parser.add_argument("--max_new_tokens", type=int, default=3000, help="Max new tokens for generation")
     parser.add_argument("--temperature", type=float, default=1.0, help="Sampling temperature")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--only_parse_answers", action='store_true', help="Only parse answers from existing forking paths data")
+    parser.add_argument("--start_index", type=int, default=None, help="Start index for data processing (0 by default)")
+    parser.add_argument("--end_index", type=int, default=None, help="End index for data processing (length of dataset by default)")
 
     args = parser.parse_args()
     main(**vars(args))
