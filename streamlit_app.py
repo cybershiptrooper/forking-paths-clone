@@ -84,6 +84,13 @@ response_text.html(text_colors_html(
 outcome_df = pd.read_csv(f"{streamlit_folder}/{model_name}/{dataset_name}/{example_index}.csv")
 outcome_set = outcome_df.groupby('outcome')['outcome_probability'].sum().sort_values(ascending=False).index.values
 
+if base_data['dataset_type'] == "open ended":
+    outcome_set = outcome_set[:len(COLORS) - 1]
+    outcome_df['outcome'] = outcome_df['outcome'].apply(
+        lambda o: o if o in outcome_set else 'Other'
+    )
+    outcome_set = list(outcome_set) + ['Other']
+
 layout =  go.Layout(
     title = None,
     font = {'size': 10},
@@ -131,6 +138,8 @@ def get_name(outcome):
             return 'unsure'
         else:
             return 'Other'
+    elif base_data['dataset_type'] == 'open ended':
+        return outcome
     elif outcome == 'Z':
         return 'Unsure'
     elif outcome in base_data['all_letters']:
@@ -167,7 +176,7 @@ for t in sorted(outcome_df.t.unique()):
         elif len(row) == 1:
             ts.append(row.iloc[0]['outcome_probability'])
         else:
-            assert False
+            ts.append(row['outcome_probability'].sum())
     dist.append(ts)
 
 d = Categorical(probs=torch.tensor(dist))
