@@ -75,7 +75,7 @@ def main(
         # compress forking paths data
         forking_paths_data = []
         for i, t in enumerate(ts):
-            with open(f"data/thought_anchors/problem_1591/chunk_{i}/solutions.json") as f:    
+            with open(f"{thought_anchors_folder}/{problem}/chunk_{i}/solutions.json") as f:    
                 fork_data = json.load(f)
 
             assert all(fork['chunk_removed'] == fork_data[0]['chunk_removed'] for fork in fork_data)
