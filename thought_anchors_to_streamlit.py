@@ -38,6 +38,7 @@ def main(
     all_base_data = []
 
     for example_index, problem in enumerate(os.listdir(thought_anchors_folder)):
+        print(f"Processing #{example_index}, problem ID: {problem}")
         # read data from thought anchors
         with open(f"{thought_anchors_folder}/{problem}/base_solution.json") as f:    
             base_solution_data = json.load(f)
@@ -70,7 +71,7 @@ def main(
             ts.append(t)
         for i in range(len(ts) - 1):
             if abs(ts[i]['t'] + ts[i]['chunk_length'] - ts[i + 1]['t']) > 1:
-                print(f"WARNING! Misaligned chunks: {ts[i]['t']} and {ts[i + 1]['t']}")
+                print(f"WARNING! Misaligned chunks: {ts[i]['t']} + {ts[i]['chunk_length']} != {ts[i + 1]['t']}")
 
         # compress forking paths data
         forking_paths_data = []
