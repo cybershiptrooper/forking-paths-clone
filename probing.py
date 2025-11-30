@@ -7,7 +7,7 @@ from torch.distributions import Categorical
 from transformers import AutoModelForCausalLM
 from sklearn.model_selection import train_test_split
 from utils.probe_utils import LinearProbeCV, get_activations
-from utils.utils import clear_cuda, set_seed
+from utils.utils import clear_cuda, set_seed, MODEL_METADATA
 
 
 def main(
@@ -35,7 +35,8 @@ def main(
         config = json.load(f)
     streamlit_folder = config['save_locations']['streamlit_folder']
     probe_folder = config['save_locations']['probe_folder']
-    example_ids = sorted([filename.split('.')[0] for filename in os.listdir(f'{streamlit_folder}/{model_name}/{dataset_name}')])
+    model_nickname = MODEL_METADATA[model_name]['nickname']
+    example_ids = sorted([filename.split('.')[0] for filename in os.listdir(f'{streamlit_folder}/{model_nickname}/{dataset_name.lower()}')])
 
     probe_data = {
         't': [], # (# questions, T)
@@ -44,10 +45,10 @@ def main(
     }
     for example_index in example_ids:
         # load base data
-        with open(f'{streamlit_folder}/{model_name}/{dataset_name}/base_data.json') as f:
+        with open(f'{streamlit_folder}/{model_nickname}/{dataset_name.lower()}/base_data.json') as f:
             base_data = json.load(f)[int(example_index)]
         # load distribution
-        outcome_df = pd.read_csv(f"{streamlit_folder}/{model_name}/{dataset_name}/{example_index}.csv")
+        outcome_df = pd.read_csv(f"{streamlit_folder}/{model_nickname}/{dataset_name.lower()}/{example_index}.csv")
         outcome_set = outcome_df.groupby('outcome')['outcome_probability'].sum().sort_values(ascending=False).index.values # (O,)
         timestamps = sorted(outcome_df.t.unique()) # (T,)
         probe_data['t'].append(timestamps)
@@ -122,8 +123,18 @@ def main(
     # - pred entropy #i: []
     index = 0
     results = {
-        "train_mse": train_mse,
-        "test_mse": test_mse,
+        "hyperparameters": {
+            "layer": layer,
+            "epochs": epochs,
+            "early_stopping": early_stopping,
+            "patience": patience,
+            "learning_rate": learning_rate,
+            "seed": seed
+        },
+        "metrics": {
+            "train_mse": train_mse,
+            "test_mse": test_mse,
+        },
         "predictions": []
     }
     for question_id in ids_train:
@@ -138,8 +149,8 @@ def main(
             "pred_entropy": pred_entropy
         })
     
-    os.makedirs(probe_folder, exist_ok=True)
-    with open(f"{probe_folder}/results.json", "w+") as f:
+    os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name}", exist_ok=True)
+    with open(f"{probe_folder}/{model_nickname}/{dataset_name}/results.json", "w+") as f:
         json.dump(results, f, index=2)
 
 
