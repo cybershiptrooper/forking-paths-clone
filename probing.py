@@ -26,7 +26,7 @@ def main(
 ):
     set_seed(seed)
     # 1. load model
-    model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", torch_dtype=torch.bfloat16)
+    model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", dtype=torch.bfloat16)
 
     # 2. load all forking paths data & collect activations
     # - per question: t -> entropy
