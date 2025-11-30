@@ -156,3 +156,4 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=0.001)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
+    main(**vars(args))
