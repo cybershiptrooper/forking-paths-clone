@@ -51,14 +51,16 @@ def main(
         outcome_df = pd.read_csv(f"{streamlit_folder}/{model_nickname}/{dataset_name.lower()}/{example_index}.csv")
         outcome_set = outcome_df.groupby('outcome')['outcome_probability'].sum().sort_values(ascending=False).index.values # (O,)
         timestamps = sorted(outcome_df.t.unique()) # (T,)
+        print("Number of outcomes:", len(outcome_set))
+        print("Number of timestamps:", len(timestamps))
         probe_data['t'].append(timestamps)
 
         # a. get activations
-        full_token_ids = base_data['prompt_token_ids'] + base_data['']
+        full_token_ids = base_data['prompt_token_ids'] + base_data['output_token_ids']
         activations = get_activations(model, {'input_ids': full_token_ids}, layer=layer) # (tokens, hidden dim)
-        print(activations.shape)
+        print("Activations:", activations.shape)
         activations_per_t = activations[timestamps] # (T, hidden dim)
-        print(activations_per_t.shape)
+        print("Activations per timestep:", activations_per_t.shape)
         probe_data['activation'].append(activations_per_t)
 
         # b. compute entropy
