@@ -51,6 +51,7 @@ def main():
     RELEVANT_KEYS = [
         'clean_answer', 
         'output_text',
+        'prompt_token_ids',
         'output_token_ids',
         'question',
         'correct_letter',

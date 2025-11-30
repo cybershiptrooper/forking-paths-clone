@@ -13,9 +13,9 @@ import Rbeast
 from utils.streamlit_utils import text_colors_html
 from utils.utils import MODEL_METADATA
 
-COLORS = ['#C4DADE', '#DDE8ED', '#F9F0E7', '#E7D9CC', '#ECF2F5  ', '#B9D9D5'] # ocean days
-# COLORS = ['#97B3AE', '#D2E0D3', '#F0DDD6', '#F2C3B9', '#D6CBBF  ', '#F0EEEA'] # lazy sunday
-LOGPROB_COLORSCALE = sns.light_palette("#C4DADE", as_cmap=True, reverse=True)
+# COLORS = ['#C4DADE', '#DDE8ED', '#F9F0E7', '#E7D9CC', '#ECF2F5  ', '#B9D9D5'] # ocean days
+COLORS = ['#97B3AE', '#D2E0D3', '#F0DDD6', '#F2C3B9', '#D6CBBF  ', '#F0EEEA'] # lazy sunday
+LOGPROB_COLORSCALE = sns.light_palette(COLORS[0], as_cmap=True, reverse=True)
 
 st.set_page_config(
     layout='wide',       # 'centered' or 'wide'
@@ -34,8 +34,8 @@ streamlit_folder = config['save_locations']['streamlit_folder']
 
 model_name = model_selection.selectbox(
     'Select a model:',
-    os.listdir(streamlit_folder),
-    index=0
+    sorted(os.listdir(streamlit_folder)),
+    index=1
 )
 
 
@@ -44,8 +44,8 @@ tokenizer = AutoTokenizer.from_pretrained(inv_model_netadata[model_name])
 
 dataset_name = dataset_selection.selectbox(
     'Select a task:',
-    os.listdir(f'{streamlit_folder}/{model_name}'),
-    index=0
+    sorted(os.listdir(f'{streamlit_folder}/{model_name}')),
+    index=1
 )
 
 example_ids = sorted([filename.split('.')[0] for filename in os.listdir(f'{streamlit_folder}/{model_name}/{dataset_name}')])
@@ -62,19 +62,20 @@ question_text, response_text = st.columns(2)
 
 if base_data['dataset_type'] == 'alignment':
     question_text.text(base_data['question'] + '\nOptions:\na) refuse\nb) comply')
+elif base_data['dataset_type'] == 'open ended':
+    question_text.text(f"{base_data['question']}\nCorrect answer: {base_data['correct_answer']}")
 else:
     question_text.text(
         base_data['question'] + '\n' + '\n'.join(f'{l}) {a}' for l, a in zip(base_data['all_letters'], base_data['all_answers'])) + \
         '\n' + 'Correct answer: ' +  f"{base_data['correct_letter']}) {base_data['correct_answer']}"
     )
 
-# response_text.text(
-#     base_data['output_text'] + '\n' + \
-#     'Model answer: ' + base_data['clean_answer']
-# )
+logprobs = base_data['output_logprobs']
+if logprobs == []:
+    logprobs = [0] * len(base_data['output_token_ids'])
 response_text.html(text_colors_html(
     [tokenizer.decode(i) for i in base_data['output_token_ids']], 
-    np.exp(base_data['output_logprobs']), 
+    np.exp(logprobs), 
     print_newln=True, 
     width='100%',
     c_map=LOGPROB_COLORSCALE
@@ -84,12 +85,12 @@ response_text.html(text_colors_html(
 outcome_df = pd.read_csv(f"{streamlit_folder}/{model_name}/{dataset_name}/{example_index}.csv")
 outcome_set = outcome_df.groupby('outcome')['outcome_probability'].sum().sort_values(ascending=False).index.values
 
-if base_data['dataset_type'] == "open ended":
-    outcome_set = outcome_set[:len(COLORS) - 1]
-    outcome_df['outcome'] = outcome_df['outcome'].apply(
-        lambda o: o if o in outcome_set else 'Other'
-    )
-    outcome_set = list(outcome_set) + ['Other']
+if len(outcome_set) > len(COLORS):
+    plot_outcome_set = outcome_set[:len(COLORS) - 1]
+    add_other_category = True
+else:
+    plot_outcome_set = outcome_set    
+    add_other_category = False
 
 layout =  go.Layout(
     title = None,
@@ -161,8 +162,25 @@ fig.add_traces([
         },
         legendrank=oi
     )
-    for oi, outcome in enumerate(outcome_set)
+    for oi, outcome in enumerate(plot_outcome_set)
 ])
+
+if add_other_category:
+    other_df = outcome_df[~outcome_df['outcome'].isin(plot_outcome_set)].groupby('t')['outcome_probability'].sum().reset_index()
+    fig.add_trace(
+        go.Scatter( 
+            name="Other",   #OTHER_TOK else outcome, 
+            x = other_df['t'], 
+            y = other_df['outcome_probability'], 
+            stackgroup='one',
+            fillcolor=COLORS[-1], # f'rgba{colors[oi] + (.7,)}',
+            line={
+                'color': COLORS[-1], # f'rgb{colors[oi]}'
+                'width': 0
+            },
+            legendrank=len(COLORS) - 1
+        )
+    )
 st.subheader("Outcome probabilities")
 st.plotly_chart(fig)
 
@@ -176,7 +194,7 @@ for t in sorted(outcome_df.t.unique()):
         elif len(row) == 1:
             ts.append(row.iloc[0]['outcome_probability'])
         else:
-            ts.append(row['outcome_probability'].sum())
+            assert False, f"Only one row per outcome & t: {outcome} & {t}; #{len(row)}"
     dist.append(ts)
 
 d = Categorical(probs=torch.tensor(dist))
