@@ -93,49 +93,6 @@ def main(
 
     # 2. create train-test split
     # - hold out questions from dataset
-    activations, entropy, question_indices = probe_data['activation'], probe_data['entropy'], range(len(probe_data['entropy']))
-    activations_train, activations_test, entropy_train, entropy_test, ids_train, ids_test = train_test_split(
-        activations, entropy, question_indices, test_size=test_split, random_state=seed
-    )
-
-    activations_train = torch.cat(activations_train) # (T * num_questions, hidden dim)
-    activations_test = torch.cat(activations_test) # (T * num_questions, hidden dim)
-    entropy_train = torch.cat(entropy_train).to(activations_train.dtype) # (T * num_questions,)
-    entropy_test = torch.cat(entropy_test).to(activations_test.dtype) # (T * num_questions,)
-    print("Train inputs:", activations_train.dtype, activations_train.shape)
-    print("Train labels:", entropy_train.dtype, entropy_train.shape)
-    print("Test inputs:", activations_test.dtype, activations_test.shape)
-    print("Test labels:", entropy_test.dtype, entropy_test.shape)
-
-    # 3. train probe
-    probe = LinearProbeCV(
-        n_split=cross_val_split,
-        input_size=activations_train.shape[-1],
-        output_size=1, 
-        epochs=epochs, 
-        device=activations_train.device, 
-        early_stopping=early_stopping, 
-        patience=patience,
-        loss_type='mse', 
-        learning_rate=learning_rate
-    )
-    probe.fit(activations_train, entropy_train)
-
-    # 4. evaluate probe on test questions
-    train_mse = probe.score(activations_train, entropy_train)
-    test_mse = probe.score(activations_test, entropy_test)
-
-    # 5. save probe results
-    # - save predictions on test questions for side-by-side plot!
-    # - repeat for each fold??
-    pred_entropy = probe.pred(activations_test) # (T * num_questions,)
-    # use ids_test to get question indices
-    # use probe data to line up to ts
-    # save as json file with:
-    # - train mse
-    # - test mse
-    # - pred entropy #i: []
-    index = 0
     results = {
         "hyperparameters": {
             "layer": layer,
@@ -146,22 +103,74 @@ def main(
             "seed": seed
         },
         "metrics": {
-            "train_mse": train_mse,
-            "test_mse": test_mse,
+            "train_mse": [],
+            "test_mse": [],
         },
         "predictions": []
     }
-    for question_id in ids_train:
-        ts = probe_data['t'][question_id]
-        entropy = probe_data['entropy'][question_id]
-        pred_entropy = pred_entropy[index:len(ts)]
-        index += len(ts)
-        results["predictions"].append({
-            "question_id": int(question_id),
-            "t": [int(t) for t in ts],
-            "true_entropy": [float(e) for e in entropy],
-            "pred_entropy": [float(e) for e in pred_entropy]
-        })
+
+    split_size = int(len(probe_data['entropy']) * test_split) if test_split < 1 else int(test_split)
+    for split_index in range(0, len(probe_data['entropy']), split_size):
+        activations, entropy = probe_data['activation'], probe_data['entropy']
+        activations_test = activations[split_index:split_index + split_size]
+        entropy_test = entropy[split_index:split_index + split_size]
+        activations_train = activations[:split_index] + activations[split_index + split_size:]
+        entropy_train = entropy[:split_index] + entropy[split_index + split_size:] 
+        # activations_train, activations_test, entropy_train, entropy_test, ids_train, ids_test = train_test_split(
+        #     activations, entropy, question_indices, test_size=test_split, random_state=seed
+        # )
+
+        activations_train = torch.cat(activations_train) # (T * num_questions, hidden dim)
+        activations_test = torch.cat(activations_test) # (T * num_questions, hidden dim)
+        entropy_train = torch.cat(entropy_train).to(activations_train.dtype) # (T * num_questions,)
+        entropy_test = torch.cat(entropy_test).to(activations_test.dtype) # (T * num_questions,)
+        print("Train inputs:", activations_train.dtype, activations_train.shape)
+        print("Train labels:", entropy_train.dtype, entropy_train.shape)
+        print("Test inputs:", activations_test.dtype, activations_test.shape)
+        print("Test labels:", entropy_test.dtype, entropy_test.shape)
+
+        # 3. train probe
+        probe = LinearProbeCV(
+            n_split=cross_val_split,
+            input_size=activations_train.shape[-1],
+            output_size=1, 
+            epochs=epochs, 
+            device=activations_train.device, 
+            early_stopping=early_stopping, 
+            patience=patience,
+            loss_type='mse', 
+            learning_rate=learning_rate
+        )
+        probe.fit(activations_train, entropy_train)
+
+        # 4. evaluate probe on test questions
+        train_mse = probe.score(activations_train, entropy_train)
+        test_mse = probe.score(activations_test, entropy_test)
+        results['metrics']['train_mse'].append(train_mse)
+        results['metrics']['test_mse'].append(test_mse)
+
+        # 5. save probe results
+        # - save predictions on test questions for side-by-side plot!
+        # - repeat for each fold??
+        pred_entropy = probe.pred(activations_test) # (T * num_questions,)
+        # use ids_test to get question indices
+        # use probe data to line up to ts
+        # save as json file with:
+        # - train mse
+        # - test mse
+        # - pred entropy #i: []
+        t_index = 0
+        for question_id in range(split_index, split_index + split_size):
+            ts = probe_data['t'][question_id]
+            entropy = probe_data['entropy'][question_id]
+            pred_entropy = pred_entropy[t_index:t_index + len(ts)]
+            t_index += len(ts) # offset by # of timestamps in each question
+            results["predictions"].append({
+                "question_id": int(question_id),
+                "t": [int(t) for t in ts],
+                "true_entropy": [float(e) for e in entropy],
+                "pred_entropy": [float(e) for e in pred_entropy]
+            })
     
     os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}", exist_ok=True)
     now = datetime.datetime.now().strftime("%m-%d-%H-%M-%S")
