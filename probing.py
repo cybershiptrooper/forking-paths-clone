@@ -163,15 +163,14 @@ def main(
         for question_id in range(split_index, min(split_index + split_size, len(probe_data['entropy']))):
             ts = probe_data['t'][question_id]
             entropy = probe_data['entropy'][question_id]
-            pred_entropy = pred_entropy[t_index:t_index + len(ts)]
-            print(f'T={len(ts)} -- H={len(entropy)} -- P={len(pred_entropy)}')
+            pred_entropy_for_q = pred_entropy[t_index:t_index + len(ts)]
             t_index += len(ts) # offset by # of timestamps in each question
-            assert len(entropy) == len(ts) and len(entropy) == len(pred_entropy), f"Ts, true H and pred H must be same length: {len(ts)}, {len(entropy)}, {len(pred_entropy)}"
+            assert len(entropy) == len(ts) and len(entropy) == len(pred_entropy_for_q), f"Ts, true H and pred H must be same length: {len(ts)}, {len(entropy)}, {len(pred_entropy_for_q)}"
             results["predictions"].append({
                 "question_id": int(question_id),
                 "t": [int(t) for t in ts],
                 "true_entropy": [float(e) for e in entropy],
-                "pred_entropy": [float(e) for e in pred_entropy]
+                "pred_entropy": [float(e) for e in pred_entropy_for_q]
             })
     
     os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}", exist_ok=True)
