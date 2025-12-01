@@ -97,10 +97,14 @@ def main(
         activations, entropy, question_indices, test_size=test_split, random_state=seed
     )
 
-    activations_train = torch.cat(activations_train) # (T * num_questions, hidden dim)
-    activations_test = torch.cat(activations_test) # (T * num_questions, hidden dim)
     entropy_train = torch.cat(entropy_train) # (T * num_questions,)
     entropy_test = torch.cat(entropy_test) # (T * num_questions,)
+    activations_train = torch.cat(activations_train).to(entropy_train.dtype) # (T * num_questions, hidden dim)
+    activations_test = torch.cat(activations_test).to(entropy_test.dtype) # (T * num_questions, hidden dim)
+    print("Train inputs:", activations_train.dtype, activations_train.shape)
+    print("Train labels:", entropy_train.dtype, entropy_train.shape)
+    print("Test inputs:", activations_test.dtype, activations_test.shape)
+    print("Test labels:", entropy_test.dtype, entropy_test.shape)
 
     # 3. train probe
     probe = LinearProbeCV(
