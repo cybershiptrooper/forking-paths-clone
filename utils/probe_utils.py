@@ -48,6 +48,8 @@ class LinearProbe(torch.nn.Module):
                 y_pred = self(X)
                 if self.loss_type == 'kl':
                     y_pred = torch.nn.functional.log_softmax(y_pred, dim=1)
+                if self.loss_type == 'mse':
+                    y_pred = y_pred.squeeze(-1)
                 loss = criterion(y_pred, y)
 
                 if loss.item() < best_loss:
@@ -75,6 +77,7 @@ class LinearProbe(torch.nn.Module):
             y = torch.argmax(y, dim=1)
         elif self.loss_type == 'mse':
             criterion = torch.nn.MSELoss()
+            y_pred = y_pred.squeeze(-1)
         return criterion(y_pred, y).item()
     
     @torch.no_grad
