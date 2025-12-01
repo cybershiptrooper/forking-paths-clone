@@ -3,8 +3,8 @@ uv run python probing.py \
     --dataset_name GPQA \
     --layer 20 \
     --test_split 0.1 \
-    --cross_val_split 1 \
-    --epochs 10 \
+    --cross_val_split 2 \
+    --epochs 100 \
     --early_stopping \
     --patience 10 \
     --learning_rate 0.001 \

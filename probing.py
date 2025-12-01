@@ -164,7 +164,7 @@ def main(
     
     os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name}", exist_ok=True)
     with open(f"{probe_folder}/{model_nickname}/{dataset_name}/results.json", "w+") as f:
-        json.dump(results, f, index=2)
+        json.dump(results, f, indent=2)
 
 
 if __name__ == "__main__":
