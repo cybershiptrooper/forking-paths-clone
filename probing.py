@@ -54,8 +54,8 @@ def main(
         outcome_df = pd.read_csv(f"{streamlit_folder}/{model_nickname}/{dataset_name.lower()}/{example_index}.csv")
         outcome_set = outcome_df.groupby('outcome')['outcome_probability'].sum().sort_values(ascending=False).index.values # (O,)
         timestamps = sorted(outcome_df.t.unique()) # (T,)
-        print("Number of outcomes:", len(outcome_set))
-        print("Number of timestamps:", len(timestamps))
+        # print("Number of outcomes:", len(outcome_set))
+        # print("Number of timestamps:", len(timestamps))
         probe_data['t'].append(timestamps)
 
         # a. get activations
@@ -63,11 +63,11 @@ def main(
             base_data['prompt_token_ids'] + base_data['output_token_ids'], 
             device=model.device
         ).unsqueeze(0)
-        print("Input tokens:", full_token_ids.shape)
+        # print("Input tokens:", full_token_ids.shape)
         activations = get_activations(model, {'input_ids': full_token_ids}, layer=layer) # (tokens, hidden dim)
-        print("Activations:", activations.shape)
+        # print("Activations:", activations.shape)
         activations_per_t = activations[timestamps] # (T, hidden dim)
-        print("Activations per timestep:", activations_per_t.shape)
+        # print("Activations per timestep:", activations_per_t.shape)
         probe_data['activation'].append(activations_per_t)
 
         # b. compute entropy
@@ -156,10 +156,10 @@ def main(
         pred_entropy = pred_entropy[index:len(ts)]
         index += len(ts)
         results["predictions"].append({
-            "question_id": question_id,
-            "t": ts,
-            "true_entropy": entropy,
-            "pred_entropy": pred_entropy
+            "question_id": int(question_id),
+            "t": [int(t) for t in ts],
+            "true_entropy": [float(e) for e in entropy],
+            "pred_entropy": [float(e) for e in pred_entropy]
         })
     
     os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name}", exist_ok=True)
