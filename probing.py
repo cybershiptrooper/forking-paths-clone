@@ -164,6 +164,7 @@ def main(
             ts = probe_data['t'][question_id]
             entropy = probe_data['entropy'][question_id]
             pred_entropy = pred_entropy[t_index:t_index + len(ts)]
+            print(f'T={len(ts)} -- H={len(entropy)} -- P={len(pred_entropy)}')
             t_index += len(ts) # offset by # of timestamps in each question
             assert len(entropy) == len(ts) and len(entropy) == len(pred_entropy), f"Ts, true H and pred H must be same length: {len(ts)}, {len(entropy)}, {len(pred_entropy)}"
             results["predictions"].append({
