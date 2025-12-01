@@ -56,7 +56,8 @@ def main(
         probe_data['t'].append(timestamps)
 
         # a. get activations
-        full_token_ids = base_data['prompt_token_ids'] + base_data['output_token_ids']
+        full_token_ids = torch.tensor(base_data['prompt_token_ids'] + base_data['output_token_ids'], device=model.device)
+        print("Input tokens:", full_token_ids.shape)
         activations = get_activations(model, {'input_ids': full_token_ids}, layer=layer) # (tokens, hidden dim)
         print("Activations:", activations.shape)
         activations_per_t = activations[timestamps] # (T, hidden dim)
