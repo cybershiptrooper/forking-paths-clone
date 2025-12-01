@@ -160,11 +160,12 @@ def main(
         # - test mse
         # - pred entropy #i: []
         t_index = 0
-        for question_id in range(split_index, split_index + split_size):
+        for question_id in range(split_index, min(split_index + split_size, len(probe_data['entropy']))):
             ts = probe_data['t'][question_id]
             entropy = probe_data['entropy'][question_id]
             pred_entropy = pred_entropy[t_index:t_index + len(ts)]
             t_index += len(ts) # offset by # of timestamps in each question
+            assert len(entropy) == len(ts) and len(entropy) == len(pred_entropy), f"Ts, true H and pred H must be same length: {len(ts)}, {len(entropy)}, {len(pred_entropy)}"
             results["predictions"].append({
                 "question_id": int(question_id),
                 "t": [int(t) for t in ts],
