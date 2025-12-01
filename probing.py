@@ -36,7 +36,10 @@ def main(
     streamlit_folder = config['save_locations']['streamlit_folder']
     probe_folder = config['save_locations']['probe_folder']
     model_nickname = MODEL_METADATA[model_name]['nickname']
-    example_ids = sorted([filename.split('.')[0] for filename in os.listdir(f'{streamlit_folder}/{model_nickname}/{dataset_name.lower()}')])
+    example_ids = sorted([
+        filename.split('.')[0] for filename in os.listdir(f'{streamlit_folder}/{model_nickname}/{dataset_name.lower()}')
+        if filename != "base_data.json" # ignore base data
+    ])
 
     probe_data = {
         't': [], # (# questions, T)
