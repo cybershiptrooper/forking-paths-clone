@@ -3,9 +3,9 @@ name=$1
 uv run python probing.py \
     --model_name deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B \
     --dataset_name $name \
-    --layer 20 \
+    --layer 22 \
     --test_split 0.1 \
-    --cross_val_split 5 \
+    --cross_val_split 10 \
     --epochs 500 \
     --early_stopping \
     --patience 10 \
