@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import json
 import os
 import pandas as pd
@@ -162,8 +163,9 @@ def main(
             "pred_entropy": [float(e) for e in pred_entropy]
         })
     
-    os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name}", exist_ok=True)
-    with open(f"{probe_folder}/{model_nickname}/{dataset_name}/results.json", "w+") as f:
+    os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}", exist_ok=True)
+    now = datetime.datetime.now().strftime("%m-%d-%H-%M-%S")
+    with open(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}/results-{now}.json", "w+") as f:
         json.dump(results, f, indent=2)
 
 
