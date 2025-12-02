@@ -150,7 +150,7 @@ def get_activations(model : PreTrainedModel, X : dict, layer : int, batch_size :
                 batch_outputs = model(**batch_inputs, output_hidden_states=True)
                 batch_activations = batch_outputs.hidden_states[layer].float().cpu()
                 activations.append(batch_activations)
-        activations = torch.stack(activations, dim=0)
+        activations = torch.cat(activations, dim=0)
         return activations
 
     with torch.no_grad():
