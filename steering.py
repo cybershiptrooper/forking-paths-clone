@@ -55,7 +55,7 @@ def steer(
     
     steer_hook_handle = model.model.layers[layer].register_forward_hook(steer_hook)
 
-    outputs = []
+    outputs = [] # (Ts * num samples, output_length)
     for b in range(0, len(inputs["input_ids"]), batch_size):
         batch_inputs = {
             "input_ids": inputs["input_ids"][b:b + batch_size],
@@ -79,7 +79,7 @@ def steer(
         for sample_index in range(num_samples):
             results.append({
                 "t": t,
-                "output_text": outputs[t_index * len(ts) + sample_index], # regroup outputs
+                "output_text": outputs[t_index * num_samples + sample_index], # regroup outputs
                 **datapoint_kwargs
             })
 
@@ -183,6 +183,8 @@ def run_steering_experiment(
     # 3. create steering vector per outcome
     steering_vectors = []
     outcome_counts = Counter([r["clean_answer"] for r in rollouts_with_outcomes])
+    print("Outcome counts:")
+    print(outcome_counts)
     for outcome, _ in outcome_counts.most_common(num_outcomes_to_steer):
         outcome_indices = [
             i for i in range(len(rollouts_with_outcomes)) 
@@ -194,6 +196,8 @@ def run_steering_experiment(
         ]
 
         # do we want to subsample?? (not sure if it'll really do much)
+        assert len(outcome_indices) != 0, "Should at least contain one outcome!"
+        assert len(other_outcome_indices) != 0, "Should at least contain a different outcome!"
 
         steering_vector = torch.mean(activations[outcome_indices], dim=0) - torch.mean(activations[other_outcome_indices], dim=0)
         steering_vectors.append({
