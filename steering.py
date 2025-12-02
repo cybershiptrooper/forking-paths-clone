@@ -45,7 +45,7 @@ def steer(
         # output = (batch size * num samples, token length or 1, hidden dim)
         return output[:, -1, :] + output[:, -1, :] * steering_vector
     
-    steer_hook_handle = model.model.layers[layer].output.register_forward_hook(steer_hook)
+    steer_hook_handle = model.model.layers[layer].register_forward_hook(steer_hook)
 
     outputs = []
     for b in range(0, len(inputs["input_ids"]), batch_size):
@@ -53,6 +53,7 @@ def steer(
             "input_ids": inputs["input_ids"][b:b + batch_size],
             "attention_mask": inputs["attention_mask"][b:b + batch_size]
         }
+        print(f"Steering batch: {batch_inputs['input_ids'].shape}")
         batch_outputs = model.generate(
             **batch_inputs, 
             do_sample=True, 
