@@ -6,6 +6,7 @@ from typing import List, Optional
 from collections import Counter
 import pandas as pd
 import torch
+from tqdm import trange
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from vllm import LLM, SamplingParams
 
@@ -50,7 +51,7 @@ def steer(
 
     outputs = [] # (Ts * num samples, output_length)
     print(f"Steering: {inputs['input_ids'].shape}")
-    for b in range(0, len(inputs["input_ids"]), batch_size):
+    for b in trange(0, len(inputs["input_ids"]), batch_size, desc="Steering..."):
         batch_inputs = {
             "input_ids": inputs["input_ids"][b:b + batch_size],
             "attention_mask": inputs["attention_mask"][b:b + batch_size]
