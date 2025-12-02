@@ -156,6 +156,9 @@ def run_steering_experiment(
         answer_llm,
         rollouts
     )
+    outcome_counts = Counter([r["clean_answer"] for r in rollouts_with_outcomes])
+    print("Outcome counts:")
+    print(outcome_counts)
 
     del answer_llm
     clear_cuda()
@@ -175,9 +178,6 @@ def run_steering_experiment(
 
     # 3. create steering vector per outcome
     steering_vectors = []
-    outcome_counts = Counter([r["clean_answer"] for r in rollouts_with_outcomes])
-    print("Outcome counts:")
-    print(outcome_counts)
     for outcome, _ in outcome_counts.most_common(num_outcomes_to_steer):
         outcome_indices = [
             i for i in range(len(rollouts_with_outcomes)) 
