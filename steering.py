@@ -40,15 +40,8 @@ def steer(
         return_tensors="pt"
     ).to(model.device)
 
-    debug_flag = 0
-
     # 2. generate completion for n ~= 10 samples with steering
     def steer_hook(module, input, output):
-        nonlocal debug_flag
-        if debug_flag < 3:
-            print("Hidden state:", output.shape)
-            print("Steering vector:", steering_vector.shape)
-            debug_flag += 1
         # output = (batch size * num samples, token length or 1, hidden dim)
         output[:, -1, :] = output[:, -1, :].clone() + steering_vector
         return output
@@ -56,12 +49,12 @@ def steer(
     steer_hook_handle = model.model.layers[layer].register_forward_hook(steer_hook)
 
     outputs = [] # (Ts * num samples, output_length)
+    print(f"Steering: {inputs['input_ids'].shape}")
     for b in range(0, len(inputs["input_ids"]), batch_size):
         batch_inputs = {
             "input_ids": inputs["input_ids"][b:b + batch_size],
             "attention_mask": inputs["attention_mask"][b:b + batch_size]
         }
-        print(f"Steering batch: {batch_inputs['input_ids'].shape}")
         batch_outputs = model.generate(
             **batch_inputs, 
             do_sample=True, 
@@ -78,7 +71,7 @@ def steer(
     for t_index, t in enumerate(ts):
         for sample_index in range(num_samples):
             results.append({
-                "t": t,
+                "t": int(t),
                 "output_text": outputs[t_index * num_samples + sample_index], # regroup outputs
                 **datapoint_kwargs
             })

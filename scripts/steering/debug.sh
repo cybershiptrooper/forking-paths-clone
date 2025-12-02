@@ -3,12 +3,12 @@ uv run python steering.py \
     --dataset_name GPQA \
     --num_paths 100 \
     --temperature 0.7 \
-    --max_new_tokens 200 \
+    --max_new_tokens 10 \
     --layer 20 \
     --token_index -1 \
-    --num_outcomes_to_steer 2 \
+    --num_outcomes_to_steer 1 \
     --num_steer_samples 2 \
-    --batch_size 8 \
+    --batch_size 16 \
     --start_index 0 \
     --end_index 1 \
     --seed 42
