@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 import torch
 from tqdm import trange
 from transformers import PreTrainedTokenizer, PreTrainedModel
@@ -136,8 +136,22 @@ class LinearProbeCV:
 
     
 
-def get_activations(model : PreTrainedModel, X : dict, layer : int) -> torch.FloatTensor:
+def get_activations(model : PreTrainedModel, X : dict, layer : int, batch_size : Optional[int] = None) -> torch.Tensor:
     model.eval()
+
+    if batch_size is not None:
+        activations = []
+        for b in range(0, len(X['input_ids']), batch_size):
+            batch_inputs = {
+                'input_ids': X['input_ids'][b:b + batch_size],
+                'attention_mask': X['attention_mask'][b:b + batch_size]
+            }
+            with torch.no_grad():
+                batch_outputs = model(**batch_inputs, output_hidden_states=True)
+                batch_activations = batch_outputs.hidden_states[layer].float().cpu()
+                activations.append(batch_activations)
+        activations = torch.stack(activations, dim=0)
+        return activations
 
     with torch.no_grad():
         outputs = model(**X, output_hidden_states=True)

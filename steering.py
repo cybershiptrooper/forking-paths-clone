@@ -178,7 +178,7 @@ def run_steering_experiment(
         return_tensors="pt"
     ).to(model.device)
 
-    activations = get_activations(model, inputs, layer)[:, token_index, :] # (N rollouts, hidden dim)
+    activations = get_activations(model, inputs, layer, batch_size=64)[:, token_index, :] # (N rollouts, hidden dim)
 
     # 3. create steering vector per outcome
     steering_vectors = []
