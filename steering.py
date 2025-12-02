@@ -204,7 +204,7 @@ def run_steering_experiment(
             base_data["output_token_ids"],
             ts,
             layer,
-            steer_data["steering_vector"],
+            steer_data["steering_vector"].to(model.device).to(model.dtype),
             temperature=temperature,
             max_new_tokens=max_new_tokens,
             num_samples=num_steer_samples,
