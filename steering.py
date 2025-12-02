@@ -179,7 +179,7 @@ def run_steering_experiment(
     ).to(model.device)
 
     print("Collection activations:", inputs['input_ids'].shape)
-    activations = get_activations(model, inputs, layer, batch_size=16)[:, token_index, :] # (N rollouts, hidden dim)
+    activations = get_activations(model, inputs, layer, batch_size=4)[:, token_index, :] # (N rollouts, hidden dim)
 
     # 3. create steering vector per outcome
     steering_vectors = []
@@ -242,7 +242,8 @@ def run_steering_experiment(
         steering_results
     )
 
-    return steering_results_with_outcomes # len = Ts * num steer; keys = [t, steer_outcome, clean_answer, ... (some base data stuff)]
+    # might want to remove output text!
+    return steering_results_with_outcomes # len = Ts * num steer; keys = [t, steer_outcome, clean_answer, output_text, ... (some base data stuff)]
 
 
 def main(
