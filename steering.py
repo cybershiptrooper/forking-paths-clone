@@ -40,8 +40,15 @@ def steer(
         return_tensors="pt"
     ).to(model.device)
 
+    debug_flag = 0
+
     # 2. generate completion for n ~= 10 samples with steering
     def steer_hook(module, input, output):
+        nonlocal debug_flag
+        if debug_flag < 3:
+            print("Hidden state:", output.shape)
+            print("Steering vector:", steering_vector.shape)
+            debug_flag += 1
         # output = (batch size * num samples, token length or 1, hidden dim)
         return output[:, -1, :] + output[:, -1, :] * steering_vector
     
