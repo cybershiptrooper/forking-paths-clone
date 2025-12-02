@@ -194,10 +194,10 @@ def run_steering_experiment(
         ]
 
         # do we want to subsample?? (not sure if it'll really do much)
-        if len(outcome_indices) != 0:
+        if len(outcome_indices) == 0:
             print("Skipping - should contain at least one example of the outcome")
             continue
-        if len(other_outcome_indices) != 0:
+        if len(other_outcome_indices) == 0:
             print("Skipping - should contain at least one example alternative")
             continue
 
