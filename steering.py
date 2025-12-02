@@ -189,8 +189,12 @@ def run_steering_experiment(
         ]
 
         # do we want to subsample?? (not sure if it'll really do much)
-        assert len(outcome_indices) != 0, "Should at least contain one outcome!"
-        assert len(other_outcome_indices) != 0, "Should at least contain a different outcome!"
+        if len(outcome_indices) != 0:
+            print("Skipping - should contain at least one example of the outcome")
+            continue
+        if len(other_outcome_indices) != 0:
+            print("Skipping - should contain at least one example alternative")
+            continue
 
         steering_vector = torch.mean(activations[outcome_indices], dim=0) - torch.mean(activations[other_outcome_indices], dim=0)
         steering_vectors.append({
