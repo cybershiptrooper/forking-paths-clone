@@ -104,6 +104,8 @@ def generate_rollouts(
         max_tokens=max_new_tokens
     )
     output = llm.generate([{"prompt_token_ids": prompt_token_ids}], sampling_params)[0]
+    print("Generated rollouts:", len(output.outputs))
+    print(output.outputs[0].text)
     results = []
     for i in range(num_paths):
         results.append({
@@ -135,6 +137,8 @@ def run_steering_experiment(
 ):
     # 1. roll out N times & parse outcomes
     base_llm = LLM(model=model_name, dtype="bfloat16")
+    print("Prompt:")
+    print(base_llm.get_tokenizer().decode(base_data["prompt_token_ids"]))
     rollouts = generate_rollouts(
         base_llm, 
         base_data["prompt_token_ids"],
