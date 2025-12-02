@@ -286,6 +286,9 @@ def main(
         outcome_df = pd.read_csv(f"{streamlit_folder}/{model_nickname}/{dataset_name.lower()}/{example_index}.csv")
         timestamps = sorted(outcome_df.t.unique()) # (T,)
 
+        print(f"Steering example #{example_index}")
+        print(base_data["question"])
+
         # 2. run steering
         steering_results = run_steering_experiment(
             model_name,

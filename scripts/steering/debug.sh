@@ -9,6 +9,6 @@ uv run python steering.py \
     --num_outcomes_to_steer 1 \
     --num_steer_samples 2 \
     --batch_size 16 \
-    --start_index 0 \
-    --end_index 2 \
+    --start_index 2 \
+    --end_index 3 \
     --seed 42
