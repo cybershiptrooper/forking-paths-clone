@@ -1,7 +1,7 @@
 uv run python steering.py \
     --model_name deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B \
     --dataset_name GPQA \
-    --num_paths 10 \
+    --num_paths 100 \
     --temperature 0.7 \
     --max_new_tokens 200 \
     --layer 20 \
