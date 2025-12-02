@@ -50,7 +50,7 @@ def steer(
             print("Steering vector:", steering_vector.shape)
             debug_flag += 1
         # output = (batch size * num samples, token length or 1, hidden dim)
-        output[:, -1, :] = output[:, -1, :].clone() + steering_vector
+        # output[:, -1, :] = output[:, -1, :].clone() + steering_vector
         return output
     
     steer_hook_handle = model.model.layers[layer].register_forward_hook(steer_hook)
