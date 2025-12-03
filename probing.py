@@ -6,15 +6,15 @@ import pandas as pd
 import torch
 from torch.distributions import Categorical
 from transformers import AutoModelForCausalLM
-from sklearn.model_selection import train_test_split
-from utils.probe_utils import LinearProbeCV, get_activations
+from utils.probe_utils import LinearProbe, MLPProbe, ProbeCV, get_activations
 from utils.utils import clear_cuda, set_seed, MODEL_METADATA
 
 
 def main(
     model_name : str = "gpt2",
     dataset_name : str = "AQuA",
-    # probe arguments
+    # probe experiment arguments
+    probe_class : str = "linear",
     layer : int = 0,
     test_split : float = 0.1,
     cross_val_split : int = 5,
@@ -24,6 +24,9 @@ def main(
     learning_rate : float = 0.001,
     # experiment arguments
     seed : int = 42,
+    # mlp probe-specific kwargs
+    hidden_size : int = -1,
+    num_layers : int = -1 
 ):
     set_seed(seed)
     # 1. load model
@@ -95,12 +98,14 @@ def main(
     # - hold out questions from dataset
     results = {
         "hyperparameters": {
+            "probe_class": probe_class,
             "layer": layer,
             "epochs": epochs,
             "early_stopping": early_stopping,
             "patience": patience,
             "learning_rate": learning_rate,
-            "seed": seed
+            "seed": seed,
+            "num_layers": num_layers
         },
         "metrics": {
             "train_mse": [],
@@ -129,8 +134,21 @@ def main(
         print("Test inputs:", activations_test.dtype, activations_test.shape)
         print("Test labels:", entropy_test.dtype, entropy_test.shape)
 
+        if probe_class == "linear":
+            probe_type = LinearProbe
+            probe_kwargs = {}
+        elif probe_class == "mlp":
+            probe_type = MLPProbe
+            probe_kwargs = {
+                "hidden_size": hidden_size * activations_train.shape[-1],
+                "num_layers": num_layers
+            }
+        else:
+            assert False, f"Probe type {probe_class} not implemented"
+
         # 3. train probe
-        probe = LinearProbeCV(
+        probe = ProbeCV(
+            probe_type,
             n_split=cross_val_split,
             input_size=activations_train.shape[-1],
             output_size=1, 
@@ -139,7 +157,8 @@ def main(
             early_stopping=early_stopping, 
             patience=patience,
             loss_type='mse', 
-            learning_rate=learning_rate
+            learning_rate=learning_rate,
+            **probe_kwargs
         )
         probe.fit(activations_train, entropy_train)
 
@@ -183,6 +202,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name", type=str, default="gpt2")
     parser.add_argument("--dataset_name", type=str, default="AQuA")
+    parser.add_argument("--probe_class", type=str, default="linear")
     parser.add_argument("--layer", type=int, default=0)
     parser.add_argument("--test_split", type=float, default=0.1)
     parser.add_argument("--cross_val_split", type=int, default=5)
@@ -191,5 +211,7 @@ if __name__ == "__main__":
     parser.add_argument("--patience", type=int, default=10)
     parser.add_argument("--learning_rate", type=float, default=0.001)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--hidden_size", type=int, default=-1)
+    parser.add_argument("--num_layers", type=int, default=-1)
     args = parser.parse_args()
     main(**vars(args))

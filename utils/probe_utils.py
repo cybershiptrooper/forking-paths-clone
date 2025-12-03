@@ -3,14 +3,17 @@ import torch
 from tqdm import trange
 from transformers import PreTrainedTokenizer, PreTrainedModel
 
-class LinearProbe(torch.nn.Module):
+class Probe(torch.nn.Module):
     def __init__(
-        self, input_size : int, output_size : int, 
-        epochs : int = 100, device : Union[torch.device, str] = 'cuda', early_stopping : bool = True, patience : int = 10,
-        loss_type : str = 'kl', learning_rate : float = 0.001
+        self,
+        epochs : int = 100, 
+        device : Union[torch.device, str] = 'cuda', 
+        early_stopping : bool = True, 
+        patience : int = 10,
+        loss_type : str = 'kl', 
+        learning_rate : float = 0.001
     ):
-        super(LinearProbe, self).__init__()
-        self.linear = torch.nn.Linear(input_size, output_size)
+        super(Probe, self).__init__()
         self.epochs = epochs
         self.device = device
         self.early_stopping = early_stopping
@@ -18,9 +21,6 @@ class LinearProbe(torch.nn.Module):
         self.loss_type = loss_type
         self.learning_rate = learning_rate
         self.to(device)
-    
-    def forward(self, x):
-        return self.linear(x)
     
     def fit(self, X : torch.Tensor, y : torch.Tensor):
         """
@@ -85,9 +85,41 @@ class LinearProbe(torch.nn.Module):
         self.to(device)
         X = X.to(device)
         return self(X)
+
+
+class LinearProbe(Probe):
+    def __init__(self, input_size : int, output_size : int, **probe_kwargs):
+        super(LinearProbe, self).__init__(**probe_kwargs)
+        self.linear = torch.nn.Linear(input_size, output_size)
+
     
-class LinearProbeCV:
-    def __init__(self, n_split : int = 5, **probe_kwargs):
+    def forward(self, x):
+        return self.linear(x)
+
+class MLPProbe(Probe):
+    def __init__(self, num_layers : int, input_size : int, hidden_size : int, output_size : int, **probe_kwargs):
+        super(MLPProbe, self).__init__(**probe_kwargs)
+        modules = [
+            torch.nn.Linear(input_size, hidden_size),
+            torch.nn.ReLU(),
+        ]
+        for _ in range(num_layers - 2):
+            modules += [
+                torch.nn.Linear(hidden_size, hidden_size),
+                torch.nn.ReLU()
+            ]
+        modules += [torch.nn.Linear(hidden_size, output_size)]
+        self.model = torch.nn.ModuleList(modules)
+
+    
+    def forward(self, x):
+        for module in self.model:
+            x = module(x)
+        return x
+    
+class ProbeCV:
+    def __init__(self, probe_class, n_split : int = 5, **probe_kwargs):
+        self.probe_class = probe_class
         self.n_split = n_split
         self.probe_kwargs = probe_kwargs
         self.best_probe = None
@@ -103,7 +135,7 @@ class LinearProbeCV:
         for _ in range(self.n_split):
             # random split into train (mask) and test (not mask)
             mask = torch.randperm(X.shape[0], generator=self.random_generator) % self.n_split != 0
-            probe = LinearProbe(**self.probe_kwargs)
+            probe = self.probe_class(**self.probe_kwargs)
             probe.fit(X[mask], y[mask])
             score = probe.score(X[~mask], y[~mask])
             if self.best_score is None or score < self.best_score:
@@ -135,7 +167,6 @@ class LinearProbeCV:
         return self.best_probe.pred(X)
 
     
-
 def get_activations(model : PreTrainedModel, X : dict, layer : int, batch_size : Optional[int] = None) -> torch.Tensor:
     model.eval()
 

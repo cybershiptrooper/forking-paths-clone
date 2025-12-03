@@ -58,14 +58,14 @@ example_index = example_selection.selectbox(
 with open(f'{streamlit_folder}/{model_name}/{dataset_name}/base_data.json') as f:
     base_data = json.load(f)[int(example_index)]
 
-question_text, response_text = st.columns(2)
+# question_text, response_text = st.columns(2)
 
 if base_data['dataset_type'] == 'alignment':
-    question_text.text(base_data['question'] + '\nOptions:\na) refuse\nb) comply')
+    st.text(base_data['question'] + '\nOptions:\na) refuse\nb) comply')
 elif base_data['dataset_type'] == 'open ended':
-    question_text.text(f"{base_data['question']}\nCorrect answer: {base_data['correct_answer']}")
+    st.text(f"{base_data['question']}\nCorrect answer: {base_data['correct_answer']}")
 else:
-    question_text.text(
+    st.text(
         base_data['question'] + '\n' + '\n'.join(f'{l}) {a}' for l, a in zip(base_data['all_letters'], base_data['all_answers'])) + \
         '\n' + 'Correct answer: ' +  f"{base_data['correct_letter']}) {base_data['correct_answer']}"
     )
@@ -73,7 +73,7 @@ else:
 logprobs = base_data['output_logprobs']
 if logprobs == []:
     logprobs = [0] * len(base_data['output_token_ids'])
-response_text.html(text_colors_html(
+st.html(text_colors_html(
     [tokenizer.decode(i) for i in base_data['output_token_ids']], 
     np.exp(logprobs), 
     print_newln=True, 
@@ -231,11 +231,49 @@ fig.add_trace(
     go.Scatter( 
         x = sorted(outcome_df.t.unique()), 
         y = d.entropy(), 
+        name="entropy",
         # stackgroup='one',
-
         line={'color': '#C4DADE'}
     )
 )
+
+if os.path.exists(f"results/probing/{model_name}/{dataset_name}"):
+    best_probe_data = None
+    best_probe_results = np.inf
+    best_probe_filename = None
+    for probe_filename in os.listdir(f"results/probing/{model_name}/{dataset_name}"):
+        with open(f"results/probing/{model_name}/{dataset_name}/{probe_filename}") as f:
+            probe_data = json.load(f)
+            probe_results = np.mean(probe_data['metrics']['test_mse'])
+            if probe_results < best_probe_results:
+                best_probe_data = probe_data
+                best_probe_results = probe_results
+                best_probe_filename = probe_filename
+
+    print(best_probe_filename)
+    print(best_probe_results)
+    probe_predictions = best_probe_data['predictions'][int(example_index)]
+    assert probe_predictions['question_id'] == int(example_index), f"Different # and question ID: {int(example_index)} != {probe_predictions['question_id']}"
+    fig.add_trace(
+        go.Scatter( 
+            x = probe_predictions['t'], 
+            y = probe_predictions['true_entropy'], 
+            name="true_entropy",
+            # stackgroup='one',
+            line={'color': COLORS[1]}
+        )
+    )
+    fig.add_trace(
+        go.Scatter( 
+            x = probe_predictions['t'], 
+            y = probe_predictions['pred_entropy'], 
+            name="pred_entropy",
+            # stackgroup='one',
+            line={'color': COLORS[2]}
+        )
+    )
+    print(np.square(np.array(probe_predictions['true_entropy']) - np.array(probe_predictions['pred_entropy'])).mean())
+
 st.subheader("Entropy of outcome probabilities")
 st.plotly_chart(fig)
 
