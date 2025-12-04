@@ -12,7 +12,7 @@ do
         --cross_val_split 10 \
         --epochs 500 \
         --early_stopping \
-        --patience 10 \
+        --patience 25 \
         --learning_rate 0.001 \
         --seed 42 \
         --hidden_size 2 \
