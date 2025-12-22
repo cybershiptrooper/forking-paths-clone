@@ -54,5 +54,29 @@
         "hf_name": null,
         "hf_split": "test",
         "type": "alignment"
+    },
+    "AIME24": {
+        "name": "AIME24",
+        "source": "math-ai/aime24",
+        "hf": true,
+        "hf_name": null,
+        "hf_split": "test",
+        "type": "open ended"
+    },
+    "AIME25": {
+        "name": "AIME25",
+        "source": "math-ai/aime25",
+        "hf": true,
+        "hf_name": null,
+        "hf_split": "test",
+        "type": "open ended"
+    },
+    "Game-of-24": {
+        "name": "Game-of-24",
+        "source": "data/game_of_24",
+        "hf": false,
+        "hf_name": null,
+        "hf_split": null,
+        "type": "open ended"
     }
 }

@@ -7,12 +7,15 @@ TODAY_DATE_STRING = "Today Date: 12 December 2024\n"
 MC_INSTRUCTION_PROMPT = """Answer the following multiple choice question. **Include the letter in your final answer.**
 {question}"""
 
+OPEN_ENDED_INSTRUCTION_PROMPT = """Answer the following question. **Box your answer** with \\boxed{{}}.
+{question}"""
+
 def fix_date(prompt : str):
     return re.sub("Today Date:.*\n", TODAY_DATE_STRING, prompt)
 
-def get_prompt(tokenizer, question, answer_prefix=None, multiple_choice=False):
-    if multiple_choice:
-        prompt = MC_INSTRUCTION_PROMPT.format(question=question)
+def get_prompt(tokenizer, question, answer_prefix=None, prompt_template=None):
+    if prompt_template:
+        prompt = prompt_template.format(question=question)
     else:
         prompt = question
     chat = [
@@ -35,13 +38,15 @@ def get_prompt(tokenizer, question, answer_prefix=None, multiple_choice=False):
     )
     return fix_date(prompt)
 
-def get_cot_prompt(tokenizer : PreTrainedTokenizer, question):
+def get_cot_prompt(tokenizer : PreTrainedTokenizer, question, multiple_choice=False):
     if MODEL_METADATA[tokenizer.name_or_path]['reasoning']:
         answer_prefix = None
     else:
         answer_prefix = "Let's think step by step."
 
-    return get_prompt(tokenizer, question, answer_prefix=answer_prefix, multiple_choice=True)
+    template = MC_INSTRUCTION_PROMPT if multiple_choice else OPEN_ENDED_INSTRUCTION_PROMPT
+
+    return get_prompt(tokenizer, question, answer_prefix=answer_prefix, prompt_template=template)
 
 def get_alignment_prompt(tokenizer, question, alignment_type=None):
     if alignment_type is None:
@@ -50,4 +55,4 @@ def get_alignment_prompt(tokenizer, question, alignment_type=None):
         answer_prefix = "Sure,"
     elif alignment_type == "aligned":
         answer_prefix = "Sorry,"
-    return get_prompt(tokenizer, question, answer_prefix=answer_prefix, multiple_choice=False)
+    return get_prompt(tokenizer, question, answer_prefix=answer_prefix, prompt_template=None)

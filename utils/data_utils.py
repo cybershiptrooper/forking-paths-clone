@@ -146,6 +146,34 @@ def format_question_justeval(example):
         "all_answers": ["refuse", "comply"]
     }
 
+def format_question_aime(example):
+    question = example['problem']
+    answer = example["solution"]
+
+    return {
+        "question": question,
+        "question_with_choices": question,
+        "correct_letter": None,
+        "correct_answer": answer,
+        "all_letters": None,
+        "all_answers": None
+    }
+
+def format_question_game_of_24(example):
+    prompt_template = "Get to 24 with the following numbers: {numbers}. You can use any arithmetic operation (+, -, x, /), including parentheses, but you must use each number exactly once. Format your final expression as \\boxed{{...}}."
+
+    question = prompt_template.format(numbers=example["Puzzles"])
+    answer = example["Solution 1"]
+
+    return {
+        "question": question,
+        "question_with_choices": question,
+        "correct_letter": None,
+        "correct_answer": answer,
+        "all_letters": None,
+        "all_answers": [example[f"Solution {i}"] for i in range(1, example["Num Solutions"] + 1)]
+    }
+
 def format_question_mc_evaluation(example):
     question = example['Question']
     answer_letter = example['Answer']
@@ -175,4 +203,7 @@ DATASET_TO_FORMAT = {
     "GSM8k": format_question_mc_evaluation,
     "MATH": format_question_mc_evaluation,
     "PythonIO": format_question_mc_evaluation,
+    "AIME24": format_question_aime,
+    "AIME25": format_question_aime,
+    "Game-of-24": format_question_game_of_24
 }

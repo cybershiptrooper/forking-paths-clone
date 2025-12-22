@@ -67,7 +67,8 @@ def load_data(
         if dataset['type'] == "alignment":
             prompt_str = get_alignment_prompt(tokenizer, datapoint['question_with_choices'], alignment_type=None)
         else:
-            prompt_str = get_cot_prompt(tokenizer, datapoint['question_with_choices'])
+            is_mc = (dataset['type'] == 'multiple choice')
+            prompt_str = get_cot_prompt(tokenizer, datapoint['question_with_choices'], multiple_choice=is_mc)
 
         data.append({
             **datapoint, # pass down info about datapoint
