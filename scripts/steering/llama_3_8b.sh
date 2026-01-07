@@ -12,7 +12,7 @@ uv run python steering.py \
     --token_index -1 \
     --num_outcomes_to_steer 5 \
     --num_steer_samples 10 \
-    --batch_size 8 \
+    --batch_size 4 \
     --start_index $start \
     --end_index $end \
     --seed 42

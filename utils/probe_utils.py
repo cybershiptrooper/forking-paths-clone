@@ -167,15 +167,62 @@ class ProbeCV:
         return self.best_probe.pred(X)
 
     
-def get_activations(model : PreTrainedModel, X : dict, layer : int, batch_size : Optional[int] = None) -> torch.Tensor:
+def get_activations(model : PreTrainedModel, X : dict, layer : int, batch_size : Optional[int] = None, efficient_mode : bool = False) -> torch.Tensor:
+    """
+    Extract activations from a specific layer of the model.
+    
+    Args:
+        model: The pretrained model
+        X: Dictionary with 'input_ids' and 'attention_mask'
+        layer: The layer index to extract activations from
+        batch_size: If provided, process in batches
+        efficient_mode: If True, use forward hooks to capture only the target layer's 
+                       activations (saves GPU memory by not storing all hidden states)
+    """
     model.eval()
 
+    if efficient_mode:
+        # Use forward hooks to capture only the specified layer's activations
+        captured_activations = []
+        
+        def activation_hook(module, input, output):
+            # output is typically (batch_size, seq_len, hidden_dim) or a tuple
+            if isinstance(output, tuple):
+                hidden_states = output[0]
+            else:
+                hidden_states = output
+            captured_activations.append(hidden_states.detach().float().cpu())
+        
+        # Register hook on the target layer
+        hook_handle = model.model.layers[layer].register_forward_hook(activation_hook)
+        
+        try:
+            if batch_size is not None:
+                activations = []
+                for b in trange(0, len(X['input_ids']), batch_size, desc="Collecting activations (efficient)..."):
+                    captured_activations.clear()
+                    batch_inputs = {
+                        'input_ids': X['input_ids'][b:b + batch_size].to(model.device),
+                        'attention_mask': X['attention_mask'][b:b + batch_size].to(model.device)
+                    }
+                    with torch.no_grad():
+                        model(**batch_inputs, output_hidden_states=False)
+                    activations.append(captured_activations[0])
+                return torch.cat(activations, dim=0)
+            else:
+                with torch.no_grad():
+                    model(**X, output_hidden_states=False)
+                return captured_activations[0].squeeze()
+        finally:
+            hook_handle.remove()
+    
+    # Original method: output_hidden_states=True (stores all layer activations)
     if batch_size is not None:
         activations = []
         for b in trange(0, len(X['input_ids']), batch_size, desc="Collecting activations..."):
             batch_inputs = {
-                'input_ids': X['input_ids'][b:b + batch_size],
-                'attention_mask': X['attention_mask'][b:b + batch_size]
+                'input_ids': X['input_ids'][b:b + batch_size].to(model.device),
+                'attention_mask': X['attention_mask'][b:b + batch_size].to(model.device)
             }
             with torch.no_grad():
                 batch_outputs = model(**batch_inputs, output_hidden_states=True)

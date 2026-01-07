@@ -39,7 +39,7 @@ def steer(
         {"input_ids": input_ids},
         padding=True,
         return_tensors="pt"
-    ).to(model.device)
+    )
 
     # 2. generate completion for n ~= 10 samples with steering
     def steer_hook(module, input, output):
@@ -53,8 +53,8 @@ def steer(
     print(f"Steering: {inputs['input_ids'].shape}")
     for b in trange(0, len(inputs["input_ids"]), batch_size, desc="Steering..."):
         batch_inputs = {
-            "input_ids": inputs["input_ids"][b:b + batch_size],
-            "attention_mask": inputs["attention_mask"][b:b + batch_size]
+            "input_ids": inputs["input_ids"][b:b + batch_size].to(model.device),
+            "attention_mask": inputs["attention_mask"][b:b + batch_size].to(model.device)
         }
         batch_outputs = model.generate(
             **batch_inputs, 
@@ -65,6 +65,8 @@ def steer(
             pad_token_id=tokenizer.eos_token_id
         )[:, batch_inputs["input_ids"].shape[1]:] # (batch size * num samples, output length)
         outputs += tokenizer.batch_decode(batch_outputs, skip_special_tokens=True)
+        del batch_outputs
+        clear_cuda()
 
     steer_hook_handle.remove()
 
@@ -185,10 +187,12 @@ def run_steering_experiment(
         {"input_ids": [r["prompt_token_ids"] + r["output_token_ids"] for r in rollouts_with_outcomes]},
         padding=True,
         return_tensors="pt"
-    ).to(model.device)
+    )
 
     print("Collection activations:", inputs['input_ids'].shape)
     activations = get_activations(model, inputs, layer, batch_size=4)[:, token_index, :] # (N rollouts, hidden dim)
+    del inputs
+    clear_cuda()
 
     # 3. create steering vector per outcome
     steering_vectors = []
@@ -215,6 +219,8 @@ def run_steering_experiment(
             "outcome": outcome,
             "steering_vector": steering_vector
         })
+    del activations
+    clear_cuda()
 
     # 4. steer towards each outcome
     # - easy steer looks annoying as heck...
