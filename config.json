@@ -4,9 +4,10 @@
         "collection_folder": "data/collection",
         "forking_paths_folder": "data/forking_paths",
         "streamlit_folder": "data/streamlit",
-        "probe_folder": "results/probing"
+        "probe_folder": "results/probing",
+        "steer_folder": "results/steering"
     },
     "experiment_parameters": {
-        "answer_model": "meta-llama/Llama-3.2-1B-Instruct"
+        "answer_model": "meta-llama/Meta-Llama-3-8B-Instruct"
     }
 }

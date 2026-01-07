@@ -5,7 +5,7 @@ import os
 import pandas as pd
 import torch
 from torch.distributions import Categorical
-from transformers import AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from utils.probe_utils import LinearProbe, MLPProbe, ProbeCV, get_activations
 from utils.utils import clear_cuda, set_seed, MODEL_METADATA
 
@@ -31,7 +31,7 @@ def main(
     set_seed(seed)
     # 1. load model
     model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", dtype=torch.bfloat16)
-
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
     # 2. load all forking paths data & collect activations
     # - per question: t -> entropy
     # - activation @ res. stream, t, layer -> entropy @ t
@@ -63,9 +63,16 @@ def main(
         probe_data['t'].append(timestamps)
 
         # a. get activations
+        question = base_data["question"]
+        prompt = tokenizer.apply_chat_template(
+            [{"role": "user", "content": question}],
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+
+        prompt_token_ids = tokenizer.encode(prompt, add_special_tokens=True)
         full_token_ids = torch.tensor(
-            base_data['prompt_token_ids'] + base_data['output_token_ids'], 
-            device=model.device
+            prompt_token_ids + base_data["output_token_ids"], device=model.device
         ).unsqueeze(0)
         # print("Input tokens:", full_token_ids.shape)
         activations = get_activations(model, {'input_ids': full_token_ids}, layer=layer) # (tokens, hidden dim)
@@ -191,7 +198,7 @@ def main(
                 "true_entropy": [float(e) for e in entropy],
                 "pred_entropy": [float(e) for e in pred_entropy_for_q]
             })
-    
+
     os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}", exist_ok=True)
     now = datetime.datetime.now().strftime("%m-%d-%H-%M-%S")
     with open(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}/results-{now}.json", "w+") as f:

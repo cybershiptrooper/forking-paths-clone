@@ -138,8 +138,16 @@ def run_steering_experiment(
 ):
     # 1. roll out N times & parse outcomes
     base_llm = LLM(model=model_name, dtype="bfloat16")
-    print("Prompt:")
-    print(base_llm.get_tokenizer().decode(base_data["prompt_token_ids"]))
+    tokenizer = base_llm.get_tokenizer()
+    print("Prompt:", base_data["question"])
+    prompt = tokenizer.apply_chat_template(
+        [{"role": "user", "content": base_data["question"]}],
+        tokenize=False,
+        add_generation_prompt=True,
+    )
+    prompt_token_ids = tokenizer.encode(prompt, add_special_tokens=True)
+    base_data["prompt_token_ids"] = prompt_token_ids
+
     rollouts = generate_rollouts(
         base_llm, 
         base_data["prompt_token_ids"],
@@ -155,7 +163,7 @@ def run_steering_experiment(
 
     del base_llm
     clear_cuda()
-    
+
     answer_llm = LLM(model=answer_model_name, dtype="bfloat16")
     rollouts_with_outcomes = parse_answer(
         answer_llm,
@@ -172,7 +180,7 @@ def run_steering_experiment(
     tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side="left")
     tokenizer.pad_token_id = tokenizer.eos_token_id # set padding token
     model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", torch_dtype=torch.bfloat16)
-    
+
     inputs = tokenizer.pad(
         {"input_ids": [r["prompt_token_ids"] + r["output_token_ids"] for r in rollouts_with_outcomes]},
         padding=True,
@@ -232,6 +240,7 @@ def run_steering_experiment(
             all_letters=base_data["all_letters"],
             all_answers=base_data["all_answers"],
         )
+        clear_cuda()
 
     del model, tokenizer
     clear_cuda()
@@ -242,6 +251,8 @@ def run_steering_experiment(
         answer_llm,
         steering_results
     )
+    del answer_llm
+    clear_cuda()
 
     # might want to remove output text!
     return steering_results_with_outcomes # len = Ts * num steer; keys = [t, steer_outcome, clean_answer, output_text, ... (some base data stuff)]
