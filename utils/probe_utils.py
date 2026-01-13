@@ -1,5 +1,6 @@
 from typing import Optional, Union
 import torch
+import torch.nn.functional as F
 from tqdm import trange
 from transformers import PreTrainedTokenizer, PreTrainedModel
 
@@ -21,7 +22,7 @@ class Probe(torch.nn.Module):
         self.loss_type = loss_type
         self.learning_rate = learning_rate
         self.to(device)
-    
+
     def fit(self, X : torch.Tensor, y : torch.Tensor):
         """
         Fit the linear probe to the data.
@@ -39,6 +40,11 @@ class Probe(torch.nn.Module):
         elif self.loss_type == 'mse':
             assert len(y.shape) == 1, f"Must be shape (n_samples) for regression, got {y.shape}"
             criterion = torch.nn.MSELoss()
+        elif self.loss_type == "bce":
+            assert (
+                len(y.shape) == 1
+            ), f"Must be shape (n_samples) for binary classification, got {y.shape}"
+            criterion = torch.nn.BCEWithLogitsLoss()
 
         best_loss = float('inf')
         best_loss_epoch = 0
@@ -49,6 +55,8 @@ class Probe(torch.nn.Module):
                 if self.loss_type == 'kl':
                     y_pred = torch.nn.functional.log_softmax(y_pred, dim=1)
                 if self.loss_type == 'mse':
+                    y_pred = y_pred.squeeze(-1)
+                if self.loss_type == "bce":
                     y_pred = y_pred.squeeze(-1)
                 loss = criterion(y_pred, y)
 
@@ -62,7 +70,7 @@ class Probe(torch.nn.Module):
                 loss.backward()
                 progress_bar.set_postfix(loss=loss.item())
                 optimizer.step()
-    
+
     @torch.no_grad
     def score(self, X, y, device='cuda'):
         self.to(device)
@@ -78,8 +86,11 @@ class Probe(torch.nn.Module):
         elif self.loss_type == 'mse':
             criterion = torch.nn.MSELoss()
             y_pred = y_pred.squeeze(-1)
+        elif self.loss_type == "bce":
+            criterion = torch.nn.BCEWithLogitsLoss()
+            y_pred = y_pred.squeeze(-1)
         return criterion(y_pred, y).item()
-    
+
     @torch.no_grad
     def pred(self, X, device='cuda'):
         self.to(device)
@@ -111,12 +122,123 @@ class MLPProbe(Probe):
         modules += [torch.nn.Linear(hidden_size, output_size)]
         self.model = torch.nn.ModuleList(modules)
 
-    
     def forward(self, x):
         for module in self.model:
             x = module(x)
         return x
-    
+
+
+class AttentionProbe(Probe):
+    """
+    Attention probe for transformer activations with lower dimensional projection.
+    Uses multi-head attention to aggregate sequence information for prediction.
+
+    Args:
+        input_size: The dimension of the input activations
+        d_proj: The dimension of the projection
+        nhead: The number of heads
+        output_size: The dimension of the output
+        max_length: (optional) The maximum length of the input sequence. Default is 8192.
+        sliding_window: (optional) The sliding window size. Default is None.
+        **probe_kwargs: Additional keyword arguments for the probe
+    Returns:
+        The output of the attention probe
+    """
+
+    def __init__(
+        self,
+        input_size: int,
+        d_proj: int,
+        nhead: int,
+        output_size: int,
+        max_length: int = 8192,
+        sliding_window: Optional[int] = None,
+        **probe_kwargs,
+    ):
+        super(AttentionProbe, self).__init__(**probe_kwargs)
+        self.input_size = input_size
+        self.d_proj = d_proj
+        self.nhead = nhead
+        self.q_proj = torch.nn.Linear(input_size, d_proj * nhead)
+        self.k_proj = torch.nn.Linear(input_size, d_proj * nhead)
+        self.v_proj = torch.nn.Linear(input_size, d_proj * nhead)
+        self.out_proj = torch.nn.Linear(d_proj * nhead, output_size)
+
+        if sliding_window is not None:
+            mask = self._construct_sliding_window_mask(max_length, sliding_window)
+        else:
+            mask = self._construct_causal_mask(max_length)
+        self.register_buffer("mask", mask)
+        self.to(probe_kwargs["device"])
+
+    def _construct_causal_mask(self, seq_len: int) -> torch.Tensor:
+        """Construct a causal (lower triangular) attention mask."""
+        mask = torch.ones(seq_len, seq_len)
+        mask = torch.tril(mask, diagonal=0)
+        return mask.to(dtype=torch.bool)
+
+    def _construct_sliding_window_mask(
+        self, seq_len: int, window_size: int
+    ) -> torch.Tensor:
+        """Construct a sliding window causal attention mask."""
+        q_idx = torch.arange(seq_len).unsqueeze(1)
+        kv_idx = torch.arange(seq_len).unsqueeze(0)
+        causal_mask = q_idx >= kv_idx
+        windowed_mask = q_idx - kv_idx < window_size
+        return causal_mask & windowed_mask
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass through the attention probe.
+
+        Args:
+            x: Input tensor of shape (batch_size, seq_len, d_model) or (seq_len, d_model)
+
+        Returns:
+            Output tensor of shape (batch_size, seq_len) or (seq_len,)
+        """
+        # Handle 2D input (seq_len, d_model) by adding batch dimension
+        squeeze_output = False
+        if x.dim() == 2:
+            x = x.unsqueeze(0)
+            squeeze_output = True
+
+        batch_size, seq_len, _ = x.shape
+
+        # Project to Q, K, V and reshape for multi-head attention
+        q = (
+            self.q_proj(x)
+            .view(batch_size, seq_len, self.nhead, self.d_proj)
+            .transpose(1, 2)
+        )
+        k = (
+            self.k_proj(x)
+            .view(batch_size, seq_len, self.nhead, self.d_proj)
+            .transpose(1, 2)
+        )
+        v = (
+            self.v_proj(x)
+            .view(batch_size, seq_len, self.nhead, self.d_proj)
+            .transpose(1, 2)
+        )
+
+        # Apply scaled dot-product attention with mask
+        attn_output = F.scaled_dot_product_attention(
+            q, k, v, attn_mask=self.mask[:seq_len, :seq_len]
+        )
+
+        # Reshape back and project to output
+        attn_output = (
+            attn_output.transpose(1, 2).contiguous().view(batch_size, seq_len, -1)
+        )
+        output = self.out_proj(attn_output).squeeze(-1)
+
+        if squeeze_output:
+            output = output.squeeze(0)
+
+        return output
+
+
 class ProbeCV:
     def __init__(self, probe_class, n_split : int = 5, **probe_kwargs):
         self.probe_class = probe_class
@@ -142,7 +264,7 @@ class ProbeCV:
                 self.best_score = score
                 self.best_probe = probe
         return self
-    
+
     def fit_splits(self, splits : list[tuple[torch.FloatTensor, torch.FloatTensor, torch.FloatTensor, torch.FloatTensor]]):
         """
         Fit the linear probe to the data.
@@ -161,12 +283,12 @@ class ProbeCV:
     def score(self, X, y):
         assert self.best_probe is not None
         return self.best_probe.score(X, y)
-    
+
     def pred(self, X):
         assert self.best_probe is not None
         return self.best_probe.pred(X)
 
-    
+
 def get_activations(model : PreTrainedModel, X : dict, layer : int, batch_size : Optional[int] = None, efficient_mode : bool = False) -> torch.Tensor:
     """
     Extract activations from a specific layer of the model.

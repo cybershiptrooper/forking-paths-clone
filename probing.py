@@ -6,8 +6,26 @@ import pandas as pd
 import torch
 from torch.distributions import Categorical
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from utils.probe_utils import LinearProbe, MLPProbe, ProbeCV, get_activations
+from utils.probe_utils import (
+    LinearProbe,
+    MLPProbe,
+    AttentionProbe,
+    ProbeCV,
+    get_activations,
+)
 from utils.utils import clear_cuda, set_seed, MODEL_METADATA
+from utils.prompt_utils import get_cot_prompt
+
+
+def make_prompt_mcq(base_data_dict: dict, tokenizer: AutoTokenizer):
+    question = base_data_dict["question"]
+    option_choices = base_data_dict["all_answers"]
+    letter_choices = base_data_dict["all_letters"]
+    formatted_question = f"{question}\n\nChoices:\n" + "\n".join(
+        f"{letter}) {option}" for letter, option in zip(letter_choices, option_choices)
+    )
+    prompt_str = get_cot_prompt(tokenizer, formatted_question, multiple_choice=True)
+    return prompt_str
 
 
 def main(
@@ -44,6 +62,8 @@ def main(
         filename.split('.')[0] for filename in os.listdir(f'{streamlit_folder}/{model_nickname}/{dataset_name.lower()}')
         if filename != "base_data.json" # ignore base data
     ])
+    # ids_to_use = ["11", "13", "16", "17", "18", "20", "21", "23", "26", "27"]
+    # example_ids = ids_to_use
 
     probe_data = {
         't': [], # (# questions, T)
@@ -63,22 +83,18 @@ def main(
         probe_data['t'].append(timestamps)
 
         # a. get activations
-        question = base_data["question"]
-        prompt = tokenizer.apply_chat_template(
-            [{"role": "user", "content": question}],
-            tokenize=False,
-            add_generation_prompt=True,
-        )
-
+        if dataset_name == "gpqa":
+            prompt = make_prompt_mcq(base_data, tokenizer)
+        else:
+            raise ValueError(f"Dataset {dataset_name} not supported")
         prompt_token_ids = tokenizer.encode(prompt, add_special_tokens=True)
         full_token_ids = torch.tensor(
             prompt_token_ids + base_data["output_token_ids"], device=model.device
         ).unsqueeze(0)
-        # print("Input tokens:", full_token_ids.shape)
-        activations = get_activations(model, {'input_ids': full_token_ids}, layer=layer) # (tokens, hidden dim)
-        # print("Activations:", activations.shape)
-        activations_per_t = activations[timestamps] # (T, hidden dim)
-        # print("Activations per timestep:", activations_per_t.shape)
+        activations = get_activations(
+            model, {"input_ids": full_token_ids}, layer=layer
+        )  # (tokens, hidden dim)
+        activations_per_t = activations[timestamps]  # (T, hidden dim)
         probe_data['activation'].append(activations_per_t)
 
         # b. compute entropy
@@ -150,6 +166,13 @@ def main(
                 "hidden_size": hidden_size * activations_train.shape[-1],
                 "num_layers": num_layers
             }
+        elif probe_class == "attention":
+            probe_type = AttentionProbe
+            probe_kwargs = {
+                "d_proj": 512,
+                "nhead": 1,
+                "sliding_window": 1024,
+            }
         else:
             assert False, f"Probe type {probe_class} not implemented"
 
@@ -158,14 +181,14 @@ def main(
             probe_type,
             n_split=cross_val_split,
             input_size=activations_train.shape[-1],
-            output_size=1, 
-            epochs=epochs, 
-            device=activations_train.device, 
-            early_stopping=early_stopping, 
+            output_size=1,
+            epochs=epochs,
+            device="cuda",
+            early_stopping=early_stopping,
             patience=patience,
-            loss_type='mse', 
+            loss_type="mse",
             learning_rate=learning_rate,
-            **probe_kwargs
+            **probe_kwargs,
         )
         probe.fit(activations_train, entropy_train)
 
@@ -200,8 +223,11 @@ def main(
             })
 
     os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}", exist_ok=True)
-    now = datetime.datetime.now().strftime("%m-%d-%H-%M-%S")
-    with open(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}/results-{now}.json", "w+") as f:
+    # now = datetime.datetime.now().strftime("%m-%d-%H-%M-%S")
+    with open(
+        f"{probe_folder}/{model_nickname}/{dataset_name.lower()}/results-{probe_class}-layer{layer}-epochs{epochs}.json",
+        "w",
+    ) as f:
         json.dump(results, f, indent=2)
 
 
