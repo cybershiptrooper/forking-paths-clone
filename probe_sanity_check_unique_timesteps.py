@@ -56,8 +56,6 @@ def main(
     )
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     # 2. load all forking paths data & collect activations
-    # - per question: t -> entropy
-    # - activation @ res. stream, t, layer -> entropy @ t
     with open("config.json") as f:
         config = json.load(f)
     streamlit_folder = config["save_locations"]["streamlit_folder"]
@@ -69,24 +67,21 @@ def main(
             for filename in os.listdir(
                 f"{streamlit_folder}/{model_nickname}/{dataset_name.lower()}"
             )
-            if filename != "base_data.json"  # ignore base data
+            if filename != "base_data.json"
         ]
     )
-    # ids_to_use = ["11", "13", "16", "17", "18", "20", "21", "23", "26", "27"]
-    # example_ids = ids_to_use
 
-    probe_data = {
-        "t": [],  # (# questions, T)
-        "activation": [],  # (# questions, T, hidden dim)
-        "entropy": [],  # (# questions, T)
-        "label": [],  # (# questions, T) - binary labels: 0 if entropy=0, 1 if entropy>0
-    }
+    # Collect data with question_id and timestamp metadata
+    # Each entry: (activation, label, entropy, question_id, timestamp)
+    all_data = []
+
     for example_index in tqdm(example_ids, desc="Loading Activations"):
+        question_id = int(example_index)
         # load base data
         with open(
             f"{streamlit_folder}/{model_nickname}/{dataset_name.lower()}/base_data.json"
         ) as f:
-            base_data = json.load(f)[int(example_index)]
+            base_data = json.load(f)[question_id]
         # load distribution
         outcome_df = pd.read_csv(
             f"{streamlit_folder}/{model_nickname}/{dataset_name.lower()}/{example_index}.csv"
@@ -96,9 +91,8 @@ def main(
             .sum()
             .sort_values(ascending=False)
             .index.values
-        )  # (O,)
-        timestamps = sorted(outcome_df.t.unique())  # (T,)
-        probe_data["t"].append(timestamps)
+        )
+        timestamps = sorted(outcome_df.t.unique())
 
         # a. get activations
         if dataset_name == "gpqa":
@@ -112,8 +106,6 @@ def main(
         activations = get_activations(
             model, {"input_ids": full_token_ids}, layer=layer
         )  # (tokens, hidden dim)
-        activations_per_t = activations[timestamps]  # (T, hidden dim)
-        probe_data["activation"].append(activations_per_t)
 
         # b. compute entropy
         distribution = []
@@ -135,17 +127,32 @@ def main(
 
         d = Categorical(probs=torch.tensor(distribution))
         entropy = d.entropy()
-        probe_data["entropy"].append(entropy)
 
         # c. compute binary labels: 0 if entropy=0, 1 if entropy>0
         binary_labels = (entropy > min_entropy + 1e-6).float()
-        probe_data["label"].append(binary_labels)
+
+        # Store each (activation, label, entropy, question_id, timestamp) tuple
+        for idx, t in enumerate(timestamps):
+            all_data.append(
+                {
+                    "activation": activations[t],  # (hidden_dim,)
+                    "label": binary_labels[idx].item(),
+                    "entropy": entropy[idx].item(),
+                    "question_id": question_id,
+                    "timestamp": t,
+                }
+            )
 
     del model  # done with model once activations are collected!
     clear_cuda()
 
-    # 2. create train-test split
-    # - hold out questions from dataset
+    # Get unique timestamps across all questions
+    unique_timestamps = sorted(set(d["timestamp"] for d in all_data))
+    num_unique_timestamps = len(unique_timestamps)
+    print(f"Total data points: {len(all_data)}")
+    print(f"Unique timestamps: {num_unique_timestamps}")
+
+    # 2. create train-test split based on timestamps
     results = {
         "hyperparameters": {
             "probe_class": probe_class,
@@ -158,6 +165,7 @@ def main(
             "num_layers": num_layers,
             "loss_type": "bce",
             "single_test_set": single_test_set,
+            "split_by": "timestamp",  # New: indicate split strategy
         },
         "metrics": {
             "train_loss": [],
@@ -169,61 +177,45 @@ def main(
     }
 
     split_size = (
-        int(len(probe_data["label"]) * test_split) if test_split < 1 else int(test_split)
+        int(num_unique_timestamps * test_split) if test_split < 1 else int(test_split)
     )
-
-    num_questions = len(probe_data["label"])
+    split_size = max(1, split_size)  # Ensure at least 1 timestamp in test set
 
     if single_test_set:
-        # Randomly sample test indices once
+        # Randomly sample test timestamps once
         torch.manual_seed(seed)
-        all_indices = torch.randperm(num_questions).tolist()
-        test_indices = set(all_indices[:split_size])
-        split_ranges = [(test_indices, None)]  # Single split with random test indices
+        perm = torch.randperm(num_unique_timestamps).tolist()
+        test_timestamp_indices = set(perm[:split_size])
+        test_timestamps = set(unique_timestamps[i] for i in test_timestamp_indices)
+        split_ranges = [(test_timestamps, "random")]
     else:
-        # K-fold: rotate through all questions as test sets
-        split_ranges = [
-            (
-                set(range(split_index, min(split_index + split_size, num_questions))),
-                split_index,
+        # K-fold: rotate through timestamps as test sets
+        split_ranges = []
+        for split_index in range(0, num_unique_timestamps, split_size):
+            test_timestamp_indices = range(
+                split_index, min(split_index + split_size, num_unique_timestamps)
             )
-            for split_index in range(0, num_questions, split_size)
-        ]
+            test_timestamps = set(unique_timestamps[i] for i in test_timestamp_indices)
+            split_ranges.append((test_timestamps, split_index))
 
-    for test_indices, split_index in split_ranges:
-        activations, labels, entropy = (
-            probe_data["activation"],
-            probe_data["label"],
-            probe_data["entropy"],
+    for test_timestamps, split_index in split_ranges:
+        # Split data based on timestamps
+        train_data = [d for d in all_data if d["timestamp"] not in test_timestamps]
+        test_data = [d for d in all_data if d["timestamp"] in test_timestamps]
+
+        activations_train = torch.stack([d["activation"] for d in train_data])
+        activations_test = torch.stack([d["activation"] for d in test_data])
+        labels_train = torch.tensor(
+            [d["label"] for d in train_data], dtype=activations_train.dtype
+        )
+        labels_test = torch.tensor(
+            [d["label"] for d in test_data], dtype=activations_test.dtype
         )
 
-        # Split based on test indices
-        activations_test = [
-            activations[i] for i in range(num_questions) if i in test_indices
-        ]
-        labels_test = [labels[i] for i in range(num_questions) if i in test_indices]
-        entropy_test = [entropy[i] for i in range(num_questions) if i in test_indices]
-        activations_train = [
-            activations[i] for i in range(num_questions) if i not in test_indices
-        ]
-        labels_train = [labels[i] for i in range(num_questions) if i not in test_indices]
-        entropy_train = [
-            entropy[i] for i in range(num_questions) if i not in test_indices
-        ]
-
-        # Keep track of which question IDs are in the test set (in order)
-        test_question_ids = [i for i in range(num_questions) if i in test_indices]
-
-        activations_train = torch.cat(
-            activations_train
-        )  # (T * num_questions, hidden dim)
-        activations_test = torch.cat(activations_test)  # (T * num_questions, hidden dim)
-        labels_train = torch.cat(labels_train).to(
-            activations_train.dtype
-        )  # (T * num_questions,)
-        labels_test = torch.cat(labels_test).to(
-            activations_test.dtype
-        )  # (T * num_questions,)
+        print(f"\n--- Split {split_index} ---")
+        print(
+            f"Test timestamps: {sorted(test_timestamps)[:10]}{'...' if len(test_timestamps) > 10 else ''}"
+        )
         print("Train inputs:", activations_train.dtype, activations_train.shape)
         print("Train labels:", labels_train.dtype, labels_train.shape)
         print(
@@ -271,13 +263,13 @@ def main(
             device="cuda",
             early_stopping=early_stopping,
             patience=patience,
-            loss_type="bce",  # Binary cross-entropy for classification
+            loss_type="bce",
             learning_rate=learning_rate,
             **probe_kwargs,
         )
         probe.fit(activations_train, labels_train)
 
-        # 4. evaluate probe on test questions
+        # 4. evaluate probe on test timestamps
         train_loss = probe.score(activations_train, labels_train)
         test_loss = probe.score(activations_test, labels_test)
 
@@ -312,37 +304,30 @@ def main(
             f"Split {split_name}: Train Acc={train_accuracy:.4f}, Test Acc={test_accuracy:.4f}"
         )
 
-        # 5. save probe results
-        pred_probs = test_pred_probs.cpu()  # (T * num_questions,)
+        # 5. save predictions for test data points
+        pred_probs = test_pred_probs.cpu()
         pred_labels = test_pred_labels.cpu()
-        t_index = 0
-        for question_id in test_question_ids:
-            ts = probe_data["t"][question_id]
-            true_entropy = probe_data["entropy"][question_id]
-            true_labels = probe_data["label"][question_id]
-            pred_probs_for_q = pred_probs[t_index : t_index + len(ts)]
-            pred_labels_for_q = pred_labels[t_index : t_index + len(ts)]
-            t_index += len(ts)  # offset by # of timestamps in each question
-            assert len(true_labels) == len(ts) and len(true_labels) == len(
-                pred_labels_for_q
-            ), f"Ts, true labels and pred labels must be same length: {len(ts)}, {len(true_labels)}, {len(pred_labels_for_q)}"
+
+        for i, d in enumerate(test_data):
             results["predictions"].append(
                 {
-                    "question_id": int(question_id),
-                    "t": [int(t) for t in ts],
-                    "true_entropy": [float(e) for e in true_entropy],
-                    "true_label": [int(l) for l in true_labels],
-                    "pred_prob": [float(p) for p in pred_probs_for_q],
-                    "pred_label": [int(l) for l in pred_labels_for_q],
+                    "question_id": d["question_id"],
+                    "timestamp": d["timestamp"],
+                    "true_entropy": d["entropy"],
+                    "true_label": int(d["label"]),
+                    "pred_prob": float(pred_probs[i]),
+                    "pred_label": int(pred_labels[i]),
                 }
             )
 
-    os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}", exist_ok=True)
-    with open(
-        f"{probe_folder}/{model_nickname}/{dataset_name.lower()}/results-classifier-{probe_class}-layer{layer}-epochs{epochs}.json",
-        "w+",
-    ) as f:
-        json.dump(results, f, indent=2)
+    # os.makedirs(f"{probe_folder}/{model_nickname}/{dataset_name.lower()}", exist_ok=True)
+    # output_filename = f"results-classifier-timestamp-{probe_class}-layer{layer}-epochs{epochs}.json"
+    # with open(
+    #     f"{probe_folder}/{model_nickname}/{dataset_name.lower()}/{output_filename}",
+    #     "w+",
+    # ) as f:
+    #     json.dump(results, f, indent=2)
+    # print(f"\nSaved results to {probe_folder}/{model_nickname}/{dataset_name.lower()}/{output_filename}")
 
 
 if __name__ == "__main__":

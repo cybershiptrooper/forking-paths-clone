@@ -1,6 +1,6 @@
 import os
 import json
-from typing import List
+from typing import List, Optional
 from datasets import load_dataset, concatenate_datasets, Dataset
 from transformers import PreTrainedTokenizer
 from vllm import LLM, SamplingParams
@@ -214,7 +214,7 @@ def sort_by_uncertainty(
             aggregated_result['alternate_texts'] = [alt['output_text'] for alt in alternate_paths]
 
         aggregated_results.append(aggregated_result)
-    
+
     def uncertainty_score(datapoint):
         """Very ad hoc uncertainty/entropy score, where we want to ignore answers that went over the max token limit"""
         score = 0
@@ -229,21 +229,24 @@ def sort_by_uncertainty(
     aggregated_results.sort(key=uncertainty_score)
 
     return aggregated_results
-    
+
+
 def main(
-    model_name : str,
-    dataset_names : str,
+    model_name: str,
+    dataset_names: str,
     # data selection parameters
-    num_examples : int = 100, 
-    shuffle : bool = True,
+    num_examples: int = 100,
+    shuffle: bool = True,
     # generation parameters
-    num_paths : int = 10,
-    max_new_tokens : int = 10000,
-    temperature : float = 0.7,
-    return_logprobs : bool = True,
+    num_paths: int = 10,
+    max_new_tokens: int = 10000,
+    temperature: float = 0.7,
+    return_logprobs: bool = True,
+    enable_prefix_caching: bool = True,
+    quantization: Optional[str] = None,
     # output parameters
-    return_alternate_texts : bool = True,
-    seed : int = 42
+    return_alternate_texts: bool = True,
+    seed: int = 42,
 ):
     set_seed(seed) # just in case
 
@@ -264,10 +267,15 @@ def main(
     for dataset_name in dataset_names.split(','):
         print(f"Generating base paths for {dataset_name}...")
         # not great, but re-load base / answer LLM for each dataset separately
-        base_llm = LLM(model=model_name, dtype="bfloat16")
+        base_llm = LLM(
+            model=model_name,
+            dtype="auto",
+            enable_prefix_caching=enable_prefix_caching,
+            quantization=quantization,
+        )
 
         dataset = load_data(base_llm.get_tokenizer(), datasets_metadata[dataset_name], n=num_examples, shuffle=shuffle)
-        
+
         base_paths = generate_base_paths(base_llm, dataset, max_new_tokens=max_new_tokens, return_logprobs=return_logprobs)
         alternate_paths = generate_alternate_paths(base_llm, dataset, max_new_tokens=max_new_tokens, num_paths=num_paths, temperature=temperature)
 
@@ -276,7 +284,7 @@ def main(
         clear_cuda()
 
         answer_llm = LLM(model=answer_model_name, dtype="bfloat16")
-        
+
         parse_results = parse_answer(
             answer_llm,
             base_paths + alternate_paths # preserve metadata
@@ -299,6 +307,7 @@ def main(
         del answer_llm
         clear_cuda()
 
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
@@ -312,6 +321,16 @@ if __name__ == "__main__":
     parser.add_argument("--return_logprobs", action='store_true', help="Return log probabilities for base paths")
     parser.add_argument("--return_alternate_texts", action='store_true', help="Return texts of randomly sampled alternative paths")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
+    parser.add_argument(
+        "--enable_prefix_caching", action="store_true", help="Enable prefix caching"
+    )
+    parser.add_argument(
+        "--quantization",
+        type=str,
+        default=None,
+        choices=["awq", "gptq", "squeezellm", "fp8"],
+        help="Quantization method",
+    )
     args = parser.parse_args()
 
     main(**vars(args))

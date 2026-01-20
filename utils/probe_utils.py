@@ -102,8 +102,8 @@ class LinearProbe(Probe):
     def __init__(self, input_size : int, output_size : int, **probe_kwargs):
         super(LinearProbe, self).__init__(**probe_kwargs)
         self.linear = torch.nn.Linear(input_size, output_size)
+        self.to(probe_kwargs["device"])
 
-    
     def forward(self, x):
         return self.linear(x)
 
@@ -121,6 +121,7 @@ class MLPProbe(Probe):
             ]
         modules += [torch.nn.Linear(hidden_size, output_size)]
         self.model = torch.nn.ModuleList(modules)
+        self.to(probe_kwargs["device"])
 
     def forward(self, x):
         for module in self.model:

@@ -3,7 +3,7 @@ probe=$2
 
 for layer in 12
 do
-    uv run python probing_classifier.py \
+    uv run python probe_sanity_check.py \
         --model_name deepseek-ai/DeepSeek-R1-Distill-Llama-8B \
         --dataset_name $name \
         --probe_class $probe \

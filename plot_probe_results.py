@@ -288,10 +288,15 @@ if __name__ == "__main__":
         description="Plot probe results from probing experiments"
     )
     parser.add_argument(
-        "--results_path", type=str, required=True, help="Path to the results JSON file"
+        "--results_path",
+        "-r",
+        type=str,
+        required=True,
+        help="Path to the results JSON file",
     )
     parser.add_argument(
         "--output_dir",
+        "-o",
         type=str,
         default=None,
         help="Directory to save plots (defaults to plots/ in same folder as results)",

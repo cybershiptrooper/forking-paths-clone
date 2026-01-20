@@ -14,5 +14,9 @@ wheels/
 
 data/collection
 data/forking_paths
-data/thought_anchors
+*thought_anchors*
 playground.ipynb
+
+plots
+thought_anchors
+*rollouts*
