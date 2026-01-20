@@ -18,6 +18,7 @@ import os
 import re
 from typing import List, Optional
 
+import matplotlib.pyplot as plt
 import pandas as pd
 from transformers import AutoTokenizer
 from vllm import LLM, SamplingParams
@@ -389,6 +390,49 @@ def main(
     # Save results
     df_results.to_csv(output_path, index=False)
     print(f"\nSaved results to {output_path}")
+
+    # Create scatter plot: forced answer probability vs distance from think end
+    if len(df_results) > 0:
+        # Calculate max forced probability for each sample
+        df_results["max_forced_prob"] = df_results[
+            ["forced_prob_A", "forced_prob_B", "forced_prob_C", "forced_prob_D"]
+        ].max(axis=1)
+
+        # Create scatter plot
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        # Color by correctness
+        correct_mask = df_results["forced_answer"] == df_results["correct_answer"]
+
+        ax.scatter(
+            df_results.loc[correct_mask, "dist_from_think_end"],
+            df_results.loc[correct_mask, "max_forced_prob"],
+            alpha=0.6,
+            label="Correct",
+            color="green",
+            s=50,
+        )
+        ax.scatter(
+            df_results.loc[~correct_mask, "dist_from_think_end"],
+            df_results.loc[~correct_mask, "max_forced_prob"],
+            alpha=0.6,
+            label="Incorrect",
+            color="red",
+            s=50,
+        )
+
+        ax.set_xlabel("Distance from Think End (tokens)", fontsize=12)
+        ax.set_ylabel("Max Forced Answer Probability", fontsize=12)
+        ax.set_title("Forced Answer Probability vs Distance from Think End", fontsize=14)
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+        # Save plot
+        plot_path = output_path.replace(".csv", "_scatter_plot.png")
+        plt.tight_layout()
+        plt.savefig(plot_path, dpi=150, bbox_inches="tight")
+        print(f"Saved scatter plot to {plot_path}")
+        plt.close()
 
     return df_results
 

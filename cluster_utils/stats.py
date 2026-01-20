@@ -37,6 +37,87 @@ class TrajectoryStatistics:
                     all_trajectories.append(value)
         return all_trajectories
 
+    def _get_trajectories_for_fork_point(
+        self, fork_point: str
+    ) -> list[list[tuple[float, int, str]]]:
+        """Get trajectories for a specific fork point."""
+        if fork_point not in self.fork_points:
+            return []
+
+        fork_data = self.fork_points[fork_point]
+        trajectories = []
+        for key, value in fork_data.items():
+            if key.startswith("trajectory_"):
+                trajectories.append(value)
+        return trajectories
+
+    def graph_width_over_time_for_fork(
+        self, fork_point: str, num_bins: int = 20
+    ) -> dict[float, int]:
+        """
+        Compute number of unique clusters at each normalized time bin for a specific fork point.
+
+        Args:
+            fork_point: Fork point key (string of character position)
+            num_bins: Number of time bins
+
+        Returns:
+            {t_norm_bin: num_unique_clusters, ...}
+        """
+        bin_edges = np.linspace(0, 1, num_bins + 1)
+        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+        bin_clusters: dict[int, set[int]] = {i: set() for i in range(num_bins)}
+
+        trajectories = self._get_trajectories_for_fork_point(fork_point)
+
+        for trajectory in trajectories:
+            for t_norm, cluster_id, _ in trajectory:
+                bin_idx = min(int(t_norm * num_bins), num_bins - 1)
+                bin_clusters[bin_idx].add(cluster_id)
+
+        return {float(bin_centers[i]): len(bin_clusters[i]) for i in range(num_bins)}
+
+    def trajectory_entropy_over_time_for_fork(
+        self, fork_point: str, num_bins: int = 20
+    ) -> dict[float, float]:
+        """
+        Compute entropy of cluster distribution at each time bin for a specific fork point.
+
+        Args:
+            fork_point: Fork point key (string of character position)
+            num_bins: Number of time bins
+
+        Returns:
+            {t_norm_bin: entropy, ...}
+        """
+        bin_edges = np.linspace(0, 1, num_bins + 1)
+        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+        bin_cluster_counts: dict[int, dict[int, int]] = {
+            i: defaultdict(int) for i in range(num_bins)
+        }
+
+        trajectories = self._get_trajectories_for_fork_point(fork_point)
+
+        for trajectory in trajectories:
+            for t_norm, cluster_id, _ in trajectory:
+                bin_idx = min(int(t_norm * num_bins), num_bins - 1)
+                bin_cluster_counts[bin_idx][cluster_id] += 1
+
+        result = {}
+        for i in range(num_bins):
+            counts = list(bin_cluster_counts[i].values())
+            if counts:
+                total = sum(counts)
+                probs = [c / total for c in counts]
+                entropy = -sum(p * np.log2(p) for p in probs if p > 0)
+            else:
+                entropy = 0.0
+            result[float(bin_centers[i])] = entropy
+
+        return result
+
     def graph_width_over_time(self, num_bins: int = 20) -> dict[float, int]:
         """
         Compute number of unique clusters at each normalized time bin.

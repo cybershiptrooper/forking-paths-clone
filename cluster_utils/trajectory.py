@@ -1,13 +1,12 @@
 """Trajectory building from forking paths data."""
 
-import sys
+import matplotlib.pyplot as plt
 from dataclasses import dataclass, field
 from typing import Optional
 
 import numpy as np
 
 # Import from parent directory
-sys.path.insert(0, "..")
 from utils.cot_analysis import split_into_sentences
 
 from .clustering import BaseClusteringEngine
@@ -102,6 +101,17 @@ class TrajectoryBuilder:
         self._all_embeddings: Optional[np.ndarray] = None
         self._sentence_to_cluster: dict[str, int] = {}
 
+    def print_sentence_stats(self, unique_sentences: list[str]):
+        min_sent = min(unique_sentences, key=len)
+        print(f"Minimum sentence length: {len(min_sent)}, Sentence: '{min_sent}'")
+        max_sent = max(unique_sentences, key=len)
+        print(f"Maximum sentence length: {len(max_sent)}")
+        mean_sent = np.mean([len(sent) for sent in unique_sentences])
+        print(f"Mean sentence length: {mean_sent}")
+        plt.hist([len(sent) for sent in unique_sentences], bins=100)
+        plt.savefig("sentence_length_distribution.png")
+        plt.close()
+
     def build_for_prompt(self, loader: ForkingPathsLoader) -> dict:
         """
         Build all trajectories for a single prompt.
@@ -128,13 +138,22 @@ class TrajectoryBuilder:
         rollouts_by_fork = loader.get_rollouts_by_fork_point()
 
         # Step 1: Collect all unique sentences from base and all rollouts
+        print(f"Collecting {len(rollouts_by_fork)} rollouts")
         all_sentences = self._collect_all_sentences(base_text, rollouts_by_fork)
 
         # Step 2: Embed all sentences
         unique_sentences = list(set(all_sentences))
+        print(
+            f"Found {len(unique_sentences)} unique sentences out of {len(all_sentences)} total sentences"
+        )
+        self.print_sentence_stats(unique_sentences)
+        print(
+            f"Found {len(unique_sentences)} unique sentences out of {len(all_sentences)} total sentences"
+        )
         embeddings = self.embedding_model.embed(unique_sentences)
 
         # Step 3: Cluster embeddings
+        print(f"Clustering {len(embeddings)} embeddings")
         labels = self.clustering_engine.fit_predict(embeddings)
 
         # Build sentence -> cluster mapping

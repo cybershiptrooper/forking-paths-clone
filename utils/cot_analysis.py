@@ -113,7 +113,7 @@ def make_stats(
     return stats
 
 
-def split_into_sentences(text: str) -> list[str]:
+def split_into_sentences(text: str, min_sentence_length: int = 50) -> list[str]:
     """
     Split text into sentences based on periods, question marks, exclamation marks, and newlines.
     Multiple consecutive newlines are treated as a single separator.
@@ -138,22 +138,19 @@ def split_into_sentences(text: str) -> list[str]:
         char = text[i]
 
         # Check for sentence-ending punctuation or <think> tag
-        if char in ".!?" or (
-            text[i : i + 7] == "<think>"
-        ) or (
-            text[i : i + 8] == "</think>"
+        if (
+            char in ".!?"
+            or (text[i : i + 7] == "<think>")
+            or (text[i : i + 8] == "</think>")
         ):
-            think_tag = None
             tag_len = 0
             if char in ".!?":
                 current_sentence += char
                 tag_len = 1
             elif text[i : i + 7] == "<think>":
-                think_tag = "<think>"
                 tag_len = 7
                 current_sentence += "<think>"
             elif text[i : i + 8] == "</think>":
-                think_tag = "</think>"
                 tag_len = 8
                 current_sentence += "</think>"
 
@@ -163,7 +160,10 @@ def split_into_sentences(text: str) -> list[str]:
                 next_idx >= len(text)
                 or text[next_idx] in " \n"
             ):
-                if current_sentence.strip():
+                if (
+                    current_sentence.strip()
+                    and len(current_sentence.strip()) >= min_sentence_length
+                ):
                     sentences.append(current_sentence.strip())
                 current_sentence = ""
                 # Skip the whitespace after punctuation or tag
@@ -172,7 +172,10 @@ def split_into_sentences(text: str) -> list[str]:
             i += tag_len
         # Check for newline (sentence separator)
         elif char == "\n":
-            if current_sentence.strip():
+            if (
+                current_sentence.strip()
+                and len(current_sentence.strip()) >= min_sentence_length
+            ):
                 sentences.append(current_sentence.strip())
             current_sentence = ""
             i += 1
@@ -181,7 +184,7 @@ def split_into_sentences(text: str) -> list[str]:
             i += 1
 
     # Add any remaining text as a sentence
-    if current_sentence.strip():
+    if current_sentence.strip() and len(current_sentence.strip()) >= min_sentence_length:
         sentences.append(current_sentence.strip())
 
     # Filter out empty sentences

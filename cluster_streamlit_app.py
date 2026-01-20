@@ -58,6 +58,10 @@ available_datasets = sorted(
     [d for d in os.listdir(model_dir) if os.path.isdir(os.path.join(model_dir, d))]
 )
 
+if not available_datasets:
+    st.error(f"No datasets found for model `{model_name}`.")
+    st.stop()
+
 with col2:
     dataset_name = st.selectbox("Select Dataset:", available_datasets, index=0)
 
@@ -66,6 +70,10 @@ dataset_dir = os.path.join(model_dir, dataset_name)
 available_examples = sorted(
     [f.replace(".json", "") for f in os.listdir(dataset_dir) if f.endswith(".json")]
 )
+
+if not available_examples:
+    st.error(f"No examples found for dataset `{dataset_name}`.")
+    st.stop()
 
 with col3:
     example_id = st.selectbox("Select Example:", available_examples, index=0)
@@ -129,103 +137,131 @@ if base_data:
                 st.sidebar.write(f"**Correct:** {'✅' if is_correct else '❌'}")
 
 # Main visualization
-st.header("🔗 Trajectory Network Graph")
+st.header("🔗 Trajectory Paths by Fork Point")
 
-# Time slider
-max_t = st.slider(
-    "Maximum normalized time (t_norm):",
-    min_value=0.0,
-    max_value=1.0,
-    value=1.0,
-    step=0.05,
-    help="Filter trajectories to show only transitions up to this normalized time",
-)
-
-# Layout selection
-col_layout, col_width, col_height = st.columns(3)
-with col_layout:
-    layout = st.selectbox(
-        "Graph Layout:",
-        ["kamada_kawai", "spring", "circular", "shell"],
-        index=0,
-    )
-with col_width:
-    fig_width = st.number_input("Width:", value=900, min_value=400, max_value=1600)
-with col_height:
-    fig_height = st.number_input("Height:", value=600, min_value=300, max_value=1200)
-
-# Build and display graph
+# Build graph builder
 graph_builder = TrajectoryGraphBuilder(traj_data)
 
-if max_t < 1.0:
-    graph = graph_builder.filter_by_time(max_t)
+# Fork point selection for visualization
+fork_points_list = graph_builder.get_fork_points()
+base_length = metadata.get("base_length_chars", 1)
+
+if not fork_points_list:
+    st.warning("No fork points found in the data.")
 else:
-    graph = graph_builder.build_graph()
+    # Fork point slider
+    fork_options_viz = {
+        fp: f"t={fp} ({int(fp)/base_length:.1%})" for fp in fork_points_list
+    }
 
-fig = graph_builder.to_plotly_figure(
-    graph=graph,
-    layout=layout,
-    title=f"Trajectory Network (t ≤ {max_t:.2f})",
-    width=int(fig_width),
-    height=int(fig_height),
-)
+    selected_fork_viz = st.select_slider(
+        "Select Fork Point to Visualize:",
+        options=fork_points_list,
+        format_func=lambda x: fork_options_viz[x],
+        key="fork_viz_select",
+    )
 
-st.plotly_chart(fig, use_container_width=True)
+    max_t = st.slider(
+        "Maximum normalized time (t_norm):",
+        min_value=0.0,
+        max_value=1.0,
+        value=1.0,
+        step=0.05,
+        help="Filter trajectories to show only transitions up to this normalized time",
+    )
 
-# Graph metrics
-metrics = graph_builder.get_graph_metrics(graph)
-met_col1, met_col2, met_col3, met_col4 = st.columns(4)
-met_col1.metric("Nodes", metrics["num_nodes"])
-met_col2.metric("Edges", metrics["num_edges"])
-met_col3.metric("Density", f"{metrics['density']:.3f}")
-met_col4.metric("Avg Degree", f"{metrics['avg_degree']:.2f}")
+    # Layout and size options
+    col_layout, col_width, col_height = st.columns(3)
+    with col_layout:
+        layout = st.selectbox(
+            "Graph Layout:",
+            ["kamada_kawai", "spring", "circular", "shell"],
+            index=0,
+        )
+    with col_width:
+        fig_width = st.number_input("Width:", value=900, min_value=400, max_value=1600)
+    with col_height:
+        fig_height = st.number_input("Height:", value=600, min_value=300, max_value=1200)
 
-# Statistics plots
-st.header("📉 Statistics Over Time")
+    # Get trajectories for this fork point
+    trajectories_at_fork = graph_builder.get_trajectories_for_fork_point(
+        selected_fork_viz
+    )
+    st.info(
+        f"**{len(trajectories_at_fork)} trajectories** at fork point t={selected_fork_viz} ({int(selected_fork_viz)/base_length:.1%})"
+    )
 
-tab1, tab2 = st.tabs(["Graph Width", "Entropy"])
+    # Create visualization with colored paths
+    fig = graph_builder.to_plotly_figure_with_paths(
+        fork_point=selected_fork_viz,
+        layout=layout,
+        title=f"Trajectory Paths at Fork t={selected_fork_viz} ({int(selected_fork_viz)/base_length:.1%})",
+        width=int(fig_width),
+        height=int(fig_height),
+        max_t_norm=max_t,
+    )
 
-with tab1:
-    width_data = summary["graph_width"]
-    if width_data:
-        fig_width_plot = go.Figure()
-        fig_width_plot.add_trace(
-            go.Scatter(
-                x=list(width_data.keys()),
-                y=list(width_data.values()),
-                mode="lines+markers",
-                name="Graph Width",
-                line=dict(color="#97B3AE"),
+    st.plotly_chart(fig, width="stretch")
+
+    # Graph metrics for this fork point
+    graph = graph_builder.build_graph_for_fork_point(selected_fork_viz)
+    metrics = graph_builder.get_graph_metrics(graph)
+    met_col1, met_col2, met_col3, met_col4 = st.columns(4)
+    met_col1.metric("Clusters", metrics["num_nodes"])
+    met_col2.metric("Transitions", metrics["num_edges"])
+    met_col3.metric("Trajectories", len(trajectories_at_fork))
+    met_col4.metric("Density", f"{metrics['density']:.3f}")
+
+    # Statistics plots for this fork point
+    st.header("📉 Statistics Over Time (for selected fork point)")
+
+    tab1, tab2 = st.tabs(["Graph Width", "Entropy"])
+
+    with tab1:
+        width_data = stats.graph_width_over_time_for_fork(selected_fork_viz)
+        if width_data:
+            fig_width_plot = go.Figure()
+            fig_width_plot.add_trace(
+                go.Scatter(
+                    x=list(width_data.keys()),
+                    y=list(width_data.values()),
+                    mode="lines+markers",
+                    name="Graph Width",
+                    line=dict(color="#97B3AE"),
+                )
             )
-        )
-        fig_width_plot.update_layout(
-            title="Number of Unique Clusters Over Time",
-            xaxis_title="Normalized Time",
-            yaxis_title="Number of Clusters",
-            height=400,
-        )
-        st.plotly_chart(fig_width_plot, use_container_width=True)
-
-with tab2:
-    entropy_data = summary["entropy_over_time"]
-    if entropy_data:
-        fig_entropy = go.Figure()
-        fig_entropy.add_trace(
-            go.Scatter(
-                x=list(entropy_data.keys()),
-                y=list(entropy_data.values()),
-                mode="lines+markers",
-                name="Entropy",
-                line=dict(color="#F2C3B9"),
+            fig_width_plot.update_layout(
+                title=f"Number of Unique Clusters Over Time (Fork t={selected_fork_viz})",
+                xaxis_title="Normalized Time",
+                yaxis_title="Number of Clusters",
+                height=400,
             )
-        )
-        fig_entropy.update_layout(
-            title="Cluster Distribution Entropy Over Time",
-            xaxis_title="Normalized Time",
-            yaxis_title="Entropy (bits)",
-            height=400,
-        )
-        st.plotly_chart(fig_entropy, use_container_width=True)
+            st.plotly_chart(fig_width_plot, width="stretch")
+        else:
+            st.info("No data available for this fork point.")
+
+    with tab2:
+        entropy_data = stats.trajectory_entropy_over_time_for_fork(selected_fork_viz)
+        if entropy_data:
+            fig_entropy = go.Figure()
+            fig_entropy.add_trace(
+                go.Scatter(
+                    x=list(entropy_data.keys()),
+                    y=list(entropy_data.values()),
+                    mode="lines+markers",
+                    name="Entropy",
+                    line=dict(color="#F2C3B9"),
+                )
+            )
+            fig_entropy.update_layout(
+                title=f"Cluster Distribution Entropy Over Time (Fork t={selected_fork_viz})",
+                xaxis_title="Normalized Time",
+                yaxis_title="Entropy (bits)",
+                height=400,
+            )
+            st.plotly_chart(fig_entropy, width="stretch")
+        else:
+            st.info("No data available for this fork point.")
 
 # Cluster exploration
 st.header("🔍 Explore Clusters")
