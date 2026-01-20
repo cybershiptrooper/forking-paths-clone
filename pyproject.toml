@@ -7,11 +7,14 @@ requires-python = ">=3.12"
 dependencies = [
     "datasets>=4.2.0",
     "jupyter>=1.1.1",
+    "networkx>=3.0",
     "numpy<2",
     "plotly>=6.3.1",
     "rbeast>=0.1.23",
     "scikit-learn>=1.7.2",
+    "scipy>=1.11.0",
     "seaborn>=0.13.2",
+    "sentence-transformers>=2.2.0",
     "streamlit>=1.51.0",
     "vllm>=0.11.0",
 ]

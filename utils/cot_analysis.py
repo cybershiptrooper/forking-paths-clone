@@ -1,6 +1,7 @@
 import pandas as pd
 from typing import Tuple, Optional
 from transformers import AutoTokenizer
+import re
 
 
 def load_data(
@@ -110,3 +111,78 @@ def make_stats(
         del df
 
     return stats
+
+
+def split_into_sentences(text: str) -> list[str]:
+    """
+    Split text into sentences based on periods, question marks, exclamation marks, and newlines.
+    Multiple consecutive newlines are treated as a single separator.
+
+    Args:
+        text: The text to split into sentences
+
+    Returns:
+        List of sentences (non-empty strings)
+    """
+    if not text:
+        return []
+
+    # Normalize newlines: replace one or more newlines with a single newline
+    text = re.sub(r"\n+", "\n", text)
+
+    sentences = []
+    current_sentence = ""
+
+    i = 0
+    while i < len(text):
+        char = text[i]
+
+        # Check for sentence-ending punctuation or <think> tag
+        if char in ".!?" or (
+            text[i : i + 7] == "<think>"
+        ) or (
+            text[i : i + 8] == "</think>"
+        ):
+            think_tag = None
+            tag_len = 0
+            if char in ".!?":
+                current_sentence += char
+                tag_len = 1
+            elif text[i : i + 7] == "<think>":
+                think_tag = "<think>"
+                tag_len = 7
+                current_sentence += "<think>"
+            elif text[i : i + 8] == "</think>":
+                think_tag = "</think>"
+                tag_len = 8
+                current_sentence += "</think>"
+
+            # Check if this is followed by whitespace, newline, or end of string
+            next_idx = i + tag_len
+            if (
+                next_idx >= len(text)
+                or text[next_idx] in " \n"
+            ):
+                if current_sentence.strip():
+                    sentences.append(current_sentence.strip())
+                current_sentence = ""
+                # Skip the whitespace after punctuation or tag
+                if next_idx < len(text) and text[next_idx] == " ":
+                    i = next_idx  # skip the space
+            i += tag_len
+        # Check for newline (sentence separator)
+        elif char == "\n":
+            if current_sentence.strip():
+                sentences.append(current_sentence.strip())
+            current_sentence = ""
+            i += 1
+        else:
+            current_sentence += char
+            i += 1
+
+    # Add any remaining text as a sentence
+    if current_sentence.strip():
+        sentences.append(current_sentence.strip())
+
+    # Filter out empty sentences
+    return [s for s in sentences if s]
