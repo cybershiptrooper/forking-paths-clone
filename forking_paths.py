@@ -111,6 +111,8 @@ def main(
     num_branches : int = 30,
     max_new_tokens : int = 10000,
     temperature : float = 0.7,
+    enable_prefix_caching : bool = True,
+    quantization: Optional[str] = None,
     # control parameters
     seed : int = 42,
     # script paramaters
@@ -140,7 +142,7 @@ def main(
 
     if not only_parse_answers:
         # load LLM
-        base_llm = LLM(model=model_name, dtype="bfloat16")
+        base_llm = LLM(model=model_name, dtype="auto", enable_prefix_caching=enable_prefix_caching, quantization=quantization)
         # process dataset!
         for prompt_index in range(start_index, end_index):
             # skip if already processed
@@ -242,6 +244,9 @@ if __name__ == "__main__":
     parser.add_argument("--only_parse_answers", action='store_true', help="Only parse answers from existing forking paths data")
     parser.add_argument("--start_index", type=int, default=None, help="Start index for data processing (0 by default)")
     parser.add_argument("--end_index", type=int, default=None, help="End index for data processing (length of dataset by default)")
+    parser.add_argument("--enable_prefix_caching", action='store_true', help="Enable prefix caching")
+    parser.add_argument("--quantization", type=str, default=None, choices=["awq", "gptq", "squeezellm", "fp8"], help="Quantization method")
+
 
     args = parser.parse_args()
     main(**vars(args))
