@@ -1,3 +1,5 @@
+"""Probing for entropy of outcome probabilities."""
+
 import argparse
 import datetime
 import json
