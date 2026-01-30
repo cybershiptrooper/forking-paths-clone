@@ -22,7 +22,7 @@ def zero_diagonal(matrix: torch.Tensor) -> torch.Tensor:
     """
     result = matrix.clone()
     has_head_dim = result.dim() == 3
-    
+
     if has_head_dim:
         # (num_heads, seq_len, seq_len)
         num_heads, seq_len, _ = result.shape
@@ -31,7 +31,47 @@ def zero_diagonal(matrix: torch.Tensor) -> torch.Tensor:
     else:
         # (seq_len, seq_len)
         result.fill_diagonal_(0)
-    
+
+    return result
+
+
+def apply_gap_filter(matrix: torch.Tensor, gap: int) -> torch.Tensor:
+    """
+    Filter attention matrix to only include pairs that are at least 'gap' positions apart.
+
+    Only considers attention from position i to position j where |i - j| >= gap.
+    This is useful for analyzing long-range attention patterns.
+
+    Args:
+        matrix: Attention matrix with shape (seq_len, seq_len) or
+            (num_heads, seq_len, seq_len)
+        gap: Minimum distance between positions (e.g., gap=4 means only pairs 4+ apart)
+
+    Returns:
+        Matrix with entries zeroed out where |i - j| < gap (same shape as input)
+    """
+    result = matrix.clone()
+    has_head_dim = result.dim() == 3
+
+    if has_head_dim:
+        num_heads, seq_len, _ = result.shape
+    else:
+        seq_len = result.shape[0]
+        result = result.unsqueeze(0)  # Add head dim temporarily
+        num_heads = 1
+
+    # Create mask: True where |i - j| >= gap, False otherwise
+    i_indices = torch.arange(seq_len).unsqueeze(1)  # (seq_len, 1)
+    j_indices = torch.arange(seq_len).unsqueeze(0)  # (1, seq_len)
+    gap_mask = torch.abs(i_indices - j_indices) >= gap  # (seq_len, seq_len)
+
+    # Apply mask to each head
+    for h in range(num_heads):
+        result[h] = result[h] * gap_mask
+
+    if not has_head_dim:
+        result = result.squeeze(0)
+
     return result
 
 
