@@ -19,6 +19,7 @@ from utils.attention_analysis import (
     compute_vertical_scores,
     get_top_kurtosis_heads,
     get_top_k_sentences_per_head,
+    zero_diagonal,
 )
 from utils.cot_analysis import (
     get_convergence_for_index,
@@ -136,6 +137,9 @@ def main(
     print("Aggregating attention by sentences...")
     sentence_attention = aggregate_attention_by_sentences(attention, sentences, aggregation='mean')
     print(f"Sentence attention shape: {sentence_attention.shape}")  # (num_heads, num_sentences, num_sentences)
+    
+    # Zero out diagonal (self-attention of sentences to themselves)
+    sentence_attention = zero_diagonal(sentence_attention)
     
     # Compute vertical scores at sentence level
     sentence_vertical_scores = compute_vertical_scores(sentence_attention)  # (num_heads, num_sentences)

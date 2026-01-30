@@ -7,6 +7,34 @@ from scipy import stats
 from utils.utils import Sentence
 
 
+def zero_diagonal(matrix: torch.Tensor) -> torch.Tensor:
+    """
+    Zero out the diagonal of an attention matrix.
+    
+    Useful for excluding self-attention (sentence attending to itself) from analysis.
+    
+    Args:
+        matrix: Attention matrix with shape (seq_len, seq_len) or 
+            (num_heads, seq_len, seq_len)
+            
+    Returns:
+        Matrix with diagonal set to zero (same shape as input)
+    """
+    result = matrix.clone()
+    has_head_dim = result.dim() == 3
+    
+    if has_head_dim:
+        # (num_heads, seq_len, seq_len)
+        num_heads, seq_len, _ = result.shape
+        for h in range(num_heads):
+            result[h].fill_diagonal_(0)
+    else:
+        # (seq_len, seq_len)
+        result.fill_diagonal_(0)
+    
+    return result
+
+
 def aggregate_attention_by_sentences(
     attention_matrix: torch.Tensor,
     sentences: List[Sentence],
