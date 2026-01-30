@@ -52,6 +52,7 @@ def main(
     output_dir: str = "results/attention_viz",
     streamlit_folder: str = "data/streamlit",
     dataset_name: str = "gpqa",
+    include_first_sentence: bool = False,
 ):
     """
     Main function to visualize attention patterns.
@@ -66,12 +67,14 @@ def main(
         output_dir: Directory to save outputs
         streamlit_folder: Path to streamlit data folder
         dataset_name: Name of dataset (e.g., 'gpqa')
+        exclude_first_sentence: If True, exclude the first sentence from analysis (useful to skip prompt)
     """
     print(f"Loading model: {model_name}")
     model = AutoModelForCausalLM.from_pretrained(
         model_name, 
         device_map="cuda", 
-        torch_dtype=torch.bfloat16
+        torch_dtype=torch.bfloat16,
+        attn_implementation="eager"  # Required to get attention weights (flash attention doesn't return them)
     )
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model_nickname = MODEL_METADATA[model_name]['nickname']
@@ -108,6 +111,14 @@ def main(
     print("Splitting tokens into sentences...")
     sentences = split_tokens_into_sentences(full_token_ids.squeeze(), tokenizer, min_sentence_length=10)
     print(f"Found {len(sentences)} sentences")
+    
+    # Optionally exclude first sentence (e.g., to skip prompt/system message)
+    sentence_offset = 0
+    if not include_first_sentence and len(sentences) > 1:
+        print("Excluding first sentence from analysis")
+        sentences = sentences[1:]
+        sentence_offset = 1
+        print(f"Analyzing {len(sentences)} sentences (after exclusion)")
     
     # Find which sentence contains convergence token
     convergence_sentence_idx = None
@@ -186,6 +197,8 @@ def main(
         "example_index": example_index,
         "layer": layer,
         "num_sentences": len(sentences),
+        "include_first_sentence": include_first_sentence,
+        "sentence_offset": sentence_offset,
         "convergence_token_idx": convergence_token_idx,
         "convergence_sentence_idx": convergence_sentence_idx,
         "convergence_outcome": convergence_outcome,
@@ -201,7 +214,7 @@ def main(
             if h in [x[0] for x in top_heads_kurtosis]  # Only save for top heads
         },
         "sentences": [
-            {"start": s.start, "end": s.end} for s in sentences
+            {"idx": i, "start": s.start, "end": s.end} for i, s in enumerate(sentences)
         ]
     }
     
@@ -226,6 +239,8 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", type=str, default="results/attention_viz")
     parser.add_argument("--streamlit_folder", type=str, default="data/streamlit")
     parser.add_argument("--dataset_name", type=str, default="gpqa")
+    parser.add_argument("--include_first_sentence", action="store_true",
+                        help="Include first sentence in analysis (useful to include prompt)")
     
     args = parser.parse_args()
     main(**vars(args))

@@ -154,6 +154,18 @@ def get_attention_patterns(
     with torch.no_grad():
         outputs = model(**X, output_attentions=True)
     
+    # Check if attentions were actually returned
+    assert outputs.attentions is not None, (
+        "Model did not return attention weights. This usually happens when using "
+        "Flash Attention. Load the model with attn_implementation='eager' to get attention patterns."
+    )
+    
+    # Check layer index is valid
+    num_layers = len(outputs.attentions)
+    assert layer < num_layers, (
+        f"Layer {layer} out of range. Model has {num_layers} layers (valid indices: 0-{num_layers - 1})."
+    )
+    
     # outputs.attentions is a tuple of tensors, one per layer
     # Each tensor has shape (batch_size, num_heads, seq_len, seq_len)
     attention = outputs.attentions[layer]  # (batch_size, num_heads, seq_len, seq_len)
