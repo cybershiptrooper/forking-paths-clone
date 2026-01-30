@@ -1,7 +1,10 @@
 import pandas as pd
-from typing import Tuple, Optional
-from transformers import AutoTokenizer
+from typing import List, Tuple, Optional
+from transformers import AutoTokenizer, PreTrainedTokenizer
 import re
+import torch
+
+from utils.utils import SENTENCE_DELIMITERS, Sentence
 
 
 def load_data(
@@ -139,12 +142,12 @@ def split_into_sentences(text: str, min_sentence_length: int = 50) -> list[str]:
 
         # Check for sentence-ending punctuation or <think> tag
         if (
-            char in ".!?"
+            char in SENTENCE_DELIMITERS
             or (text[i : i + 7] == "<think>")
             or (text[i : i + 8] == "</think>")
         ):
             tag_len = 0
-            if char in ".!?":
+            if char in SENTENCE_DELIMITERS:
                 current_sentence += char
                 tag_len = 1
             elif text[i : i + 7] == "<think>":
@@ -189,3 +192,86 @@ def split_into_sentences(text: str, min_sentence_length: int = 50) -> list[str]:
 
     # Filter out empty sentences
     return [s for s in sentences if s]
+
+
+def split_tokens_into_sentences(
+    token_ids: torch.Tensor,
+    tokenizer: PreTrainedTokenizer,
+    min_sentence_length: int = 10
+) -> List[Sentence]:
+    """
+    Split a token sequence into sentences based on SENTENCE_DELIMITERS.
+    
+    A sentence boundary is detected when a token's decoded string contains
+    any of the delimiters (., !, ?, newline).
+    
+    Args:
+        token_ids: 1D tensor of token IDs
+        tokenizer: The tokenizer used to decode tokens
+        min_sentence_length: Minimum number of tokens per sentence (default: 10)
+        
+    Returns:
+        List of Sentence namedtuples with (start, end) token indices (inclusive)
+        Example: [Sentence(start=0, end=31), Sentence(start=32, end=56), ...]
+    """
+    if token_ids.dim() > 1:
+        token_ids = token_ids.squeeze()
+    
+    token_ids_list = token_ids.tolist()
+    tokens = tokenizer.convert_ids_to_tokens(token_ids_list)
+    
+    sentences = []
+    current_start = 0
+    
+    for i, token in enumerate(tokens):
+        # Decode the token to check for delimiters
+        # Some tokenizers use special prefixes like 'Ġ' for space, so decode properly
+        decoded_token = tokenizer.decode([token_ids_list[i]])
+        
+        # Check if any delimiter is in this token
+        has_delimiter = any(delim in decoded_token for delim in SENTENCE_DELIMITERS)
+        
+        # Also check for </think> tag which may span tokens
+        is_think_end = "</think>" in decoded_token or token.lower() in ["</think>", "think>"]
+        
+        if has_delimiter or is_think_end:
+            # Check if we have enough tokens for a sentence
+            sentence_length = i - current_start + 1
+            if sentence_length >= min_sentence_length:
+                sentences.append(Sentence(start=current_start, end=i))
+                current_start = i + 1
+    
+    # Handle remaining tokens as the last sentence
+    if current_start < len(tokens):
+        remaining_length = len(tokens) - current_start
+        if remaining_length >= min_sentence_length:
+            sentences.append(Sentence(start=current_start, end=len(tokens) - 1))
+        elif sentences:
+            # Merge with previous sentence if too short
+            prev = sentences.pop()
+            sentences.append(Sentence(start=prev.start, end=len(tokens) - 1))
+        else:
+            # Only one short sentence - keep it anyway
+            sentences.append(Sentence(start=current_start, end=len(tokens) - 1))
+    
+    return sentences
+
+
+def get_sentence_for_token(
+    token_idx: int,
+    sentences: List[Sentence]
+) -> Optional[int]:
+    """
+    Find which sentence index contains the given token index.
+    
+    Args:
+        token_idx: The token index to search for
+        sentences: List of Sentence namedtuples from split_tokens_into_sentences
+        
+    Returns:
+        The sentence index (0-based) containing the token, or None if not found
+    """
+    for i, sentence in enumerate(sentences):
+        if sentence.start <= token_idx <= sentence.end:
+            return i
+    return None

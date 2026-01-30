@@ -2,6 +2,7 @@ import gc
 import random
 import numpy as np
 import torch
+from collections import namedtuple
 
 MODEL_METADATA = {
     # Deepseek
@@ -44,6 +45,11 @@ SENTENCE_DELIMITERS = [
     "?",
     "\n"
 ]
+
+# Sentence = (start_token_idx, end_token_idx)
+Sentence = namedtuple("Sentence", ["start", "end"])
+
+
 
 def set_seed(seed : int):
     random.seed(seed)
