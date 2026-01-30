@@ -4,7 +4,6 @@ from typing import List, Optional
 import torch
 from tqdm import trange
 from transformers import PreTrainedModel
-from utils.utils import get_attention_module
 
 def get_activations(
     model: PreTrainedModel,

@@ -1,6 +1,6 @@
 """Utilities for analyzing attention patterns from transformer models."""
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 import torch
 from scipy import stats
 
@@ -267,55 +267,68 @@ def get_top_k_sentences_per_head(
 
 def select_top_sentences_by_mean_score(
     top_sentences_per_head: Dict[str, List[Dict]],
-    k: int = 10
+    k: int = 10,
+    max_token_idx: Optional[int] = None,
+    clip_to_max: bool = True,
 ) -> List[Sentence]:
     """
     Select top K sentences by mean score across all heads.
-    
+
     Aggregates scores across all heads for each unique sentence (identified by
-    token_start and token_end), computes the mean score, and returns the top K
-    sentences sorted by mean score descending.
-    
+    token_start and token_end) and returns the top K sentences with highest
+    mean scores.
+
     Args:
         top_sentences_per_head: Dictionary mapping head indices (as strings) to
-            lists of sentence dicts. Each dict has keys:
-            - sentence_idx: Sentence index
-            - score: Vertical attention score for this sentence
-            - token_start: Start token index of the sentence
-            - token_end: End token index of the sentence
+            lists of sentence dicts. Each dict has keys: sentence_idx, score,
+            token_start, token_end.
         k: Number of top sentences to return (default: 10)
-        
+        max_token_idx: If provided, only include sentences that start before or at
+            this token index. Sentences extending beyond this point will be clipped
+            if clip_to_max is True, or excluded if clip_to_max is False.
+        clip_to_max: If True and max_token_idx is provided, clip sentences that
+            extend beyond max_token_idx. If False, exclude such sentences entirely.
+            Default: True
+
     Returns:
-        List of Sentence namedtuples sorted by mean score descending
+        List of Sentence objects sorted by mean score descending
     """
     # Aggregate scores by sentence (identified by token_start, token_end)
     sentence_scores = {}  # (token_start, token_end) -> list of scores
-    
+
     for head_idx, sentences_list in top_sentences_per_head.items():
         for sent_dict in sentences_list:
             token_start = sent_dict["token_start"]
             token_end = sent_dict["token_end"]
             score = sent_dict["score"]
-            
+
+            # Filter/clip based on max_token_idx if provided
+            if max_token_idx is not None:
+                # Skip sentences that start after max_token_idx
+                if token_start > max_token_idx:
+                    continue
+                # Clip sentences that extend beyond max_token_idx
+                if clip_to_max and token_end > max_token_idx:
+                    token_end = max_token_idx
+
             key = (token_start, token_end)
             if key not in sentence_scores:
                 sentence_scores[key] = []
             sentence_scores[key].append(score)
-    
+
     # Compute mean score for each sentence
     sentence_means = []
     for (token_start, token_end), scores in sentence_scores.items():
         mean_score = sum(scores) / len(scores)
         sentence_means.append((mean_score, token_start, token_end))
-    
+
     # Sort by mean score descending and take top k
     sentence_means.sort(reverse=True, key=lambda x: x[0])
     k_actual = min(k, len(sentence_means))
-    
+
     # Convert to Sentence objects
-    top_sentences = [
-        Sentence(start=token_start, end=token_end)
-        for _, token_start, token_end in sentence_means[:k_actual]
-    ]
-    
-    return top_sentences
+    result = []
+    for mean_score, token_start, token_end in sentence_means[:k_actual]:
+        result.append(Sentence(start=token_start, end=token_end))
+
+    return result
