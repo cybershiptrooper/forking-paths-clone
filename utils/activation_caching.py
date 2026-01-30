@@ -4,42 +4,7 @@ from typing import List, Optional
 import torch
 from tqdm import trange
 from transformers import PreTrainedModel
-
-
-# Architecture-specific attention module paths
-# Easy to extend for new model architectures
-ATTENTION_MODULE_PATHS = {
-    "llama": lambda model, layer: model.model.layers[layer].self_attn,
-    "qwen2": lambda model, layer: model.model.layers[layer].self_attn,
-    "qwen": lambda model, layer: model.model.layers[layer].self_attn,
-    # Easy to add new architectures:
-    # "phi": lambda model, layer: model.model.layers[layer].mixer,
-    # "mistral": lambda model, layer: model.model.layers[layer].self_attn,
-}
-
-
-def get_attention_module(model: PreTrainedModel, layer: int):
-    """Auto-detect model architecture and return attention module.
-    
-    Args:
-        model: The pretrained model
-        layer: The layer index
-        
-    Returns:
-        The attention module for the specified layer
-        
-    Raises:
-        ValueError: If the model type is not supported
-    """
-    model_type = model.config.model_type.lower()
-    if model_type in ATTENTION_MODULE_PATHS:
-        return ATTENTION_MODULE_PATHS[model_type](model, layer)
-    raise ValueError(
-        f"Unsupported model type: {model_type}. "
-        f"Supported types: {list(ATTENTION_MODULE_PATHS.keys())}. "
-        f"Add to ATTENTION_MODULE_PATHS in activation_caching.py to support new architectures."
-    )
-
+from utils.utils import get_attention_module
 
 def get_activations(
     model: PreTrainedModel,

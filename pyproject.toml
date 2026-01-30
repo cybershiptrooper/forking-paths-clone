@@ -8,6 +8,7 @@ dependencies = [
     "datasets>=4.2.0",
     "jupyter>=1.1.1",
     "networkx>=3.0",
+    "nnsight>=0.1.0",
     "numpy<2",
     "plotly>=6.3.1",
     "rbeast>=0.1.23",
@@ -16,5 +17,7 @@ dependencies = [
     "seaborn>=0.13.2",
     "sentence-transformers>=2.2.0",
     "streamlit>=1.51.0",
+    "torch>=2.0.0",
+    "transformers>=4.30.0",
     "vllm>=0.11.0",
 ]

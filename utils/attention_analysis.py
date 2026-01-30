@@ -263,3 +263,59 @@ def get_top_k_sentences_per_head(
         result[h] = head_result
     
     return result
+
+
+def select_top_sentences_by_mean_score(
+    top_sentences_per_head: Dict[str, List[Dict]],
+    k: int = 10
+) -> List[Sentence]:
+    """
+    Select top K sentences by mean score across all heads.
+    
+    Aggregates scores across all heads for each unique sentence (identified by
+    token_start and token_end), computes the mean score, and returns the top K
+    sentences sorted by mean score descending.
+    
+    Args:
+        top_sentences_per_head: Dictionary mapping head indices (as strings) to
+            lists of sentence dicts. Each dict has keys:
+            - sentence_idx: Sentence index
+            - score: Vertical attention score for this sentence
+            - token_start: Start token index of the sentence
+            - token_end: End token index of the sentence
+        k: Number of top sentences to return (default: 10)
+        
+    Returns:
+        List of Sentence namedtuples sorted by mean score descending
+    """
+    # Aggregate scores by sentence (identified by token_start, token_end)
+    sentence_scores = {}  # (token_start, token_end) -> list of scores
+    
+    for head_idx, sentences_list in top_sentences_per_head.items():
+        for sent_dict in sentences_list:
+            token_start = sent_dict["token_start"]
+            token_end = sent_dict["token_end"]
+            score = sent_dict["score"]
+            
+            key = (token_start, token_end)
+            if key not in sentence_scores:
+                sentence_scores[key] = []
+            sentence_scores[key].append(score)
+    
+    # Compute mean score for each sentence
+    sentence_means = []
+    for (token_start, token_end), scores in sentence_scores.items():
+        mean_score = sum(scores) / len(scores)
+        sentence_means.append((mean_score, token_start, token_end))
+    
+    # Sort by mean score descending and take top k
+    sentence_means.sort(reverse=True, key=lambda x: x[0])
+    k_actual = min(k, len(sentence_means))
+    
+    # Convert to Sentence objects
+    top_sentences = [
+        Sentence(start=token_start, end=token_end)
+        for _, token_start, token_end in sentence_means[:k_actual]
+    ]
+    
+    return top_sentences

@@ -47,7 +47,7 @@ def make_prompt_mcq(base_data_dict: dict, tokenizer: AutoTokenizer) -> str:
 def main(
     model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
     example_index: int = 0,
-    layer: int = 36,
+    layer: int = 16,
     heads: Optional[List[int]] = None,
     top_k_sentences: int = 5,
     top_k_heads: int = 5,
