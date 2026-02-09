@@ -253,7 +253,7 @@ def main(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualize attention patterns")
     parser.add_argument("--model_name", type=str, default="deepseek-ai/DeepSeek-R1-Distill-Llama-8B")
-    parser.add_argument("--example_index", type=int, default=0)
+    parser.add_argument("--example_index", "-idx", type=int, default=0)
     parser.add_argument("--layer", type=int, default=16)
     parser.add_argument("--heads", type=int, nargs="+", default=None, 
                         help="Specific heads to analyze (default: all)")
