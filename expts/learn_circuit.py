@@ -72,6 +72,13 @@ def generate_branches_vllm(
     return branches
 
 
+DEFAULT_PROMPT = (
+    "The capital of France is Paris. "
+    "Answer in 100 words or less, what are the most popular things "
+    "in the city to do?"
+)
+
+
 def main(
     model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
     num_new_branches: int = 8,
@@ -87,19 +94,17 @@ def main(
     output_dir: str = "results/circuit_discovery",
     min_sentence_length: int = 10,
     batch_size: int = 4,
+    prompt: str = "",
 ):
     set_seed(seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     layers = [int(x.strip()) for x in layers_to_analyse.split(",")]
 
-    # --- 1. Tokenize prompt (same as controlled_ablations_v2.py) ---
+    # --- 1. Tokenize prompt ---
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    prompt = (
-        "The capital of France is Paris. "
-        "Answer in 100 words or less, what are the most popular things "
-        "in the city to do?"
-    )
+    if not prompt:
+        prompt = DEFAULT_PROMPT
     chat = [{"role": "user", "content": prompt}]
     formatted_text = tokenizer.apply_chat_template(
         chat, tokenize=False, add_generation_prompt=True
@@ -239,5 +244,11 @@ if __name__ == "__main__":
     )
     parser.add_argument("--min_sentence_length", type=int, default=10)
     parser.add_argument("--batch_size", type=int, default=4)
+    parser.add_argument(
+        "--prompt",
+        type=str,
+        default="",
+        help="Custom prompt (default: Paris example)",
+    )
     args = parser.parse_args()
     main(**vars(args))
