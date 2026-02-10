@@ -51,7 +51,7 @@ def plot_head_heatmap(
         node_mask: NodeMask with attribution scores
         layer: Layer index
         head: Head index
-        threshold: Values with |score| below this are set to zero
+        threshold: Values with score < threshold are set to zero
         ax: Matplotlib axes (creates new figure if None)
         cmap: Colormap name
         title: Plot title (auto-generated if None)
@@ -245,6 +245,8 @@ def plot_circuit_graph(
     """Network graph with sentences as nodes, edges colored by importance.
 
     Green = above threshold (important), Red = below threshold (not important).
+    Thresholding uses signed scores (score > threshold). With default
+    negated scores, green edges reduce KL.
 
     Args:
         node_mask: NodeMask
@@ -356,7 +358,7 @@ def plot_attention_pattern(
         node_mask: NodeMask with attribution scores
         layer: Specific layer index, or None for all-layers aggregation
         aggregation: How to aggregate across heads ("mean", "max", "sum")
-        threshold: Values with |score| below this are dimmed to zero
+        threshold: Values with score < threshold are dimmed to zero
         ax: Matplotlib axes (creates new figure if None)
         cmap: Colormap (default "Greens" for the causal-importance look)
         save_path: Path to save figure (shows if None)
@@ -434,21 +436,40 @@ def plot_sparsity_vs_kl(
         kl_scores: Corresponding KL divergence scores
         save_path: Save path
     """
-    fig, ax1 = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(8, 5))
 
-    color1 = "tab:blue"
-    ax1.set_xlabel("Threshold")
-    ax1.set_ylabel("Sparsity", color=color1)
-    ax1.plot(thresholds, sparsities, "o-", color=color1, label="Sparsity")
-    ax1.tick_params(axis="y", labelcolor=color1)
+    thresholds_arr = np.array(thresholds, dtype=float)
+    sparsities_arr = np.array(sparsities, dtype=float)
+    kl_arr = np.array(kl_scores, dtype=float)
 
-    ax2 = ax1.twinx()
-    color2 = "tab:red"
-    ax2.set_ylabel("KL Divergence", color=color2)
-    ax2.plot(thresholds, kl_scores, "s-", color=color2, label="KL Divergence")
-    ax2.tick_params(axis="y", labelcolor=color2)
-    ax2.yaxis.set_major_formatter(_sci_formatter)
-    ax2.set_xscale("log")
+    sort_idx = np.argsort(sparsities_arr)
+    sparsities_sorted = sparsities_arr[sort_idx]
+    kl_sorted = kl_arr[sort_idx]
+
+    if np.all(thresholds_arr > 0):
+        norm = mcolors.LogNorm(vmin=thresholds_arr.min(), vmax=thresholds_arr.max())
+    else:
+        norm = mcolors.Normalize(vmin=thresholds_arr.min(), vmax=thresholds_arr.max())
+
+    ax.plot(sparsities_sorted, kl_sorted, "-", color="gray", alpha=0.4)
+    sc = ax.scatter(
+        sparsities_arr,
+        kl_arr,
+        c=thresholds_arr,
+        cmap="viridis",
+        norm=norm,
+        s=40,
+        edgecolors="k",
+        linewidths=0.3,
+    )
+
+    ax.set_xlabel("Sparsity")
+    ax.set_ylabel("KL Divergence")
+    ax.xaxis.set_major_formatter(mticker.PercentFormatter(1.0))
+    ax.yaxis.set_major_formatter(_sci_formatter)
+
+    cbar = plt.colorbar(sc, ax=ax, shrink=0.9)
+    cbar.set_label("Threshold")
 
     fig.suptitle("Sparsity vs KL Divergence")
     fig.tight_layout()
@@ -474,6 +495,7 @@ def plot_full_circuit(
 
     Green cells indicate above-threshold importance (causal relation),
     red cells indicate below-threshold (no causal relation).
+    Thresholding uses signed scores (>= threshold), assuming positive reduces KL.
 
     Args:
         node_mask: NodeMask with attribution scores

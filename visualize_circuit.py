@@ -5,7 +5,7 @@ Loads a saved NodeMask JSON and generates multi-level visualizations:
 - Per-layer aggregated heatmaps
 - Layer comparison (side-by-side)
 - Circuit graph (sentences as nodes, edges by importance)
-- Sparsity vs KL plot (if threshold evaluation data is available)
+- Sparsity vs KL plot (x = sparsity, y = KL; if threshold evaluation data is available)
 """
 
 import os

@@ -237,6 +237,12 @@ class NodewiseAttribution(CircuitDiscovery):
     of each (layer, head, src_sentence, tgt_sentence) edge to the objective
     using integrated gradients along the path from fully ablated (mask=0)
     to fully present (mask=1).
+
+    Sign convention:
+    - Raw IG gradients are w.r.t. the KL objective, so positive means
+      increasing KL (worse retention).
+    - By default we negate scores so positive means *reducing* KL (helpful).
+      Set `negate_scores=False` to preserve raw (harmful-positive) scores.
     """
 
     def __init__(self, num_ig_steps: int = 10, negate_scores: bool = True, **kwargs):
@@ -385,7 +391,7 @@ class NodewiseAttribution(CircuitDiscovery):
 
         # 4. Average gradients → attribution scores
         # Raw IG scores: positive means including the node increases KL (hurts).
-        # Negate so that positive means including the node *reduces* KL (helps retention).
+        # Negate (default) so positive means including the node *reduces* KL (helps).
         num_total = self.num_ig_steps * len(continuations)
         sign = -1.0 if self.negate_scores else 1.0
         scores = {}

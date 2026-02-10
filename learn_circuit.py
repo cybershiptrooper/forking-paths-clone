@@ -123,6 +123,9 @@ def evaluate_at_thresholds(
     - Compute sparsity from the mask
     - Re-run model with thresholded binary mask
     - Compute KL divergence with clean output
+
+    Thresholding uses signed scores: keep edges with score >= threshold.
+    This assumes the default convention where positive scores reduce KL.
     """
     from utils.circuit_discovery.nodewise_attribution import (
         llama_attention_forward_with_differentiable_mask,
@@ -181,7 +184,9 @@ def evaluate_at_thresholds(
     for threshold in thresholds:
         sparsity = node_mask.sparsity(threshold)
 
-        # Build binary masks: 1 if score >= threshold, 0 otherwise
+        # Build binary masks: 1 if score >= threshold, 0 otherwise.
+        # This relies on the convention that positive scores are helpful
+        # (reduce KL), which is the default in nodewise attribution.
         binary_masks = {}
         for l in layers:
             m = torch.ones(num_heads, num_sents, num_sents, device=device)
@@ -264,9 +269,7 @@ def evaluate_at_thresholds(
         if per_sent_kl_branches:
             entry["per_sentence_kl"] = per_sent_kl_branches
         results.append(entry)
-        print(
-            f"  threshold={threshold:.3f} | sparsity={sparsity:.2%} | KL={avg_kl:.6f}"
-        )
+        print(f"  threshold={threshold:.1e} | sparsity={sparsity:.2%} | KL={avg_kl:.6f}")
 
     # Cleanup non-target layer ablation
     for h in non_target_handles:
@@ -571,7 +574,22 @@ if __name__ == "__main__":
         "--thresholds",
         type=float,
         nargs="+",
-        default=[0.01, 0.05, 0.1, 0.2, 0.5],
+        default=[
+            -1e-5,
+            -5e-6,
+            -1e-6,
+            -5e-7,
+            -5e-8,
+            -1e-8,
+            0.0,
+            1e-8,
+            5e-8,
+            1e-7,
+            5e-7,
+            1e-6,
+            5e-6,
+            1e-5,
+        ],
         help="Thresholds for sparsity-vs-KL evaluation",
     )
     args = parser.parse_args()

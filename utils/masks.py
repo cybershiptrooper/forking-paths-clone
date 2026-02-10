@@ -19,7 +19,12 @@ class MaskResult(ABC):
 
     @abstractmethod
     def sparsity(self, threshold: float) -> float:
-        """Fraction of entries with |score| < threshold."""
+        """Fraction of entries with score < threshold.
+
+        Note: This uses the *signed* score, not |score|. With the default
+        negated scores (positive = helpful / reduces KL), this measures how
+        many entries fall below an importance cutoff.
+        """
         ...
 
     def to_json(self, path: str):
@@ -51,7 +56,11 @@ class NodeMask(MaskResult):
     scores: Dict[int, Dict[int, List[List[float]]]] = field(default_factory=dict)
 
     def sparsity(self, threshold: float) -> float:
-        """Fraction of entries with score < threshold."""
+        """Fraction of entries with score < threshold.
+
+        Note: Signed thresholding (not absolute value). This matches the
+        default convention where positive scores reduce KL.
+        """
         total = 0
         below = 0
         for layer_scores in self.scores.values():
