@@ -227,6 +227,9 @@ def llama_attention_forward_with_differentiable_mask(
         # Renormalize
         row_sums = attn_weights.sum(dim=-1, keepdim=True) + 1e-12
         attn_weights = attn_weights / row_sums
+
+        # Cast back to model dtype (mask is float32 for grad, but matmul needs matching dtypes)
+        attn_weights = attn_weights.to(value_states.dtype)
     # =====================================================================
 
     attn_weights = nn.functional.dropout(
