@@ -17,6 +17,7 @@ from utils.circuit_vis import (
     plot_layer_aggregated,
     plot_layer_comparison,
     plot_circuit_graph,
+    plot_attention_pattern,
     plot_sparsity_vs_kl,
 )
 
@@ -68,7 +69,20 @@ def main(
     plot_layer_comparison(mask, layers=layers, save_path=save_path)
     print(f"  Saved: {save_path}")
 
-    # 4. Circuit graphs
+    # 4. Attention pattern (causal triangle) heatmaps
+    print("\nGenerating attention pattern heatmaps...")
+    # Per-layer attention patterns
+    for layer in layers:
+        save_path = os.path.join(output_dir, f"attn_pattern_layer_{layer}.png")
+        plot_attention_pattern(mask, layer=layer, threshold=threshold, save_path=save_path)
+        print(f"  Saved: {save_path}")
+
+    # All-layers aggregated attention pattern
+    save_path = os.path.join(output_dir, "attn_pattern_all_layers.png")
+    plot_attention_pattern(mask, layer=None, threshold=threshold, save_path=save_path)
+    print(f"  Saved: {save_path}")
+
+    # 5. Circuit graphs
     print("\nGenerating circuit graphs...")
     # Aggregated across all layers
     save_path = os.path.join(output_dir, f"circuit_all_layers_t{threshold}.png")
@@ -83,7 +97,7 @@ def main(
         plot_circuit_graph(mask, threshold=threshold, layer=layer, save_path=save_path)
         print(f"  Saved: {save_path}")
 
-    # 5. Sparsity vs KL (if threshold evaluation data exists)
+    # 6. Sparsity vs KL (if threshold evaluation data exists)
     threshold_eval = mask.metadata.get("threshold_evaluation", [])
     if threshold_eval:
         print("\nGenerating sparsity vs KL plot...")

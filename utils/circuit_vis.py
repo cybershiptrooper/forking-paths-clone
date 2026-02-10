@@ -299,6 +299,87 @@ def plot_circuit_graph(
     return fig
 
 
+def plot_attention_pattern(
+    node_mask: NodeMask,
+    layer: Optional[int] = None,
+    aggregation: str = "mean",
+    threshold: float = 0.0,
+    ax: Optional[plt.Axes] = None,
+    cmap: str = "Greens",
+    save_path: Optional[str] = None,
+):
+    """Lower-triangular attention-pattern heatmap of sentence-to-sentence scores.
+
+    Displays causal dependencies as a triangular matrix (row i attends to
+    column j where j <= i), mimicking the classic attention-pattern style.
+
+    Args:
+        node_mask: NodeMask with attribution scores
+        layer: Specific layer index, or None for all-layers aggregation
+        aggregation: How to aggregate across heads ("mean", "max", "sum")
+        threshold: Values with |score| below this are dimmed to zero
+        ax: Matplotlib axes (creates new figure if None)
+        cmap: Colormap (default "Greens" for the causal-importance look)
+        save_path: Path to save figure (shows if None)
+    """
+    if layer is not None:
+        scores = np.array(node_mask.get_layer_aggregated(layer, aggregation))
+        title = f"Attention Pattern — Layer {layer} ({aggregation})"
+    else:
+        scores = np.array(node_mask.get_all_layers_aggregated(aggregation))
+        title = f"Attention Pattern — All Layers ({aggregation})"
+
+    num_sents = scores.shape[0]
+
+    # Apply causal (lower-triangular) mask: row i can attend to columns j <= i
+    causal_mask = np.tril(np.ones_like(scores))
+    scores_masked = np.where(causal_mask, np.abs(scores), np.nan)
+
+    # Apply threshold: dim entries below threshold
+    if threshold > 0:
+        scores_masked = np.where(scores_masked >= threshold, scores_masked, 0.0)
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(8, 7))
+    else:
+        fig = ax.figure
+
+    # Plot heatmap with NaN for upper triangle (renders as white/transparent)
+    im = ax.imshow(
+        scores_masked,
+        cmap=cmap,
+        aspect="equal",
+        origin="upper",
+        interpolation="nearest",
+    )
+
+    # Sentence labels
+    labels = _get_sentence_labels(node_mask.sentences, max_chars=15)
+    ax.set_xticks(range(num_sents))
+    ax.set_yticks(range(num_sents))
+    ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
+    ax.set_yticklabels(labels, fontsize=7)
+    ax.set_xlabel("Key Sentence")
+    ax.set_ylabel("Query Sentence")
+
+    # Draw cell borders for the causal triangle
+    for i in range(num_sents):
+        for j in range(i + 1):
+            rect = plt.Rectangle(
+                (j - 0.5, i - 0.5), 1, 1,
+                linewidth=0.5, edgecolor="gray", facecolor="none",
+            )
+            ax.add_patch(rect)
+
+    plt.colorbar(im, ax=ax, shrink=0.8, label="Importance")
+    ax.set_title(title)
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+    return fig if save_path or ax is None else ax
+
+
 def plot_sparsity_vs_kl(
     thresholds: List[float],
     sparsities: List[float],
