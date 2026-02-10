@@ -107,17 +107,17 @@ def plot_top_heads(
     cmap: str = "RdYlGn",
     save_path: Optional[str] = None,
 ):
-    """Subplot grid of top-K heads (ranked by total |attribution|) at a given layer.
+    """Subplot grid of top-K heads (ranked by total attribution) at a given layer.
 
     Args:
         node_mask: NodeMask with attribution scores
         layer: Layer index
         top_k: Number of top heads to show
-        threshold: Values with |score| below this are set to zero
+        threshold: Scores below this are zeroed before ranking/display
         cmap: Colormap name
         save_path: Path to save figure (shows if None)
     """
-    importance = node_mask.get_head_importance(layer)
+    importance = node_mask.get_head_importance(layer, threshold=threshold)
     top_heads = list(importance.keys())[:top_k]
 
     ncols = min(top_k, 3)
@@ -135,7 +135,7 @@ def plot_top_heads(
             threshold=threshold,
             ax=axes[i],
             cmap=cmap,
-            title=f"L{layer} H{head} (|attr|={importance[head]:.2e})",
+            title=f"L{layer} H{head} (attr={importance[head]:.2e})",
         )
 
     # Hide unused axes

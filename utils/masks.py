@@ -51,7 +51,7 @@ class NodeMask(MaskResult):
     scores: Dict[int, Dict[int, List[List[float]]]] = field(default_factory=dict)
 
     def sparsity(self, threshold: float) -> float:
-        """Fraction of entries with |score| < threshold."""
+        """Fraction of entries with score < threshold."""
         total = 0
         below = 0
         for layer_scores in self.scores.values():
@@ -59,7 +59,7 @@ class NodeMask(MaskResult):
                 for row in head_scores:
                     for val in row:
                         total += 1
-                        if abs(val) < threshold:
+                        if val < threshold:
                             below += 1
         return below / total if total > 0 else 0.0
 
@@ -142,13 +142,18 @@ class NodeMask(MaskResult):
         else:
             raise ValueError(f"Unknown aggregation: {aggregation}")
 
-    def get_head_importance(self, layer: int) -> Dict[int, float]:
-        """Rank heads by total |attribution| at a layer."""
+    def get_head_importance(self, layer: int, threshold: float = 0.0) -> Dict[int, float]:
+        """Rank heads by total attribution at a layer (after thresholding).
+
+        Only scores >= threshold contribute to importance.
+        """
         import numpy as np
 
         result = {}
         for head, scores in self.scores[layer].items():
-            result[head] = float(np.abs(np.array(scores)).sum())
+            arr = np.array(scores)
+            arr = np.where(arr >= threshold, arr, 0.0)
+            result[head] = float(arr.sum())
         return dict(sorted(result.items(), key=lambda x: x[1], reverse=True))
 
 

@@ -181,7 +181,7 @@ def evaluate_at_thresholds(
     for threshold in thresholds:
         sparsity = node_mask.sparsity(threshold)
 
-        # Build binary masks: 1 if |score| >= threshold, 0 otherwise
+        # Build binary masks: 1 if score >= threshold, 0 otherwise
         binary_masks = {}
         for l in layers:
             m = torch.ones(num_heads, num_sents, num_sents, device=device)
@@ -189,7 +189,7 @@ def evaluate_at_thresholds(
                 scores = node_mask.scores[l][h]
                 for i in range(num_sents):
                     for j in range(num_sents):
-                        if abs(scores[i][j]) < threshold:
+                        if scores[i][j] < threshold:
                             m[h, i, j] = 0.0
             binary_masks[l] = m
 
