@@ -15,5 +15,5 @@ class CircuitDiscoveryAlgorithm(ABC):
         branch_token_ids: List[List[int]],
         **kwargs: Any,
     ) -> Tuple[EdgewiseMask, Dict[str, Any]]:
-        \"\"\"Learn a mask and return (mask, metrics).\"\"\"
+        """Learn a mask and return (mask, metrics)."""
         raise NotImplementedError
