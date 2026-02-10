@@ -115,6 +115,7 @@ def evaluate_at_thresholds(
     thresholds: list[float],
     layers: list[int],
     ablate_non_target_layers: bool = False,
+    tokenizer=None,
 ) -> list[dict]:
     """Evaluate KL divergence and sparsity at different mask thresholds.
 
@@ -210,6 +211,8 @@ def evaluate_at_thresholds(
         # Compute masked logits
         total_kl = 0.0
         total_tokens = 0
+        per_token_kl_branches = []
+        per_sent_kl_branches = []
         with torch.no_grad():
             for cont_idx, cont in enumerate(continuations):
                 full_input = torch.cat([input_ids, cont], dim=-1)
@@ -223,18 +226,44 @@ def evaluate_at_thresholds(
                 total_kl += kl.item() * pos_mask.sum().item()
                 total_tokens += pos_mask.sum().item()
 
+                # Per-token KL for this branch (continuation tokens only)
+                log_clean = torch.nn.functional.log_softmax(clean.detach(), dim=-1)
+                log_masked = torch.nn.functional.log_softmax(logits, dim=-1)
+                kl_tokens = torch.nn.functional.kl_div(
+                    log_masked, log_clean, log_target=True, reduction="none"
+                ).sum(dim=-1)  # (1, seq_len)
+                branch_kl = kl_tokens[0, prefix_len - 1 : full_len - 1].cpu().tolist()
+                per_token_kl_branches.append(branch_kl)
+
+                # Per-sentence KL for this branch
+                if tokenizer is not None:
+                    cont_token_ids = cont[0]  # (num_cont_tokens,)
+                    cont_sents = split_tokens_into_sentences(
+                        cont_token_ids, tokenizer, min_sentence_length=5
+                    )
+                    sent_kl_list = []
+                    for s in cont_sents:
+                        # s.start/end are relative to cont; branch_kl is indexed the same way
+                        s_kl = branch_kl[s.start : s.end + 1]
+                        avg = sum(s_kl) / max(len(s_kl), 1)
+                        text = tokenizer.decode(cont_token_ids[s.start : s.end + 1].tolist())
+                        sent_kl_list.append({"text": text, "mean_kl": avg})
+                    per_sent_kl_branches.append(sent_kl_list)
+
         # Cleanup
         for h in handles:
             h.remove()
 
         avg_kl = total_kl / max(total_tokens, 1)
-        results.append(
-            {
-                "threshold": threshold,
-                "sparsity": sparsity,
-                "kl_divergence": avg_kl,
-            }
-        )
+        entry = {
+            "threshold": threshold,
+            "sparsity": sparsity,
+            "kl_divergence": avg_kl,
+            "per_token_kl": per_token_kl_branches,
+        }
+        if per_sent_kl_branches:
+            entry["per_sentence_kl"] = per_sent_kl_branches
+        results.append(entry)
         print(
             f"  threshold={threshold:.3f} | sparsity={sparsity:.2%} | KL={avg_kl:.6f}"
         )
@@ -257,6 +286,7 @@ def main(
     sentence_chunk: int = 1,
     ablate_non_target_layers: bool = False,
     num_ig_steps: int = 10,
+    no_negate_scores: bool = False,
     max_new_tokens: int = 150,
     temperature: float = 0.6,
     seed: int = 42,
@@ -416,6 +446,7 @@ def main(
         sentence_gap=sentence_gap,
         ablate_non_target_layers=ablate_non_target_layers,
         num_ig_steps=num_ig_steps,
+        negate_scores=not no_negate_scores,
     )
 
     node_mask = discoverer.discover(
@@ -445,6 +476,7 @@ def main(
         thresholds=thresholds,
         layers=layers_to_analyse,
         ablate_non_target_layers=ablate_non_target_layers,
+        tokenizer=tokenizer,
     )
 
     node_mask.metadata["threshold_evaluation"] = threshold_results
@@ -479,7 +511,7 @@ def main(
     print("\nThreshold evaluation:")
     for r in threshold_results:
         print(
-            f"  t={r['threshold']:.3f} → sparsity={r['sparsity']:.2%}, KL={r['kl_divergence']:.6f}"
+            f"  t={r['threshold']:.1e} → sparsity={r['sparsity']:.2%}, KL={r['kl_divergence']:.2e}"
         )
 
     # Cleanup
@@ -524,6 +556,12 @@ if __name__ == "__main__":
         help="Ablate all attention heads in layers outside --layers_to_analyse",
     )
     parser.add_argument("--num_ig_steps", type=int, default=10)
+    parser.add_argument(
+        "--no_negate_scores",
+        action="store_true",
+        help="Store raw IG scores (positive = increases KL). "
+        "Default negates so positive = helps retention.",
+    )
     parser.add_argument("--max_new_tokens", type=int, default=150)
     parser.add_argument("--temperature", type=float, default=0.6)
     parser.add_argument("--seed", type=int, default=42)

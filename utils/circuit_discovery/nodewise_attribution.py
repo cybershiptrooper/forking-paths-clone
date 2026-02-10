@@ -239,9 +239,10 @@ class NodewiseAttribution(CircuitDiscovery):
     to fully present (mask=1).
     """
 
-    def __init__(self, num_ig_steps: int = 10, **kwargs):
+    def __init__(self, num_ig_steps: int = 10, negate_scores: bool = True, **kwargs):
         super().__init__(**kwargs)
         self.num_ig_steps = num_ig_steps
+        self.negate_scores = negate_scores
 
     def _get_clean_logits(
         self,
@@ -383,10 +384,13 @@ class NodewiseAttribution(CircuitDiscovery):
             self._unpatch_model(non_target_handles)
 
         # 4. Average gradients → attribution scores
+        # Raw IG scores: positive means including the node increases KL (hurts).
+        # Negate so that positive means including the node *reduces* KL (helps retention).
         num_total = self.num_ig_steps * len(continuations)
+        sign = -1.0 if self.negate_scores else 1.0
         scores = {}
         for l in self.layers:
-            avg = accumulated_grads[l] / num_total
+            avg = sign * accumulated_grads[l] / num_total
             scores[l] = {h: avg[h].tolist() for h in range(num_heads)}
 
         return NodeMask(
@@ -403,6 +407,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 "sentence_gap": self.sentence_gap,
                 "num_heads": num_heads,
                 "ablate_non_target_layers": self.ablate_non_target_layers,
+                "negate_scores": self.negate_scores,
             },
             scores=scores,
         )

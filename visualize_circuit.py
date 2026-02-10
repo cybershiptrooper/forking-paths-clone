@@ -20,6 +20,8 @@ from utils.circuit_vis import (
     plot_attention_pattern,
     plot_sparsity_vs_kl,
     plot_full_circuit,
+    plot_per_token_objective,
+    plot_per_sentence_objective,
 )
 
 
@@ -116,6 +118,26 @@ def main(
         print(f"  Saved: {save_path}")
     else:
         print("\nNo threshold evaluation data found in mask metadata, skipping sparsity-KL plot.")
+
+    # 8. Per-token objective (KL) across branches
+    has_per_token = any("per_token_kl" in r for r in threshold_eval)
+    if has_per_token:
+        print("\nGenerating per-token objective plot...")
+        save_path = os.path.join(output_dir, "per_token_kl.png")
+        plot_per_token_objective(threshold_eval, save_path=save_path)
+        print(f"  Saved: {save_path}")
+    else:
+        print("\nNo per-token KL data found in mask metadata, skipping per-token plot.")
+
+    # 9. Per-sentence objective (KL) across branches
+    has_per_sent = any("per_sentence_kl" in r for r in threshold_eval)
+    if has_per_sent:
+        print("\nGenerating per-sentence objective plot...")
+        save_path = os.path.join(output_dir, "per_sentence_kl.png")
+        plot_per_sentence_objective(threshold_eval, save_path=save_path)
+        print(f"  Saved: {save_path}")
+    else:
+        print("\nNo per-sentence KL data found in mask metadata, skipping per-sentence plot.")
 
     print(f"\nDone! All visualizations saved to {output_dir}/")
 

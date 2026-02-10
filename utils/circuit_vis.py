@@ -57,7 +57,7 @@ def plot_head_heatmap(
         title: Plot title (auto-generated if None)
         use_threshold: Whether to apply thresholding (default False, for cleaner head-level patterns)
     """
-    scores = np.abs(np.array(node_mask.scores[layer][head]))
+    scores = np.array(node_mask.scores[layer][head])
     num_sents = scores.shape[0]
     labels = _get_sentence_labels(node_mask.sentences, max_chars=15)
 
@@ -261,10 +261,10 @@ def plot_circuit_graph(
 
     if layer is not None:
         scores = np.array(node_mask.get_layer_aggregated(layer, aggregation))
-        title = f"Circuit Graph — Layer {layer} (threshold={threshold})"
+        title = f"Sentence Graph — Layer {layer} (threshold={threshold})"
     else:
         scores = np.array(node_mask.get_all_layers_aggregated(aggregation))
-        title = f"Circuit Graph — All Layers (threshold={threshold})"
+        title = f"Sentence Graph — All Layers (threshold={threshold})"
 
     num_sents = scores.shape[0]
     labels = _get_sentence_labels(node_mask.sentences, max_chars=15)
@@ -281,7 +281,7 @@ def plot_circuit_graph(
         for j in range(num_sents):
             if i == j:
                 continue
-            score = abs(scores[i, j])
+            score = scores[i, j]
             if score > threshold:
                 green_edges.append((i, j))
             else:
@@ -301,7 +301,7 @@ def plot_circuit_graph(
 
     # Draw important edges (green)
     if green_edges:
-        green_weights = [abs(scores[i, j]) for i, j in green_edges]
+        green_weights = [scores[i, j] for i, j in green_edges]
         max_w = max(green_weights) if green_weights else 1.0
         nx.draw_networkx_edges(
             G,
@@ -363,16 +363,16 @@ def plot_attention_pattern(
     """
     if layer is not None:
         scores = np.array(node_mask.get_layer_aggregated(layer, aggregation))
-        title = f"Attention Pattern — Layer {layer} ({aggregation})"
+        title = f"Sentence Pair Importance — Layer {layer} ({aggregation})"
     else:
         scores = np.array(node_mask.get_all_layers_aggregated(aggregation))
-        title = f"Attention Pattern — All Layers ({aggregation})"
+        title = f"Sentence Pair Importance — All Layers ({aggregation})"
 
     num_sents = scores.shape[0]
 
     # Apply causal (lower-triangular) mask: row i can attend to columns j <= i
     causal_mask = np.tril(np.ones_like(scores))
-    scores_masked = np.where(causal_mask, np.abs(scores), np.nan)
+    scores_masked = np.where(causal_mask, scores, np.nan)
 
     # Apply threshold: dim entries below threshold
     if threshold > 0:
@@ -441,7 +441,6 @@ def plot_sparsity_vs_kl(
     ax1.set_ylabel("Sparsity", color=color1)
     ax1.plot(thresholds, sparsities, "o-", color=color1, label="Sparsity")
     ax1.tick_params(axis="y", labelcolor=color1)
-    ax1.yaxis.set_major_formatter(_sci_formatter)
 
     ax2 = ax1.twinx()
     color2 = "tab:red"
@@ -492,7 +491,7 @@ def plot_full_circuit(
     importance_matrix = np.zeros((num_layers, num_sents))
 
     for i, layer in enumerate(layers):
-        scores = np.abs(np.array(node_mask.get_layer_aggregated(layer, aggregation)))
+        scores = np.array(node_mask.get_layer_aggregated(layer, aggregation))
         # Causal mask: row q attends to column k where k <= q
         causal_mask = np.tril(np.ones_like(scores))
         scores_causal = np.where(causal_mask, scores, 0.0)
@@ -549,6 +548,136 @@ def plot_full_circuit(
     ax.set_xlabel("Sentence")
     ax.set_ylabel("Layer")
     ax.set_title("Circuit Overview — Per-Sentence Importance by Layer")
+    fig.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+    return fig
+
+
+def plot_per_token_objective(
+    per_token_data: List[dict],
+    threshold: Optional[float] = None,
+    save_path: Optional[str] = None,
+) -> Optional[plt.Figure]:
+    """Line plot of per-token KL divergence across continuation branches.
+
+    X-axis: token index in continuation, Y-axis: KL divergence.
+    One line per branch, one subplot per threshold.
+
+    Args:
+        per_token_data: List of threshold evaluation dicts, each containing
+            "threshold", "per_token_kl" (list of lists, one per branch).
+        threshold: If given, plot only this threshold. Otherwise plot all.
+        save_path: Path to save figure (shows if None).
+    """
+    # Filter to entries that have per-token data
+    entries = [d for d in per_token_data if "per_token_kl" in d]
+    if not entries:
+        return None
+
+    if threshold is not None:
+        entries = [d for d in entries if d["threshold"] == threshold]
+        if not entries:
+            return None
+
+    n = len(entries)
+    fig, axes = plt.subplots(1, n, figsize=(6 * n, 4), squeeze=False)
+    axes = axes.flatten()
+
+    cmap = plt.get_cmap("tab10")
+
+    for idx, entry in enumerate(entries):
+        ax = axes[idx]
+        branches = entry["per_token_kl"]
+        for b_idx, branch_kl in enumerate(branches):
+            ax.plot(
+                range(len(branch_kl)),
+                branch_kl,
+                linewidth=0.8,
+                alpha=0.7,
+                color=cmap(b_idx % 10),
+                label=f"Branch {b_idx}",
+            )
+        ax.set_xlabel("Continuation Token Index")
+        ax.set_ylabel("KL Divergence")
+        ax.set_title(
+            f"threshold={entry['threshold']:.1e} "
+            f"(sparsity={entry.get('sparsity', 0):.1%})"
+        )
+        ax.yaxis.set_major_formatter(_sci_formatter)
+        if len(branches) <= 10:
+            ax.legend(fontsize=6, ncol=2)
+
+    fig.suptitle("Per-Token Objective (KL) Across Branches", fontsize=13)
+    fig.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+    return fig
+
+
+def plot_per_sentence_objective(
+    per_token_data: List[dict],
+    threshold: Optional[float] = None,
+    save_path: Optional[str] = None,
+) -> Optional[plt.Figure]:
+    """Line plot of per-sentence mean KL divergence across continuation branches.
+
+    X-axis: sentence index in continuation, Y-axis: mean KL divergence.
+    One "x-" line per branch, one subplot per threshold.
+
+    Args:
+        per_token_data: List of threshold evaluation dicts, each containing
+            "threshold", "per_sentence_kl" (list of lists of dicts with
+            "text" and "mean_kl", one list per branch).
+        threshold: If given, plot only this threshold. Otherwise plot all.
+        save_path: Path to save figure (shows if None).
+    """
+    entries = [d for d in per_token_data if "per_sentence_kl" in d]
+    if not entries:
+        return None
+
+    if threshold is not None:
+        entries = [d for d in entries if d["threshold"] == threshold]
+        if not entries:
+            return None
+
+    n = len(entries)
+    fig, axes = plt.subplots(1, n, figsize=(6 * n, 4), squeeze=False)
+    axes = axes.flatten()
+
+    cmap = plt.get_cmap("tab10")
+
+    for idx, entry in enumerate(entries):
+        ax = axes[idx]
+        branches = entry["per_sentence_kl"]  # list of list-of-dicts
+
+        for b_idx, branch_sents in enumerate(branches):
+            kl_vals = [s["mean_kl"] for s in branch_sents]
+            ax.plot(
+                range(len(kl_vals)),
+                kl_vals,
+                "x-",
+                linewidth=0.8,
+                alpha=0.7,
+                color=cmap(b_idx % 10),
+                label=f"Branch {b_idx}",
+            )
+
+        ax.set_xlabel("Continuation Sentence Index")
+        ax.set_ylabel("Mean KL Divergence")
+        ax.set_title(
+            f"threshold={entry['threshold']:.1e} "
+            f"(sparsity={entry.get('sparsity', 0):.1%})"
+        )
+        ax.yaxis.set_major_formatter(_sci_formatter)
+        if len(branches) <= 10:
+            ax.legend(fontsize=6, ncol=2)
+
+    fig.suptitle("Per-Sentence Objective (KL) Across Branches", fontsize=13)
     fig.tight_layout()
 
     if save_path:
