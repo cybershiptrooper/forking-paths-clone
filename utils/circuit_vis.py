@@ -455,7 +455,7 @@ def plot_threshold_vs_metrics(
     ax1b.set_ylabel("KL Divergence", color=color2)
     ax1b.plot(thresholds_arr, kl_arr, "s-", color=color2, label="KL Divergence")
     ax1b.tick_params(axis="y", labelcolor=color2)
-    ax1b.yaxis.set_major_formatter(_sci_formatter)
+    # ax1b.yaxis.set_major_formatter(_sci_formatter)
 
     fig.suptitle("Threshold vs Sparsity/KL Divergence")
     fig.tight_layout()
@@ -510,7 +510,7 @@ def plot_sparsity_vs_kl(
     ax.set_xlabel("Sparsity")
     ax.set_ylabel("KL Divergence")
     ax.xaxis.set_major_formatter(mticker.PercentFormatter(1.0))
-    ax.yaxis.set_major_formatter(_sci_formatter)
+    # ax.yaxis.set_major_formatter(_sci_formatter)
 
     cbar = plt.colorbar(sc, ax=ax, shrink=0.9)
     cbar.set_label("Threshold")

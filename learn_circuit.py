@@ -307,6 +307,33 @@ def evaluate_at_thresholds(
     return results
 
 
+def _parse_layers_arg(value: str):
+    lowered = value.lower()
+    if lowered == "all":
+        return "all"
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            f"Invalid layer value: {value!r}. Use integers or 'all'."
+        ) from exc
+
+
+def _resolve_layers_to_analyse(layers_to_analyse, model):
+    if layers_to_analyse is None:
+        return [8, 12, 16, 20, 24]
+    if isinstance(layers_to_analyse, str):
+        if layers_to_analyse.lower() == "all":
+            return list(range(model.config.num_hidden_layers))
+        return [int(layers_to_analyse)]
+    if len(layers_to_analyse) == 1 and isinstance(layers_to_analyse[0], str):
+        if layers_to_analyse[0].lower() == "all":
+            return list(range(model.config.num_hidden_layers))
+    if any(isinstance(l, str) and l.lower() == "all" for l in layers_to_analyse):
+        raise ValueError("Use 'all' by itself (no other layer indices).")
+    return [int(l) for l in layers_to_analyse]
+
+
 def main(
     model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
     num_new_branches: int = 8,
@@ -326,8 +353,6 @@ def main(
     output_dir: str = "results/circuit_discovery",
     thresholds: list[float] = None,
 ):
-    if layers_to_analyse is None:
-        layers_to_analyse = [8, 12, 16, 20, 24]
     if thresholds is None:
         thresholds = [0.01, 0.05, 0.1, 0.2, 0.5]
 
@@ -454,6 +479,8 @@ def main(
 
     model, tokenizer = load_model_eager(model_name, device=device)
     input_ids = input_ids.to(device)
+    layers_to_analyse_arg = "all" if layers_to_analyse[0] == "all" else None
+    layers_to_analyse = _resolve_layers_to_analyse(layers_to_analyse, model)
 
     # Convert branches to tensors
     continuations = []
@@ -523,10 +550,14 @@ def main(
     print("\n" + "=" * 80)
     print("Step 7: Saving results...")
     print("=" * 80)
-
+    layers_str = (
+        "_all"
+        if "all" in layers_to_analyse_arg
+        else "_".join(str(l) for l in layers_to_analyse)
+    )
     output_file = os.path.join(
         output_dir,
-        f"circuit_{masking_algorithm}_layers{'_'.join(map(str, layers_to_analyse))}"
+        f"circuit_{masking_algorithm}_layers{layers_str}"
         f"_branches{num_new_branches}_ig{num_ig_steps}.json",
     )
     node_mask.to_json(output_file)
@@ -576,9 +607,10 @@ if __name__ == "__main__":
     parser.add_argument("--objective", default="kl_divergence")
     parser.add_argument(
         "--layers_to_analyse",
-        type=int,
+        type=_parse_layers_arg,
         nargs="+",
         default=[8, 12, 16, 20, 24],
+        help="Layer indices to analyze, or 'all' for every layer.",
     )
     parser.add_argument("--sentence_gap", type=int, default=1)
     parser.add_argument("--sentence_chunk", type=int, default=1)
@@ -604,6 +636,7 @@ if __name__ == "__main__":
         type=float,
         nargs="+",
         default=[
+            -5e-3,
             -1e-3,
             -5e-4,
             -1e-4,
@@ -634,6 +667,7 @@ if __name__ == "__main__":
             1e-4,
             5e-4,
             1e-3,
+            5e-3,
         ],
         help="Thresholds for sparsity-vs-KL evaluation",
     )
