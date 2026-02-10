@@ -3822,6 +3822,7 @@ name = "road-not-taken-experiments"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "accelerate" },
     { name = "datasets" },
     { name = "jupyter" },
     { name = "networkx" },
@@ -3842,6 +3843,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "accelerate", specifier = ">=0.20.0" },
     { name = "datasets", specifier = ">=4.2.0" },
     { name = "jupyter", specifier = ">=1.1.1" },
     { name = "networkx", specifier = ">=3.0" },
