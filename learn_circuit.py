@@ -61,7 +61,7 @@ def remove_bos_from_sentences(sentences: list[Sentence]) -> list[Sentence]:
     result = []
     for s in sentences:
         if s.start == 0:
-            result.append(Sentence(start=1, end=s.end))
+            result.append(Sentence(start=2, end=s.end))
         else:
             result.append(s)
     return result
@@ -252,10 +252,11 @@ def main(
     print("=" * 80)
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    prompt = (
-        "The capital of France is Paris. Answer in 100 words or less, "
-        "what are the most popular things in the city to do?"
-    )
+    # prompt = (
+    #     "The capital of France is Paris. Answer in 100 words or less, "
+    #     "what are the most popular things in the city to do?"
+    # )
+    prompt = "A rectangular band formation is a formation with $m$ band members in each of $r$ rows, where $m$ and $r$ are integers. A particular band has less than 100 band members. The director arranges them in a rectangular formation and finds that he has two members left over. If he increases the number of members in each row by 1 and reduces the number of rows by 2, there are exactly enough places in the new formation for each band member. What is the largest number of members the band could have?"
     chat = [{"role": "user", "content": prompt}]
     formatted_text = tokenizer.apply_chat_template(
         chat, tokenize=False, add_generation_prompt=True
@@ -265,22 +266,86 @@ def main(
     prompt_len = input_ids.shape[-1]
 
     if analysis_timestep is None:
-        analysis_timestep = prompt_len
+        analysis_timestep = prompt_len + 200
 
     print(f"Prompt length: {prompt_len} tokens")
     print(f"Analysis timestep: {analysis_timestep}")
     print(f"Formatted text:\n{formatted_text}\n")
 
     # =====================================================================
-    # Step 2: Split into sentences
+    # Step 2: Generate base completion (if needed) and branches with vLLM
     # =====================================================================
     print("=" * 80)
-    print("Step 2: Splitting into sentences...")
+    print("Step 2: Generating with vLLM...")
+    print("=" * 80)
+
+    llm = LLM(model=model_name, dtype="auto")
+
+    # Generate base completion if analysis_timestep extends beyond prompt
+    if analysis_timestep > prompt_len:
+        needed = analysis_timestep - prompt_len
+        print(f"Generating base completion ({needed} tokens needed)...")
+        base_params = SamplingParams(
+            n=1,
+            temperature=temperature,
+            max_tokens=10000,
+            seed=seed,
+        )
+        base_outputs = llm.generate([formatted_text], base_params)
+        base_output = base_outputs[0].outputs[0]
+        base_token_ids = list(base_output.token_ids)[:needed]
+        base_ids_tensor = torch.tensor([base_token_ids], dtype=input_ids.dtype)
+        input_ids = torch.cat([input_ids, base_ids_tensor], dim=-1)
+        print(
+            f"Extended input_ids to {input_ids.shape[-1]} tokens "
+            f"(prompt={prompt_len} + base_completion={len(base_token_ids)})."
+        )
+        if input_ids.shape[-1] < analysis_timestep:
+            print(
+                f"Warning: base completion shorter than expected "
+                f"({input_ids.shape[-1]} < {analysis_timestep}). "
+                f"Adjusting analysis_timestep."
+            )
+            analysis_timestep = input_ids.shape[-1]
+
+    # Generate branches from prefix up to analysis_timestep
+    prefix_text = tokenizer.decode(input_ids[0, :analysis_timestep])
+    print(f"Generating {num_new_branches} branches...")
+    branch_params = SamplingParams(
+        n=num_new_branches,
+        temperature=temperature,
+        max_tokens=max_new_tokens,
+        seed=seed,
+    )
+    branch_outputs = llm.generate([prefix_text], branch_params)
+
+    branches = []
+    for output in branch_outputs[0].outputs:
+        branches.append(
+            {
+                "text": output.text,
+                "token_ids": list(output.token_ids),
+            }
+        )
+
+    # Cleanup vLLM
+    del llm
+    clear_cuda()
+    print(f"Generated {len(branches)} branches, vLLM cleaned up.")
+
+    for i, b in enumerate(branches):
+        print(f"  Branch {i}: {len(b['token_ids'])} tokens — {repr(b['text'][:80])}...")
+
+    # =====================================================================
+    # Step 3: Split into sentences
+    # =====================================================================
+    print("\n" + "=" * 80)
+    print("Step 3: Splitting into sentences...")
     print("=" * 80)
 
     token_ids_for_splitting = input_ids[0, :analysis_timestep]
     sentences = split_tokens_into_sentences(
-        token_ids_for_splitting, tokenizer, min_sentence_length=3
+        token_ids_for_splitting, tokenizer, min_sentence_length=10
     )
     sentences = remove_bos_from_sentences(sentences)
     sentences = chunk_sentences(sentences, sentence_chunk)
@@ -289,26 +354,6 @@ def main(
     for i, s in enumerate(sentences):
         text = tokenizer.decode(input_ids[0, s.start : s.end + 1])
         print(f"  S{i}: [{s.start}:{s.end}] = {repr(text)}")
-
-    # =====================================================================
-    # Step 3: Generate branches using vLLM
-    # =====================================================================
-    print("\n" + "=" * 80)
-    print("Step 3: Generating branches with vLLM...")
-    print("=" * 80)
-
-    prefix_text = tokenizer.decode(input_ids[0, :analysis_timestep])
-    branches = generate_branches(
-        model_name=model_name,
-        prefix_text=prefix_text,
-        num_branches=num_new_branches,
-        temperature=temperature,
-        max_new_tokens=max_new_tokens,
-        seed=seed,
-    )
-
-    for i, b in enumerate(branches):
-        print(f"  Branch {i}: {len(b['token_ids'])} tokens — {repr(b['text'][:80])}...")
 
     # =====================================================================
     # Step 4: Load HuggingFace model (eager attention)
