@@ -1,0 +1,131 @@
+"""Abstract base class for circuit discovery algorithms."""
+
+import types
+from abc import ABC, abstractmethod
+from typing import List, Callable, Optional, Union
+
+import torch
+
+from utils.masks import NodeMask
+from utils.utils import Sentence, get_attention_module
+
+
+class AblationHandle:
+    """Manages the lifecycle of a monkey-patched attention forward."""
+
+    def __init__(self, module, original_forward):
+        self.module = module
+        self.original_forward = original_forward
+
+    def remove(self):
+        """Restore original forward and clean up attributes."""
+        self.module.forward = self.original_forward
+        for attr in [
+            "_circuit_mask",
+            "_token_to_sent",
+            "_gap_filter",
+        ]:
+            if hasattr(self.module, attr):
+                delattr(self.module, attr)
+
+
+class CircuitDiscovery(ABC):
+    """Base class for circuit discovery algorithms.
+
+    Subclasses implement specific algorithms (nodewise attribution,
+    subnetwork probing, EAP) that learn which sentence-to-sentence
+    attention edges are important for the model's output.
+    """
+
+    def __init__(
+        self,
+        model: torch.nn.Module,
+        tokenizer,
+        layers: List[int],
+        objective_fn: Callable,
+        sentence_gap: int = 1,
+        **kwargs,
+    ):
+        self.model = model
+        self.tokenizer = tokenizer
+        self.layers = layers
+        self.objective_fn = objective_fn
+        self.sentence_gap = sentence_gap
+
+    def _build_token_to_sentence_map(
+        self, sentences: List[Sentence], seq_len: int
+    ) -> torch.Tensor:
+        """Map each token position to its sentence index.
+
+        Tokens not in any sentence get -1 (will map to sentinel in mask expansion).
+        """
+        mapping = torch.full((seq_len,), -1, dtype=torch.long)
+        for idx, sent in enumerate(sentences):
+            mapping[sent.start : sent.end + 1] = idx
+        return mapping
+
+    def _build_gap_filter(self, num_sents: int) -> torch.Tensor:
+        """Boolean mask: True where |i-j| < gap (always-on, not learnable).
+
+        Entries where this is True should have mask = 1.0 (no ablation).
+        """
+        i = torch.arange(num_sents).unsqueeze(1)
+        j = torch.arange(num_sents).unsqueeze(0)
+        return (i - j).abs() < self.sentence_gap
+
+    def _patch_model(
+        self,
+        masks: dict,
+        token_to_sent: torch.Tensor,
+        gap_filter: torch.Tensor,
+        custom_forward_fn,
+    ) -> List[AblationHandle]:
+        """Patch model layers with mask-aware attention forward.
+
+        Args:
+            masks: Dict mapping layer_idx -> mask tensor (num_heads, num_sents, num_sents)
+            token_to_sent: (seq_len,) mapping token -> sentence index
+            gap_filter: (num_sents, num_sents) boolean gap filter
+            custom_forward_fn: The custom forward function to bind
+
+        Returns:
+            List of AblationHandle for cleanup.
+        """
+        handles = []
+        for layer_idx in self.layers:
+            attn_module = get_attention_module(self.model, layer_idx)
+            original_forward = attn_module.forward
+
+            attn_module._circuit_mask = masks.get(layer_idx)
+            attn_module._token_to_sent = token_to_sent
+            attn_module._gap_filter = gap_filter
+
+            attn_module.forward = types.MethodType(custom_forward_fn, attn_module)
+            handles.append(AblationHandle(attn_module, original_forward))
+
+        return handles
+
+    def _unpatch_model(self, handles: List[AblationHandle]):
+        """Restore original forwards."""
+        for h in handles:
+            h.remove()
+
+    @abstractmethod
+    def discover(
+        self,
+        input_ids: torch.Tensor,
+        sentences: List[Sentence],
+        continuations: List[torch.Tensor],
+        **kwargs,
+    ) -> NodeMask:
+        """Run circuit discovery.
+
+        Args:
+            input_ids: (1, prompt_len) tokenized prompt up to analysis timestep
+            sentences: List of Sentence(start, end) in the prompt
+            continuations: List of (1, cont_len) token ID tensors for each branch
+
+        Returns:
+            NodeMask with per-(layer, head, src_sent, tgt_sent) attribution scores.
+        """
+        ...
