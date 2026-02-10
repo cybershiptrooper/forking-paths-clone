@@ -19,6 +19,7 @@ from utils.circuit_vis import (
     plot_circuit_graph,
     plot_attention_pattern,
     plot_sparsity_vs_kl,
+    plot_full_circuit,
 )
 
 
@@ -53,7 +54,7 @@ def main(
     print("\nGenerating top-heads heatmaps...")
     for layer in layers:
         save_path = os.path.join(output_dir, f"top_heads_layer_{layer}.png")
-        plot_top_heads(mask, layer, top_k=top_k_heads, save_path=save_path)
+        plot_top_heads(mask, layer, top_k=top_k_heads, threshold=threshold, save_path=save_path)
         print(f"  Saved: {save_path}")
 
     # 2. Layer-aggregated heatmaps
@@ -97,7 +98,13 @@ def main(
         plot_circuit_graph(mask, threshold=threshold, layer=layer, save_path=save_path)
         print(f"  Saved: {save_path}")
 
-    # 6. Sparsity vs KL (if threshold evaluation data exists)
+    # 6. Full circuit overview (sentences x layers)
+    print("\nGenerating full circuit overview...")
+    save_path = os.path.join(output_dir, f"full_circuit_t{threshold}.png")
+    plot_full_circuit(mask, threshold=threshold, save_path=save_path)
+    print(f"  Saved: {save_path}")
+
+    # 7. Sparsity vs KL (if threshold evaluation data exists)
     threshold_eval = mask.metadata.get("threshold_evaluation", [])
     if threshold_eval:
         print("\nGenerating sparsity vs KL plot...")

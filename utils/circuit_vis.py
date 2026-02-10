@@ -9,8 +9,19 @@ from typing import List, Optional, Dict
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import matplotlib.ticker as mticker
 
 from utils.masks import NodeMask
+
+
+def _sci_fmt(x, _pos):
+    """Format tick value in scientific notation (e.g. 1.0e-8)."""
+    if x == 0:
+        return "0"
+    return f"{x:.1e}"
+
+
+_sci_formatter = mticker.FuncFormatter(_sci_fmt)
 
 
 def _get_sentence_labels(sentences: List[dict], max_chars: int = 20) -> List[str]:
@@ -28,34 +39,58 @@ def plot_head_heatmap(
     node_mask: NodeMask,
     layer: int,
     head: int,
+    threshold: float = 0.0,
     ax: Optional[plt.Axes] = None,
-    cmap: str = "RdYlGn",
+    cmap: str = "Greens",
     title: Optional[str] = None,
+    use_threshold: bool = False,
 ):
-    """Heatmap of sentence-to-sentence scores for a single (layer, head).
+    """Lower-triangular heatmap of sentence-to-sentence scores for a single (layer, head).
 
     Args:
         node_mask: NodeMask with attribution scores
         layer: Layer index
         head: Head index
+        threshold: Values with |score| below this are set to zero
         ax: Matplotlib axes (creates new figure if None)
         cmap: Colormap name
         title: Plot title (auto-generated if None)
+        use_threshold: Whether to apply thresholding (default False, for cleaner head-level patterns)
     """
-    scores = np.array(node_mask.scores[layer][head])
-    labels = _get_sentence_labels(node_mask.sentences)
+    scores = np.abs(np.array(node_mask.scores[layer][head]))
+    num_sents = scores.shape[0]
+    labels = _get_sentence_labels(node_mask.sentences, max_chars=15)
+
+    # Apply causal (lower-triangular) mask
+    causal_mask = np.tril(np.ones_like(scores))
+    scores_masked = np.where(causal_mask, scores, np.nan)
+
+    # Apply threshold: dim entries below threshold
+    if threshold > 0 and use_threshold:
+        scores_masked = np.where(scores_masked >= threshold, scores_masked, 0.0)
 
     if ax is None:
-        fig, ax = plt.subplots(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(8, 7))
 
-    im = ax.imshow(scores, cmap=cmap, aspect="auto")
-    ax.set_xticks(range(len(labels)))
-    ax.set_yticks(range(len(labels)))
+    im = ax.imshow(scores_masked, cmap=cmap, aspect="equal", origin="upper",
+                   interpolation="nearest")
+    ax.set_xticks(range(num_sents))
+    ax.set_yticks(range(num_sents))
     ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
     ax.set_yticklabels(labels, fontsize=7)
-    ax.set_xlabel("Target Sentence (Key)")
-    ax.set_ylabel("Source Sentence (Query)")
-    plt.colorbar(im, ax=ax, shrink=0.8)
+    ax.set_xlabel("Key Sentence")
+    ax.set_ylabel("Query Sentence")
+
+    # Cell borders for the causal triangle
+    for i in range(num_sents):
+        for j in range(i + 1):
+            ax.add_patch(plt.Rectangle(
+                (j - 0.5, i - 0.5), 1, 1,
+                linewidth=0.5, edgecolor="gray", facecolor="none",
+            ))
+
+    cbar = plt.colorbar(im, ax=ax, shrink=0.8, label="Importance")
+    cbar.ax.yaxis.set_major_formatter(_sci_formatter)
 
     if title is None:
         title = f"Layer {layer}, Head {head}"
@@ -68,6 +103,7 @@ def plot_top_heads(
     node_mask: NodeMask,
     layer: int,
     top_k: int = 5,
+    threshold: float = 0.0,
     cmap: str = "RdYlGn",
     save_path: Optional[str] = None,
 ):
@@ -77,6 +113,7 @@ def plot_top_heads(
         node_mask: NodeMask with attribution scores
         layer: Layer index
         top_k: Number of top heads to show
+        threshold: Values with |score| below this are set to zero
         cmap: Colormap name
         save_path: Path to save figure (shows if None)
     """
@@ -95,9 +132,10 @@ def plot_top_heads(
             node_mask,
             layer,
             head,
+            threshold=threshold,
             ax=axes[i],
             cmap=cmap,
-            title=f"L{layer} H{head} (|attr|={importance[head]:.4f})",
+            title=f"L{layer} H{head} (|attr|={importance[head]:.2e})",
         )
 
     # Hide unused axes
@@ -146,7 +184,8 @@ def plot_layer_aggregated(
     ax.set_yticklabels(labels, fontsize=7)
     ax.set_xlabel("Target Sentence (Key)")
     ax.set_ylabel("Source Sentence (Query)")
-    plt.colorbar(im, ax=ax, shrink=0.8)
+    cbar = plt.colorbar(im, ax=ax, shrink=0.8)
+    cbar.ax.yaxis.set_major_formatter(_sci_formatter)
     ax.set_title(f"Layer {layer} — {aggregation} across heads")
 
     if save_path:
@@ -371,7 +410,8 @@ def plot_attention_pattern(
             )
             ax.add_patch(rect)
 
-    plt.colorbar(im, ax=ax, shrink=0.8, label="Importance")
+    cbar = plt.colorbar(im, ax=ax, shrink=0.8, label="Importance")
+    cbar.ax.yaxis.set_major_formatter(_sci_formatter)
     ax.set_title(title)
 
     if save_path:
@@ -401,14 +441,114 @@ def plot_sparsity_vs_kl(
     ax1.set_ylabel("Sparsity", color=color1)
     ax1.plot(thresholds, sparsities, "o-", color=color1, label="Sparsity")
     ax1.tick_params(axis="y", labelcolor=color1)
+    ax1.yaxis.set_major_formatter(_sci_formatter)
 
     ax2 = ax1.twinx()
     color2 = "tab:red"
     ax2.set_ylabel("KL Divergence", color=color2)
     ax2.plot(thresholds, kl_scores, "s-", color=color2, label="KL Divergence")
     ax2.tick_params(axis="y", labelcolor=color2)
+    ax2.yaxis.set_major_formatter(_sci_formatter)
+    ax2.set_xscale("log")
 
     fig.suptitle("Sparsity vs KL Divergence")
+    fig.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+    return fig
+
+
+def plot_full_circuit(
+    node_mask: NodeMask,
+    threshold: float = 0.0,
+    aggregation: str = "mean",
+    save_path: Optional[str] = None,
+):
+    """Full circuit overview: sentences on x-axis, layers on y-axis.
+
+    Shows per-sentence importance at each layer, giving a bird's-eye view
+    of where each sentence matters across the network. Importance is computed
+    as the mean attribution score each sentence receives as a key (i.e. how
+    much other sentences attend to it), aggregated across heads.
+
+    Green cells indicate above-threshold importance (causal relation),
+    red cells indicate below-threshold (no causal relation).
+
+    Args:
+        node_mask: NodeMask with attribution scores
+        threshold: Importance threshold for green/red coloring
+        aggregation: How to aggregate across heads ("mean", "max", "sum")
+        save_path: Path to save figure (shows if None)
+    """
+    layers = node_mask.layers
+    num_sents = len(node_mask.sentences)
+    num_layers = len(layers)
+
+    # Build (num_layers, num_sents) importance matrix.
+    # For each (layer, sentence), compute how much that sentence is attended
+    # to by downstream sentences (column importance under causal mask).
+    importance_matrix = np.zeros((num_layers, num_sents))
+
+    for i, layer in enumerate(layers):
+        scores = np.abs(np.array(node_mask.get_layer_aggregated(layer, aggregation)))
+        # Causal mask: row q attends to column k where k <= q
+        causal_mask = np.tril(np.ones_like(scores))
+        scores_causal = np.where(causal_mask, scores, 0.0)
+        # Exclude self-attention (diagonal)
+        np.fill_diagonal(scores_causal, 0.0)
+        # Column sum = total importance of each sentence as a key
+        col_sum = scores_causal.sum(axis=0)
+        # Normalise by number of valid query positions per column
+        valid_counts = np.maximum(causal_mask.sum(axis=0) - 1, 1)  # -1 for diagonal
+        importance_matrix[i] = col_sum / valid_counts
+
+    labels = _get_sentence_labels(node_mask.sentences, max_chars=15)
+
+    fig_w = max(8, num_sents * 1.0)
+    fig_h = max(4, num_layers * 0.7)
+    fig, ax = plt.subplots(figsize=(fig_w, fig_h))
+
+    if threshold > 0:
+        # Binary green/red coloring based on threshold
+        binary = np.where(importance_matrix >= threshold, 1.0, 0.0)
+        cmap = mcolors.ListedColormap(["#d9534f", "#5cb85c"])  # red, green
+        bounds = [-0.5, 0.5, 1.5]
+        norm = mcolors.BoundaryNorm(bounds, cmap.N)
+        im = ax.imshow(
+            binary, cmap=cmap, norm=norm, aspect="auto", origin="lower",
+            interpolation="nearest",
+        )
+        # Overlay the actual score values as text
+        for i in range(num_layers):
+            for j in range(num_sents):
+                val = importance_matrix[i, j]
+                ax.text(j, i, f"{val:.1e}", ha="center", va="center",
+                        fontsize=6, color="white", fontweight="bold")
+    else:
+        im = ax.imshow(
+            importance_matrix, cmap="Greens", aspect="auto", origin="lower",
+            interpolation="nearest",
+        )
+        cbar = plt.colorbar(im, ax=ax, shrink=0.8, label="Importance")
+        cbar.ax.yaxis.set_major_formatter(_sci_formatter)
+
+    # Cell grid lines
+    for i in range(num_layers):
+        for j in range(num_sents):
+            ax.add_patch(plt.Rectangle(
+                (j - 0.5, i - 0.5), 1, 1,
+                linewidth=0.5, edgecolor="gray", facecolor="none",
+            ))
+
+    ax.set_xticks(range(num_sents))
+    ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
+    ax.set_yticks(range(num_layers))
+    ax.set_yticklabels([f"Layer {l}" for l in layers], fontsize=8)
+    ax.set_xlabel("Sentence")
+    ax.set_ylabel("Layer")
+    ax.set_title("Circuit Overview — Per-Sentence Importance by Layer")
     fig.tight_layout()
 
     if save_path:
