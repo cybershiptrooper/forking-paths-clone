@@ -11,6 +11,11 @@ Loads a saved NodeMask JSON and generates multi-level visualizations:
 import os
 import argparse
 
+import numpy as np
+import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+
 from utils.masks import NodeMask, load_mask
 from utils.circuit_vis import (
     plot_top_heads,
@@ -18,11 +23,78 @@ from utils.circuit_vis import (
     plot_layer_comparison,
     plot_circuit_graph,
     plot_attention_pattern,
-    plot_sparsity_vs_kl,
+    plot_threshold_vs_metrics,
     plot_full_circuit,
     plot_per_token_objective,
     plot_per_sentence_objective,
 )
+
+
+def plot_sparsity_vs_kl_with_random(
+    thresholds: list[float],
+    sparsities: list[float],
+    kl_scores: list[float],
+    random_kl_scores: list[float] | None,
+    save_path: str,
+):
+    thresholds_arr = np.array(thresholds, dtype=float)
+    sparsities_arr = np.array(sparsities, dtype=float)
+    kl_arr = np.array(kl_scores, dtype=float)
+
+    sort_idx = np.argsort(sparsities_arr)
+    sparsities_sorted = sparsities_arr[sort_idx]
+    kl_sorted = kl_arr[sort_idx]
+
+    if np.all(thresholds_arr > 0):
+        norm = mcolors.LogNorm(vmin=thresholds_arr.min(), vmax=thresholds_arr.max())
+    else:
+        norm = mcolors.Normalize(vmin=thresholds_arr.min(), vmax=thresholds_arr.max())
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(sparsities_sorted, kl_sorted, "-", color="gray", alpha=0.4)
+    sc = ax.scatter(
+        sparsities_arr,
+        kl_arr,
+        c=thresholds_arr,
+        cmap="viridis",
+        norm=norm,
+        s=40,
+        edgecolors="k",
+        linewidths=0.3,
+    )
+
+    if random_kl_scores is not None:
+        random_arr = np.array(random_kl_scores, dtype=float)
+        random_sorted = random_arr[sort_idx]
+        ax.plot(
+            sparsities_sorted,
+            random_sorted,
+            "--",
+            color="tab:orange",
+            label="Random baseline",
+        )
+        ax.scatter(
+            sparsities_arr,
+            random_arr,
+            marker="x",
+            color="tab:orange",
+            s=35,
+            linewidths=0.8,
+        )
+        ax.legend(loc="best", frameon=False)
+
+    ax.set_xlabel("Sparsity")
+    ax.set_ylabel("KL Divergence")
+    ax.xaxis.set_major_formatter(mticker.PercentFormatter(1.0))
+    ax.yaxis.set_major_formatter(mticker.ScalarFormatter(useMathText=True))
+
+    cbar = plt.colorbar(sc, ax=ax, shrink=0.9)
+    cbar.set_label("Threshold")
+
+    fig.suptitle("Sparsity vs KL Divergence")
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
 
 
 def main(
@@ -109,12 +181,21 @@ def main(
     # 7. Sparsity vs KL (if threshold evaluation data exists)
     threshold_eval = mask.metadata.get("threshold_evaluation", [])
     if threshold_eval:
-        print("\nGenerating sparsity vs KL plot...")
+        print("\nGenerating threshold vs sparsity/KL plot...")
         thresholds = [r["threshold"] for r in threshold_eval]
         sparsities = [r["sparsity"] for r in threshold_eval]
         kl_scores = [r["kl_divergence"] for r in threshold_eval]
+        save_path = os.path.join(output_dir, "threshold_vs_metrics.png")
+        plot_threshold_vs_metrics(thresholds, sparsities, kl_scores, save_path=save_path)
+
+        print("\nGenerating sparsity vs KL plot...")
         save_path = os.path.join(output_dir, "sparsity_vs_kl.png")
-        plot_sparsity_vs_kl(thresholds, sparsities, kl_scores, save_path=save_path)
+        random_kl = [r.get("random_kl_divergence") for r in threshold_eval]
+        if any(v is None for v in random_kl):
+            random_kl = None
+        plot_sparsity_vs_kl_with_random(
+            thresholds, sparsities, kl_scores, random_kl, save_path=save_path
+        )
         print(f"  Saved: {save_path}")
     else:
         print("\nNo threshold evaluation data found in mask metadata, skipping sparsity-KL plot.")

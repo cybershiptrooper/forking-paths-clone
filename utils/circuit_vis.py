@@ -422,6 +422,50 @@ def plot_attention_pattern(
     return fig if save_path or ax is None else ax
 
 
+def plot_threshold_vs_metrics(
+    thresholds: List[float],
+    sparsities: List[float],
+    kl_scores: List[float],
+    save_path: Optional[str] = None,
+):
+    """Plot threshold vs sparsity and KL divergence (dual y-axis).
+
+    Args:
+        thresholds: List of threshold values
+        sparsities: Corresponding sparsity values
+        kl_scores: Corresponding KL divergence scores
+        save_path: Save path
+    """
+    thresholds_arr = np.array(thresholds, dtype=float)
+    sparsities_arr = np.array(sparsities, dtype=float)
+    kl_arr = np.array(kl_scores, dtype=float)
+
+    fig, ax1 = plt.subplots(figsize=(8, 5))
+
+    color1 = "tab:blue"
+    ax1.set_xlabel("Threshold")
+    ax1.set_ylabel("Sparsity", color=color1)
+    ax1.plot(thresholds_arr, sparsities_arr, "o-", color=color1, label="Sparsity")
+    ax1.tick_params(axis="y", labelcolor=color1)
+    ax1.xaxis.set_major_formatter(_sci_formatter)
+    ax1.set_xscale("log")
+
+    ax1b = ax1.twinx()
+    color2 = "tab:red"
+    ax1b.set_ylabel("KL Divergence", color=color2)
+    ax1b.plot(thresholds_arr, kl_arr, "s-", color=color2, label="KL Divergence")
+    ax1b.tick_params(axis="y", labelcolor=color2)
+    ax1b.yaxis.set_major_formatter(_sci_formatter)
+
+    fig.suptitle("Threshold vs Sparsity/KL Divergence")
+    fig.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+    return fig
+
+
 def plot_sparsity_vs_kl(
     thresholds: List[float],
     sparsities: List[float],
@@ -436,8 +480,6 @@ def plot_sparsity_vs_kl(
         kl_scores: Corresponding KL divergence scores
         save_path: Save path
     """
-    fig, ax = plt.subplots(figsize=(8, 5))
-
     thresholds_arr = np.array(thresholds, dtype=float)
     sparsities_arr = np.array(sparsities, dtype=float)
     kl_arr = np.array(kl_scores, dtype=float)
@@ -450,6 +492,8 @@ def plot_sparsity_vs_kl(
         norm = mcolors.LogNorm(vmin=thresholds_arr.min(), vmax=thresholds_arr.max())
     else:
         norm = mcolors.Normalize(vmin=thresholds_arr.min(), vmax=thresholds_arr.max())
+
+    fig, ax = plt.subplots(figsize=(8, 5))
 
     ax.plot(sparsities_sorted, kl_sorted, "-", color="gray", alpha=0.4)
     sc = ax.scatter(

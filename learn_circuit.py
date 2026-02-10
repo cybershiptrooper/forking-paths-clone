@@ -149,6 +149,79 @@ def evaluate_at_thresholds(
 
     gap_filter = torch.zeros(num_sents, num_sents, dtype=torch.bool)  # no gap for eval
 
+    def _eval_with_masks(
+        binary_masks: dict[int, torch.Tensor],
+        collect_per_token: bool,
+        collect_per_sentence: bool,
+    ):
+        import types
+
+        handles = []
+        for layer_idx in layers:
+            attn_module = get_attention_module(model, layer_idx)
+            original_forward = attn_module.forward
+            attn_module._circuit_mask = binary_masks[layer_idx]
+            attn_module._token_to_sent = token_to_sent
+            attn_module._gap_filter = gap_filter
+            attn_module.forward = types.MethodType(
+                llama_attention_forward_with_differentiable_mask, attn_module
+            )
+            handles.append(AblationHandle(attn_module, original_forward))
+
+        total_kl = 0.0
+        total_tokens = 0
+        per_token_kl_branches = []
+        per_sent_kl_branches = []
+        with torch.no_grad():
+            for cont_idx, cont in enumerate(continuations):
+                full_input = torch.cat([input_ids, cont], dim=-1)
+                full_len = full_input.shape[-1]
+                pos_mask = torch.zeros(1, full_len, device=device)
+                pos_mask[0, prefix_len - 1 : full_len - 1] = 1.0
+
+                logits = model(full_input).logits
+                clean = clean_logits_list[cont_idx][:, :full_len].to(device)
+                kl = objective_fn(clean, logits, pos_mask)
+                total_kl += kl.item() * pos_mask.sum().item()
+                total_tokens += pos_mask.sum().item()
+
+                if collect_per_token or collect_per_sentence:
+                    log_clean = torch.nn.functional.log_softmax(
+                        clean.detach(), dim=-1
+                    )
+                    log_masked = torch.nn.functional.log_softmax(logits, dim=-1)
+                    kl_tokens = torch.nn.functional.kl_div(
+                        log_masked, log_clean, log_target=True, reduction="none"
+                    ).sum(dim=-1)  # (1, seq_len)
+                    branch_kl = kl_tokens[
+                        0, prefix_len - 1 : full_len - 1
+                    ].cpu().tolist()
+
+                    if collect_per_token:
+                        per_token_kl_branches.append(branch_kl)
+
+                    if collect_per_sentence and tokenizer is not None:
+                        cont_token_ids = cont[0]  # (num_cont_tokens,)
+                        cont_sents = split_tokens_into_sentences(
+                            cont_token_ids, tokenizer, min_sentence_length=5
+                        )
+                        sent_kl_list = []
+                        for s in cont_sents:
+                            # s.start/end are relative to cont; branch_kl is indexed the same way
+                            s_kl = branch_kl[s.start : s.end + 1]
+                            avg = sum(s_kl) / max(len(s_kl), 1)
+                            text = tokenizer.decode(
+                                cont_token_ids[s.start : s.end + 1].tolist()
+                            )
+                            sent_kl_list.append({"text": text, "mean_kl": avg})
+                        per_sent_kl_branches.append(sent_kl_list)
+
+        for h in handles:
+            h.remove()
+
+        avg_kl = total_kl / max(total_tokens, 1)
+        return avg_kl, per_token_kl_branches, per_sent_kl_branches
+
     # Optionally ablate non-target layers
     non_target_handles = []
     if ablate_non_target_layers:
@@ -198,72 +271,28 @@ def evaluate_at_thresholds(
                             m[h, i, j] = 0.0
             binary_masks[l] = m
 
-        # Patch model
-        import types
+        avg_kl, per_token_kl_branches, per_sent_kl_branches = _eval_with_masks(
+            binary_masks=binary_masks,
+            collect_per_token=True,
+            collect_per_sentence=True,
+        )
 
-        handles = []
-        for layer_idx in layers:
-            attn_module = get_attention_module(model, layer_idx)
-            original_forward = attn_module.forward
-            attn_module._circuit_mask = binary_masks[layer_idx]
-            attn_module._token_to_sent = token_to_sent
-            attn_module._gap_filter = gap_filter
-            attn_module.forward = types.MethodType(
-                llama_attention_forward_with_differentiable_mask, attn_module
-            )
-            handles.append(AblationHandle(attn_module, original_forward))
+        keep_prob = max(0.0, min(1.0, 1.0 - sparsity))
+        random_masks = {}
+        for l in layers:
+            rand = torch.rand(num_heads, num_sents, num_sents, device=device)
+            random_masks[l] = (rand < keep_prob).float()
 
-        # Compute masked logits
-        total_kl = 0.0
-        total_tokens = 0
-        per_token_kl_branches = []
-        per_sent_kl_branches = []
-        with torch.no_grad():
-            for cont_idx, cont in enumerate(continuations):
-                full_input = torch.cat([input_ids, cont], dim=-1)
-                full_len = full_input.shape[-1]
-                pos_mask = torch.zeros(1, full_len, device=device)
-                pos_mask[0, prefix_len - 1 : full_len - 1] = 1.0
-
-                logits = model(full_input).logits
-                clean = clean_logits_list[cont_idx][:, :full_len].to(device)
-                kl = objective_fn(clean, logits, pos_mask)
-                total_kl += kl.item() * pos_mask.sum().item()
-                total_tokens += pos_mask.sum().item()
-
-                # Per-token KL for this branch (continuation tokens only)
-                log_clean = torch.nn.functional.log_softmax(clean.detach(), dim=-1)
-                log_masked = torch.nn.functional.log_softmax(logits, dim=-1)
-                kl_tokens = torch.nn.functional.kl_div(
-                    log_masked, log_clean, log_target=True, reduction="none"
-                ).sum(dim=-1)  # (1, seq_len)
-                branch_kl = kl_tokens[0, prefix_len - 1 : full_len - 1].cpu().tolist()
-                per_token_kl_branches.append(branch_kl)
-
-                # Per-sentence KL for this branch
-                if tokenizer is not None:
-                    cont_token_ids = cont[0]  # (num_cont_tokens,)
-                    cont_sents = split_tokens_into_sentences(
-                        cont_token_ids, tokenizer, min_sentence_length=5
-                    )
-                    sent_kl_list = []
-                    for s in cont_sents:
-                        # s.start/end are relative to cont; branch_kl is indexed the same way
-                        s_kl = branch_kl[s.start : s.end + 1]
-                        avg = sum(s_kl) / max(len(s_kl), 1)
-                        text = tokenizer.decode(cont_token_ids[s.start : s.end + 1].tolist())
-                        sent_kl_list.append({"text": text, "mean_kl": avg})
-                    per_sent_kl_branches.append(sent_kl_list)
-
-        # Cleanup
-        for h in handles:
-            h.remove()
-
-        avg_kl = total_kl / max(total_tokens, 1)
+        random_kl, _, _ = _eval_with_masks(
+            binary_masks=random_masks,
+            collect_per_token=False,
+            collect_per_sentence=False,
+        )
         entry = {
             "threshold": threshold,
             "sparsity": sparsity,
             "kl_divergence": avg_kl,
+            "random_kl_divergence": random_kl,
             "per_token_kl": per_token_kl_branches,
         }
         if per_sent_kl_branches:
@@ -575,13 +604,25 @@ if __name__ == "__main__":
         type=float,
         nargs="+",
         default=[
+            -1e-3,
+            -5e-4,
+            -1e-4,
+            -5e-5,
             -1e-5,
             -5e-6,
             -1e-6,
             -5e-7,
             -5e-8,
             -1e-8,
+            -1e-9,
+            -1e-10,
+            -1e-11,
+            -1e-12,
             0.0,
+            1e-12,
+            1e-11,
+            1e-10,
+            1e-9,
             1e-8,
             5e-8,
             1e-7,
@@ -589,6 +630,10 @@ if __name__ == "__main__":
             1e-6,
             5e-6,
             1e-5,
+            5e-5,
+            1e-4,
+            5e-4,
+            1e-3,
         ],
         help="Thresholds for sparsity-vs-KL evaluation",
     )
