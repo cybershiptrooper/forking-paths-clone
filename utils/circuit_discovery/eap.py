@@ -224,7 +224,7 @@ class EAPDiscovery(CircuitDiscoveryAlgorithm):
         for p in self.model.parameters():
             p.requires_grad_(False)
 
-        self.num_heads = self.model.model.layers[0].self_attn.num_attention_heads
+        self.num_heads = self.model.config.num_attention_heads
         self.num_chunks = len(sentence_chunks)
 
         init = torch.full(
