@@ -178,15 +178,17 @@ def llama_attention_forward_with_differentiable_mask(
 
     if mask is not None and token_to_sent is not None:
         k_len = key_states.shape[-2]
+        original_dtype = attn_weights.dtype
         token_mask = expand_sentence_mask_to_tokens(
             mask, token_to_sent, gap_filter, q_len, k_len, cache_position
         )
         # token_mask: (num_heads, q_len, k_len)
         # attn_weights: (bsz, num_heads, q_len, k_len)
-        attn_weights = attn_weights * token_mask.unsqueeze(0)
+        # Compute in float32 for numerical stability, then cast back
+        attn_weights = (attn_weights.float() * token_mask.unsqueeze(0))
         # Renormalize
         row_sums = attn_weights.sum(dim=-1, keepdim=True) + 1e-12
-        attn_weights = attn_weights / row_sums
+        attn_weights = (attn_weights / row_sums).to(original_dtype)
     # =========================================================================
 
     attn_weights = nn.functional.dropout(
