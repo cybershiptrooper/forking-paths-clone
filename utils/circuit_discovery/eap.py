@@ -126,17 +126,16 @@ def llama_attention_forward_with_eap(
             if gap_mask is not None:
                 mask_layer = mask_layer * gap_mask.unsqueeze(0) + (1.0 - gap_mask).unsqueeze(0)
 
+            mask_full = torch.ones_like(attn_weights)
             for local_q, abs_pos in enumerate(current_query_positions):
                 if abs_pos >= analysis_timestep or abs_pos < 0:
                     continue
                 q_chunk = int(chunk_map[abs_pos].item())
                 mask_for_q = mask_layer[:, q_chunk, :]
                 mask_for_keys = mask_for_q[:, k_chunk_ids]
-                attn_weights[:, :, local_q, :k_prefix_len] = (
-                    attn_weights[:, :, local_q, :k_prefix_len]
-                    * mask_for_keys.unsqueeze(0)
-                )
+                mask_full[:, :, local_q, :k_prefix_len] = mask_for_keys.unsqueeze(0)
 
+            attn_weights = attn_weights * mask_full
             row_sums = attn_weights.sum(dim=-1, keepdim=True) + 1e-12
             attn_weights = attn_weights / row_sums
 
