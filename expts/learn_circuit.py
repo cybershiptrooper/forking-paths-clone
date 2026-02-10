@@ -132,6 +132,11 @@ def main(
         last = sentences[-1]
         sentences[-1] = Sentence(start=last.start, end=analysis_timestep - 1)
 
+    # Exclude BOS token (index 0) from analysis
+    if sentences and sentences[0].start == 0:
+        from utils.utils import Sentence
+        sentences[0] = Sentence(start=1, end=sentences[0].end)
+
     print(f"Found {len(sentences)} sentences in prefix")
     for i, s in enumerate(sentences):
         text = tokenizer.decode(prefix_token_ids[s.start : s.end + 1])

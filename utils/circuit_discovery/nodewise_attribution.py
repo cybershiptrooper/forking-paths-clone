@@ -1,7 +1,10 @@
 """Nodewise Attribution Patching for attention-based circuit discovery.
 
-Learns per-head, per-layer sentence-to-sentence masks by computing gradients of
-a KL divergence objective through differentiable attention. All analyzed layers
+Uses proper attribution patching: a clean (unmasked) forward pass produces
+reference logits, while an ablated forward pass zeros out all maskable
+sentence-to-sentence attention edges. The gradient of KL(clean || ablated)
+w.r.t. the mask at zero tells us how much *restoring* each connection would
+reduce divergence — i.e. each edge's causal importance. All analyzed layers
 are patched simultaneously so gradients capture inter-layer effects.
 """
 
@@ -204,7 +207,8 @@ def llama_attention_forward_with_differentiable_mask(
     token_to_sent = getattr(self, "_token_to_sentence", None)
     maskable = getattr(self, "_maskable", None)
 
-    if node_mask is not None and token_to_sent is not None:
+    apply_mask = getattr(self, "_apply_mask", True)
+    if node_mask is not None and token_to_sent is not None and apply_mask:
         k_len = key_states.shape[-2]
 
         # Apply gap constraint: force non-maskable edges to 1.0
@@ -268,7 +272,7 @@ def llama_attention_forward_with_differentiable_mask(
 class DifferentiableMaskHandle:
     """Handle to restore original forward and clean up mask attributes."""
 
-    _ATTRS = ("_node_mask", "_token_to_sentence", "_maskable")
+    _ATTRS = ("_node_mask", "_token_to_sentence", "_maskable", "_apply_mask")
 
     def __init__(self, attn_module, original_forward):
         self.attn_module = attn_module
@@ -289,9 +293,10 @@ class DifferentiableMaskHandle:
 class NodewiseAttributionDiscovery(CircuitDiscoveryAlgorithm):
     """Nodewise attribution patching for attention circuits.
 
-    Computes per-head, per-layer sentence-to-sentence attributions via a
-    single forward+backward pass with differentiable attention masks applied
-    to ALL analyzed layers simultaneously.
+    For each branch, runs a clean forward (no mask) and an ablated forward
+    (all maskable sentence-to-sentence edges zeroed). Gradients of
+    KL(clean || ablated) w.r.t. the zero-valued masks give per-head,
+    per-layer causal importance scores for each sentence pair.
     """
 
     @property
@@ -371,7 +376,7 @@ class NodewiseAttributionDiscovery(CircuitDiscoveryAlgorithm):
         # --- Create masks for ALL analyzed layers (requires_grad) ---
         masks: Dict[int, torch.Tensor] = {}
         for layer_idx in layers:
-            masks[layer_idx] = torch.ones(
+            masks[layer_idx] = torch.zeros(
                 num_heads,
                 num_sentences,
                 num_sentences,
@@ -409,15 +414,18 @@ class NodewiseAttributionDiscovery(CircuitDiscoveryAlgorithm):
                     attn_masks[batch_start:batch_end], device=device
                 )
 
-                # Clean forward (no mask effect since mask=1, but we need reference)
+                # Clean forward (mask disabled — unperturbed reference)
+                for h in handles:
+                    h.attn_module._apply_mask = False
                 with torch.no_grad():
                     clean_out = model(
                         input_ids=batch_ids, attention_mask=batch_attn
                     )
                     clean_logits = clean_out.logits.detach()
 
-                # Masked forward (masks are all 1.0, so output is same as clean,
-                # but gradients tell us the sensitivity to each mask element)
+                # Ablated forward (masks=0 for maskable pairs — actual ablation)
+                for h in handles:
+                    h.attn_module._apply_mask = True
                 masked_out = model(
                     input_ids=batch_ids, attention_mask=batch_attn
                 )
