@@ -114,6 +114,7 @@ def evaluate_at_thresholds(
     objective_fn,
     thresholds: list[float],
     layers: list[int],
+    ablate_non_target_layers: bool = False,
 ) -> list[dict]:
     """Evaluate KL divergence and sparsity at different mask thresholds.
 
@@ -143,6 +144,28 @@ def evaluate_at_thresholds(
     token_to_sent = token_to_sent.to(device)
 
     gap_filter = torch.zeros(num_sents, num_sents, dtype=torch.bool)  # no gap for eval
+
+    # Optionally ablate non-target layers
+    non_target_handles = []
+    if ablate_non_target_layers:
+        import types
+
+        num_total_layers = model.config.num_hidden_layers
+        target_set = set(layers)
+        non_target = [l for l in range(num_total_layers) if l not in target_set]
+        print(f"Ablating {len(non_target)} non-target layers for evaluation...")
+        for layer_idx in non_target:
+            attn_module = get_attention_module(model, layer_idx)
+            original_forward = attn_module.forward
+            attn_module._circuit_mask = torch.zeros(
+                num_heads, num_sents, num_sents, device=device
+            )
+            attn_module._token_to_sent = token_to_sent
+            attn_module._gap_filter = gap_filter
+            attn_module.forward = types.MethodType(
+                llama_attention_forward_with_differentiable_mask, attn_module
+            )
+            non_target_handles.append(AblationHandle(attn_module, original_forward))
 
     # Compute clean logits
     print("Computing clean logits for threshold evaluation...")
@@ -216,6 +239,10 @@ def evaluate_at_thresholds(
             f"  threshold={threshold:.3f} | sparsity={sparsity:.2%} | KL={avg_kl:.6f}"
         )
 
+    # Cleanup non-target layer ablation
+    for h in non_target_handles:
+        h.remove()
+
     return results
 
 
@@ -228,6 +255,7 @@ def main(
     layers_to_analyse: list[int] = None,
     sentence_gap: int = 1,
     sentence_chunk: int = 1,
+    ablate_non_target_layers: bool = False,
     num_ig_steps: int = 10,
     max_new_tokens: int = 150,
     temperature: float = 0.6,
@@ -386,6 +414,7 @@ def main(
         layers=layers_to_analyse,
         objective_fn=objective_fn,
         sentence_gap=sentence_gap,
+        ablate_non_target_layers=ablate_non_target_layers,
         num_ig_steps=num_ig_steps,
     )
 
@@ -415,6 +444,7 @@ def main(
         objective_fn=objective_fn,
         thresholds=thresholds,
         layers=layers_to_analyse,
+        ablate_non_target_layers=ablate_non_target_layers,
     )
 
     node_mask.metadata["threshold_evaluation"] = threshold_results
@@ -488,6 +518,11 @@ if __name__ == "__main__":
     )
     parser.add_argument("--sentence_gap", type=int, default=1)
     parser.add_argument("--sentence_chunk", type=int, default=1)
+    parser.add_argument(
+        "--ablate_non_target_layers",
+        action="store_true",
+        help="Ablate all attention heads in layers outside --layers_to_analyse",
+    )
     parser.add_argument("--num_ig_steps", type=int, default=10)
     parser.add_argument("--max_new_tokens", type=int, default=150)
     parser.add_argument("--temperature", type=float, default=0.6)

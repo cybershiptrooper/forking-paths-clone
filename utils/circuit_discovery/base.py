@@ -44,6 +44,7 @@ class CircuitDiscovery(ABC):
         layers: List[int],
         objective_fn: Callable,
         sentence_gap: int = 1,
+        ablate_non_target_layers: bool = False,
         **kwargs,
     ):
         self.model = model
@@ -51,6 +52,7 @@ class CircuitDiscovery(ABC):
         self.layers = layers
         self.objective_fn = objective_fn
         self.sentence_gap = sentence_gap
+        self.ablate_non_target_layers = ablate_non_target_layers
 
     def _build_token_to_sentence_map(
         self, sentences: List[Sentence], seq_len: int
@@ -109,6 +111,49 @@ class CircuitDiscovery(ABC):
         """Restore original forwards."""
         for h in handles:
             h.remove()
+
+    def _patch_non_target_layers(
+        self,
+        num_heads: int,
+        num_sents: int,
+        token_to_sent: torch.Tensor,
+        gap_filter: torch.Tensor,
+        custom_forward_fn,
+    ) -> List[AblationHandle]:
+        """Patch all layers NOT in self.layers with zero masks (fully ablated).
+
+        Args:
+            num_heads: Number of attention heads per layer
+            num_sents: Number of sentences
+            token_to_sent: (seq_len,) mapping token -> sentence index
+            gap_filter: (num_sents, num_sents) boolean gap filter
+            custom_forward_fn: The custom forward function to bind
+
+        Returns:
+            List of AblationHandle for cleanup.
+        """
+        device = next(self.model.parameters()).device
+        num_layers = self.model.config.num_hidden_layers
+        target_set = set(self.layers)
+        non_target = [l for l in range(num_layers) if l not in target_set]
+
+        handles = []
+        for layer_idx in non_target:
+            attn_module = get_attention_module(self.model, layer_idx)
+            original_forward = attn_module.forward
+
+            # Zero mask = fully ablated
+            zero_mask = torch.zeros(
+                num_heads, num_sents, num_sents, device=device
+            )
+            attn_module._circuit_mask = zero_mask
+            attn_module._token_to_sent = token_to_sent
+            attn_module._gap_filter = gap_filter
+
+            attn_module.forward = types.MethodType(custom_forward_fn, attn_module)
+            handles.append(AblationHandle(attn_module, original_forward))
+
+        return handles
 
     @abstractmethod
     def discover(

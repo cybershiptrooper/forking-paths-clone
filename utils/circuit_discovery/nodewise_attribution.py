@@ -300,7 +300,22 @@ class NodewiseAttribution(CircuitDiscovery):
         token_to_sent = token_to_sent.to(device)
         gap_filter = self._build_gap_filter(num_sents)
 
-        # 1. Pre-compute clean logits
+        # 0. Optionally ablate all non-target layers
+        non_target_handles = []
+        if self.ablate_non_target_layers:
+            print(
+                f"Ablating all layers outside {self.layers} "
+                f"({self.model.config.num_hidden_layers - len(self.layers)} layers)..."
+            )
+            non_target_handles = self._patch_non_target_layers(
+                num_heads=num_heads,
+                num_sents=num_sents,
+                token_to_sent=token_to_sent,
+                gap_filter=gap_filter,
+                custom_forward_fn=llama_attention_forward_with_differentiable_mask,
+            )
+
+        # 1. Pre-compute clean logits (with non-target layers ablated if enabled)
         print("Computing clean logits...")
         clean_logits_list = self._get_clean_logits(input_ids, continuations)
 
@@ -363,7 +378,11 @@ class NodewiseAttribution(CircuitDiscovery):
             # Cleanup
             self._unpatch_model(handles)
 
-        # 3. Average gradients → attribution scores
+        # 3. Cleanup non-target layer ablation
+        if non_target_handles:
+            self._unpatch_model(non_target_handles)
+
+        # 4. Average gradients → attribution scores
         num_total = self.num_ig_steps * len(continuations)
         scores = {}
         for l in self.layers:
@@ -383,6 +402,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 "num_continuations": len(continuations),
                 "sentence_gap": self.sentence_gap,
                 "num_heads": num_heads,
+                "ablate_non_target_layers": self.ablate_non_target_layers,
             },
             scores=scores,
         )
