@@ -27,75 +27,8 @@ from utils.circuit_vis import (
     plot_full_circuit,
     plot_per_token_objective,
     plot_per_sentence_objective,
+    plot_sparsity_vs_kl_with_random,
 )
-
-
-def plot_sparsity_vs_kl_with_random(
-    thresholds: list[float],
-    sparsities: list[float],
-    kl_scores: list[float],
-    random_kl_scores: list[float] | None,
-    save_path: str,
-):
-    thresholds_arr = np.array(thresholds, dtype=float)
-    sparsities_arr = np.array(sparsities, dtype=float)
-    kl_arr = np.array(kl_scores, dtype=float)
-
-    sort_idx = np.argsort(sparsities_arr)
-    sparsities_sorted = sparsities_arr[sort_idx]
-    kl_sorted = kl_arr[sort_idx]
-
-    if np.all(thresholds_arr > 0):
-        norm = mcolors.LogNorm(vmin=thresholds_arr.min(), vmax=thresholds_arr.max())
-    else:
-        norm = mcolors.Normalize(vmin=thresholds_arr.min(), vmax=thresholds_arr.max())
-
-    fig, ax = plt.subplots(figsize=(8, 5))
-    ax.plot(sparsities_sorted, kl_sorted, "-", color="gray", alpha=0.4)
-    sc = ax.scatter(
-        sparsities_arr,
-        kl_arr,
-        c=thresholds_arr,
-        cmap="viridis",
-        norm=norm,
-        s=40,
-        edgecolors="k",
-        linewidths=0.3,
-    )
-
-    if random_kl_scores is not None:
-        random_arr = np.array(random_kl_scores, dtype=float)
-        random_sorted = random_arr[sort_idx]
-        ax.plot(
-            sparsities_sorted,
-            random_sorted,
-            "--",
-            color="tab:orange",
-            label="Random baseline",
-        )
-        ax.scatter(
-            sparsities_arr,
-            random_arr,
-            marker="x",
-            color="tab:orange",
-            s=35,
-            linewidths=0.8,
-        )
-        ax.legend(loc="best", frameon=False)
-
-    ax.set_xlabel("Sparsity")
-    ax.set_ylabel("KL Divergence")
-    ax.xaxis.set_major_formatter(mticker.PercentFormatter(1.0))
-    ax.yaxis.set_major_formatter(mticker.ScalarFormatter(useMathText=True))
-
-    cbar = plt.colorbar(sc, ax=ax, shrink=0.9)
-    cbar.set_label("Threshold")
-
-    fig.suptitle("Sparsity vs KL Divergence")
-    fig.tight_layout()
-    fig.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.close(fig)
-
 
 def main(
     mask_path: str,
