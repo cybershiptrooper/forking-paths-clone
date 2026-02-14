@@ -66,15 +66,6 @@ class CircuitDiscovery(ABC):
             mapping[sent.start : sent.end + 1] = idx
         return mapping
 
-    def _build_gap_filter(self, num_sents: int) -> torch.Tensor:
-        """Boolean mask: True where |i-j| < gap (always-on, not learnable).
-
-        Entries where this is True should have mask = 1.0 (no ablation).
-        """
-        i = torch.arange(num_sents).unsqueeze(1)
-        j = torch.arange(num_sents).unsqueeze(0)
-        return (i - j).abs() < self.sentence_gap
-
     def _patch_model(
         self,
         masks: dict,

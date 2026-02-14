@@ -15,7 +15,7 @@ from transformers.cache_utils import Cache
 from transformers.models.llama.modeling_llama import apply_rotary_pos_emb, repeat_kv
 from tqdm import tqdm
 
-from utils.masks import NodeMask
+from utils.masks import NodeMask, build_gap_filter, apply_gap_filter
 from utils.utils import Sentence
 from utils.circuit_discovery.base import CircuitDiscovery
 
@@ -62,8 +62,7 @@ def expand_sentence_mask_to_tokens(
         num_heads, num_sents + 1, num_sents + 1, device=device, dtype=mask.dtype
     )
     # Apply gap filter: gap entries stay 1.0, non-gap entries use mask values
-    gap_float = gap_filter.to(device=device, dtype=mask.dtype)
-    effective_mask = gap_float + (1.0 - gap_float) * mask
+    effective_mask = apply_gap_filter(mask, gap_filter, fill_value=1.0)
     padded[:, :num_sents, :num_sents] = effective_mask
 
     # Remap -1 -> num_sents (sentinel index)
@@ -305,7 +304,7 @@ class NodewiseAttribution(CircuitDiscovery):
         total_seq_len = prefix_len + max_cont_len
         token_to_sent = self._build_token_to_sentence_map(sentences, total_seq_len)
         token_to_sent = token_to_sent.to(device)
-        gap_filter = self._build_gap_filter(num_sents)
+        gap_filter = build_gap_filter(num_sents, self.sentence_gap, device=device)
 
         # 0. Optionally ablate all non-target layers
         non_target_handles = []

@@ -4,6 +4,29 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Optional
+import torch
+
+
+def build_gap_filter(
+    num_sents: int, sentence_gap: int, device: Optional[torch.device] = None
+) -> torch.Tensor:
+    """Build boolean mask: True where |i - j| < gap (always-on, not learnable)."""
+    if sentence_gap is None or sentence_gap <= 0:
+        return torch.zeros(num_sents, num_sents, dtype=torch.bool, device=device)
+    i = torch.arange(num_sents, device=device)
+    return (i[:, None] - i[None, :]).abs() < sentence_gap
+
+
+def apply_gap_filter(
+    mask: torch.Tensor, gap_filter: Optional[torch.Tensor], fill_value: float = 1.0
+) -> torch.Tensor:
+    """Force gap-filtered entries to a fixed value (default 1.0)."""
+    if gap_filter is None:
+        return mask
+    gap = gap_filter.to(device=mask.device, dtype=mask.dtype)
+    while gap.dim() < mask.dim():
+        gap = gap.unsqueeze(0)
+    return gap * fill_value + (1.0 - gap) * mask
 
 
 @dataclass
@@ -55,18 +78,28 @@ class NodeMask(MaskResult):
 
     scores: Dict[int, Dict[int, List[List[float]]]] = field(default_factory=dict)
 
-    def sparsity(self, threshold: float) -> float:
+    def sparsity(
+        self,
+        threshold: float,
+        gap_filter: Optional[torch.Tensor] = None,
+        sentence_gap: Optional[int] = None,
+    ) -> float:
         """Fraction of entries with score < threshold.
 
         Note: Signed thresholding (not absolute value). This matches the
         default convention where positive scores reduce KL.
         """
+        if gap_filter is None and sentence_gap is not None:
+            gap_filter = build_gap_filter(len(self.sentences), sentence_gap)
+
         total = 0
         below = 0
         for layer_scores in self.scores.values():
             for head_scores in layer_scores.values():
-                for row in head_scores:
-                    for val in row:
+                for i, row in enumerate(head_scores):
+                    for j, val in enumerate(row):
+                        if gap_filter is not None and bool(gap_filter[i, j]):
+                            continue
                         total += 1
                         if val < threshold:
                             below += 1

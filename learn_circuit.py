@@ -19,7 +19,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from utils.utils import Sentence, set_seed, clear_cuda
 from utils.cot_analysis import split_tokens_into_sentences
 from utils.objectives import get_objective
-from utils.masks import NodeMask
+from utils.masks import NodeMask, build_gap_filter, apply_gap_filter
 from utils.circuit_discovery.factory import create_circuit_discovery
 
 
@@ -147,7 +147,11 @@ def evaluate_at_thresholds(
         token_to_sent[sent.start : sent.end + 1] = idx
     token_to_sent = token_to_sent.to(device)
 
-    gap_filter = torch.zeros(num_sents, num_sents, dtype=torch.bool)  # no gap for eval
+    sentence_gap = 0
+    if hasattr(node_mask, "metadata"):
+        sentence_gap = node_mask.metadata.get("sentence_gap", 0)
+    gap_filter = build_gap_filter(num_sents, sentence_gap, device=device)
+    gap_filter_cpu = gap_filter.cpu()
 
     def _eval_with_masks(
         binary_masks: dict[int, torch.Tensor],
@@ -234,8 +238,11 @@ def evaluate_at_thresholds(
         for layer_idx in non_target:
             attn_module = get_attention_module(model, layer_idx)
             original_forward = attn_module.forward
-            attn_module._circuit_mask = torch.zeros(
+            zero_mask = torch.zeros(
                 num_heads, num_sents, num_sents, device=device
+            )
+            attn_module._circuit_mask = apply_gap_filter(
+                zero_mask, gap_filter, fill_value=1.0
             )
             attn_module._token_to_sent = token_to_sent
             attn_module._gap_filter = gap_filter
@@ -255,7 +262,7 @@ def evaluate_at_thresholds(
 
     results = []
     for threshold in thresholds:
-        sparsity = node_mask.sparsity(threshold)
+        sparsity = node_mask.sparsity(threshold, gap_filter=gap_filter_cpu)
 
         # Build binary masks: 1 if score >= threshold, 0 otherwise.
         # This relies on the convention that positive scores are helpful
@@ -269,7 +276,7 @@ def evaluate_at_thresholds(
                     for j in range(num_sents):
                         if scores[i][j] < threshold:
                             m[h, i, j] = 0.0
-            binary_masks[l] = m
+            binary_masks[l] = apply_gap_filter(m, gap_filter, fill_value=1.0)
 
         avg_kl, per_token_kl_branches, per_sent_kl_branches = _eval_with_masks(
             binary_masks=binary_masks,
@@ -281,7 +288,9 @@ def evaluate_at_thresholds(
         random_masks = {}
         for l in layers:
             rand = torch.rand(num_heads, num_sents, num_sents, device=device)
-            random_masks[l] = (rand < keep_prob).float()
+            random_masks[l] = apply_gap_filter(
+                (rand < keep_prob).float(), gap_filter, fill_value=1.0
+            )
 
         random_kl, _, _ = _eval_with_masks(
             binary_masks=random_masks,
