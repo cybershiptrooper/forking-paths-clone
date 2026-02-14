@@ -185,9 +185,13 @@ def llama_attention_forward_with_differentiable_mask(
         # attn_weights: (bsz, num_heads, q_len, k_len)
         # Compute in float32 for numerical stability, then cast back
         attn_weights = (attn_weights.float() * token_mask.unsqueeze(0))
-        # Renormalize
-        row_sums = attn_weights.sum(dim=-1, keepdim=True) + 1e-12
-        attn_weights = (attn_weights / row_sums).to(original_dtype)
+        renormalize = getattr(self, "_renormalize_masked_attn", True)
+        if renormalize:
+            # Renormalize
+            row_sums = attn_weights.sum(dim=-1, keepdim=True) + 1e-12
+            attn_weights = (attn_weights / row_sums).to(original_dtype)
+        else:
+            attn_weights = attn_weights.to(original_dtype)
     # =========================================================================
 
     attn_weights = nn.functional.dropout(

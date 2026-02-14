@@ -24,6 +24,7 @@ class AblationHandle:
             "_circuit_mask",
             "_token_to_sent",
             "_gap_filter",
+            "_renormalize_masked_attn",
         ]:
             if hasattr(self.module, attr):
                 delattr(self.module, attr)
@@ -45,6 +46,7 @@ class CircuitDiscovery(ABC):
         objective_fn: Callable,
         sentence_gap: int = 1,
         ablate_non_target_layers: bool = False,
+        renormalize_masked_attention: bool = True,
         **kwargs,
     ):
         self.model = model
@@ -53,6 +55,7 @@ class CircuitDiscovery(ABC):
         self.objective_fn = objective_fn
         self.sentence_gap = sentence_gap
         self.ablate_non_target_layers = ablate_non_target_layers
+        self.renormalize_masked_attention = renormalize_masked_attention
 
     def _build_token_to_sentence_map(
         self, sentences: List[Sentence], seq_len: int
@@ -92,6 +95,7 @@ class CircuitDiscovery(ABC):
             attn_module._circuit_mask = masks.get(layer_idx)
             attn_module._token_to_sent = token_to_sent
             attn_module._gap_filter = gap_filter
+            attn_module._renormalize_masked_attn = self.renormalize_masked_attention
 
             attn_module.forward = types.MethodType(custom_forward_fn, attn_module)
             handles.append(AblationHandle(attn_module, original_forward))
@@ -140,6 +144,7 @@ class CircuitDiscovery(ABC):
             attn_module._circuit_mask = zero_mask
             attn_module._token_to_sent = token_to_sent
             attn_module._gap_filter = gap_filter
+            attn_module._renormalize_masked_attn = self.renormalize_masked_attention
 
             attn_module.forward = types.MethodType(custom_forward_fn, attn_module)
             handles.append(AblationHandle(attn_module, original_forward))

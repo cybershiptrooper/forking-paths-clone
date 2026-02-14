@@ -115,6 +115,7 @@ def evaluate_at_thresholds(
     thresholds: list[float],
     layers: list[int],
     ablate_non_target_layers: bool = False,
+    renormalize_masked_attention: bool = True,
     tokenizer=None,
 ) -> list[dict]:
     """Evaluate KL divergence and sparsity at different mask thresholds.
@@ -167,6 +168,7 @@ def evaluate_at_thresholds(
             attn_module._circuit_mask = binary_masks[layer_idx]
             attn_module._token_to_sent = token_to_sent
             attn_module._gap_filter = gap_filter
+            attn_module._renormalize_masked_attn = renormalize_masked_attention
             attn_module.forward = types.MethodType(
                 llama_attention_forward_with_differentiable_mask, attn_module
             )
@@ -246,6 +248,7 @@ def evaluate_at_thresholds(
             )
             attn_module._token_to_sent = token_to_sent
             attn_module._gap_filter = gap_filter
+            attn_module._renormalize_masked_attn = renormalize_masked_attention
             attn_module.forward = types.MethodType(
                 llama_attention_forward_with_differentiable_mask, attn_module
             )
@@ -353,6 +356,7 @@ def main(
     sentence_gap: int = 1,
     sentence_chunk: int = 1,
     ablate_non_target_layers: bool = False,
+    renormalize_masked_attention: bool = True,
     num_ig_steps: int = 10,
     no_negate_scores: bool = False,
     max_new_tokens: int = 150,
@@ -513,6 +517,7 @@ def main(
         objective_fn=objective_fn,
         sentence_gap=sentence_gap,
         ablate_non_target_layers=ablate_non_target_layers,
+        renormalize_masked_attention=renormalize_masked_attention,
         num_ig_steps=num_ig_steps,
         negate_scores=not no_negate_scores,
     )
@@ -544,6 +549,7 @@ def main(
         thresholds=thresholds,
         layers=layers_to_analyse,
         ablate_non_target_layers=ablate_non_target_layers,
+        renormalize_masked_attention=renormalize_masked_attention,
         tokenizer=tokenizer,
     )
 
@@ -627,6 +633,12 @@ if __name__ == "__main__":
         "--ablate_non_target_layers",
         action="store_true",
         help="Ablate all attention heads in layers outside --layers_to_analyse",
+    )
+    parser.add_argument(
+        "--no_renormalize_masked_attention",
+        dest="renormalize_masked_attention",
+        action="store_false",
+        help="Do not renormalize post-softmax attention after applying the mask.",
     )
     parser.add_argument("--num_ig_steps", type=int, default=10)
     parser.add_argument(
