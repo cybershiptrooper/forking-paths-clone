@@ -36,6 +36,8 @@ def main(
     threshold: float = 0.1,
     top_k_heads: int = 5,
     output_dir: str = None,
+    per_head: bool = False,
+    per_layer: bool = False,
 ):
     # Load mask
     print(f"Loading mask from {mask_path}...")
@@ -57,19 +59,21 @@ def main(
     print(f"Sentences: {len(mask.sentences)}")
     print(f"Saving visualizations to {output_dir}/")
 
-    # 1. Top heads per layer
-    print("\nGenerating top-heads heatmaps...")
-    for layer in layers:
-        save_path = os.path.join(output_dir, f"top_heads_layer_{layer}.png")
-        plot_top_heads(mask, layer, top_k=top_k_heads, threshold=threshold, save_path=save_path)
-        print(f"  Saved: {save_path}")
+    # 1. Top heads per layer (opt-in)
+    if per_head:
+        print("\nGenerating top-heads heatmaps...")
+        for layer in layers:
+            save_path = os.path.join(output_dir, f"top_heads_layer_{layer}.png")
+            plot_top_heads(mask, layer, top_k=top_k_heads, threshold=threshold, save_path=save_path)
+            print(f"  Saved: {save_path}")
 
-    # 2. Layer-aggregated heatmaps
-    print("\nGenerating layer-aggregated heatmaps...")
-    for layer in layers:
-        save_path = os.path.join(output_dir, f"layer_aggregated_{layer}.png")
-        plot_layer_aggregated(mask, layer, aggregation="mean", save_path=save_path)
-        print(f"  Saved: {save_path}")
+    # 2. Layer-aggregated heatmaps (opt-in)
+    if per_layer:
+        print("\nGenerating layer-aggregated heatmaps...")
+        for layer in layers:
+            save_path = os.path.join(output_dir, f"layer_aggregated_{layer}.png")
+            plot_layer_aggregated(mask, layer, aggregation="mean", save_path=save_path)
+            print(f"  Saved: {save_path}")
 
     # 3. Layer comparison
     print("\nGenerating layer comparison...")
@@ -78,12 +82,13 @@ def main(
     print(f"  Saved: {save_path}")
 
     # 4. Attention pattern (causal triangle) heatmaps
-    print("\nGenerating attention pattern heatmaps...")
-    # Per-layer attention patterns
-    for layer in layers:
-        save_path = os.path.join(output_dir, f"attn_pattern_layer_{layer}.png")
-        plot_attention_pattern(mask, layer=layer, threshold=threshold, save_path=save_path)
-        print(f"  Saved: {save_path}")
+    # Per-layer attention patterns (opt-in)
+    if per_layer:
+        print("\nGenerating per-layer attention pattern heatmaps...")
+        for layer in layers:
+            save_path = os.path.join(output_dir, f"attn_pattern_layer_{layer}.png")
+            plot_attention_pattern(mask, layer=layer, threshold=threshold, save_path=save_path)
+            print(f"  Saved: {save_path}")
 
     # All-layers aggregated attention pattern
     save_path = os.path.join(output_dir, "attn_pattern_all_layers.png")
@@ -97,13 +102,14 @@ def main(
     plot_circuit_graph(mask, threshold=threshold, layer=None, save_path=save_path)
     print(f"  Saved: {save_path}")
 
-    # Per-layer circuit graphs
-    for layer in layers:
-        save_path = os.path.join(
-            output_dir, f"circuit_layer_{layer}_t{threshold}.png"
-        )
-        plot_circuit_graph(mask, threshold=threshold, layer=layer, save_path=save_path)
-        print(f"  Saved: {save_path}")
+    # Per-layer circuit graphs (opt-in)
+    if per_layer:
+        for layer in layers:
+            save_path = os.path.join(
+                output_dir, f"circuit_layer_{layer}_t{threshold}.png"
+            )
+            plot_circuit_graph(mask, threshold=threshold, layer=layer, save_path=save_path)
+            print(f"  Saved: {save_path}")
 
     # 6. Full circuit overview (sentences x layers)
     print("\nGenerating full circuit overview...")
@@ -186,6 +192,16 @@ if __name__ == "__main__":
         "--output_dir",
         default=None,
         help="Output directory for plots (default: alongside mask file)",
+    )
+    parser.add_argument(
+        "--per_head",
+        action="store_true",
+        help="Generate per-head heatmaps (top K heads per layer)",
+    )
+    parser.add_argument(
+        "--per_layer",
+        action="store_true",
+        help="Generate per-layer plots (aggregated heatmaps, attention patterns, circuit graphs)",
     )
     args = parser.parse_args()
     main(**vars(args))
