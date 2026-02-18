@@ -39,7 +39,7 @@ def build_token_to_sent_map(
 
 
 def build_binary_masks(
-    node_mask: NodeMask,
+    scores: NodeMask | dict[int, dict[int, list[list[float]]]],
     threshold: float,
     layers: list[int],
     num_heads: int,
@@ -47,19 +47,23 @@ def build_binary_masks(
     gap_filter: torch.Tensor,
     device: torch.device,
 ) -> dict[int, torch.Tensor]:
-    """Threshold *node_mask* scores into binary masks (1 = keep, 0 = ablate).
+    """Threshold scores into binary masks (1 = keep, 0 = ablate).
+
+    *scores* can be a :class:`NodeMask` or a raw ``scores`` dict with the
+    same ``[layer][head][i][j]`` structure.
 
     Entries with ``score >= threshold`` are kept; the rest are zeroed.
     Gap-filtered positions are always kept (filled with 1).
     """
+    scores_dict = scores.scores if isinstance(scores, NodeMask) else scores
     binary_masks: dict[int, torch.Tensor] = {}
     for layer in layers:
         m = torch.ones(num_heads, num_sents, num_sents, device=device)
         for h in range(num_heads):
-            scores = node_mask.scores[layer][h]
+            layer_scores = scores_dict[layer][h]
             for i in range(num_sents):
                 for j in range(num_sents):
-                    if scores[i][j] < threshold:
+                    if layer_scores[i][j] < threshold:
                         m[h, i, j] = 0.0
         binary_masks[layer] = apply_gap_filter(m, gap_filter, fill_value=1.0)
     return binary_masks
@@ -81,6 +85,53 @@ def build_random_masks(
             (rand < keep_prob).float(), gap_filter, fill_value=1.0
         )
     return random_masks
+
+
+def build_random_score_masks(
+    node_mask: NodeMask,
+    num_samples: int,
+    layers: list[int],
+    combined_filter: torch.Tensor,
+) -> list[dict[int, dict[int, list[list[float]]]]]:
+    """Create *num_samples* random score masks by permuting learned scores.
+
+    Only scores at non-filtered positions are permuted so that the
+    sparsity-vs-threshold distribution matches the learned mask exactly.
+    """
+    num_sents = combined_filter.shape[0]
+    filter_bool = combined_filter.bool()
+
+    # Collect non-filtered scores and their positions
+    positions: list[tuple[int, int, int, int]] = []
+    score_values: list[float] = []
+    for layer in layers:
+        for h in node_mask.scores[layer]:
+            scores_2d = node_mask.scores[layer][h]
+            for i in range(num_sents):
+                for j in range(num_sents):
+                    if not filter_bool[i, j]:
+                        positions.append((layer, h, i, j))
+                        score_values.append(scores_2d[i][j])
+
+    random_masks = []
+    for _ in range(num_samples):
+        perm = torch.randperm(len(score_values))
+        permuted = [score_values[p] for p in perm.tolist()]
+
+        scores_dict: dict[int, dict[int, list[list[float]]]] = {}
+        for layer in layers:
+            scores_dict[layer] = {}
+            for h in node_mask.scores[layer]:
+                scores_dict[layer][h] = [
+                    [0.0] * num_sents for _ in range(num_sents)
+                ]
+
+        for idx, (layer, h, i, j) in enumerate(positions):
+            scores_dict[layer][h][i][j] = permuted[idx]
+
+        random_masks.append(scores_dict)
+    return random_masks
+
 
 
 def compute_clean_logits(
@@ -269,6 +320,7 @@ def evaluate_at_thresholds(
     renormalize_masked_attention: bool = True,
     tokenizer=None,
     min_sentence_length: int = 10,
+    num_random_samples: int = 5,
 ) -> list[dict]:
     """Evaluate objective value and sparsity at different mask thresholds.
 
@@ -320,6 +372,12 @@ def evaluate_at_thresholds(
     print("Computing clean logits for threshold evaluation...")
     clean_logits_list = compute_clean_logits(model, input_ids, continuations)
 
+    # Pre-generate K random score masks by permuting learned scores
+    print(f"Generating {num_random_samples} random score masks (permuted)...")
+    random_score_masks = build_random_score_masks(
+        node_mask, num_random_samples, layers, combined_filter_cpu
+    )
+
     results = []
     for threshold in thresholds:
         sparsity = node_mask.sparsity(threshold, gap_filter=combined_filter_cpu)
@@ -351,41 +409,48 @@ def evaluate_at_thresholds(
             min_sentence_length=min_sentence_length,
         )
 
-        keep_prob = max(0.0, min(1.0, 1.0 - sparsity))
-        random_masks = build_random_masks(
-            keep_prob,
-            layers,
-            num_heads,
-            num_sents,
-            combined_filter,
-            device,
-        )
+        # Evaluate K random score masks at this threshold
+        random_kl_divergences = []
+        for k in range(num_random_samples):
+            rand_binary = build_binary_masks(
+                random_score_masks[k],
+                threshold,
+                layers,
+                num_heads,
+                num_sents,
+                combined_filter,
+                device,
+            )
+            rand_obj, _, _ = eval_with_masks(
+                model=model,
+                binary_masks=rand_binary,
+                layers=layers,
+                input_ids=input_ids,
+                continuations=continuations,
+                clean_logits_list=clean_logits_list,
+                objective_fn=objective_fn,
+                token_to_sent=token_to_sent,
+                gap_filter=combined_filter,
+                renormalize=renormalize_masked_attention,
+            )
+            random_kl_divergences.append(rand_obj)
 
-        random_objective, _, _ = eval_with_masks(
-            model=model,
-            binary_masks=random_masks,
-            layers=layers,
-            input_ids=input_ids,
-            continuations=continuations,
-            clean_logits_list=clean_logits_list,
-            objective_fn=objective_fn,
-            token_to_sent=token_to_sent,
-            gap_filter=combined_filter,
-            renormalize=renormalize_masked_attention,
-        )
-
+        mean_random_kl = sum(random_kl_divergences) / len(random_kl_divergences)
         entry = {
             "threshold": threshold,
             "sparsity": sparsity,
             "kl_divergence": avg_objective,
-            "random_kl_divergence": random_objective,
+            "random_kl_divergence": mean_random_kl,
+            "random_kl_divergences": random_kl_divergences,
             "per_token_kl": per_token_kl_branches,
         }
         if per_sent_kl_branches:
             entry["per_sentence_kl"] = per_sent_kl_branches
         results.append(entry)
         print(
-            f"  threshold={threshold:.1e} | sparsity={sparsity:.2%} | objective={avg_objective:.6f}"
+            f"  threshold={threshold:.1e} | sparsity={sparsity:.2%} "
+            f"| objective={avg_objective:.6f} "
+            f"| random mean={mean_random_kl:.6f} (K={num_random_samples})"
         )
 
     remove_handles(non_target_handles)

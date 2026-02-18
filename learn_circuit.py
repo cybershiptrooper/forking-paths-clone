@@ -119,6 +119,7 @@ def main(
     renormalize_masked_attention: bool = True,
     num_ig_steps: int = 10,
     no_negate_scores: bool = False,
+    num_random_samples: int = 5,
     max_new_tokens: int = 150,
     min_sentence_length: int = 10,
     temperature: float = 0.6,
@@ -241,6 +242,8 @@ def main(
     num_prefix_sentences = len(sentences)
 
     # Optionally add generation sentences (for "generation" / "both" modes)
+    gen_sentences_raw = []
+    first_branch_tokens = None
     if mask_mode in ("generation", "both"):
         first_branch_tokens = torch.tensor(branches[0]["token_ids"])
         gen_sentences_raw = split_tokens_into_sentences(
@@ -258,11 +261,12 @@ def main(
     print(f"Found {len(sentences)} sentence chunks ({num_prefix_sentences} prefix):")
     for i, s in enumerate(sentences):
         label = "P" if i < num_prefix_sentences else "G"
-        # Generation sentence positions may exceed input_ids length
-        if s.end < input_ids.shape[-1]:
+        if i < num_prefix_sentences:
             text = tokenizer.decode(input_ids[0, s.start : s.end + 1])
         else:
-            text = "<generation>"
+            # Decode from first branch tokens using the raw (pre-offset) boundaries
+            raw = gen_sentences_raw[i - num_prefix_sentences]
+            text = tokenizer.decode(first_branch_tokens[raw.start : raw.end + 1].tolist())
         print(f"  {label}{i}: [{s.start}:{s.end}] = {repr(text)}")
 
     # =====================================================================
@@ -318,12 +322,12 @@ def main(
     )
 
     # Add sentence text to metadata
-    seq_len = input_ids.shape[-1]
     for i, s in enumerate(node_mask.sentences):
-        if s["end"] < seq_len:
+        if i < num_prefix_sentences:
             s["text"] = tokenizer.decode(input_ids[0, s["start"] : s["end"] + 1])
         else:
-            s["text"] = "<generation>"
+            raw = gen_sentences_raw[i - num_prefix_sentences]
+            s["text"] = tokenizer.decode(first_branch_tokens[raw.start : raw.end + 1].tolist())
 
     # =====================================================================
     # Step 6: Evaluate at thresholds
@@ -344,6 +348,7 @@ def main(
         ablate_non_target_layers=ablate_non_target_layers,
         renormalize_masked_attention=renormalize_masked_attention,
         tokenizer=tokenizer,
+        num_random_samples=num_random_samples,
     )
 
     node_mask.metadata["threshold_evaluation"] = threshold_results
@@ -351,6 +356,7 @@ def main(
     node_mask.metadata["temperature"] = temperature
     node_mask.metadata["max_new_tokens"] = max_new_tokens
     node_mask.metadata["num_branches"] = num_new_branches
+    node_mask.metadata["num_random_samples"] = num_random_samples
 
     # =====================================================================
     # Step 7: Save results
@@ -441,6 +447,12 @@ if __name__ == "__main__":
         help="Do not renormalize post-softmax attention after applying the mask.",
     )
     parser.add_argument("--num_ig_steps", type=int, default=10)
+    parser.add_argument(
+        "--num_random_samples",
+        type=int,
+        default=5,
+        help="Number of random score masks (K) to sample for baseline comparison.",
+    )
     parser.add_argument(
         "--no_negate_scores",
         action="store_true",

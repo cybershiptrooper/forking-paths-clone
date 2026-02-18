@@ -129,9 +129,14 @@ def main(
 
         print("\nGenerating sparsity vs KL plot...")
         save_path = os.path.join(output_dir, "sparsity_vs_kl.png")
-        random_kl = [r.get("random_kl_divergence") for r in threshold_eval]
-        if any(v is None for v in random_kl):
-            random_kl = None
+        # Prefer per-sample random KLs (list of lists) over single mean
+        has_multi = all("random_kl_divergences" in r for r in threshold_eval)
+        if has_multi:
+            random_kl = [r["random_kl_divergences"] for r in threshold_eval]
+        else:
+            random_kl = [r.get("random_kl_divergence") for r in threshold_eval]
+            if any(v is None for v in random_kl):
+                random_kl = None
         plot_sparsity_vs_kl_with_random(
             thresholds, sparsities, kl_scores, random_kl, save_path=save_path
         )

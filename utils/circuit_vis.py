@@ -756,7 +756,7 @@ def plot_sparsity_vs_kl_with_random(
     thresholds: list[float],
     sparsities: list[float],
     kl_scores: list[float],
-    random_kl_scores: list[float] | None,
+    random_kl_scores: list[float] | list[list[float]] | None,
     save_path: str,
 ):
     thresholds_arr = np.array(thresholds, dtype=float)
@@ -787,22 +787,53 @@ def plot_sparsity_vs_kl_with_random(
 
     if random_kl_scores is not None:
         random_arr = np.array(random_kl_scores, dtype=float)
-        random_sorted = random_arr[sort_idx]
-        ax.plot(
-            sparsities_sorted,
-            random_sorted,
-            "--",
-            color="tab:orange",
-            label="Random baseline",
-        )
-        ax.scatter(
-            sparsities_arr,
-            random_arr,
-            marker="x",
-            color="tab:orange",
-            s=35,
-            linewidths=0.8,
-        )
+        if random_arr.ndim == 2:
+            # Multiple random samples: shape (num_thresholds, K)
+            random_mean = random_arr.mean(axis=1)
+            random_std = random_arr.std(axis=1)
+            random_mean_sorted = random_mean[sort_idx]
+            random_std_sorted = random_std[sort_idx]
+            ax.plot(
+                sparsities_sorted,
+                random_mean_sorted,
+                "--",
+                color="tab:orange",
+                label="Random baseline (mean)",
+            )
+            ax.fill_between(
+                sparsities_sorted,
+                random_mean_sorted - random_std_sorted,
+                random_mean_sorted + random_std_sorted,
+                alpha=0.25,
+                color="tab:orange",
+                label="Random baseline (\u00b11\u03c3)",
+            )
+            ax.scatter(
+                sparsities_arr,
+                random_mean,
+                marker="x",
+                color="tab:orange",
+                s=35,
+                linewidths=0.8,
+            )
+        else:
+            # Single random baseline (backward compat)
+            random_sorted = random_arr[sort_idx]
+            ax.plot(
+                sparsities_sorted,
+                random_sorted,
+                "--",
+                color="tab:orange",
+                label="Random baseline",
+            )
+            ax.scatter(
+                sparsities_arr,
+                random_arr,
+                marker="x",
+                color="tab:orange",
+                s=35,
+                linewidths=0.8,
+            )
         ax.legend(loc="best", frameon=False)
 
     ax.set_xlabel("Sparsity")

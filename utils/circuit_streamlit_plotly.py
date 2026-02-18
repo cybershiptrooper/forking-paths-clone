@@ -605,7 +605,51 @@ def build_sparsity_vs_kl_figure(
         )
     )
 
-    if all(
+    # Check for per-sample random KLs (K random masks)
+    has_multi_random = all(
+        "random_kl_divergences" in entry
+        and isinstance(entry["random_kl_divergences"], list)
+        and len(entry["random_kl_divergences"]) > 0
+        for entry in entries
+    )
+    if has_multi_random:
+        random_all = np.array(
+            [entry["random_kl_divergences"] for entry in entries], dtype=float
+        )  # shape (num_thresholds, K)
+        random_mean = random_all.mean(axis=1)
+        random_std = random_all.std(axis=1)
+        random_mean_sorted = random_mean[sort_idx]
+        random_std_sorted = random_std[sort_idx]
+        sparsities_sorted = sparsities[sort_idx]
+
+        # Mean line
+        fig.add_trace(
+            go.Scatter(
+                x=sparsities_sorted,
+                y=random_mean_sorted,
+                mode="lines+markers",
+                line=dict(color="orange", dash="dash"),
+                marker=dict(symbol="x"),
+                name="Random baseline (mean)",
+            )
+        )
+        # Error band (mean +/- 1 std)
+        fig.add_trace(
+            go.Scatter(
+                x=np.concatenate([sparsities_sorted, sparsities_sorted[::-1]]),
+                y=np.concatenate([
+                    random_mean_sorted + random_std_sorted,
+                    (random_mean_sorted - random_std_sorted)[::-1],
+                ]),
+                fill="toself",
+                fillcolor="rgba(255, 165, 0, 0.2)",
+                line=dict(color="rgba(255, 165, 0, 0)"),
+                hoverinfo="skip",
+                showlegend=True,
+                name="Random baseline (\u00b11\u03c3)",
+            )
+        )
+    elif all(
         "random_kl_divergence" in entry and entry["random_kl_divergence"] is not None
         for entry in entries
     ):

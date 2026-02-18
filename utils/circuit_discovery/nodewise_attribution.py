@@ -257,14 +257,20 @@ class NodewiseAttribution(CircuitDiscovery):
         input_ids: torch.Tensor,
         continuations: List[torch.Tensor],
     ) -> List[torch.Tensor]:
-        """Pre-compute clean logits (no mask) for each continuation."""
+        """Pre-compute clean logits (no mask) for each continuation.
+
+        Uses the same autocast context as the IG forward pass so that the
+        precision of clean and masked logits matches. Without this, KL at
+        alpha=1 (identity mask) is spuriously non-zero due to float32-vs-
+        bfloat16 differences, biasing all IG gradients.
+        """
         clean_logits_list = []
         self.model.eval()
-        with torch.no_grad():
+        with torch.no_grad(), torch.amp.autocast("cuda"):
             for cont in continuations:
                 full_input = torch.cat([input_ids, cont], dim=-1)
                 outputs = self.model(full_input)
-                clean_logits_list.append(outputs.logits.detach().cpu())
+                clean_logits_list.append(outputs.logits.float().detach().cpu())
         return clean_logits_list
 
     def _build_position_mask(
@@ -387,7 +393,9 @@ class NodewiseAttribution(CircuitDiscovery):
                 with torch.amp.autocast("cuda"):
                     logits = self.model(full_input).logits
 
-                loss = self.objective_fn(clean_logits, logits, position_mask)
+                # Cast to float32 to match clean_logits precision — avoids
+                # spurious KL from bfloat16-vs-float32 log_softmax differences.
+                loss = self.objective_fn(clean_logits, logits.float(), position_mask)
                 loss.backward()
 
                 # Accumulate grads
