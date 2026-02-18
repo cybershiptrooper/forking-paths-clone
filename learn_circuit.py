@@ -117,22 +117,23 @@ def evaluate_at_thresholds(
     ablate_non_target_layers: bool = False,
     renormalize_masked_attention: bool = True,
     tokenizer=None,
+    min_sentence_length: int = 10,
 ) -> list[dict]:
-    """Evaluate KL divergence and sparsity at different mask thresholds.
+    """Evaluate objective value and sparsity at different mask thresholds.
 
     For each threshold:
     - Compute sparsity from the mask
     - Re-run model with thresholded binary mask
-    - Compute KL divergence with clean output
+    - Compute objective with clean output
 
-    Thresholding uses signed scores: keep edges with score >= threshold.
-    This assumes the default convention where positive scores reduce KL.
+    Thresholding uses score sign semantics from node_mask metadata:
+    - negate_scores=True (default): keep score >= threshold
+    - negate_scores=False: keep score <= -threshold
     """
     from utils.circuit_discovery.nodewise_attribution import (
         llama_attention_forward_with_differentiable_mask,
-        expand_sentence_mask_to_tokens,
     )
-    from utils.circuit_discovery.base import CircuitDiscovery, AblationHandle
+    from utils.circuit_discovery.base import AblationHandle
     from utils.utils import get_attention_module
 
     device = next(model.parameters()).device
@@ -174,8 +175,8 @@ def evaluate_at_thresholds(
             )
             handles.append(AblationHandle(attn_module, original_forward))
 
-        total_kl = 0.0
-        total_tokens = 0
+        total_objective = 0.0
+        total_branches = 0
         per_token_kl_branches = []
         per_sent_kl_branches = []
         with torch.no_grad():
@@ -187,9 +188,9 @@ def evaluate_at_thresholds(
 
                 logits = model(full_input).logits
                 clean = clean_logits_list[cont_idx][:, :full_len].to(device)
-                kl = objective_fn(clean, logits, pos_mask)
-                total_kl += kl.item() * pos_mask.sum().item()
-                total_tokens += pos_mask.sum().item()
+                objective_value = objective_fn(clean, logits, pos_mask)
+                total_objective += objective_value.item()
+                total_branches += 1
 
                 if collect_per_token or collect_per_sentence:
                     log_clean = torch.nn.functional.log_softmax(
@@ -209,7 +210,9 @@ def evaluate_at_thresholds(
                     if collect_per_sentence and tokenizer is not None:
                         cont_token_ids = cont[0]  # (num_cont_tokens,)
                         cont_sents = split_tokens_into_sentences(
-                            cont_token_ids, tokenizer, min_sentence_length=5
+                            cont_token_ids,
+                            tokenizer,
+                            min_sentence_length=min_sentence_length,
                         )
                         sent_kl_list = []
                         for s in cont_sents:
@@ -225,8 +228,8 @@ def evaluate_at_thresholds(
         for h in handles:
             h.remove()
 
-        avg_kl = total_kl / max(total_tokens, 1)
-        return avg_kl, per_token_kl_branches, per_sent_kl_branches
+        avg_objective = total_objective / max(total_branches, 1)
+        return avg_objective, per_token_kl_branches, per_sent_kl_branches
 
     # Optionally ablate non-target layers
     non_target_handles = []
@@ -281,7 +284,7 @@ def evaluate_at_thresholds(
                             m[h, i, j] = 0.0
             binary_masks[l] = apply_gap_filter(m, gap_filter, fill_value=1.0)
 
-        avg_kl, per_token_kl_branches, per_sent_kl_branches = _eval_with_masks(
+        avg_objective, per_token_kl_branches, per_sent_kl_branches = _eval_with_masks(
             binary_masks=binary_masks,
             collect_per_token=True,
             collect_per_sentence=True,
@@ -295,7 +298,7 @@ def evaluate_at_thresholds(
                 (rand < keep_prob).float(), gap_filter, fill_value=1.0
             )
 
-        random_kl, _, _ = _eval_with_masks(
+        random_objective, _, _ = _eval_with_masks(
             binary_masks=random_masks,
             collect_per_token=False,
             collect_per_sentence=False,
@@ -303,14 +306,16 @@ def evaluate_at_thresholds(
         entry = {
             "threshold": threshold,
             "sparsity": sparsity,
-            "kl_divergence": avg_kl,
-            "random_kl_divergence": random_kl,
+            "kl_divergence": avg_objective,
+            "random_kl_divergence": random_objective,
             "per_token_kl": per_token_kl_branches,
         }
         if per_sent_kl_branches:
             entry["per_sentence_kl"] = per_sent_kl_branches
         results.append(entry)
-        print(f"  threshold={threshold:.1e} | sparsity={sparsity:.2%} | KL={avg_kl:.6f}")
+        print(
+            f"  threshold={threshold:.1e} | sparsity={sparsity:.2%} | objective={avg_objective:.6f}"
+        )
 
     # Cleanup non-target layer ablation
     for h in non_target_handles:
@@ -360,6 +365,7 @@ def main(
     num_ig_steps: int = 10,
     no_negate_scores: bool = False,
     max_new_tokens: int = 150,
+    min_sentence_length: int = 10,
     temperature: float = 0.6,
     seed: int = 42,
     device: str = "cuda",
@@ -416,7 +422,7 @@ def main(
         base_params = SamplingParams(
             n=1,
             temperature=temperature,
-            max_tokens=10000,
+            max_tokens=max_new_tokens,
             seed=seed,
         )
         base_outputs = llm.generate([formatted_text], base_params)
@@ -473,7 +479,7 @@ def main(
 
     token_ids_for_splitting = input_ids[0, :analysis_timestep]
     sentences = split_tokens_into_sentences(
-        token_ids_for_splitting, tokenizer, min_sentence_length=10
+        token_ids_for_splitting, tokenizer, min_sentence_length=min_sentence_length
     )
     sentences = remove_bos_from_sentences(sentences)
     sentences = chunk_sentences(sentences, sentence_chunk)
@@ -492,7 +498,12 @@ def main(
 
     model, tokenizer = load_model_eager(model_name, device=device)
     input_ids = input_ids.to(device)
-    layers_to_analyse_arg = "all" if layers_to_analyse[0] == "all" else None
+    layers_to_analyse_is_all = (
+        isinstance(layers_to_analyse, list)
+        and len(layers_to_analyse) == 1
+        and isinstance(layers_to_analyse[0], str)
+        and layers_to_analyse[0].lower() == "all"
+    )
     layers_to_analyse = _resolve_layers_to_analyse(layers_to_analyse, model)
 
     # Convert branches to tensors
@@ -567,7 +578,7 @@ def main(
     print("=" * 80)
     layers_str = (
         "_all"
-        if "all" in layers_to_analyse_arg
+        if layers_to_analyse_is_all
         else "_".join(str(l) for l in layers_to_analyse)
     )
     output_file = os.path.join(
@@ -652,6 +663,12 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--output_dir", default="results/circuit_discovery")
+    parser.add_argument(
+        "--min_sentence_length",
+        type=int,
+        default=10,
+        help="Minimum number of tokens for a sentence (after splitting).",
+    )
     parser.add_argument(
         "--thresholds",
         type=float,
