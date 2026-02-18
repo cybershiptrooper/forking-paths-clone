@@ -29,6 +29,41 @@ def apply_gap_filter(
     return gap * fill_value + (1.0 - gap) * mask
 
 
+def build_mode_filter(
+    num_prefix_sents: int,
+    num_total_sents: int,
+    mask_mode: str,
+    device: Optional[torch.device] = None,
+) -> torch.Tensor:
+    """Build boolean filter for mask_mode: True = frozen at 1.0, False = learnable.
+
+    Modes:
+        "prefix"     – learn only prefix-query → prefix-key (top-left block)
+        "generation" – learn only generation-query → prefix-key (bottom-left block)
+        "both"       – learn all-query → prefix-key (full left block)
+    """
+    frozen = torch.ones(
+        num_total_sents, num_total_sents, dtype=torch.bool, device=device
+    )
+    if mask_mode == "prefix":
+        frozen[:num_prefix_sents, :num_prefix_sents] = False
+    elif mask_mode == "generation":
+        frozen[num_prefix_sents:, :num_prefix_sents] = False
+    elif mask_mode == "both":
+        frozen[:, :num_prefix_sents] = False
+    else:
+        raise ValueError(f"Unknown mask_mode: {mask_mode!r}")
+    return frozen
+
+
+def build_combined_filter(
+    gap_filter: torch.Tensor,
+    mode_filter: torch.Tensor,
+) -> torch.Tensor:
+    """Combine gap and mode filters into one frozen-mask. True = frozen at 1.0."""
+    return gap_filter | mode_filter
+
+
 @dataclass
 class MaskResult(ABC):
     """Base fields shared by all mask types."""

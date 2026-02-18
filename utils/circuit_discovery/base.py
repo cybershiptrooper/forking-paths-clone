@@ -157,14 +157,19 @@ class CircuitDiscovery(ABC):
         input_ids: torch.Tensor,
         sentences: List[Sentence],
         continuations: List[torch.Tensor],
+        mask_mode: str = "prefix",
+        num_prefix_sentences: Optional[int] = None,
         **kwargs,
     ) -> NodeMask:
         """Run circuit discovery.
 
         Args:
             input_ids: (1, prompt_len) tokenized prompt up to analysis timestep
-            sentences: List of Sentence(start, end) in the prompt
+            sentences: List of Sentence(start, end) — prefix + optional generation
             continuations: List of (1, cont_len) token ID tensors for each branch
+            mask_mode: "prefix", "generation", or "both"
+            num_prefix_sentences: How many sentences are prefix (rest are generation).
+                Defaults to len(sentences).
 
         Returns:
             NodeMask with per-(layer, head, src_sent, tgt_sent) attribution scores.

@@ -15,7 +15,7 @@ from transformers.cache_utils import Cache
 from transformers.models.llama.modeling_llama import apply_rotary_pos_emb, repeat_kv
 from tqdm import tqdm
 
-from utils.masks import NodeMask, build_gap_filter, apply_gap_filter
+from utils.masks import NodeMask, build_gap_filter, apply_gap_filter, build_mode_filter, build_combined_filter
 from utils.utils import Sentence
 from utils.circuit_discovery.base import CircuitDiscovery
 
@@ -52,8 +52,7 @@ def expand_sentence_mask_to_tokens(
     if cache_position is not None:
         q_sent = token_to_sent[cache_position.long()]  # (q_len,)
     else:
-        total_len = token_to_sent.shape[0]
-        q_sent = token_to_sent[total_len - q_len : total_len]  # (q_len,)
+        q_sent = token_to_sent[:q_len]  # (q_len,)
     k_sent = token_to_sent[:k_len]  # (k_len,)
 
     # Pad mask with sentinel row/col of 1s for tokens not in any sentence
@@ -285,14 +284,20 @@ class NodewiseAttribution(CircuitDiscovery):
         input_ids: torch.Tensor,
         sentences: List[Sentence],
         continuations: List[torch.Tensor],
+        mask_mode: str = "prefix",
+        num_prefix_sentences: Optional[int] = None,
         **kwargs,
     ) -> NodeMask:
         """Run integrated gradients circuit discovery.
 
         Args:
             input_ids: (1, prompt_len) tokenized prompt
-            sentences: Sentence boundaries in the prompt
+            sentences: Sentence boundaries (prefix + optional generation sentences)
             continuations: List of (1, cont_len) continuation token tensors
+            mask_mode: "prefix" (MASK 1), "generation" (MASK 2), or "both"
+            num_prefix_sentences: Number of prefix sentences in *sentences*.
+                Generation sentences start at this index. Defaults to len(sentences)
+                (all are prefix, original behaviour).
 
         Returns:
             NodeMask with attribution scores per (layer, head, src_sent, tgt_sent)
@@ -301,6 +306,7 @@ class NodewiseAttribution(CircuitDiscovery):
         num_sents = len(sentences)
         num_heads = self.model.config.num_attention_heads
         prefix_len = input_ids.shape[-1]
+        num_prefix_sents = num_prefix_sentences if num_prefix_sentences is not None else num_sents
 
         # Build mappings
         # token_to_sent needs to cover the full sequence (prompt + longest continuation)
@@ -309,6 +315,10 @@ class NodewiseAttribution(CircuitDiscovery):
         token_to_sent = self._build_token_to_sentence_map(sentences, total_seq_len)
         token_to_sent = token_to_sent.to(device)
         gap_filter = build_gap_filter(num_sents, self.sentence_gap, device=device)
+
+        # Build combined filter (gap + mode) — True = frozen at 1.0
+        mode_filter = build_mode_filter(num_prefix_sents, num_sents, mask_mode, device=device)
+        combined_filter = build_combined_filter(gap_filter, mode_filter)
 
         # 0. Optionally ablate all non-target layers
         non_target_handles = []
@@ -321,7 +331,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 num_heads=num_heads,
                 num_sents=num_sents,
                 token_to_sent=token_to_sent,
-                gap_filter=gap_filter,
+                gap_filter=combined_filter,
                 custom_forward_fn=llama_attention_forward_with_differentiable_mask,
             )
 
@@ -357,7 +367,7 @@ class NodewiseAttribution(CircuitDiscovery):
             handles = self._patch_model(
                 masks,
                 token_to_sent,
-                gap_filter,
+                combined_filter,
                 llama_attention_forward_with_differentiable_mask,
             )
 
@@ -417,6 +427,8 @@ class NodewiseAttribution(CircuitDiscovery):
                 "num_heads": num_heads,
                 "ablate_non_target_layers": self.ablate_non_target_layers,
                 "negate_scores": self.negate_scores,
+                "mask_mode": mask_mode,
+                "num_prefix_sentences": num_prefix_sents,
             },
             scores=scores,
         )

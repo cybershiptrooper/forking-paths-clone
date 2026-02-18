@@ -18,7 +18,7 @@ from utils.cot_analysis import remove_bos_from_sentences
 from vllm import LLM, SamplingParams
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from utils.utils import set_seed, clear_cuda
+from utils.utils import set_seed, clear_cuda, Sentence
 from utils.cot_analysis import split_tokens_into_sentences
 from utils.objectives import get_objective
 from utils.masks import NodeMask
@@ -114,6 +114,7 @@ def main(
     layers_to_analyse: list[int] = None,
     sentence_gap: int = 1,
     sentence_chunk: int = 1,
+    mask_mode: str = "prefix",
     ablate_non_target_layers: bool = False,
     renormalize_masked_attention: bool = True,
     num_ig_steps: int = 10,
@@ -237,11 +238,32 @@ def main(
     )
     sentences = remove_bos_from_sentences(sentences)
     sentences = chunk_sentences(sentences, sentence_chunk)
+    num_prefix_sentences = len(sentences)
 
-    print(f"Found {len(sentences)} sentence chunks:")
+    # Optionally add generation sentences (for "generation" / "both" modes)
+    if mask_mode in ("generation", "both"):
+        first_branch_tokens = torch.tensor(branches[0]["token_ids"])
+        gen_sentences_raw = split_tokens_into_sentences(
+            first_branch_tokens, tokenizer, min_sentence_length=min_sentence_length
+        )
+        gen_sentences_raw = chunk_sentences(gen_sentences_raw, sentence_chunk)
+        # Offset to absolute positions in the full sequence
+        gen_sentences = [
+            Sentence(start=s.start + analysis_timestep, end=s.end + analysis_timestep)
+            for s in gen_sentences_raw
+        ]
+        sentences = list(sentences) + gen_sentences
+        print(f"Mask mode '{mask_mode}': added {len(gen_sentences)} generation sentences")
+
+    print(f"Found {len(sentences)} sentence chunks ({num_prefix_sentences} prefix):")
     for i, s in enumerate(sentences):
-        text = tokenizer.decode(input_ids[0, s.start : s.end + 1])
-        print(f"  S{i}: [{s.start}:{s.end}] = {repr(text)}")
+        label = "P" if i < num_prefix_sentences else "G"
+        # Generation sentence positions may exceed input_ids length
+        if s.end < input_ids.shape[-1]:
+            text = tokenizer.decode(input_ids[0, s.start : s.end + 1])
+        else:
+            text = "<generation>"
+        print(f"  {label}{i}: [{s.start}:{s.end}] = {repr(text)}")
 
     # =====================================================================
     # Step 4: Load HuggingFace model (eager attention)
@@ -291,11 +313,17 @@ def main(
         input_ids=input_ids,
         sentences=sentences,
         continuations=continuations,
+        mask_mode=mask_mode,
+        num_prefix_sentences=num_prefix_sentences,
     )
 
     # Add sentence text to metadata
+    seq_len = input_ids.shape[-1]
     for i, s in enumerate(node_mask.sentences):
-        s["text"] = tokenizer.decode(input_ids[0, s["start"] : s["end"] + 1])
+        if s["end"] < seq_len:
+            s["text"] = tokenizer.decode(input_ids[0, s["start"] : s["end"] + 1])
+        else:
+            s["text"] = "<generation>"
 
     # =====================================================================
     # Step 6: Evaluate at thresholds
@@ -394,6 +422,13 @@ if __name__ == "__main__":
     )
     parser.add_argument("--sentence_gap", type=int, default=1)
     parser.add_argument("--sentence_chunk", type=int, default=1)
+    parser.add_argument(
+        "--mask_mode",
+        choices=["prefix", "generation", "both"],
+        default="prefix",
+        help="Which query-key region to learn: prefix (MASK 1), "
+        "generation (MASK 2), or both.",
+    )
     parser.add_argument(
         "--ablate_non_target_layers",
         action="store_true",

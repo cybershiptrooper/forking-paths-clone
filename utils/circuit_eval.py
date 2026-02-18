@@ -13,7 +13,7 @@ from typing import Callable
 import torch
 
 from utils.utils import Sentence, get_attention_module
-from utils.masks import NodeMask, build_gap_filter, apply_gap_filter
+from utils.masks import NodeMask, build_gap_filter, apply_gap_filter, build_mode_filter, build_combined_filter
 from utils.cot_analysis import split_tokens_into_sentences
 from utils.circuit_discovery.nodewise_attribution import (
     llama_attention_forward_with_differentiable_mask,
@@ -294,7 +294,13 @@ def evaluate_at_thresholds(
     if hasattr(node_mask, "metadata"):
         sentence_gap = node_mask.metadata.get("sentence_gap", 0)
     gap_filter = build_gap_filter(num_sents, sentence_gap, device=device)
-    gap_filter_cpu = gap_filter.cpu()
+
+    # Build combined filter (gap + mode) to match discovery-time filtering
+    mask_mode = node_mask.metadata.get("mask_mode", "prefix")
+    num_prefix_sents = node_mask.metadata.get("num_prefix_sentences", num_sents)
+    mode_filter = build_mode_filter(num_prefix_sents, num_sents, mask_mode, device=device)
+    combined_filter = build_combined_filter(gap_filter, mode_filter)
+    combined_filter_cpu = combined_filter.cpu()
 
     # Optionally ablate non-target layers
     non_target_handles: list[AblationHandle] = []
@@ -305,7 +311,7 @@ def evaluate_at_thresholds(
             num_heads,
             num_sents,
             token_to_sent,
-            gap_filter,
+            combined_filter,
             renormalize_masked_attention,
             device,
         )
@@ -316,7 +322,7 @@ def evaluate_at_thresholds(
 
     results = []
     for threshold in thresholds:
-        sparsity = node_mask.sparsity(threshold, gap_filter=gap_filter_cpu)
+        sparsity = node_mask.sparsity(threshold, gap_filter=combined_filter_cpu)
 
         binary_masks = build_binary_masks(
             node_mask,
@@ -324,7 +330,7 @@ def evaluate_at_thresholds(
             layers,
             num_heads,
             num_sents,
-            gap_filter,
+            combined_filter,
             device,
         )
 
@@ -337,7 +343,7 @@ def evaluate_at_thresholds(
             clean_logits_list=clean_logits_list,
             objective_fn=objective_fn,
             token_to_sent=token_to_sent,
-            gap_filter=gap_filter,
+            gap_filter=combined_filter,
             renormalize=renormalize_masked_attention,
             collect_per_token=True,
             collect_per_sentence=True,
@@ -351,7 +357,7 @@ def evaluate_at_thresholds(
             layers,
             num_heads,
             num_sents,
-            gap_filter,
+            combined_filter,
             device,
         )
 
@@ -364,7 +370,7 @@ def evaluate_at_thresholds(
             clean_logits_list=clean_logits_list,
             objective_fn=objective_fn,
             token_to_sent=token_to_sent,
-            gap_filter=gap_filter,
+            gap_filter=combined_filter,
             renormalize=renormalize_masked_attention,
         )
 
