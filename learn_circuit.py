@@ -13,6 +13,8 @@ import argparse
 import json
 
 import torch
+from utils.cot_analysis import chunk_sentences
+from utils.cot_analysis import remove_bos_from_sentences
 from vllm import LLM, SamplingParams
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -35,36 +37,6 @@ def load_model_eager(model_name: str, device: str = "cuda"):
     )
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     return model, tokenizer
-
-
-def chunk_sentences(sentences: list[Sentence], chunk_size: int) -> list[Sentence]:
-    """Merge consecutive sentences into chunks of chunk_size.
-
-    Args:
-        sentences: List of Sentence(start, end) namedtuples
-        chunk_size: Number of sentences per chunk
-
-    Returns:
-        List of Sentence chunks with merged token ranges
-    """
-    if chunk_size <= 1:
-        return sentences
-    chunks = []
-    for i in range(0, len(sentences), chunk_size):
-        group = sentences[i : i + chunk_size]
-        chunks.append(Sentence(start=group[0].start, end=group[-1].end))
-    return chunks
-
-
-def remove_bos_from_sentences(sentences: list[Sentence]) -> list[Sentence]:
-    """If any sentence starts at index 0, clamp to index 1 to skip BOS token."""
-    result = []
-    for s in sentences:
-        if s.start == 0:
-            result.append(Sentence(start=2, end=s.end))
-        else:
-            result.append(s)
-    return result
 
 
 def generate_branches(
