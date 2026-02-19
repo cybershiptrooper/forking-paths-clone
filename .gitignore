@@ -24,6 +24,8 @@ thought_anchors
 *rough*
 results/attention*
 expts/test_scripts
-results/circuitviz
+results/circuitviz*
 
 CLAUDE.md
+.DS_Store
+cluster.md

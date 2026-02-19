@@ -26,8 +26,8 @@ def kl_divergence_loss(
     Returns:
         Scalar KL divergence loss (differentiable w.r.t. masked_logits).
     """
-    clean_log_probs = F.log_softmax(clean_logits.detach(), dim=-1)
-    masked_log_probs = F.log_softmax(masked_logits, dim=-1)
+    clean_log_probs = F.log_softmax(clean_logits.detach().float(), dim=-1)
+    masked_log_probs = F.log_softmax(masked_logits.float(), dim=-1)
 
     # KL(P || Q) = sum P * (log P - log Q)
     kl = F.kl_div(

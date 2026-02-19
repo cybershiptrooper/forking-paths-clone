@@ -133,7 +133,6 @@ def build_random_score_masks(
     return random_masks
 
 
-
 def compute_clean_logits(
     model: torch.nn.Module,
     input_ids: torch.Tensor,
@@ -269,8 +268,10 @@ def eval_with_masks(
             total_branches += 1
 
             if collect_per_token or collect_per_sentence:
-                log_clean = torch.nn.functional.log_softmax(clean.detach(), dim=-1)
-                log_masked = torch.nn.functional.log_softmax(logits, dim=-1)
+                log_clean = torch.nn.functional.log_softmax(
+                    clean.detach().float(), dim=-1
+                )
+                log_masked = torch.nn.functional.log_softmax(logits.float(), dim=-1)
                 kl_tokens = torch.nn.functional.kl_div(
                     log_masked, log_clean, log_target=True, reduction="none"
                 ).sum(dim=-1)

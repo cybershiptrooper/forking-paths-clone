@@ -3,20 +3,25 @@ uv run python learn_circuit.py \
   --num_ig_steps 50 \
   --max_new_tokens 200 \
   --layers_to_analyse "all" \
-  --output_dir results/circuitviz/ig50_prefix \
+  --output_dir results/circuitviz/ig50_prefix_no_norm \
   --ablate_non_target_layers \
   --sentence_gap 0 \
-  --mask_mode prefix
+  --num_random_samples 1 \
+  --mask_mode prefix 
+  # --no_renormalize_masked_attention
 
 uv run python learn_circuit.py \
   --num_new_branches 1 \
   --num_ig_steps 50 \
   --max_new_tokens 200 \
   --layers_to_analyse "all" \
-  --output_dir results/circuitviz/ig50_prefix_gap_1 \
+  --output_dir results/circuitviz/ig50_prefix_gap_1_no_norm \
   --ablate_non_target_layers \
   --sentence_gap 1 \
-  --mask_mode prefix
+  --num_random_samples 1 \
+  --mask_mode prefix 
+  # --no_renormalize_masked_attention
+
 
 ####################################################################
 
