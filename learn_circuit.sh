@@ -2,6 +2,8 @@ uv run python learn_circuit.py \
   --num_new_branches 1 \
   --num_ig_steps 50 \
   --max_new_tokens 200 \
+  --masking_algorithm nodewise_attribution_attention \
+  --pair_aggregation sum \
   --layers_to_analyse "all" \
   --output_dir results/circuitviz/ig50_prefix_no_norm \
   --ablate_non_target_layers \
@@ -14,6 +16,8 @@ uv run python learn_circuit.py \
   --num_new_branches 1 \
   --num_ig_steps 50 \
   --max_new_tokens 200 \
+  --masking_algorithm nodewise_attribution_attention \
+  --pair_aggregation sum \
   --layers_to_analyse "all" \
   --output_dir results/circuitviz/ig50_prefix_gap_1_no_norm \
   --ablate_non_target_layers \

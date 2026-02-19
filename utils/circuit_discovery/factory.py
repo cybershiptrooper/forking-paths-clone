@@ -1,11 +1,17 @@
 """Factory for creating circuit discovery algorithm instances from config."""
 
 from utils.circuit_discovery.base import CircuitDiscovery
-from utils.circuit_discovery.nodewise_attribution import NodewiseAttribution
+from utils.circuit_discovery.nodewise_attribution import (
+    NodewiseAttribution as MaskIGNodewiseAttribution,
+)
+from utils.circuit_discovery.nodewise_attribution_attention import (
+    NodewiseAttribution as AttentionAPIGNodewiseAttribution,
+)
 
 
 ALGORITHMS = {
-    "nodewise_attribution": NodewiseAttribution,
+    "nodewise_attribution": MaskIGNodewiseAttribution,
+    "nodewise_attribution_attention": AttentionAPIGNodewiseAttribution,
     # Future:
     # "subnetwork_probing": SubnetworkProbing,
     # "EAP": EdgeAttributionPatching,
