@@ -15,8 +15,9 @@ import torch
 from utils.utils import Sentence, get_attention_module
 from utils.masks import NodeMask, build_gap_filter, apply_gap_filter, build_mode_filter, build_combined_filter
 from utils.cot_analysis import split_tokens_into_sentences
-from utils.circuit_discovery.nodewise_attribution import (
-    llama_attention_forward_with_differentiable_mask,
+from utils.circuit_discovery.common import (
+    make_llama_attention_forward,
+    apply_sentence_mask,
 )
 from utils.circuit_discovery.base import AblationHandle
 
@@ -162,6 +163,7 @@ def install_mask_hooks(
     renormalize: bool,
 ) -> list[AblationHandle]:
     """Monkey-patch attention modules with *binary_masks* and return handles."""
+    forward_fn = make_llama_attention_forward(apply_sentence_mask)
     handles: list[AblationHandle] = []
     for layer_idx in layers:
         attn_module = get_attention_module(model, layer_idx)
@@ -170,9 +172,7 @@ def install_mask_hooks(
         attn_module._token_to_sent = token_to_sent
         attn_module._gap_filter = gap_filter
         attn_module._renormalize_masked_attn = renormalize
-        attn_module.forward = types.MethodType(
-            llama_attention_forward_with_differentiable_mask, attn_module
-        )
+        attn_module.forward = types.MethodType(forward_fn, attn_module)
         handles.append(AblationHandle(attn_module, original_forward))
     return handles
 
@@ -196,6 +196,7 @@ def install_non_target_ablation(
     zero_mask = torch.zeros(num_heads, num_sents, num_sents, device=device)
     filled_mask = apply_gap_filter(zero_mask, gap_filter, fill_value=1.0)
 
+    forward_fn = make_llama_attention_forward(apply_sentence_mask)
     handles: list[AblationHandle] = []
     for layer_idx in non_target:
         attn_module = get_attention_module(model, layer_idx)
@@ -204,9 +205,7 @@ def install_non_target_ablation(
         attn_module._token_to_sent = token_to_sent
         attn_module._gap_filter = gap_filter
         attn_module._renormalize_masked_attn = renormalize
-        attn_module.forward = types.MethodType(
-            llama_attention_forward_with_differentiable_mask, attn_module
-        )
+        attn_module.forward = types.MethodType(forward_fn, attn_module)
         handles.append(AblationHandle(attn_module, original_forward))
     return handles
 

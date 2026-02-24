@@ -5,20 +5,16 @@ integrated gradients over attention-pattern activations to compute
 per-(layer, head, source_sentence, target_sentence) attribution scores.
 """
 
-import math
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-from transformers.cache_utils import Cache
-from transformers.models.llama.modeling_llama import apply_rotary_pos_emb, repeat_kv
 from tqdm import tqdm
 
 from utils.circuit_discovery.base import CircuitDiscovery
+from utils.circuit_discovery.common import make_llama_attention_forward, apply_sentence_mask
 from utils.masks import (
     NodeMask,
-    apply_gap_filter,
     build_combined_filter,
     build_gap_filter,
     build_mode_filter,
@@ -29,199 +25,34 @@ from utils.utils import Sentence, get_attention_module
 _ALLOWED_PAIR_AGGREGATIONS = {"sum", "mean", "median", "max"}
 
 
-def expand_sentence_mask_to_tokens(
-    mask: torch.Tensor,
-    token_to_sent: torch.Tensor,
-    gap_filter: torch.Tensor,
+def ap_ig_attention_injection(
+    module,
+    attn_weights: torch.Tensor,
     q_len: int,
     k_len: int,
-    cache_position: Optional[torch.Tensor] = None,
+    cache_position: Optional[torch.Tensor],
 ) -> torch.Tensor:
-    """Expand (num_heads, num_sents, num_sents) mask to (num_heads, q_len, k_len).
+    """Injection for activation-patching integrated gradients.
 
-    Uses PyTorch advanced indexing for differentiability.
-    Tokens not assigned to any sentence (index -1) get mask value 1.0.
-    Gap-filtered entries (|src-tgt| < gap) also get 1.0.
-
-    Args:
-        mask: (num_heads, num_sents, num_sents) with requires_grad
-        token_to_sent: (total_seq_len,) int tensor mapping token -> sentence idx (-1 if none)
-        gap_filter: (num_sents, num_sents) bool, True where |i-j| < gap
-        q_len: number of query positions in current forward
-        k_len: number of key positions (total including cache)
-        cache_position: (q_len,) absolute positions of current queries, or None
-
-    Returns:
-        (num_heads, q_len, k_len) differentiable token-level mask
+    1. Applies the standard sentence mask (via ``apply_sentence_mask``).
+    2. Optionally overrides attention weights entirely with interpolated
+       activations (``_attn_override``).
+    3. Optionally captures attention weights for later retrieval
+       (``_capture_attn``).
     """
-    num_heads, num_sents, _ = mask.shape
-    device = mask.device
+    # Step 1: standard sentence mask
+    attn_weights = apply_sentence_mask(module, attn_weights, q_len, k_len, cache_position)
 
-    if cache_position is not None:
-        q_sent = token_to_sent[cache_position.long()]
-    else:
-        q_sent = token_to_sent[:q_len]
-    k_sent = token_to_sent[:k_len]
-
-    padded = torch.ones(
-        num_heads, num_sents + 1, num_sents + 1, device=device, dtype=mask.dtype
-    )
-    effective_mask = apply_gap_filter(mask, gap_filter, fill_value=1.0)
-    padded[:, :num_sents, :num_sents] = effective_mask
-
-    q_idx = q_sent.clone().to(device)
-    k_idx = k_sent.clone().to(device)
-    q_idx[q_sent == -1] = num_sents
-    k_idx[k_sent == -1] = num_sents
-
-    token_mask = padded[:, q_idx][:, :, k_idx]
-    return token_mask
-
-
-def llama_attention_forward_with_differentiable_mask(
-    self,
-    hidden_states: torch.Tensor,
-    position_embeddings: Tuple[torch.Tensor, torch.Tensor],
-    attention_mask: Optional[torch.Tensor] = None,
-    past_key_values: Optional[Cache] = None,
-    cache_position: Optional[torch.LongTensor] = None,
-    **kwargs,
-):
-    """Patched LlamaAttention forward with masking + AP-IG attention overrides."""
-    bsz, q_len, _ = hidden_states.size()
-
-    if self.config.pretraining_tp > 1:
-        key_value_slicing = (
-            self.config.num_key_value_heads * self.head_dim
-        ) // self.config.pretraining_tp
-        query_slices = self.q_proj.weight.split(
-            (self.config.num_attention_heads * self.head_dim)
-            // self.config.pretraining_tp,
-            dim=0,
-        )
-        key_slices = self.k_proj.weight.split(key_value_slicing, dim=0)
-        value_slices = self.v_proj.weight.split(key_value_slicing, dim=0)
-
-        query_states = [
-            nn.functional.linear(hidden_states, query_slices[i])
-            for i in range(self.config.pretraining_tp)
-        ]
-        query_states = torch.cat(query_states, dim=-1)
-        key_states = [
-            nn.functional.linear(hidden_states, key_slices[i])
-            for i in range(self.config.pretraining_tp)
-        ]
-        key_states = torch.cat(key_states, dim=-1)
-        value_states = [
-            nn.functional.linear(hidden_states, value_slices[i])
-            for i in range(self.config.pretraining_tp)
-        ]
-        value_states = torch.cat(value_states, dim=-1)
-    else:
-        query_states = self.q_proj(hidden_states)
-        key_states = self.k_proj(hidden_states)
-        value_states = self.v_proj(hidden_states)
-
-    query_states = query_states.view(
-        bsz, q_len, self.config.num_attention_heads, self.head_dim
-    ).transpose(1, 2)
-    key_states = key_states.view(
-        bsz, q_len, self.config.num_key_value_heads, self.head_dim
-    ).transpose(1, 2)
-    value_states = value_states.view(
-        bsz, q_len, self.config.num_key_value_heads, self.head_dim
-    ).transpose(1, 2)
-
-    cos, sin = position_embeddings
-    query_states, key_states = apply_rotary_pos_emb(
-        query_states, key_states, cos, sin
-    )
-
-    if past_key_values is not None:
-        cache_kwargs = {"sin": sin, "cos": cos, "cache_position": cache_position}
-        key_states, value_states = past_key_values.update(
-            key_states, value_states, self.layer_idx, cache_kwargs
-        )
-
-    key_states = repeat_kv(key_states, self.num_key_value_groups)
-    value_states = repeat_kv(value_states, self.num_key_value_groups)
-
-    attn_weights = torch.matmul(
-        query_states, key_states.transpose(2, 3)
-    ) / math.sqrt(self.head_dim)
-
-    if attention_mask is not None:
-        causal_mask = attention_mask
-        if attention_mask.size() != (bsz, 1, q_len, key_states.shape[-2]):
-            causal_mask = causal_mask[:, :, :, : key_states.shape[-2]]
-        attn_weights = attn_weights + causal_mask
-
-    attn_weights = nn.functional.softmax(
-        attn_weights, dim=-1, dtype=torch.float32
-    ).to(query_states.dtype)
-
-    mask = getattr(self, "_circuit_mask", None)
-    token_to_sent = getattr(self, "_token_to_sent", None)
-    gap_filter = getattr(self, "_gap_filter", None)
-
-    if mask is not None and token_to_sent is not None:
-        k_len = key_states.shape[-2]
-        original_dtype = attn_weights.dtype
-        token_mask = expand_sentence_mask_to_tokens(
-            mask, token_to_sent, gap_filter, q_len, k_len, cache_position
-        )
-        attn_weights = (attn_weights.float() * token_mask.unsqueeze(0))
-        renormalize = getattr(self, "_renormalize_masked_attn", True)
-        if renormalize:
-            row_sums = attn_weights.sum(dim=-1, keepdim=True) + 1e-12
-            attn_weights = (attn_weights / row_sums).to(original_dtype)
-        else:
-            attn_weights = attn_weights.to(original_dtype)
-
-    override = getattr(self, "_attn_override", None)
+    # Step 2: replace with interpolated activations for AP-IG
+    override = getattr(module, "_attn_override", None)
     if override is not None:
         attn_weights = override.to(attn_weights.dtype) + (attn_weights * 0)
 
-    if getattr(self, "_capture_attn", False):
-        self._last_attn_weights = attn_weights.detach()
+    # Step 3: snapshot for clean / corrupted capture
+    if getattr(module, "_capture_attn", False):
+        module._last_attn_weights = attn_weights.detach()
 
-    attn_weights = nn.functional.dropout(
-        attn_weights, p=self.attention_dropout, training=self.training
-    )
-    attn_output = torch.matmul(attn_weights, value_states)
-
-    if attn_output.size() != (
-        bsz,
-        self.config.num_attention_heads,
-        q_len,
-        self.head_dim,
-    ):
-        attn_output = attn_output.transpose(1, 2).contiguous()
-        attn_output = attn_output.reshape(bsz, q_len, self.config.hidden_size)
-    else:
-        attn_output = (
-            attn_output.transpose(1, 2)
-            .contiguous()
-            .reshape(bsz, q_len, self.config.hidden_size)
-        )
-
-    if self.config.pretraining_tp > 1:
-        attn_output = attn_output.split(
-            self.config.hidden_size // self.config.pretraining_tp, dim=2
-        )
-        o_proj_slices = self.o_proj.weight.split(
-            self.config.hidden_size // self.config.pretraining_tp, dim=1
-        )
-        attn_output = sum(
-            [
-                nn.functional.linear(attn_output[i], o_proj_slices[i])
-                for i in range(self.config.pretraining_tp)
-            ]
-        )
-    else:
-        attn_output = self.o_proj(attn_output)
-
-    return attn_output, past_key_values
+    return attn_weights
 
 
 class NodewiseAttribution(CircuitDiscovery):
@@ -237,29 +68,6 @@ class NodewiseAttribution(CircuitDiscovery):
         super().__init__(**kwargs)
         self.num_ig_steps = num_ig_steps
         self.negate_scores = negate_scores
-
-    def _get_clean_logits(
-        self,
-        input_ids: torch.Tensor,
-        continuations: List[torch.Tensor],
-    ) -> List[torch.Tensor]:
-        """Pre-compute clean logits (no mask) for each continuation."""
-        clean_logits_list = []
-        self.model.eval()
-        with torch.no_grad(), torch.amp.autocast("cuda"):
-            for cont in continuations:
-                full_input = torch.cat([input_ids, cont], dim=-1)
-                outputs = self.model(full_input)
-                clean_logits_list.append(outputs.logits.float().detach().cpu())
-        return clean_logits_list
-
-    def _build_position_mask(
-        self, full_len: int, prefix_len: int, device: torch.device
-    ) -> torch.Tensor:
-        """Build mask with 1 for continuation tokens, 0 for prefix."""
-        mask = torch.zeros(1, full_len, device=device)
-        mask[0, prefix_len - 1 : full_len - 1] = 1.0
-        return mask
 
     def _make_layer_masks(
         self,
@@ -295,12 +103,13 @@ class NodewiseAttribution(CircuitDiscovery):
         num_sents: int,
         device: torch.device,
     ) -> Dict[int, torch.Tensor]:
+        forward_fn = make_llama_attention_forward(ap_ig_attention_injection)
         masks = self._make_layer_masks(mask_value, num_heads, num_sents, device)
         handles = self._patch_model(
             masks,
             token_to_sent,
             combined_filter,
-            llama_attention_forward_with_differentiable_mask,
+            forward_fn,
         )
         try:
             for layer in self.layers:
@@ -412,6 +221,9 @@ class NodewiseAttribution(CircuitDiscovery):
         combined_filter = build_combined_filter(gap_filter, mode_filter)
         combined_filter_cpu = combined_filter.detach().cpu()
 
+        # Build the patched forward with AP-IG injection
+        forward_fn = make_llama_attention_forward(ap_ig_attention_injection)
+
         non_target_handles = []
         if self.ablate_non_target_layers:
             print(
@@ -423,7 +235,6 @@ class NodewiseAttribution(CircuitDiscovery):
                 num_sents=num_sents,
                 token_to_sent=token_to_sent,
                 gap_filter=combined_filter,
-                custom_forward_fn=llama_attention_forward_with_differentiable_mask,
             )
 
         print("Computing clean logits...")
@@ -478,7 +289,7 @@ class NodewiseAttribution(CircuitDiscovery):
                     masks,
                     token_to_sent,
                     combined_filter,
-                    llama_attention_forward_with_differentiable_mask,
+                    forward_fn,
                 )
 
                 step_overrides: Dict[int, torch.Tensor] = {}

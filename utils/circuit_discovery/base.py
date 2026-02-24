@@ -8,6 +8,7 @@ import torch
 
 from utils.masks import NodeMask
 from utils.utils import Sentence, get_attention_module
+from utils.circuit_discovery.common import make_llama_attention_forward, apply_sentence_mask
 
 
 class AblationHandle:
@@ -69,6 +70,39 @@ class CircuitDiscovery(ABC):
             mapping[sent.start : sent.end + 1] = idx
         return mapping
 
+    def _get_clean_logits(
+        self,
+        input_ids: torch.Tensor,
+        continuations: List[torch.Tensor],
+    ) -> List[torch.Tensor]:
+        """Pre-compute clean logits (no mask) for each continuation.
+
+        Uses the same autocast context as the IG forward pass so that the
+        precision of clean and masked logits matches. Without this, KL at
+        alpha=1 (identity mask) is spuriously non-zero due to float32-vs-
+        bfloat16 differences, biasing all IG gradients.
+        """
+        clean_logits_list = []
+        self.model.eval()
+        with torch.no_grad(), torch.amp.autocast("cuda"):
+            for cont in continuations:
+                full_input = torch.cat([input_ids, cont], dim=-1)
+                outputs = self.model(full_input)
+                clean_logits_list.append(outputs.logits.float().detach().cpu())
+        return clean_logits_list
+
+    def _build_position_mask(
+        self, full_len: int, prefix_len: int, device: torch.device
+    ) -> torch.Tensor:
+        """Build mask with 1 for continuation tokens, 0 for prefix."""
+        mask = torch.zeros(1, full_len, device=device)
+        # We care about logits that predict continuation tokens
+        # logits at position i predict token i+1
+        # So for continuation starting at prefix_len, we want positions prefix_len-1 onwards
+        # But the first useful prediction is at prefix_len-1 (predicting token at prefix_len)
+        mask[0, prefix_len - 1 : full_len - 1] = 1.0
+        return mask
+
     def _patch_model(
         self,
         masks: dict,
@@ -113,16 +147,17 @@ class CircuitDiscovery(ABC):
         num_sents: int,
         token_to_sent: torch.Tensor,
         gap_filter: torch.Tensor,
-        custom_forward_fn,
     ) -> List[AblationHandle]:
         """Patch all layers NOT in self.layers with zero masks (fully ablated).
+
+        Uses ``apply_sentence_mask`` as the injection — non-target layers
+        only need masking, not algorithm-specific behaviour.
 
         Args:
             num_heads: Number of attention heads per layer
             num_sents: Number of sentences
             token_to_sent: (seq_len,) mapping token -> sentence index
             gap_filter: (num_sents, num_sents) boolean gap filter
-            custom_forward_fn: The custom forward function to bind
 
         Returns:
             List of AblationHandle for cleanup.
@@ -132,6 +167,7 @@ class CircuitDiscovery(ABC):
         target_set = set(self.layers)
         non_target = [l for l in range(num_layers) if l not in target_set]
 
+        forward_fn = make_llama_attention_forward(apply_sentence_mask)
         handles = []
         for layer_idx in non_target:
             attn_module = get_attention_module(self.model, layer_idx)
@@ -146,7 +182,7 @@ class CircuitDiscovery(ABC):
             attn_module._gap_filter = gap_filter
             attn_module._renormalize_masked_attn = self.renormalize_masked_attention
 
-            attn_module.forward = types.MethodType(custom_forward_fn, attn_module)
+            attn_module.forward = types.MethodType(forward_fn, attn_module)
             handles.append(AblationHandle(attn_module, original_forward))
 
         return handles

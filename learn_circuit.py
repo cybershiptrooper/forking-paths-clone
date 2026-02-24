@@ -158,6 +158,8 @@ def main(
 
     if analysis_timestep is None:
         analysis_timestep = prompt_len + 200
+    else:
+        analysis_timestep = prompt_len + analysis_timestep
 
     print(f"Prompt length: {prompt_len} tokens")
     print(f"Analysis timestep: {analysis_timestep}")

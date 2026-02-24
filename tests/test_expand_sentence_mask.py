@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 
-from utils.circuit_discovery.nodewise_attribution import expand_sentence_mask_to_tokens
+from utils.circuit_discovery.common import expand_sentence_mask_to_tokens
 from utils.masks import build_gap_filter, apply_gap_filter, build_mode_filter, build_combined_filter
 
 

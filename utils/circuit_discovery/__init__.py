@@ -1,6 +1,11 @@
 """Circuit discovery algorithms for learning attention masks."""
 
 from utils.circuit_discovery.base import CircuitDiscovery
+from utils.circuit_discovery.common import (
+    make_llama_attention_forward,
+    apply_sentence_mask,
+    expand_sentence_mask_to_tokens,
+)
 from utils.circuit_discovery.nodewise_attribution import NodewiseAttribution
 from utils.circuit_discovery.nodewise_attribution_attention import (
     NodewiseAttribution as NodewiseAttributionAttention,
@@ -12,4 +17,7 @@ __all__ = [
     "NodewiseAttribution",
     "NodewiseAttributionAttention",
     "create_circuit_discovery",
+    "make_llama_attention_forward",
+    "apply_sentence_mask",
+    "expand_sentence_mask_to_tokens",
 ]
