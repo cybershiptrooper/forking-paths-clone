@@ -13,7 +13,7 @@ from typing import Callable
 import torch
 
 from utils.utils import Sentence, get_attention_module
-from utils.masks import NodeMask, build_gap_filter, apply_gap_filter, build_mode_filter, build_combined_filter
+from utils.masks import NodeMask, build_gap_filter, apply_gap_filter, build_mode_filter, build_combined_filter, build_causal_filter
 from utils.cot_analysis import split_tokens_into_sentences
 from utils.circuit_discovery.common import (
     make_llama_attention_forward,
@@ -347,11 +347,12 @@ def evaluate_at_thresholds(
         sentence_gap = node_mask.metadata.get("sentence_gap", 0)
     gap_filter = build_gap_filter(num_sents, sentence_gap, device=device)
 
-    # Build combined filter (gap + mode) to match discovery-time filtering
+    # Build combined filter (gap + mode + causal) to match discovery-time filtering
     mask_mode = node_mask.metadata.get("mask_mode", "prefix")
     num_prefix_sents = node_mask.metadata.get("num_prefix_sentences", num_sents)
     mode_filter = build_mode_filter(num_prefix_sents, num_sents, mask_mode, device=device)
-    combined_filter = build_combined_filter(gap_filter, mode_filter)
+    causal_filter = build_causal_filter(num_sents, device=device)
+    combined_filter = build_combined_filter(gap_filter, mode_filter, causal_filter)
     combined_filter_cpu = combined_filter.cpu()
 
     # Optionally ablate non-target layers

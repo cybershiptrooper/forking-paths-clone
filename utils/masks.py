@@ -56,12 +56,31 @@ def build_mode_filter(
     return frozen
 
 
+def build_causal_filter(
+    num_sents: int, device: Optional[torch.device] = None
+) -> torch.Tensor:
+    """Build boolean mask: True where j > i (causally invalid: key after query).
+
+    In autoregressive models, sentence i cannot attend to sentence j when j > i.
+    The causal attention mask zeros these weights pre-softmax, so IG scores for
+    these positions are structurally zero.  Excluding them from the permutable
+    pool prevents random baselines from having a different *effective* sparsity
+    than the learned mask.
+    """
+    i = torch.arange(num_sents, device=device)
+    return i[None, :] > i[:, None]
+
+
 def build_combined_filter(
     gap_filter: torch.Tensor,
     mode_filter: torch.Tensor,
+    causal_filter: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
-    """Combine gap and mode filters into one frozen-mask. True = frozen at 1.0."""
-    return gap_filter | mode_filter
+    """Combine gap, mode, and causal filters into one frozen-mask. True = frozen at 1.0."""
+    combined = gap_filter | mode_filter
+    if causal_filter is not None:
+        combined = combined | causal_filter.to(combined.device)
+    return combined
 
 
 @dataclass

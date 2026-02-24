@@ -10,7 +10,7 @@ from typing import List, Optional
 import torch
 from tqdm import tqdm
 
-from utils.masks import NodeMask, build_gap_filter, build_mode_filter, build_combined_filter
+from utils.masks import NodeMask, build_gap_filter, build_mode_filter, build_combined_filter, build_causal_filter
 from utils.utils import Sentence
 from utils.circuit_discovery.base import CircuitDiscovery
 from utils.circuit_discovery.common import make_llama_attention_forward, apply_sentence_mask
@@ -73,9 +73,10 @@ class NodewiseAttribution(CircuitDiscovery):
         token_to_sent = token_to_sent.to(device)
         gap_filter = build_gap_filter(num_sents, self.sentence_gap, device=device)
 
-        # Build combined filter (gap + mode) — True = frozen at 1.0
+        # Build combined filter (gap + mode + causal) — True = frozen at 1.0
         mode_filter = build_mode_filter(num_prefix_sents, num_sents, mask_mode, device=device)
-        combined_filter = build_combined_filter(gap_filter, mode_filter)
+        causal_filter = build_causal_filter(num_sents, device=device)
+        combined_filter = build_combined_filter(gap_filter, mode_filter, causal_filter)
 
         # Build the patched forward with sentence-mask injection
         forward_fn = make_llama_attention_forward(apply_sentence_mask)

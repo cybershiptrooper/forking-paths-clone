@@ -15,6 +15,7 @@ from utils.circuit_discovery.base import CircuitDiscovery
 from utils.circuit_discovery.common import make_llama_attention_forward, apply_sentence_mask
 from utils.masks import (
     NodeMask,
+    build_causal_filter,
     build_combined_filter,
     build_gap_filter,
     build_mode_filter,
@@ -218,7 +219,8 @@ class NodewiseAttribution(CircuitDiscovery):
         mode_filter = build_mode_filter(
             num_prefix_sents, num_sents, mask_mode, device=device
         )
-        combined_filter = build_combined_filter(gap_filter, mode_filter)
+        causal_filter = build_causal_filter(num_sents, device=device)
+        combined_filter = build_combined_filter(gap_filter, mode_filter, causal_filter)
         combined_filter_cpu = combined_filter.detach().cpu()
 
         # Build the patched forward with AP-IG injection
