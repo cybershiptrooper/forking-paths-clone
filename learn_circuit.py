@@ -343,13 +343,24 @@ def main(
     print("=" * 80)
 
     # Extend thresholds to include the min and max scores from the learned mask
-    all_scores = [
-        v
-        for layer_heads in node_mask.scores.values()
-        for head_scores in layer_heads.values()
-        for row in head_scores
-        for v in row
-    ]
+    granularity = node_mask.granularity
+    if granularity == "head":
+        all_scores = [
+            v
+            for layer_heads in node_mask.scores.values()
+            for head_scores in layer_heads.values()
+            for row in head_scores
+            for v in row
+        ]
+    elif granularity == "layer":
+        all_scores = [
+            v
+            for layer_scores in node_mask.scores.values()
+            for row in layer_scores
+            for v in row
+        ]
+    else:  # "pair"
+        all_scores = [v for row in node_mask.scores for v in row]
     if all_scores:
         score_min = min(all_scores)
         score_max = max(all_scores)
