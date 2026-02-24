@@ -7,11 +7,15 @@ from utils.circuit_discovery.nodewise_attribution import (
 from utils.circuit_discovery.nodewise_attribution_attention import (
     NodewiseAttribution as AttentionAPIGNodewiseAttribution,
 )
+from utils.circuit_discovery.nodewise_activation_patching import (
+    NodewiseActivationPatching,
+)
 
 
 ALGORITHMS = {
     "nodewise_attribution": MaskIGNodewiseAttribution,
     "nodewise_attribution_attention": AttentionAPIGNodewiseAttribution,
+    "nodewise_activation_patching": NodewiseActivationPatching,
     # Future:
     # "subnetwork_probing": SubnetworkProbing,
     # "EAP": EdgeAttributionPatching,

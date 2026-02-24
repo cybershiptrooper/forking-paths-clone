@@ -299,6 +299,38 @@ def main(
     # =====================================================================
     # Step 5: Circuit discovery
     # =====================================================================
+    # Cost warning for per-head activation patching
+    if masking_algorithm == "nodewise_activation_patching" and mask_granularity == "head":
+        from utils.masks import (
+            build_gap_filter as _bgf,
+            build_mode_filter as _bmf,
+            build_causal_filter as _bcf,
+            build_combined_filter as _bcombf,
+        )
+        _num_heads = model.config.num_attention_heads
+        _ns = len(sentences)
+        _cf = _bcombf(
+            _bgf(_ns, sentence_gap),
+            _bmf(num_prefix_sentences, _ns, mask_mode),
+            _bcf(_ns),
+        )
+        _num_active = int((~_cf).sum().item())
+        _total = len(layers_to_analyse) * _num_heads * _num_active * len(continuations)
+        print(
+            f"\n*** WARNING: Per-head activation patching will require "
+            f"{_total:,} forward passes. ***"
+        )
+        print(
+            f"    {len(layers_to_analyse)} layers x {_num_heads} heads "
+            f"x {_num_active} active pairs x {len(continuations)} branches"
+        )
+        _confirm = input("Continue? Type 'yes' to proceed: ").strip().lower()
+        if _confirm != "yes":
+            print("Aborted by user.")
+            del model
+            clear_cuda()
+            return
+
     print("\n" + "=" * 80)
     print(f"Step 5: Running {masking_algorithm}...")
     print("=" * 80)
@@ -400,11 +432,18 @@ def main(
         if layers_to_analyse_is_all
         else "_".join(str(l) for l in layers_to_analyse)
     )
-    output_file = os.path.join(
-        output_dir,
-        f"circuit_{masking_algorithm}_layers{layers_str}"
-        f"_branches{num_new_branches}_ig{num_ig_steps}.json",
-    )
+    if masking_algorithm == "nodewise_activation_patching":
+        output_file = os.path.join(
+            output_dir,
+            f"circuit_{masking_algorithm}_layers{layers_str}"
+            f"_branches{num_new_branches}.json",
+        )
+    else:
+        output_file = os.path.join(
+            output_dir,
+            f"circuit_{masking_algorithm}_layers{layers_str}"
+            f"_branches{num_new_branches}_ig{num_ig_steps}.json",
+        )
     node_mask.to_json(output_file)
     print(f"Saved NodeMask to {output_file}")
 
@@ -445,6 +484,7 @@ if __name__ == "__main__":
         choices=[
             "nodewise_attribution",
             "nodewise_attribution_attention",
+            "nodewise_activation_patching",
             "EAP",
             "subnetwork_probing",
         ],
