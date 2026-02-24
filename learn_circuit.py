@@ -109,7 +109,7 @@ def main(
     model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
     num_new_branches: int = 8,
     masking_algorithm: str = "nodewise_attribution",
-    pair_aggregation: str = "sum",
+    pair_aggregation: str = "mean",
     mask_granularity: str = "head",
     analysis_timestep: int = None,
     objective: str = "kl_divergence",
@@ -493,7 +493,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pair_aggregation",
         choices=["sum", "mean", "median", "max"],
-        default="sum",
+        default="mean",
         help="How to aggregate token-pair AP+IG scores into sentence-pair mask scores.",
     )
     parser.add_argument(

@@ -16,6 +16,9 @@ from utils.circuit_discovery.base import CircuitDiscovery
 from utils.circuit_discovery.common import make_llama_attention_forward, apply_sentence_mask
 
 
+_ALLOWED_PAIR_AGGREGATIONS = {"sum", "mean"}
+
+
 class NodewiseAttribution(CircuitDiscovery):
     """Nodewise attribution using integrated gradients.
 
@@ -32,6 +35,12 @@ class NodewiseAttribution(CircuitDiscovery):
     """
 
     def __init__(self, num_ig_steps: int = 10, negate_scores: bool = True, **kwargs):
+        self.pair_aggregation = kwargs.pop("pair_aggregation", "sum")
+        if self.pair_aggregation not in _ALLOWED_PAIR_AGGREGATIONS:
+            raise ValueError(
+                f"pair_aggregation for mask-IG must be one of {_ALLOWED_PAIR_AGGREGATIONS}, "
+                f"got {self.pair_aggregation!r}"
+            )
         super().__init__(**kwargs)
         self.num_ig_steps = num_ig_steps
         self.negate_scores = negate_scores
@@ -114,7 +123,8 @@ class NodewiseAttribution(CircuitDiscovery):
 
         print(
             f"Running integrated gradients ({self.num_ig_steps} steps, "
-            f"{len(continuations)} continuations, granularity={granularity})..."
+            f"{len(continuations)} continuations, "
+            f"aggregation={self.pair_aggregation}, granularity={granularity})..."
         )
         for step in tqdm(range(1, self.num_ig_steps + 1), desc="IG steps"):
             alpha = step / self.num_ig_steps
@@ -214,18 +224,35 @@ class NodewiseAttribution(CircuitDiscovery):
         num_total = self.num_ig_steps * len(continuations)
         sign = -1.0 if self.negate_scores else 1.0
 
+        # Normalize by sentence-pair token counts if pair_aggregation == "mean".
+        # Autograd sums over all (t_q, t_k) pairs; dividing by |sent_i|*|sent_j|
+        # converts the sum to a mean so longer sentences don't dominate.
+        if self.pair_aggregation == "mean":
+            sent_lens = torch.tensor(
+                [s.end - s.start + 1 for s in sentences], dtype=torch.float32
+            )
+            pair_counts = (sent_lens.unsqueeze(1) * sent_lens.unsqueeze(0)).clamp_min(1.0)
+        else:
+            pair_counts = None
+
         if granularity == "head":
             scores = {}
             for l in self.layers:
                 avg = sign * accumulated_grads[l] / num_total
+                if pair_counts is not None:
+                    avg /= pair_counts.unsqueeze(0)
                 scores[l] = {h: avg[h].tolist() for h in range(num_heads)}
         elif granularity == "layer":
             scores = {}
             for l in self.layers:
                 avg = sign * accumulated_grads[l] / num_total
+                if pair_counts is not None:
+                    avg /= pair_counts.unsqueeze(0)
                 scores[l] = avg[0].tolist()
         else:  # "pair"
             avg = sign * accumulated_grads / num_total
+            if pair_counts is not None:
+                avg /= pair_counts.unsqueeze(0)
             scores = avg[0].tolist()
 
         return NodeMask(
@@ -245,6 +272,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 "negate_scores": self.negate_scores,
                 "mask_mode": mask_mode,
                 "num_prefix_sentences": num_prefix_sents,
+                "pair_aggregation": self.pair_aggregation,
                 "mask_granularity": granularity,
             },
             scores=scores,
