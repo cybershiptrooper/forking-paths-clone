@@ -340,6 +340,20 @@ def main(
     print("Step 6: Evaluating sparsity vs KL at thresholds...")
     print("=" * 80)
 
+    # Extend thresholds to include the min and max scores from the learned mask
+    all_scores = [
+        v
+        for layer_heads in node_mask.scores.values()
+        for head_scores in layer_heads.values()
+        for row in head_scores
+        for v in row
+    ]
+    if all_scores:
+        score_min = min(all_scores)
+        score_max = max(all_scores)
+        print(f"  NodeMask score range: [{score_min:.4e}, {score_max:.4e}]")
+        thresholds = sorted(set(thresholds) | {score_min, score_max})
+
     threshold_results = evaluate_at_thresholds(
         model=model,
         node_mask=node_mask,
