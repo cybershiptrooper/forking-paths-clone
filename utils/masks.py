@@ -3,7 +3,7 @@
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 import torch
 
 
@@ -122,15 +122,49 @@ class MaskResult(ABC):
         ...
 
 
+_VALID_GRANULARITIES = {"head", "layer", "pair"}
+
+
+def _count_below(scores_2d: List[List[float]], threshold: float,
+                 gap_filter: Optional[torch.Tensor]) -> tuple[int, int]:
+    """Count (total, below_threshold) for a single 2D score matrix."""
+    total = 0
+    below = 0
+    for i, row in enumerate(scores_2d):
+        for j, val in enumerate(row):
+            if gap_filter is not None and bool(gap_filter[i, j]):
+                continue
+            total += 1
+            if val < threshold:
+                below += 1
+    return total, below
+
+
 @dataclass
 class NodeMask(MaskResult):
-    """Per-head, sentence-to-sentence attribution scores.
+    """Sentence-to-sentence attribution scores at configurable granularity.
 
-    Each attention head is a separate node in the circuit.
-    scores[layer_idx][head_idx] = 2D list (num_sents x num_sents)
+    The *granularity* (stored in ``metadata["mask_granularity"]``) controls
+    the shape of ``scores``:
+
+    - ``"head"`` (default): ``scores[layer][head] = [[float]]``
+      One score per (layer, head, src_sent, tgt_sent).
+    - ``"layer"``: ``scores[layer] = [[float]]``
+      One score per (layer, src_sent, tgt_sent), shared across heads.
+    - ``"pair"``: ``scores = [[float]]``
+      One score per (src_sent, tgt_sent), shared across layers and heads.
     """
 
-    scores: Dict[int, Dict[int, List[List[float]]]] = field(default_factory=dict)
+    scores: Any = field(default_factory=dict)
+
+    @property
+    def granularity(self) -> str:
+        """Mask granularity: ``"head"``, ``"layer"``, or ``"pair"``."""
+        return self.metadata.get("mask_granularity", "head")
+
+    # ------------------------------------------------------------------
+    # Sparsity
+    # ------------------------------------------------------------------
 
     def sparsity(
         self,
@@ -138,29 +172,59 @@ class NodeMask(MaskResult):
         gap_filter: Optional[torch.Tensor] = None,
         sentence_gap: Optional[int] = None,
     ) -> float:
-        """Fraction of entries with score < threshold.
+        """Fraction of unique score entries below *threshold*.
 
-        Note: Signed thresholding (not absolute value). This matches the
-        default convention where positive scores reduce KL.
+        Counts only unique learnable parameters (not broadcasted copies).
         """
         if gap_filter is None and sentence_gap is not None:
             gap_filter = build_gap_filter(len(self.sentences), sentence_gap)
 
+        g = self.granularity
         total = 0
         below = 0
-        for layer_scores in self.scores.values():
-            for head_scores in layer_scores.values():
-                for i, row in enumerate(head_scores):
-                    for j, val in enumerate(row):
-                        if gap_filter is not None and bool(gap_filter[i, j]):
-                            continue
-                        total += 1
-                        if val < threshold:
-                            below += 1
+
+        if g == "head":
+            for layer_scores in self.scores.values():
+                for head_scores in layer_scores.values():
+                    t, b = _count_below(head_scores, threshold, gap_filter)
+                    total += t
+                    below += b
+        elif g == "layer":
+            for layer_scores in self.scores.values():
+                t, b = _count_below(layer_scores, threshold, gap_filter)
+                total += t
+                below += b
+        elif g == "pair":
+            t, b = _count_below(self.scores, threshold, gap_filter)
+            total += t
+            below += b
+
         return below / total if total > 0 else 0.0
 
+    # ------------------------------------------------------------------
+    # JSON serialization
+    # ------------------------------------------------------------------
+
     def to_json(self, path: str):
-        """Serialize to JSON file with string keys."""
+        """Serialize to JSON file."""
+        g = self.granularity
+
+        if g == "head":
+            serialized_scores = {
+                str(layer): {
+                    str(head): scores
+                    for head, scores in heads.items()
+                }
+                for layer, heads in self.scores.items()
+            }
+        elif g == "layer":
+            serialized_scores = {
+                str(layer): scores
+                for layer, scores in self.scores.items()
+            }
+        else:  # "pair"
+            serialized_scores = self.scores
+
         data = {
             "mask_type": "NodeMask",
             "model_name": self.model_name,
@@ -169,13 +233,7 @@ class NodeMask(MaskResult):
             "sentences": self.sentences,
             "objective_name": self.objective_name,
             "metadata": self.metadata,
-            "scores": {
-                str(layer): {
-                    str(head): scores
-                    for head, scores in heads.items()
-                }
-                for layer, heads in self.scores.items()
-            },
+            "scores": serialized_scores,
         }
         with open(path, "w") as f:
             json.dump(data, f, indent=2)
@@ -185,27 +243,50 @@ class NodeMask(MaskResult):
         """Deserialize from JSON file."""
         with open(path, "r") as f:
             data = json.load(f)
-        scores = {
-            int(layer): {
-                int(head): scores
-                for head, scores in heads.items()
+
+        metadata = data.get("metadata", {})
+        g = metadata.get("mask_granularity", "head")
+
+        raw = data["scores"]
+        if g == "head":
+            scores = {
+                int(layer): {
+                    int(head): scores
+                    for head, scores in heads.items()
+                }
+                for layer, heads in raw.items()
             }
-            for layer, heads in data["scores"].items()
-        }
+        elif g == "layer":
+            scores = {int(layer): scores for layer, scores in raw.items()}
+        else:  # "pair"
+            scores = raw  # already a 2D list
+
         return cls(
             model_name=data["model_name"],
             algorithm=data["algorithm"],
             layers=data["layers"],
             sentences=data["sentences"],
             objective_name=data["objective_name"],
-            metadata=data.get("metadata", {}),
+            metadata=metadata,
             scores=scores,
         )
 
+    # ------------------------------------------------------------------
+    # Aggregation helpers (used by visualization)
+    # ------------------------------------------------------------------
+
     def get_layer_aggregated(self, layer: int, aggregation: str = "mean") -> List[List[float]]:
-        """Aggregate across heads for a single layer. Used by visualization."""
+        """Aggregate scores for a single layer into a 2D (S, S) matrix."""
         import numpy as np
 
+        g = self.granularity
+        if g == "pair":
+            return list(self.scores)  # same for every layer
+        if g == "layer":
+            if layer not in self.scores:
+                raise ValueError(f"Layer {layer} not in mask. Available: {list(self.scores.keys())}")
+            return list(self.scores[layer])
+        # g == "head"
         if layer not in self.scores:
             raise ValueError(f"Layer {layer} not in mask. Available: {list(self.scores.keys())}")
         heads = self.scores[layer]
@@ -221,14 +302,21 @@ class NodeMask(MaskResult):
             raise ValueError(f"Unknown aggregation: {aggregation}")
 
     def get_all_layers_aggregated(self, aggregation: str = "mean") -> List[List[float]]:
-        """Aggregate across all layers and heads. Used by visualization."""
+        """Aggregate scores across all layers (and heads) into a 2D (S, S) matrix."""
         import numpy as np
 
-        all_arrays = []
-        for layer in self.scores:
-            for head_scores in self.scores[layer].values():
-                all_arrays.append(np.array(head_scores))
-        stacked = np.stack(all_arrays, axis=0)
+        g = self.granularity
+        if g == "pair":
+            return list(self.scores)
+        if g == "layer":
+            arrays = [np.array(s) for s in self.scores.values()]
+        else:  # "head"
+            arrays = []
+            for layer in self.scores:
+                for head_scores in self.scores[layer].values():
+                    arrays.append(np.array(head_scores))
+
+        stacked = np.stack(arrays, axis=0)
         if aggregation == "mean":
             return stacked.mean(axis=0).tolist()
         elif aggregation == "max":
@@ -241,16 +329,60 @@ class NodeMask(MaskResult):
     def get_head_importance(self, layer: int, threshold: float = 0.0) -> Dict[int, float]:
         """Rank heads by total attribution at a layer (after thresholding).
 
-        Only scores >= threshold contribute to importance.
+        Only available for ``granularity == "head"``.
         """
         import numpy as np
 
+        if self.granularity != "head":
+            raise ValueError(
+                f"get_head_importance requires granularity='head', got '{self.granularity}'"
+            )
         result = {}
         for head, scores in self.scores[layer].items():
             arr = np.array(scores)
             arr = np.where(arr >= threshold, arr, 0.0)
             result[head] = float(arr.sum())
         return dict(sorted(result.items(), key=lambda x: x[1], reverse=True))
+
+    # ------------------------------------------------------------------
+    # Expansion to per-head format (for mask application at eval time)
+    # ------------------------------------------------------------------
+
+    def expand_to_per_head(
+        self, layers: List[int], num_heads: int, device: torch.device = torch.device("cpu"),
+    ) -> Dict[int, torch.Tensor]:
+        """Expand scores to ``{layer: (num_heads, S, S)}`` tensors.
+
+        Broadcasts from native granularity so that downstream code
+        (``install_mask_hooks``, ``expand_sentence_mask_to_tokens``) can
+        always receive ``(H, S, S)`` tensors.
+        """
+        import numpy as np
+
+        g = self.granularity
+        result: Dict[int, torch.Tensor] = {}
+
+        if g == "pair":
+            shared = torch.tensor(np.array(self.scores, dtype=float), device=device)
+            expanded = shared.unsqueeze(0).expand(num_heads, -1, -1)
+            for layer in layers:
+                result[layer] = expanded
+        elif g == "layer":
+            for layer in layers:
+                layer_scores = torch.tensor(
+                    np.array(self.scores[layer], dtype=float), device=device,
+                )
+                result[layer] = layer_scores.unsqueeze(0).expand(num_heads, -1, -1)
+        else:  # "head"
+            for layer in layers:
+                head_arrays = [
+                    np.array(self.scores[layer][h], dtype=float)
+                    for h in range(num_heads)
+                ]
+                result[layer] = torch.tensor(
+                    np.stack(head_arrays, axis=0), device=device,
+                )
+        return result
 
 
 @dataclass

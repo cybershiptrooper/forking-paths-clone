@@ -100,28 +100,61 @@ class NodewiseAttribution(CircuitDiscovery):
         clean_logits_list = self._get_clean_logits(input_ids, continuations)
 
         # 2. Integrated gradients
-        accumulated_grads = {
-            l: torch.zeros(num_heads, num_sents, num_sents) for l in self.layers
-        }
+        granularity = self.mask_granularity
+        if granularity == "head":
+            accumulated_grads = {
+                l: torch.zeros(num_heads, num_sents, num_sents) for l in self.layers
+            }
+        elif granularity == "layer":
+            accumulated_grads = {
+                l: torch.zeros(1, num_sents, num_sents) for l in self.layers
+            }
+        else:  # "pair"
+            accumulated_grads = torch.zeros(1, num_sents, num_sents)
 
         print(
             f"Running integrated gradients ({self.num_ig_steps} steps, "
-            f"{len(continuations)} continuations)..."
+            f"{len(continuations)} continuations, granularity={granularity})..."
         )
         for step in tqdm(range(1, self.num_ig_steps + 1), desc="IG steps"):
             alpha = step / self.num_ig_steps
 
-            # Create per-layer mask tensors
+            # Create mask tensors at the appropriate granularity.
+            # For per-layer/per-pair, we create a smaller learnable tensor
+            # and .expand() it to (H, S, S) so expand_sentence_mask_to_tokens
+            # receives the shape it expects. Autograd sums gradients over
+            # expanded dimensions.
             masks = {}
-            for l in self.layers:
-                m = torch.full(
-                    (num_heads, num_sents, num_sents),
-                    alpha,
-                    device=device,
-                    dtype=torch.float32,
+            raw_masks: dict | torch.Tensor = {}
+            if granularity == "head":
+                for l in self.layers:
+                    m = torch.full(
+                        (num_heads, num_sents, num_sents),
+                        alpha, device=device, dtype=torch.float32,
+                        requires_grad=True,
+                    )
+                    masks[l] = m
+                raw_masks = masks
+            elif granularity == "layer":
+                raw_masks = {}
+                for l in self.layers:
+                    m = torch.full(
+                        (1, num_sents, num_sents),
+                        alpha, device=device, dtype=torch.float32,
+                        requires_grad=True,
+                    )
+                    raw_masks[l] = m
+                    masks[l] = m.expand(num_heads, -1, -1)
+            else:  # "pair"
+                shared_m = torch.full(
+                    (1, num_sents, num_sents),
+                    alpha, device=device, dtype=torch.float32,
                     requires_grad=True,
                 )
-                masks[l] = m
+                raw_masks = shared_m
+                expanded = shared_m.expand(num_heads, -1, -1)
+                for l in self.layers:
+                    masks[l] = expanded
 
             # Patch model
             handles = self._patch_model(
@@ -139,10 +172,16 @@ class NodewiseAttribution(CircuitDiscovery):
                 clean_logits = clean_logits_list[cont_idx][:, :full_len].to(device)
 
                 # Zero grads from previous continuation
-                for l in self.layers:
-                    if masks[l].grad is not None:
-                        masks[l].grad.detach_()
-                        masks[l].grad.zero_()
+                if granularity == "pair":
+                    if raw_masks.grad is not None:
+                        raw_masks.grad.detach_()
+                        raw_masks.grad.zero_()
+                else:
+                    for l in self.layers:
+                        rm = raw_masks[l]
+                        if rm.grad is not None:
+                            rm.grad.detach_()
+                            rm.grad.zero_()
 
                 with torch.amp.autocast("cuda"):
                     logits = self.model(full_input).logits
@@ -153,9 +192,14 @@ class NodewiseAttribution(CircuitDiscovery):
                 loss.backward()
 
                 # Accumulate grads
-                for l in self.layers:
-                    if masks[l].grad is not None:
-                        accumulated_grads[l] += masks[l].grad.detach().cpu()
+                if granularity == "pair":
+                    if raw_masks.grad is not None:
+                        accumulated_grads += raw_masks.grad.detach().cpu()
+                else:
+                    for l in self.layers:
+                        rm = raw_masks[l]
+                        if rm.grad is not None:
+                            accumulated_grads[l] += rm.grad.detach().cpu()
 
             # Cleanup
             self._unpatch_model(handles)
@@ -169,10 +213,20 @@ class NodewiseAttribution(CircuitDiscovery):
         # Negate (default) so positive means including the node *reduces* KL (helps).
         num_total = self.num_ig_steps * len(continuations)
         sign = -1.0 if self.negate_scores else 1.0
-        scores = {}
-        for l in self.layers:
-            avg = sign * accumulated_grads[l] / num_total
-            scores[l] = {h: avg[h].tolist() for h in range(num_heads)}
+
+        if granularity == "head":
+            scores = {}
+            for l in self.layers:
+                avg = sign * accumulated_grads[l] / num_total
+                scores[l] = {h: avg[h].tolist() for h in range(num_heads)}
+        elif granularity == "layer":
+            scores = {}
+            for l in self.layers:
+                avg = sign * accumulated_grads[l] / num_total
+                scores[l] = avg[0].tolist()
+        else:  # "pair"
+            avg = sign * accumulated_grads / num_total
+            scores = avg[0].tolist()
 
         return NodeMask(
             model_name=self.model.config._name_or_path,
@@ -191,6 +245,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 "negate_scores": self.negate_scores,
                 "mask_mode": mask_mode,
                 "num_prefix_sentences": num_prefix_sents,
+                "mask_granularity": granularity,
             },
             scores=scores,
         )

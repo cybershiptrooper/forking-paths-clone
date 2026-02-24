@@ -167,40 +167,43 @@ def main() -> None:
             default=active_layers,
         )
 
-    enable_per_head = st.sidebar.checkbox(
-        "Enable per-head plots",
-        value=False,
-    )
+    granularity = mask.granularity
+    enable_per_head = False
     per_head_layer = active_layers[0]
     selected_heads: list[int] = []
-    if enable_per_head:
-        per_head_layer = st.sidebar.selectbox(
-            "Layer for per-head plots",
-            options=active_layers,
-            index=0,
+    if granularity == "head":
+        enable_per_head = st.sidebar.checkbox(
+            "Enable per-head plots",
+            value=False,
         )
-        available_heads = sorted(mask.scores[per_head_layer].keys())
-        head_selection_mode = st.sidebar.radio(
-            "Head selection mode",
-            options=["Top-K", "Manual"],
-            index=0,
-            horizontal=True,
-        )
-        if head_selection_mode == "Top-K":
-            top_k = st.sidebar.slider(
-                "Top-K heads",
-                min_value=1,
-                max_value=len(available_heads),
-                value=min(5, len(available_heads)),
+        if enable_per_head:
+            per_head_layer = st.sidebar.selectbox(
+                "Layer for per-head plots",
+                options=active_layers,
+                index=0,
             )
-            ranked = mask.get_head_importance(per_head_layer, threshold=threshold)
-            selected_heads = list(ranked.keys())[:top_k]
-        else:
-            selected_heads = st.sidebar.multiselect(
-                "Select heads",
-                options=available_heads,
-                default=available_heads[: min(5, len(available_heads))],
+            available_heads = sorted(mask.scores[per_head_layer].keys())
+            head_selection_mode = st.sidebar.radio(
+                "Head selection mode",
+                options=["Top-K", "Manual"],
+                index=0,
+                horizontal=True,
             )
+            if head_selection_mode == "Top-K":
+                top_k = st.sidebar.slider(
+                    "Top-K heads",
+                    min_value=1,
+                    max_value=len(available_heads),
+                    value=min(5, len(available_heads)),
+                )
+                ranked = mask.get_head_importance(per_head_layer, threshold=threshold)
+                selected_heads = list(ranked.keys())[:top_k]
+            else:
+                selected_heads = st.sidebar.multiselect(
+                    "Select heads",
+                    options=available_heads,
+                    default=available_heads[: min(5, len(available_heads))],
+                )
 
     st.sidebar.subheader("KL View")
     kl_mode = st.sidebar.radio(
@@ -209,12 +212,13 @@ def main() -> None:
         index=0,
     )
 
-    meta_cols = st.columns(5)
+    meta_cols = st.columns(6)
     meta_cols[0].metric("Algorithm", mask.algorithm)
-    meta_cols[1].metric("Layers", len(mask.layers))
-    meta_cols[2].metric("Active Layers", len(active_layers))
-    meta_cols[3].metric("Sentences", len(mask.sentences))
-    meta_cols[4].metric("Threshold", f"{threshold:.1e}")
+    meta_cols[1].metric("Granularity", granularity)
+    meta_cols[2].metric("Layers", len(mask.layers))
+    meta_cols[3].metric("Active Layers", len(active_layers))
+    meta_cols[4].metric("Sentences", len(mask.sentences))
+    meta_cols[5].metric("Threshold", f"{threshold:.1e}")
     st.caption(f"Mask file: `{mask_path}`")
 
     core_tab, optional_tab, threshold_tab = st.tabs(
@@ -302,7 +306,12 @@ def main() -> None:
         else:
             st.info("Enable `per-layer plots` in the sidebar to render these sections.")
 
-        if enable_per_head:
+        if granularity != "head":
+            st.info(
+                f"Per-head plots are not available for granularity='{granularity}'. "
+                "Scores are shared across heads at this granularity."
+            )
+        elif enable_per_head:
             st.subheader("Per-Head Heatmaps")
             if not selected_heads:
                 st.warning("Select at least one head.")

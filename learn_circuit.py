@@ -110,6 +110,7 @@ def main(
     num_new_branches: int = 8,
     masking_algorithm: str = "nodewise_attribution",
     pair_aggregation: str = "sum",
+    mask_granularity: str = "head",
     analysis_timestep: int = None,
     objective: str = "kl_divergence",
     layers_to_analyse: list[int] = None,
@@ -315,6 +316,7 @@ def main(
         num_ig_steps=num_ig_steps,
         negate_scores=not no_negate_scores,
         pair_aggregation=pair_aggregation,
+        mask_granularity=mask_granularity,
     )
 
     node_mask = discoverer.discover(
@@ -401,6 +403,7 @@ def main(
     print(f"  Heads per layer: {node_mask.metadata.get('num_heads', '?')}")
     print(f"  Sentences: {len(sentences)}")
     print(f"  Algorithm: {masking_algorithm}")
+    print(f"  Mask granularity: {mask_granularity}")
     print(f"  Pair aggregation: {pair_aggregation}")
     print(f"  IG steps: {num_ig_steps}")
     print(f"  Branches: {num_new_branches}")
@@ -441,6 +444,13 @@ if __name__ == "__main__":
         choices=["sum", "mean", "median", "max"],
         default="sum",
         help="How to aggregate token-pair AP+IG scores into sentence-pair mask scores.",
+    )
+    parser.add_argument(
+        "--mask_granularity",
+        choices=["head", "layer", "pair"],
+        default="head",
+        help="Score granularity: 'head' (per-head), 'layer' (shared across heads), "
+        "'pair' (shared across layers and heads).",
     )
     parser.add_argument(
         "--analysis_timestep",

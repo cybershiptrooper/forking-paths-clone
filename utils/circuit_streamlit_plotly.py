@@ -78,23 +78,38 @@ def aggregate_selected_layers(
     if not layer_list:
         raise ValueError("No layers selected.")
 
+    g = node_mask.granularity
+    if g == "pair":
+        return np.array(node_mask.scores, dtype=float)
+
     arrays: list[np.ndarray] = []
     for layer in layer_list:
-        if layer not in node_mask.scores:
-            continue
-        for head_scores in node_mask.scores[layer].values():
-            arrays.append(np.array(head_scores, dtype=float))
+        if g == "layer":
+            if layer in node_mask.scores:
+                arrays.append(np.array(node_mask.scores[layer], dtype=float))
+        else:  # "head"
+            if layer not in node_mask.scores:
+                continue
+            for head_scores in node_mask.scores[layer].values():
+                arrays.append(np.array(head_scores, dtype=float))
 
     if not arrays:
-        raise ValueError("Selected layers do not contain any head scores.")
+        raise ValueError("Selected layers do not contain any scores.")
     return _aggregate_stack(arrays, aggregation=aggregation)
 
 
 def compute_score_range(node_mask: NodeMask) -> tuple[float, float, float]:
+    g = node_mask.granularity
     all_values = []
-    for layer_scores in node_mask.scores.values():
-        for head_scores in layer_scores.values():
-            all_values.append(np.array(head_scores, dtype=float).ravel())
+    if g == "pair":
+        all_values.append(np.array(node_mask.scores, dtype=float).ravel())
+    elif g == "layer":
+        for layer_scores in node_mask.scores.values():
+            all_values.append(np.array(layer_scores, dtype=float).ravel())
+    else:  # "head"
+        for layer_scores in node_mask.scores.values():
+            for head_scores in layer_scores.values():
+                all_values.append(np.array(head_scores, dtype=float).ravel())
     flat = np.concatenate(all_values)
     return float(np.min(flat)), float(np.max(flat)), float(np.percentile(flat, 99))
 

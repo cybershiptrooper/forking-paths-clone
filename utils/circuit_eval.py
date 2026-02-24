@@ -39,34 +39,69 @@ def build_token_to_sent_map(
     return token_to_sent.to(device)
 
 
+def _threshold_2d(
+    scores_2d: list[list[float]], threshold: float, num_sents: int, device: torch.device,
+) -> torch.Tensor:
+    """Threshold a 2D score matrix into a binary (S, S) tensor."""
+    m = torch.ones(num_sents, num_sents, device=device)
+    for i in range(num_sents):
+        for j in range(num_sents):
+            if scores_2d[i][j] < threshold:
+                m[i, j] = 0.0
+    return m
+
+
 def build_binary_masks(
-    scores: NodeMask | dict[int, dict[int, list[list[float]]]],
+    scores: NodeMask | dict | list,
     threshold: float,
     layers: list[int],
     num_heads: int,
     num_sents: int,
     gap_filter: torch.Tensor,
     device: torch.device,
+    granularity: str = "head",
 ) -> dict[int, torch.Tensor]:
-    """Threshold scores into binary masks (1 = keep, 0 = ablate).
+    """Threshold scores into binary masks of shape ``(H, S, S)`` per layer.
 
-    *scores* can be a :class:`NodeMask` or a raw ``scores`` dict with the
-    same ``[layer][head][i][j]`` structure.
+    Handles all three granularities:
 
-    Entries with ``score >= threshold`` are kept; the rest are zeroed.
-    Gap-filtered positions are always kept (filled with 1).
+    - ``"head"``: ``scores[layer][head][i][j]``
+    - ``"layer"``: ``scores[layer][i][j]`` — broadcast to all heads
+    - ``"pair"``: ``scores[i][j]`` — broadcast to all heads and layers
+
+    Returns ``{layer: (num_heads, num_sents, num_sents)}`` tensors.
     """
-    scores_dict = scores.scores if isinstance(scores, NodeMask) else scores
+    if isinstance(scores, NodeMask):
+        granularity = scores.granularity
+        scores_data = scores.scores
+    else:
+        scores_data = scores
+
     binary_masks: dict[int, torch.Tensor] = {}
-    for layer in layers:
-        m = torch.ones(num_heads, num_sents, num_sents, device=device)
-        for h in range(num_heads):
-            layer_scores = scores_dict[layer][h]
-            for i in range(num_sents):
-                for j in range(num_sents):
-                    if layer_scores[i][j] < threshold:
-                        m[h, i, j] = 0.0
-        binary_masks[layer] = apply_gap_filter(m, gap_filter, fill_value=1.0)
+
+    if granularity == "pair":
+        # scores_data is a 2D list
+        base = _threshold_2d(scores_data, threshold, num_sents, device)
+        base = apply_gap_filter(base, gap_filter, fill_value=1.0)
+        expanded = base.unsqueeze(0).expand(num_heads, -1, -1)
+        for layer in layers:
+            binary_masks[layer] = expanded
+    elif granularity == "layer":
+        for layer in layers:
+            base = _threshold_2d(scores_data[layer], threshold, num_sents, device)
+            base = apply_gap_filter(base, gap_filter, fill_value=1.0)
+            binary_masks[layer] = base.unsqueeze(0).expand(num_heads, -1, -1)
+    else:  # "head"
+        for layer in layers:
+            m = torch.ones(num_heads, num_sents, num_sents, device=device)
+            for h in range(num_heads):
+                layer_scores = scores_data[layer][h]
+                for i in range(num_sents):
+                    for j in range(num_sents):
+                        if layer_scores[i][j] < threshold:
+                            m[h, i, j] = 0.0
+            binary_masks[layer] = apply_gap_filter(m, gap_filter, fill_value=1.0)
+
     return binary_masks
 
 
@@ -93,45 +128,91 @@ def build_random_score_masks(
     num_samples: int,
     layers: list[int],
     combined_filter: torch.Tensor,
-) -> list[dict[int, dict[int, list[list[float]]]]]:
+):
     """Create *num_samples* random score masks by permuting learned scores.
 
-    Only scores at non-filtered positions are permuted so that the
-    sparsity-vs-threshold distribution matches the learned mask exactly.
+    Permutes at the native granularity of the mask so the random baseline
+    has the same structural constraints as the learned mask:
+
+    - ``"head"``: permute ``(layer, head, i, j)`` positions
+    - ``"layer"``: permute ``(layer, i, j)`` positions
+    - ``"pair"``: permute ``(i, j)`` positions
     """
     num_sents = combined_filter.shape[0]
     filter_bool = combined_filter.bool()
+    g = node_mask.granularity
 
-    # Collect non-filtered scores and their positions
-    positions: list[tuple[int, int, int, int]] = []
-    score_values: list[float] = []
-    for layer in layers:
-        for h in node_mask.scores[layer]:
-            scores_2d = node_mask.scores[layer][h]
+    if g == "head":
+        positions: list[tuple] = []
+        score_values: list[float] = []
+        for layer in layers:
+            for h in node_mask.scores[layer]:
+                scores_2d = node_mask.scores[layer][h]
+                for i in range(num_sents):
+                    for j in range(num_sents):
+                        if not filter_bool[i, j]:
+                            positions.append((layer, h, i, j))
+                            score_values.append(scores_2d[i][j])
+
+        random_masks = []
+        for _ in range(num_samples):
+            perm = torch.randperm(len(score_values))
+            permuted = [score_values[p] for p in perm.tolist()]
+            scores_dict: dict = {}
+            for layer in layers:
+                scores_dict[layer] = {}
+                for h in node_mask.scores[layer]:
+                    scores_dict[layer][h] = [
+                        [0.0] * num_sents for _ in range(num_sents)
+                    ]
+            for idx, (layer, h, i, j) in enumerate(positions):
+                scores_dict[layer][h][i][j] = permuted[idx]
+            random_masks.append(scores_dict)
+        return random_masks
+
+    elif g == "layer":
+        positions = []
+        score_values = []
+        for layer in layers:
+            scores_2d = node_mask.scores[layer]
             for i in range(num_sents):
                 for j in range(num_sents):
                     if not filter_bool[i, j]:
-                        positions.append((layer, h, i, j))
+                        positions.append((layer, i, j))
                         score_values.append(scores_2d[i][j])
 
-    random_masks = []
-    for _ in range(num_samples):
-        perm = torch.randperm(len(score_values))
-        permuted = [score_values[p] for p in perm.tolist()]
-
-        scores_dict: dict[int, dict[int, list[list[float]]]] = {}
-        for layer in layers:
-            scores_dict[layer] = {}
-            for h in node_mask.scores[layer]:
-                scores_dict[layer][h] = [
+        random_masks = []
+        for _ in range(num_samples):
+            perm = torch.randperm(len(score_values))
+            permuted = [score_values[p] for p in perm.tolist()]
+            scores_dict = {}
+            for layer in layers:
+                scores_dict[layer] = [
                     [0.0] * num_sents for _ in range(num_sents)
                 ]
+            for idx, (layer, i, j) in enumerate(positions):
+                scores_dict[layer][i][j] = permuted[idx]
+            random_masks.append(scores_dict)
+        return random_masks
 
-        for idx, (layer, h, i, j) in enumerate(positions):
-            scores_dict[layer][h][i][j] = permuted[idx]
+    else:  # "pair"
+        positions = []
+        score_values = []
+        for i in range(num_sents):
+            for j in range(num_sents):
+                if not filter_bool[i, j]:
+                    positions.append((i, j))
+                    score_values.append(node_mask.scores[i][j])
 
-        random_masks.append(scores_dict)
-    return random_masks
+        random_masks = []
+        for _ in range(num_samples):
+            perm = torch.randperm(len(score_values))
+            permuted = [score_values[p] for p in perm.tolist()]
+            scores_2d = [[0.0] * num_sents for _ in range(num_sents)]
+            for idx, (i, j) in enumerate(positions):
+                scores_2d[i][j] = permuted[idx]
+            random_masks.append(scores_2d)
+        return random_masks
 
 
 def compute_clean_logits(
@@ -412,6 +493,7 @@ def evaluate_at_thresholds(
 
         # Evaluate K random score masks at this threshold
         random_kl_divergences = []
+        granularity = node_mask.granularity
         for k in range(num_random_samples):
             rand_binary = build_binary_masks(
                 random_score_masks[k],
@@ -421,6 +503,7 @@ def evaluate_at_thresholds(
                 num_sents,
                 combined_filter,
                 device,
+                granularity=granularity,
             )
             rand_obj, _, _ = eval_with_masks(
                 model=model,

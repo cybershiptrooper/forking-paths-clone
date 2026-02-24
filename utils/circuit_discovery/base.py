@@ -48,8 +48,13 @@ class CircuitDiscovery(ABC):
         sentence_gap: int = 1,
         ablate_non_target_layers: bool = False,
         renormalize_masked_attention: bool = True,
+        mask_granularity: str = "head",
         **kwargs,
     ):
+        if mask_granularity not in ("head", "layer", "pair"):
+            raise ValueError(
+                f"mask_granularity must be 'head', 'layer', or 'pair', got {mask_granularity!r}"
+            )
         self.model = model
         self.tokenizer = tokenizer
         self.layers = layers
@@ -57,6 +62,7 @@ class CircuitDiscovery(ABC):
         self.sentence_gap = sentence_gap
         self.ablate_non_target_layers = ablate_non_target_layers
         self.renormalize_masked_attention = renormalize_masked_attention
+        self.mask_granularity = mask_granularity
 
     def _build_token_to_sentence_map(
         self, sentences: List[Sentence], seq_len: int

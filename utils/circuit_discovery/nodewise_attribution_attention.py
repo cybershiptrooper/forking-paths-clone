@@ -242,14 +242,23 @@ class NodewiseAttribution(CircuitDiscovery):
         print("Computing clean logits...")
         clean_logits_list = self._get_clean_logits(input_ids, continuations)
 
-        accumulated_scores = {
-            layer: torch.zeros(num_heads, num_sents, num_sents, dtype=torch.float32)
-            for layer in self.layers
-        }
+        granularity = self.mask_granularity
+        if granularity == "head":
+            accumulated_scores = {
+                layer: torch.zeros(num_heads, num_sents, num_sents, dtype=torch.float32)
+                for layer in self.layers
+            }
+        elif granularity == "layer":
+            accumulated_scores = {
+                layer: torch.zeros(num_sents, num_sents, dtype=torch.float32)
+                for layer in self.layers
+            }
+        else:  # "pair"
+            accumulated_scores = torch.zeros(num_sents, num_sents, dtype=torch.float32)
 
         print(
             f"Running AP+IG ({self.num_ig_steps} steps, {len(continuations)} continuations, "
-            f"aggregation={self.pair_aggregation})..."
+            f"aggregation={self.pair_aggregation}, granularity={granularity})..."
         )
         for cont_idx, cont in enumerate(tqdm(continuations, desc="Continuations")):
             full_input = torch.cat([input_ids, cont], dim=-1)
@@ -317,10 +326,16 @@ class NodewiseAttribution(CircuitDiscovery):
                             continue
                         token_attr = (deltas[layer] * grad.float()).detach()
                         token_attr = token_attr.sum(dim=0).cpu()
+                        # aggregated: (H, S, S) — per-head token→sentence scores
                         aggregated = self._aggregate_token_scores(
                             token_attr, q_sent, k_sent, num_sents
                         )
-                        accumulated_scores[layer] += aggregated
+                        if granularity == "head":
+                            accumulated_scores[layer] += aggregated
+                        elif granularity == "layer":
+                            accumulated_scores[layer] += aggregated.sum(dim=0)
+                        else:  # "pair"
+                            accumulated_scores += aggregated.sum(dim=0)
                 finally:
                     self._clear_runtime_attrs()
                     self._unpatch_model(handles)
@@ -328,16 +343,28 @@ class NodewiseAttribution(CircuitDiscovery):
         if non_target_handles:
             self._unpatch_model(non_target_handles)
 
-        # Ensure frozen entries are not included in learned scores.
-        frozen = combined_filter_cpu.unsqueeze(0).expand(num_heads, -1, -1)
-
         num_total = self.num_ig_steps * len(continuations)
         sign = -1.0 if self.negate_scores else 1.0
-        scores = {}
-        for layer in self.layers:
-            avg = sign * accumulated_scores[layer] / max(num_total, 1)
-            avg[frozen] = 0.0
-            scores[layer] = {head: avg[head].tolist() for head in range(num_heads)}
+
+        if granularity == "head":
+            frozen = combined_filter_cpu.unsqueeze(0).expand(num_heads, -1, -1)
+            scores = {}
+            for layer in self.layers:
+                avg = sign * accumulated_scores[layer] / max(num_total, 1)
+                avg[frozen] = 0.0
+                scores[layer] = {head: avg[head].tolist() for head in range(num_heads)}
+        elif granularity == "layer":
+            frozen_2d = combined_filter_cpu.bool()
+            scores = {}
+            for layer in self.layers:
+                avg = sign * accumulated_scores[layer] / max(num_total, 1)
+                avg[frozen_2d] = 0.0
+                scores[layer] = avg.tolist()
+        else:  # "pair"
+            frozen_2d = combined_filter_cpu.bool()
+            avg = sign * accumulated_scores / max(num_total, 1)
+            avg[frozen_2d] = 0.0
+            scores = avg.tolist()
 
         return NodeMask(
             model_name=self.model.config._name_or_path,
@@ -355,6 +382,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 "mask_mode": mask_mode,
                 "num_prefix_sentences": num_prefix_sents,
                 "pair_aggregation": self.pair_aggregation,
+                "mask_granularity": granularity,
             },
             scores=scores,
         )
