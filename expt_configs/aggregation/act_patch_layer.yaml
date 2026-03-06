@@ -1,0 +1,4 @@
+base_config: expt_configs/aggregation/base.yaml
+masking_algorithm: nodewise_activation_patching
+mask_granularity: layer
+output_dir: results/circuitviz/aggregation/act_patch_layer

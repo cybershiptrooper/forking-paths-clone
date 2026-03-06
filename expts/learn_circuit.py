@@ -107,6 +107,7 @@ def _resolve_layers_to_analyse(layers_to_analyse, model):
 
 def main(
     model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    prompt: str = None,
     num_new_branches: int = 8,
     masking_algorithm: str = "nodewise_attribution",
     pair_aggregation: str = "mean",
@@ -144,11 +145,17 @@ def main(
     print("=" * 80)
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    # prompt = (
-    #     "The capital of France is Paris. Answer in 100 words or less, "
-    #     "what are the most popular things in the city to do?"
-    # )
-    prompt = "A rectangular band formation is a formation with $m$ band members in each of $r$ rows, where $m$ and $r$ are integers. A particular band has less than 100 band members. The director arranges them in a rectangular formation and finds that he has two members left over. If he increases the number of members in each row by 1 and reduces the number of rows by 2, there are exactly enough places in the new formation for each band member. What is the largest number of members the band could have?"
+    if prompt is None:
+        prompt = (
+            "A rectangular band formation is a formation with $m$ band members "
+            "in each of $r$ rows, where $m$ and $r$ are integers. A particular "
+            "band has less than 100 band members. The director arranges them in "
+            "a rectangular formation and finds that he has two members left over. "
+            "If he increases the number of members in each row by 1 and reduces "
+            "the number of rows by 2, there are exactly enough places in the new "
+            "formation for each band member. What is the largest number of "
+            "members the band could have?"
+        )
     chat = [{"role": "user", "content": prompt}]
     formatted_text = tokenizer.apply_chat_template(
         chat, tokenize=False, add_generation_prompt=True
@@ -474,10 +481,17 @@ if __name__ == "__main__":
         description="Learn a circuit mask over sentence-to-sentence attention patterns"
     )
     parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Path to YAML/JSON config file. CLI args override config values.",
+    )
+    parser.add_argument(
         "--model_name",
         type=str,
         default="deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
     )
+    parser.add_argument("--prompt", type=str, default=None)
     parser.add_argument("--num_new_branches", type=int, default=8)
     parser.add_argument(
         "--masking_algorithm",
@@ -601,5 +615,16 @@ if __name__ == "__main__":
         ],
         help="Thresholds for sparsity-vs-KL evaluation",
     )
+    # First parse to check for --config
+    args, _ = parser.parse_known_args()
+    if args.config:
+        from utils.expt_config import load_config
+
+        config = load_config(args.config)
+        # Apply config values as new argparse defaults; CLI args will override
+        parser.set_defaults(**{k: v for k, v in config.items() if k != "config"})
+    # Re-parse with config-informed defaults
     args = parser.parse_args()
-    main(**vars(args))
+    kwargs = vars(args)
+    kwargs.pop("config", None)
+    main(**kwargs)
