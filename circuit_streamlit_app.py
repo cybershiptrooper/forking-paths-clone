@@ -15,6 +15,7 @@ from utils.circuit_streamlit_plotly import (
     build_layer_comparison_figure,
     build_per_sentence_kl_figure,
     build_per_token_kl_figure,
+    build_sentence_connection_figure,
     build_sparsity_vs_kl_figure,
     build_threshold_vs_metrics_figure,
     compute_score_range,
@@ -150,11 +151,27 @@ def main() -> None:
     all_layers = sorted(mask.layers)
     layer_start, layer_end = _render_layer_range(all_layers)
     active_layers = _filter_layers(all_layers, layer_start, layer_end)
+    skip_k = st.sidebar.number_input(
+        "Skip every k layers",
+        min_value=0,
+        value=0,
+        help="When >0, keep every (k+1)-th layer (e.g. 1 → layers 0, 2, 4, …).",
+    )
+    if skip_k > 0:
+        active_layers = active_layers[:: skip_k + 1]
     if not active_layers:
         st.error("No active layers after filtering.")
         st.stop()
 
     st.sidebar.subheader("Optional Sections")
+    circuit_view_mode = st.sidebar.radio(
+        "Circuit overview mode",
+        options=["Key importance", "Query importance", "Sentence connections"],
+        index=0,
+        help="Key: which sentences are most attended to. "
+        "Query: which sentences attend most to previous ones. "
+        "Connections: per-layer arrow diagram.",
+    )
     enable_per_layer = st.sidebar.checkbox(
         "Enable per-layer plots",
         value=False,
@@ -266,14 +283,38 @@ def main() -> None:
         )
 
         st.subheader("Full Circuit Overview")
-        st.plotly_chart(
-            build_full_circuit_figure(
-                mask,
-                layers=active_layers,
-                threshold=threshold,
-            ),
-            width="stretch",
-        )
+        if circuit_view_mode == "Sentence connections":
+            sent_labels = [f"S{i}" for i in range(len(mask.sentences))]
+            highlight_choice = st.selectbox(
+                "Highlight sentence",
+                options=["None (show all)"] + sent_labels,
+                index=0,
+                key="highlight_sentence",
+                help="Select a sentence to highlight its connections and fade the rest.",
+            )
+            highlight_idx: int | None = None
+            if highlight_choice != "None (show all)":
+                highlight_idx = int(highlight_choice[1:])
+            st.plotly_chart(
+                build_sentence_connection_figure(
+                    mask,
+                    layers=active_layers,
+                    threshold=threshold,
+                    highlight_sentence=highlight_idx,
+                ),
+                width="stretch",
+            )
+        else:
+            mode = "query" if circuit_view_mode == "Query importance" else "key"
+            st.plotly_chart(
+                build_full_circuit_figure(
+                    mask,
+                    layers=active_layers,
+                    threshold=threshold,
+                    mode=mode,
+                ),
+                width="stretch",
+            )
 
     with optional_tab:
         if enable_per_layer:
