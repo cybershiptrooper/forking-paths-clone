@@ -51,21 +51,28 @@ class NodewiseActivationPatching(CircuitDiscovery):
         clean_logits_list: List[torch.Tensor],
         prefix_len: int,
         device: torch.device,
+        branch_rewards: Optional[List[float]] = None,
+        position_mask_overrides: Optional[List[Optional[torch.Tensor]]] = None,
     ) -> float:
-        """Forward all continuations through the (patched) model, return mean KL."""
-        kl_sum = 0.0
+        """Forward all continuations through the (patched) model, return mean objective."""
+        obj_sum = 0.0
         for cont_idx, cont in enumerate(continuations):
             full_input = torch.cat([input_ids, cont], dim=-1)
             full_len = full_input.shape[-1]
             position_mask = self._build_position_mask(full_len, prefix_len, device)
+            if position_mask_overrides is not None and position_mask_overrides[cont_idx] is not None:
+                position_mask = position_mask_overrides[cont_idx].to(device)
             clean_logits = clean_logits_list[cont_idx][:, :full_len].to(device)
 
             with torch.amp.autocast("cuda"):
                 logits = self.model(full_input).logits
 
-            kl = self.objective_fn(clean_logits, logits.float(), position_mask)
-            kl_sum += kl.item()
-        return kl_sum / len(continuations)
+            obj = self.objective_fn(
+                clean_logits, logits.float(), position_mask, token_ids=full_input
+            )
+            weight = branch_rewards[cont_idx] if branch_rewards is not None else 1.0
+            obj_sum += obj.item() * weight
+        return obj_sum / len(continuations)
 
     # ------------------------------------------------------------------
     # Main entry point
@@ -78,6 +85,8 @@ class NodewiseActivationPatching(CircuitDiscovery):
         continuations: List[torch.Tensor],
         mask_mode: str = "prefix",
         num_prefix_sentences: Optional[int] = None,
+        branch_rewards: Optional[List[float]] = None,
+        position_mask_overrides: Optional[List[Optional[torch.Tensor]]] = None,
         **kwargs,
     ) -> NodeMask:
         """Run activation patching circuit discovery.
@@ -88,6 +97,8 @@ class NodewiseActivationPatching(CircuitDiscovery):
             continuations: List of (1, cont_len) continuation token tensors
             mask_mode: "prefix", "generation", or "both"
             num_prefix_sentences: Number of prefix sentences in *sentences*.
+            branch_rewards: Optional per-branch scalar rewards.
+            position_mask_overrides: Optional per-branch position masks.
 
         Returns:
             NodeMask with importance scores per edge.
@@ -189,6 +200,8 @@ class NodewiseActivationPatching(CircuitDiscovery):
                     mean_kl = self._compute_mean_kl(
                         input_ids, continuations, clean_logits_list,
                         prefix_len, device,
+                        branch_rewards=branch_rewards,
+                        position_mask_overrides=position_mask_overrides,
                     )
                     accumulated[i, j] = mean_kl
                     # Restore
@@ -257,7 +270,7 @@ class NodewiseActivationPatching(CircuitDiscovery):
             algorithm="nodewise_activation_patching",
             layers=self.layers,
             sentences=[{"start": s.start, "end": s.end} for s in sentences],
-            objective_name="kl_divergence",
+            objective_name=getattr(self.objective_fn, "__name__", "unknown"),
             metadata={
                 "num_continuations": len(continuations),
                 "sentence_gap": self.sentence_gap,
@@ -266,6 +279,7 @@ class NodewiseActivationPatching(CircuitDiscovery):
                 "mask_mode": mask_mode,
                 "num_prefix_sentences": num_prefix_sents,
                 "mask_granularity": granularity,
+                "branch_rewards": branch_rewards,
             },
             scores=scores,
         )

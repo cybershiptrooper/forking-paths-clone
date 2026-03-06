@@ -24,6 +24,12 @@ from utils.objectives import get_objective
 from utils.masks import NodeMask
 from utils.circuit_discovery.factory import create_circuit_discovery
 from utils.circuit_eval import evaluate_at_thresholds
+from utils.rewards import (
+    extract_boxed,
+    compute_correctness_rewards,
+    compute_cot_length_rewards,
+    find_answer_token_positions,
+)
 
 
 def load_model_eager(model_name: str, device: str = "cuda"):
@@ -130,12 +136,38 @@ def main(
     device: str = "cuda",
     output_dir: str = "results/circuit_discovery",
     thresholds: list[float] = None,
+    reward_type: str = "none",
+    correct_answer: str = None,
+    data_path: str = None,
+    prompt_index: int = None,
+    dataset_type: str = "open ended",
+    answer_only: bool = False,
+    judge_model: str = "meta-llama/llama-3.2-3b-instruct",
 ):
     if thresholds is None:
         thresholds = [0.01, 0.05, 0.1, 0.2, 0.5]
 
     set_seed(seed)
     os.makedirs(output_dir, exist_ok=True)
+
+    # =====================================================================
+    # Step 0: Load data from collection JSON if provided
+    # =====================================================================
+    if data_path is not None and prompt_index is not None:
+        print(f"Loading record {prompt_index} from {data_path}...")
+        with open(data_path) as f:
+            records = json.load(f)
+        record = records[prompt_index]
+        prompt = record["question"]
+        if correct_answer is None and "correct_answer" in record:
+            correct_answer = extract_boxed(record["correct_answer"]) or record["correct_answer"]
+        if "dataset_type" in record:
+            dataset_type = record["dataset_type"]
+        print(f"  Question: {prompt[:120]}...")
+        print(f"  Correct answer: {correct_answer}")
+
+    branch_rewards = None
+    position_mask_overrides = None
 
     # =====================================================================
     # Step 1: Prepare input (example from controlled_ablations_v2.py)
@@ -229,13 +261,34 @@ def main(
             }
         )
 
+    # Compute correctness rewards while vLLM is still available (uses OpenRouter)
+    if reward_type == "correctness":
+        if correct_answer is None:
+            raise ValueError(
+                "--reward_type correctness requires --correct_answer or "
+                "--data_path + --prompt_index with a correct_answer field."
+            )
+        from openai import OpenAI
+        from dotenv import load_dotenv
+        load_dotenv()
+        openrouter_key = os.getenv("OPENROUTER_API_KEY")
+        if not openrouter_key:
+            raise ValueError("OPENROUTER_API_KEY not found in environment.")
+        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=openrouter_key)
+        branch_rewards = compute_correctness_rewards(
+            branches, correct_answer, prompt, prefix_text, client, judge_model
+        )
+        del client
+        print(f"Correctness rewards: {branch_rewards}")
+
     # Cleanup vLLM
     del llm
     clear_cuda()
     print(f"Generated {len(branches)} branches, vLLM cleaned up.")
 
     for i, b in enumerate(branches):
-        print(f"  Branch {i}: {len(b['token_ids'])} tokens — {repr(b['text'][:80])}...")
+        reward_str = f" reward={branch_rewards[i]:+.1f}" if branch_rewards is not None else ""
+        print(f"  Branch {i}: {len(b['token_ids'])} tokens{reward_str} — {repr(b['text'][:80])}...")
 
     # =====================================================================
     # Step 3: Split into sentences
@@ -280,6 +333,13 @@ def main(
             text = tokenizer.decode(first_branch_tokens[raw.start : raw.end + 1].tolist())
         print(f"  {label}{i}: [{s.start}:{s.end}] = {repr(text)}")
 
+    # Compute CoT length rewards (uses sentence splitting on branches)
+    if reward_type == "cot_length":
+        branch_rewards = compute_cot_length_rewards(
+            branches, tokenizer, min_sentence_length=min_sentence_length
+        )
+        print(f"CoT length rewards: {branch_rewards}")
+
     # =====================================================================
     # Step 4: Load HuggingFace model (eager attention)
     # =====================================================================
@@ -302,6 +362,24 @@ def main(
     for b in branches:
         cont_ids = torch.tensor([b["token_ids"]], device=device)
         continuations.append(cont_ids)
+
+    # Build answer-only position masks if requested
+    if answer_only:
+        print("Building answer-only position masks...")
+        prefix_len = input_ids.shape[-1]
+        position_mask_overrides = []
+        for b in branches:
+            pm = find_answer_token_positions(
+                b["text"], b["token_ids"], tokenizer, prefix_len
+            )
+            if pm is not None:
+                pm = pm.to(device)
+            position_mask_overrides.append(pm)
+        n_found = sum(1 for pm in position_mask_overrides if pm is not None)
+        print(f"  Found answer tokens in {n_found}/{len(branches)} branches")
+        if n_found == 0:
+            print("  WARNING: No answer tokens found in any branch. Falling back to full mask.")
+            position_mask_overrides = None
 
     # =====================================================================
     # Step 5: Circuit discovery
@@ -364,6 +442,8 @@ def main(
         continuations=continuations,
         mask_mode=mask_mode,
         num_prefix_sentences=num_prefix_sentences,
+        branch_rewards=branch_rewards,
+        position_mask_overrides=position_mask_overrides,
     )
 
     # Add sentence text to metadata
@@ -419,6 +499,8 @@ def main(
         renormalize_masked_attention=renormalize_masked_attention,
         tokenizer=tokenizer,
         num_random_samples=num_random_samples,
+        branch_rewards=branch_rewards,
+        position_mask_overrides=position_mask_overrides,
     )
 
     node_mask.metadata["threshold_evaluation"] = threshold_results
@@ -427,6 +509,12 @@ def main(
     node_mask.metadata["max_new_tokens"] = max_new_tokens
     node_mask.metadata["num_branches"] = num_new_branches
     node_mask.metadata["num_random_samples"] = num_random_samples
+    node_mask.metadata["reward_type"] = reward_type
+    if branch_rewards is not None:
+        node_mask.metadata["branch_rewards"] = branch_rewards
+    node_mask.metadata["answer_only"] = answer_only
+    if correct_answer is not None:
+        node_mask.metadata["correct_answer"] = correct_answer
 
     # =====================================================================
     # Step 7: Save results
@@ -464,6 +552,11 @@ def main(
     print(f"  Pair aggregation: {pair_aggregation}")
     print(f"  IG steps: {num_ig_steps}")
     print(f"  Branches: {num_new_branches}")
+    print(f"  Objective: {objective}")
+    print(f"  Reward type: {reward_type}")
+    if branch_rewards is not None:
+        print(f"  Branch rewards: {branch_rewards}")
+    print(f"  Answer only: {answer_only}")
     print("\nThreshold evaluation:")
     for r in threshold_results:
         print(
@@ -523,7 +616,11 @@ if __name__ == "__main__":
         default=None,
         help="Token index for analysis (default: prompt length)",
     )
-    parser.add_argument("--objective", default="kl_divergence")
+    parser.add_argument(
+        "--objective",
+        choices=["kl_divergence", "log_prob"],
+        default="kl_divergence",
+    )
     parser.add_argument(
         "--layers_to_analyse",
         type=_parse_layers_arg,
@@ -614,6 +711,47 @@ if __name__ == "__main__":
             5e-3,
         ],
         help="Thresholds for sparsity-vs-KL evaluation",
+    )
+    parser.add_argument(
+        "--reward_type",
+        choices=["none", "correctness", "cot_length"],
+        default="none",
+        help="Reward type for reward-weighted circuit discovery.",
+    )
+    parser.add_argument(
+        "--correct_answer",
+        type=str,
+        default=None,
+        help="Ground truth answer string (for correctness reward).",
+    )
+    parser.add_argument(
+        "--data_path",
+        type=str,
+        default=None,
+        help="Path to collection JSON with question/answer records.",
+    )
+    parser.add_argument(
+        "--prompt_index",
+        type=int,
+        default=None,
+        help="Index into collection JSON to load question + correct_answer.",
+    )
+    parser.add_argument(
+        "--dataset_type",
+        choices=["open ended", "multiple choice", "alignment"],
+        default="open ended",
+        help="Dataset type for answer parsing.",
+    )
+    parser.add_argument(
+        "--answer_only",
+        action="store_true",
+        help="Restrict position mask to answer tokens only (\\boxed{...}).",
+    )
+    parser.add_argument(
+        "--judge_model",
+        type=str,
+        default="meta-llama/llama-3.2-3b-instruct",
+        help="Model for LLM-based answer judging (OpenRouter).",
     )
     # First parse to check for --config
     args, _ = parser.parse_known_args()

@@ -377,13 +377,31 @@ def main() -> None:
         if not threshold_eval:
             st.info("No threshold evaluation data found in this mask.")
         else:
+            # Check if reward-weighted data is available
+            has_reward_metric = any(
+                "reward_weighted_objective" in entry for entry in threshold_eval
+            )
+            if has_reward_metric:
+                metric_mode = st.radio(
+                    "Metric",
+                    ["KL Divergence", "Reward-Weighted"],
+                    horizontal=True,
+                )
+                metric_key = "reward_weighted_objective" if metric_mode == "Reward-Weighted" else "kl_divergence"
+            else:
+                metric_key = "kl_divergence"
+
             st.subheader("Threshold vs Metrics")
-            threshold_fig = build_threshold_vs_metrics_figure(threshold_eval, selected_threshold=threshold)
+            threshold_fig = build_threshold_vs_metrics_figure(
+                threshold_eval, selected_threshold=threshold, metric_key=metric_key
+            )
             if threshold_fig is not None:
                 st.plotly_chart(threshold_fig, width="stretch")
 
-            st.subheader("Sparsity vs KL")
-            sparsity_fig = build_sparsity_vs_kl_figure(threshold_eval, selected_threshold=threshold)
+            st.subheader("Sparsity vs Metric")
+            sparsity_fig = build_sparsity_vs_kl_figure(
+                threshold_eval, selected_threshold=threshold, metric_key=metric_key
+            )
             if sparsity_fig is not None:
                 st.plotly_chart(sparsity_fig, width="stretch")
 

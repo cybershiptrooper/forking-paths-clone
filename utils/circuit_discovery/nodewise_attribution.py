@@ -52,6 +52,8 @@ class NodewiseAttribution(CircuitDiscovery):
         continuations: List[torch.Tensor],
         mask_mode: str = "prefix",
         num_prefix_sentences: Optional[int] = None,
+        branch_rewards: Optional[List[float]] = None,
+        position_mask_overrides: Optional[List[Optional[torch.Tensor]]] = None,
         **kwargs,
     ) -> NodeMask:
         """Run integrated gradients circuit discovery.
@@ -179,6 +181,8 @@ class NodewiseAttribution(CircuitDiscovery):
                 full_input = torch.cat([input_ids, cont], dim=-1)
                 full_len = full_input.shape[-1]
                 position_mask = self._build_position_mask(full_len, prefix_len, device)
+                if position_mask_overrides is not None and position_mask_overrides[cont_idx] is not None:
+                    position_mask = position_mask_overrides[cont_idx].to(device)
                 clean_logits = clean_logits_list[cont_idx][:, :full_len].to(device)
 
                 # Zero grads from previous continuation
@@ -198,7 +202,11 @@ class NodewiseAttribution(CircuitDiscovery):
 
                 # Cast to float32 to match clean_logits precision — avoids
                 # spurious KL from bfloat16-vs-float32 log_softmax differences.
-                loss = self.objective_fn(clean_logits, logits.float(), position_mask)
+                loss = self.objective_fn(
+                    clean_logits, logits.float(), position_mask, token_ids=full_input
+                )
+                if branch_rewards is not None:
+                    loss = loss * branch_rewards[cont_idx]
                 loss.backward()
 
                 # Accumulate grads
@@ -262,7 +270,7 @@ class NodewiseAttribution(CircuitDiscovery):
             sentences=[
                 {"start": s.start, "end": s.end} for s in sentences
             ],
-            objective_name="kl_divergence",
+            objective_name=getattr(self.objective_fn, "__name__", "unknown"),
             metadata={
                 "num_ig_steps": self.num_ig_steps,
                 "num_continuations": len(continuations),
@@ -274,6 +282,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 "num_prefix_sentences": num_prefix_sents,
                 "pair_aggregation": self.pair_aggregation,
                 "mask_granularity": granularity,
+                "branch_rewards": branch_rewards,
             },
             scores=scores,
         )

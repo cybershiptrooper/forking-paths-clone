@@ -201,6 +201,8 @@ class CircuitDiscovery(ABC):
         continuations: List[torch.Tensor],
         mask_mode: str = "prefix",
         num_prefix_sentences: Optional[int] = None,
+        branch_rewards: Optional[List[float]] = None,
+        position_mask_overrides: Optional[List[Optional[torch.Tensor]]] = None,
         **kwargs,
     ) -> NodeMask:
         """Run circuit discovery.
@@ -212,6 +214,12 @@ class CircuitDiscovery(ABC):
             mask_mode: "prefix", "generation", or "both"
             num_prefix_sentences: How many sentences are prefix (rest are generation).
                 Defaults to len(sentences).
+            branch_rewards: Optional per-branch scalar rewards. When provided,
+                each branch's objective loss is multiplied by its reward before
+                gradient accumulation.
+            position_mask_overrides: Optional per-branch position masks. When
+                provided, overrides the default continuation-wide position mask
+                for that branch (e.g. to restrict to answer tokens only).
 
         Returns:
             NodeMask with per-(layer, head, src_sent, tgt_sent) attribution scores.

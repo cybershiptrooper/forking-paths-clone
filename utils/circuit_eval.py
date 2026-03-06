@@ -317,11 +317,18 @@ def eval_with_masks(
     collect_per_sentence: bool = False,
     tokenizer=None,
     min_sentence_length: int = 10,
-) -> tuple[float, list[list[float]], list[list[dict]]]:
+    branch_rewards: list[float] | None = None,
+    position_mask_overrides: list[torch.Tensor | None] | None = None,
+) -> tuple[float, float, list[list[float]], list[list[dict]]]:
     """Run model with *binary_masks* applied and compute objective.
 
-    Returns ``(avg_objective, per_token_kl_branches, per_sent_kl_branches)``.
+    Returns ``(avg_objective, avg_kl, per_token_kl_branches, per_sent_kl_branches)``.
+
+    *avg_objective* is the (optionally reward-weighted) objective value.
+    *avg_kl* is always the plain KL divergence (for comparison).
     """
+    from utils.objectives import kl_divergence_loss
+
     device = next(model.parameters()).device
     prefix_len = input_ids.shape[-1]
 
@@ -330,6 +337,7 @@ def eval_with_masks(
     )
 
     total_objective = 0.0
+    total_kl = 0.0
     total_branches = 0
     per_token_kl_branches: list[list[float]] = []
     per_sent_kl_branches: list[list[dict]] = []
@@ -338,13 +346,25 @@ def eval_with_masks(
         for cont_idx, cont in enumerate(continuations):
             full_input = torch.cat([input_ids, cont], dim=-1)
             full_len = full_input.shape[-1]
-            pos_mask = torch.zeros(1, full_len, device=device)
-            pos_mask[0, prefix_len - 1 : full_len - 1] = 1.0
+            default_pos_mask = torch.zeros(1, full_len, device=device)
+            default_pos_mask[0, prefix_len - 1 : full_len - 1] = 1.0
+
+            pos_mask = default_pos_mask
+            if position_mask_overrides is not None and position_mask_overrides[cont_idx] is not None:
+                pos_mask = position_mask_overrides[cont_idx].to(device)
 
             logits = model(full_input).logits
             clean = clean_logits_list[cont_idx][:, :full_len].to(device)
-            objective_value = objective_fn(clean, logits, pos_mask)
-            total_objective += objective_value.item()
+
+            objective_value = objective_fn(
+                clean, logits, pos_mask, token_ids=full_input
+            )
+            weight = branch_rewards[cont_idx] if branch_rewards is not None else 1.0
+            total_objective += objective_value.item() * weight
+
+            # Always compute plain KL for reporting
+            plain_kl = kl_divergence_loss(clean, logits, default_pos_mask)
+            total_kl += plain_kl.item()
             total_branches += 1
 
             if collect_per_token or collect_per_sentence:
@@ -380,7 +400,8 @@ def eval_with_masks(
     remove_handles(handles)
 
     avg_objective = total_objective / max(total_branches, 1)
-    return avg_objective, per_token_kl_branches, per_sent_kl_branches
+    avg_kl = total_kl / max(total_branches, 1)
+    return avg_objective, avg_kl, per_token_kl_branches, per_sent_kl_branches
 
 
 # ------------------------------------------------------------------
@@ -402,6 +423,8 @@ def evaluate_at_thresholds(
     tokenizer=None,
     min_sentence_length: int = 10,
     num_random_samples: int = 5,
+    branch_rewards: list[float] | None = None,
+    position_mask_overrides: list[torch.Tensor | None] | None = None,
 ) -> list[dict]:
     """Evaluate objective value and sparsity at different mask thresholds.
 
@@ -474,7 +497,7 @@ def evaluate_at_thresholds(
             device,
         )
 
-        avg_objective, per_token_kl_branches, per_sent_kl_branches = eval_with_masks(
+        avg_objective, avg_kl, per_token_kl_branches, per_sent_kl_branches = eval_with_masks(
             model=model,
             binary_masks=binary_masks,
             layers=layers,
@@ -489,9 +512,12 @@ def evaluate_at_thresholds(
             collect_per_sentence=True,
             tokenizer=tokenizer,
             min_sentence_length=min_sentence_length,
+            branch_rewards=branch_rewards,
+            position_mask_overrides=position_mask_overrides,
         )
 
         # Evaluate K random score masks at this threshold
+        random_objectives = []
         random_kl_divergences = []
         granularity = node_mask.granularity
         for k in range(num_random_samples):
@@ -505,7 +531,7 @@ def evaluate_at_thresholds(
                 device,
                 granularity=granularity,
             )
-            rand_obj, _, _ = eval_with_masks(
+            rand_obj, rand_kl, _, _ = eval_with_masks(
                 model=model,
                 binary_masks=rand_binary,
                 layers=layers,
@@ -516,25 +542,34 @@ def evaluate_at_thresholds(
                 token_to_sent=token_to_sent,
                 gap_filter=combined_filter,
                 renormalize=renormalize_masked_attention,
+                branch_rewards=branch_rewards,
+                position_mask_overrides=position_mask_overrides,
             )
-            random_kl_divergences.append(rand_obj)
+            random_objectives.append(rand_obj)
+            random_kl_divergences.append(rand_kl)
 
         mean_random_kl = sum(random_kl_divergences) / len(random_kl_divergences)
         entry = {
             "threshold": threshold,
             "sparsity": sparsity,
-            "kl_divergence": avg_objective,
+            "kl_divergence": avg_kl,
             "random_kl_divergence": mean_random_kl,
             "random_kl_divergences": random_kl_divergences,
             "per_token_kl": per_token_kl_branches,
         }
+        # Add reward-weighted objective when rewards are active
+        if branch_rewards is not None:
+            mean_random_obj = sum(random_objectives) / len(random_objectives)
+            entry["reward_weighted_objective"] = avg_objective
+            entry["random_reward_weighted_objective"] = mean_random_obj
+            entry["random_reward_weighted_objectives"] = random_objectives
         if per_sent_kl_branches:
             entry["per_sentence_kl"] = per_sent_kl_branches
         results.append(entry)
         print(
             f"  threshold={threshold:.1e} | sparsity={sparsity:.2%} "
-            f"| objective={avg_objective:.6f} "
-            f"| random mean={mean_random_kl:.6f} (K={num_random_samples})"
+            f"| KL={avg_kl:.6f} | objective={avg_objective:.6f} "
+            f"| random KL={mean_random_kl:.6f} (K={num_random_samples})"
         )
 
     remove_handles(non_target_handles)
