@@ -1,4 +1,4 @@
-uv run python learn_circuit.py \
+uv run python -m expts.learn_circuit \
   --num_new_branches 1 \
   --num_ig_steps 50 \
   --max_new_tokens 200 \
@@ -12,7 +12,7 @@ uv run python learn_circuit.py \
   --mask_mode prefix 
   # --no_renormalize_masked_attention
 
-uv run python learn_circuit.py \
+uv run python -m expts.learn_circuit \
   --num_new_branches 1 \
   --num_ig_steps 50 \
   --max_new_tokens 200 \
@@ -29,7 +29,7 @@ uv run python learn_circuit.py \
 
 ####################################################################
 
-# uv run python learn_circuit.py \
+# uv run python -m expts.learn_circuit \
 #   --num_new_branches 1 \
 #   --num_ig_steps 20 \
 #   --max_new_tokens 200 \
@@ -40,7 +40,7 @@ uv run python learn_circuit.py \
 #   --mask_mode generation
 
 
-# uv run python learn_circuit.py \
+# uv run python -m expts.learn_circuit \
 #   --num_new_branches 1 \
 #   --num_ig_steps 20 \
 #   --max_new_tokens 200 \
@@ -52,7 +52,7 @@ uv run python learn_circuit.py \
 
 # ####################################################################
 
-# uv run python learn_circuit.py \
+# uv run python -m expts.learn_circuit \
 #   --num_new_branches 1 \
 #   --num_ig_steps 20 \
 #   --max_new_tokens 200 \
@@ -62,7 +62,7 @@ uv run python learn_circuit.py \
 #   --sentence_gap 0 \
 #   --mask_mode both
 
-# uv run python learn_circuit.py \
+# uv run python -m expts.learn_circuit \
 #   --num_new_branches 1 \
 #   --num_ig_steps 20 \
 #   --max_new_tokens 200 \
@@ -78,7 +78,7 @@ uv run python learn_circuit.py \
 # ####################################################################
 # ####################################################################
 
-# uv run python learn_circuit.py \
+# uv run python -m expts.learn_circuit \
 #   --num_new_branches 16 \
 #   --num_ig_steps 20 \
 #   --max_new_tokens 200 \
@@ -90,7 +90,7 @@ uv run python learn_circuit.py \
 # uv run python visualize_circuit.py --mask_path results/circuitviz/math_gap_0/circuit_nodewise_attribution_layers_all_branches16_ig20.json --top_k_heads 6 --threshold 5e-8
 
 
-# uv run python learn_circuit.py \
+# uv run python -m expts.learn_circuit \
 #   --num_new_branches 16 \
 #   --num_ig_steps 20 \
 #   --max_new_tokens 200 \
@@ -102,7 +102,7 @@ uv run python learn_circuit.py \
 # uv run python visualize_circuit.py --mask_path results/circuitviz/math_gap_1/circuit_nodewise_attribution_layers_all_branches16_ig20.json --top_k_heads 6 --threshold 5e-8
 
 
-# uv run python learn_circuit.py \
+# uv run python -m expts.learn_circuit \
 #   --num_new_branches 16 \
 #   --num_ig_steps 20 \
 #   --max_new_tokens 200 \
@@ -115,7 +115,7 @@ uv run python learn_circuit.py \
 
 # uv run python visualize_circuit.py --mask_path results/circuitviz/math_gap_no_norm/circuit_nodewise_attribution_layers_all_branches16_ig20.json --top_k_heads 6 --threshold 5e-8
 
-# uv run python learn_circuit.py \
+# uv run python -m expts.learn_circuit \
 #   --num_new_branches 16 \
 #   --num_ig_steps 20 \
 #   --max_new_tokens 200 \
@@ -128,7 +128,7 @@ uv run python learn_circuit.py \
 
 # uv run python visualize_circuit.py --mask_path results/circuitviz/math_gap_1_no_norm/circuit_nodewise_attribution_layers_all_branches16_ig20.json --top_k_heads 6 --threshold 5e-8
 
-# uv run python learn_circuit.py \
+# uv run python -m expts.learn_circuit \
 #   --num_new_branches 16 \
 #   --num_ig_steps 20 \
 #   --max_new_tokens 200 \
