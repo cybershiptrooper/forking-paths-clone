@@ -420,6 +420,7 @@ def build_full_circuit_figure(
     layers: Sequence[int],
     threshold: float,
     aggregation: str = "mean",
+    mode: str = "key",
 ) -> go.Figure:
     texts = sentence_texts(node_mask)
     hover_texts = sentence_hover_texts(node_mask)
@@ -433,9 +434,13 @@ def build_full_circuit_figure(
         causal_mask = np.tril(np.ones_like(scores))
         scores_causal = np.where(causal_mask, scores, 0.0)
         np.fill_diagonal(scores_causal, 0.0)
-        col_sum = scores_causal.sum(axis=0)
-        valid_counts = np.maximum(causal_mask.sum(axis=0) - 1, 1)
-        importance_matrix[i] = col_sum / valid_counts
+        if mode == "query":
+            agg_sum = scores_causal.sum(axis=1)
+            valid_counts = np.maximum(causal_mask.sum(axis=1) - 1, 1)
+        else:
+            agg_sum = scores_causal.sum(axis=0)
+            valid_counts = np.maximum(causal_mask.sum(axis=0) - 1, 1)
+        importance_matrix[i] = agg_sum / valid_counts
 
     customdata = np.empty((num_layers, num_sents, 2), dtype=object)
     for i, layer in enumerate(layers):
@@ -446,54 +451,39 @@ def build_full_circuit_figure(
     y_labels = [f"Layer {layer}" for layer in layers]
     fig = go.Figure()
 
-    if threshold > 0:
-        binary = (importance_matrix >= threshold).astype(float)
-        fig.add_trace(
-            go.Heatmap(
-                z=binary,
-                x=labels,
-                y=y_labels,
-                text=np.vectorize(lambda x: f"{x:.1e}")(importance_matrix),
-                texttemplate="%{text}",
-                customdata=customdata,
-                colorscale=[
-                    [0.0, "#d9534f"],
-                    [0.499, "#d9534f"],
-                    [0.5, "#5cb85c"],
-                    [1.0, "#5cb85c"],
-                ],
-                showscale=False,
-                xgap=1,
-                ygap=1,
-                hovertemplate=(
-                    "Layer: %{customdata[0]}<br>"
-                    "Sentence: %{customdata[1]}<br>"
-                    "Importance: %{text}<br>"
-                    "Status: %{z}<extra></extra>"
-                ),
-            )
+    binary = (importance_matrix >= threshold).astype(float)
+    fig.add_trace(
+        go.Heatmap(
+            z=binary,
+            x=labels,
+            y=y_labels,
+            text=np.vectorize(lambda x: f"{x:.1e}")(importance_matrix),
+            texttemplate="%{text}",
+            customdata=customdata,
+            colorscale=[
+                [0.0, "#d9534f"],
+                [0.499, "#d9534f"],
+                [0.5, "#5cb85c"],
+                [1.0, "#5cb85c"],
+            ],
+            showscale=False,
+            xgap=1,
+            ygap=1,
+            hovertemplate=(
+                "Layer: %{customdata[0]}<br>"
+                "Sentence: %{customdata[1]}<br>"
+                "Importance: %{text}<br>"
+                "Status: %{z}<extra></extra>"
+            ),
         )
-    else:
-        fig.add_trace(
-            go.Heatmap(
-                z=importance_matrix,
-                x=labels,
-                y=y_labels,
-                customdata=customdata,
-                colorscale="Greens",
-                colorbar=dict(title="Importance"),
-                xgap=1,
-                ygap=1,
-                hovertemplate=(
-                    "Layer: %{customdata[0]}<br>"
-                    "Sentence: %{customdata[1]}<br>"
-                    "Importance: %{z:.3e}<extra></extra>"
-                ),
-            )
-        )
+    )
 
     fig.update_layout(
-        title="Circuit Overview - Per-Sentence Importance by Layer",
+        title=(
+            "Circuit Overview - Per-Sentence Key Importance by Layer"
+            if mode != "query"
+            else "Circuit Overview - Per-Sentence Query Importance by Layer"
+        ),
         xaxis_title="Sentence",
         yaxis_title="Layer",
         height=max(620, int(42 * num_layers + 220)),
@@ -510,6 +500,208 @@ def build_full_circuit_figure(
         automargin=True,
     )
     fig.update_yaxes(tickfont=dict(size=13), automargin=True)
+    return fig
+
+
+def build_sentence_connection_figure(
+    node_mask: NodeMask,
+    layers: Sequence[int],
+    threshold: float,
+    aggregation: str = "mean",
+    highlight_sentence: int | None = None,
+) -> go.Figure:
+    """Per-layer sentence-to-sentence connection diagram with green arrows.
+
+    When *highlight_sentence* is not None, only arcs touching that sentence
+    (as query or key) are shown in full colour; the rest are faded out and
+    the connected sentence boxes are tinted green.
+    """
+    labels = sentence_labels(node_mask, max_chars=18)
+    hover_texts = sentence_hover_texts(node_mask)
+    num_sents = len(labels)
+    num_layers = len(layers)
+
+    fig = go.Figure()
+
+    # Collect all above-threshold edges per layer
+    all_scores: list[float] = []
+    layer_edges: list[list[tuple[int, int, float]]] = []
+    for layer in layers:
+        scores = _single_layer_scores(node_mask, layer, aggregation=aggregation)
+        causal_mask = np.tril(np.ones_like(scores))
+        scores_causal = np.where(causal_mask, scores, 0.0)
+        np.fill_diagonal(scores_causal, 0.0)
+        edges: list[tuple[int, int, float]] = []
+        for q in range(num_sents):
+            for k in range(q):
+                val = scores_causal[q, k]
+                if val >= threshold:
+                    edges.append((k, q, float(val)))
+                    all_scores.append(float(val))
+        layer_edges.append(edges)
+
+    global_max = max(all_scores) if all_scores else 1.0
+
+    # Pre-compute arc basis
+    n_pts = 12
+    ts = np.linspace(0, 1, n_pts)
+    parabola = 4 * ts * (1 - ts)
+
+    # Build per-layer set of highlighted sentence indices (for box colouring)
+    # highlighted_boxes[layer_idx] = set of sentence indices connected to
+    # highlight_sentence at that layer.
+    highlighted_boxes: list[set[int]] = [set() for _ in range(num_layers)]
+
+    # Batch shapes, hover segments, arrowheads
+    all_shapes: list[dict] = []
+    all_hover_x: list[float | None] = []
+    all_hover_y: list[float | None] = []
+    all_hover_text: list[str | None] = []
+    all_arrow_x: list[float] = []
+    all_arrow_y: list[float] = []
+    all_arrow_colors: list[str] = []
+
+    for i, (layer, edges) in enumerate(zip(layers, layer_edges)):
+        for key_sent, query_sent, score in edges:
+            is_active = highlight_sentence is None or (
+                key_sent == highlight_sentence or query_sent == highlight_sentence
+            )
+
+            opacity = max(0.2, min(1.0, score / global_max))
+            width = max(1.5, 3.0 * score / global_max)
+
+            if not is_active:
+                opacity *= 0.12
+                width = max(0.5, width * 0.4)
+
+            dist = abs(query_sent - key_sent)
+            curve_height = 0.15 + 0.05 * dist
+
+            seg_x = (key_sent * (1 - ts) + query_sent * ts).tolist()
+            seg_y = (i + curve_height * parabola).tolist()
+
+            path_parts = [f"M {seg_x[0]},{seg_y[0]}"]
+            for p in range(1, n_pts):
+                path_parts.append(f"L {seg_x[p]},{seg_y[p]}")
+            color = f"rgba(76, 175, 80, {opacity})"
+            all_shapes.append(
+                dict(
+                    type="path",
+                    path=" ".join(path_parts),
+                    xref="x",
+                    yref="y",
+                    line=dict(color=color, width=width),
+                )
+            )
+
+            all_arrow_x.append(query_sent)
+            all_arrow_y.append(float(i))
+            all_arrow_colors.append(color)
+
+            hover = (
+                f"Layer {layer}<br>"
+                f"Key: S{key_sent}<br>"
+                f"Query: S{query_sent}<br>"
+                f"Score: {score:.3e}"
+            )
+            all_hover_x.extend([key_sent, query_sent, None])
+            all_hover_y.extend([float(i), float(i), None])
+            all_hover_text.extend([hover, hover, None])
+
+            if is_active and highlight_sentence is not None:
+                highlighted_boxes[i].add(key_sent)
+                highlighted_boxes[i].add(query_sent)
+
+    # Invisible wide hover trace for all arcs
+    if all_hover_x:
+        fig.add_trace(
+            go.Scatter(
+                x=all_hover_x,
+                y=all_hover_y,
+                mode="lines",
+                line=dict(color="rgba(0,0,0,0)", width=8),
+                showlegend=False,
+                hoverinfo="text",
+                hovertext=all_hover_text,
+            )
+        )
+
+    # All arrowheads in one trace
+    if all_arrow_x:
+        fig.add_trace(
+            go.Scatter(
+                x=all_arrow_x,
+                y=all_arrow_y,
+                mode="markers",
+                marker=dict(
+                    symbol="triangle-down",
+                    size=8,
+                    color=all_arrow_colors,
+                ),
+                showlegend=False,
+                hoverinfo="skip",
+            )
+        )
+
+    # Sentence box markers: one trace per layer (no text on boxes)
+    for i, layer in enumerate(layers):
+        box_colors = []
+        for j in range(num_sents):
+            if highlight_sentence is not None and j in highlighted_boxes[i]:
+                box_colors.append("rgba(76, 175, 80, 0.35)")
+            else:
+                box_colors.append("white")
+        fig.add_trace(
+            go.Scatter(
+                x=list(range(num_sents)),
+                y=[i] * num_sents,
+                mode="markers+text",
+                marker=dict(
+                    symbol="square",
+                    size=20,
+                    color=box_colors,
+                    line=dict(color="black", width=1.5),
+                ),
+                text=[str(j) for j in range(num_sents)],
+                textposition="middle center",
+                textfont=dict(size=8, color="black"),
+                showlegend=False,
+                hovertext=[
+                    f"S{j}: {hover_texts[j]}<br>Layer {layer}"
+                    for j in range(num_sents)
+                ],
+                hoverinfo="text",
+            )
+        )
+
+    y_labels = [f"Layer {layer}" for layer in layers]
+    fig.update_layout(
+        title="Circuit Overview - Sentence Connections by Layer",
+        xaxis_title="Sentence",
+        yaxis_title="Layer",
+        height=max(500, 120 * num_layers + 150),
+        plot_bgcolor="white",
+        font=dict(size=14),
+        hoverlabel=dict(font_size=15, align="left"),
+        margin=dict(l=10, r=10, t=60, b=20),
+        shapes=all_shapes,
+    )
+    fig.update_xaxes(
+        tickvals=list(range(num_sents)),
+        ticktext=labels,
+        tickangle=-45,
+        tickfont=dict(size=11),
+        automargin=True,
+        showgrid=False,
+    )
+    fig.update_yaxes(
+        tickvals=list(range(num_layers)),
+        ticktext=y_labels,
+        tickfont=dict(size=13),
+        automargin=True,
+        showgrid=True,
+        gridcolor="lightgray",
+    )
     return fig
 
 
