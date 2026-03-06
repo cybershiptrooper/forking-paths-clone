@@ -1,0 +1,12 @@
+uv run python -m expts.forking_paths.data_collection_new \
+    --model_name deepseek-ai/DeepSeek-R1-Distill-Llama-8B \
+    --dataset_names MATH_open \
+    --num_examples 100 \
+    --shuffle \
+    --num_paths 16 \
+    --max_new_tokens 10000 \
+    --temperature 0.6 \
+    --return_logprobs \
+    --return_alternate_texts \
+    --enable_prefix_caching \
+    --hf_repo_id cybershiptrooper/deepseek_llama_8B_math

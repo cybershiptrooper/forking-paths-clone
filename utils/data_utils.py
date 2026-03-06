@@ -174,6 +174,19 @@ def format_question_game_of_24(example):
         "all_answers": [example[f"Solution {i}"] for i in range(1, example["Num Solutions"] + 1)]
     }
 
+def format_question_math_hf(example):
+    question = example['problem']
+    answer = example['solution']
+
+    return {
+        "question": question,
+        "question_with_choices": question,
+        "correct_letter": None,
+        "correct_answer": answer,
+        "all_letters": None,
+        "all_answers": None
+    }
+
 def format_question_mc_evaluation(example):
     question = example['Question']
     answer_letter = example['Answer']
@@ -201,7 +214,8 @@ DATASET_TO_FORMAT = {
     "WildJailBreak": format_question_wildjailbreak,
     "Just-Eval": format_question_justeval,
     "GSM8k": format_question_mc_evaluation,
-    "MATH": format_question_mc_evaluation,
+    "MATH_mcq": format_question_mc_evaluation,
+    "MATH_open": format_question_math_hf,
     "PythonIO": format_question_mc_evaluation,
     "AIME24": format_question_aime,
     "AIME25": format_question_aime,

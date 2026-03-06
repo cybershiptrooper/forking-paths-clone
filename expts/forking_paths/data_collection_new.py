@@ -34,7 +34,21 @@ def load_data(
     """
     # load dataset
     print(f"Loading {dataset['name']} dataset...")
-    if dataset["hf"]:
+    if dataset["name"] == "MATH_open":
+        # EleutherAI/hendrycks_math has 7 separate configs; load and concatenate all
+        math_configs = [
+            "algebra", "counting_and_probability", "geometry",
+            "intermediate_algebra", "number_theory", "prealgebra", "precalculus",
+        ]
+        hf_dataset = concatenate_datasets([
+            load_dataset(dataset["source"], cfg, split=dataset["hf_split"])
+            for cfg in math_configs
+        ])
+        # Keep only problems with difficulty level >= 3
+        hf_dataset = hf_dataset.filter(
+            lambda x: int(x["level"].split()[-1]) >= 3
+        )
+    elif dataset["hf"]:
         hf_dataset = load_dataset(
             dataset["source"], dataset["hf_name"], split=dataset["hf_split"]
         )
@@ -361,6 +375,8 @@ def main(
     # output parameters
     return_alternate_texts: bool = True,
     seed: int = 42,
+    # HuggingFace upload
+    hf_repo_id: Optional[str] = None,
 ):
     set_seed(seed)
     random.seed(seed)  # for base answer selection
@@ -428,6 +444,14 @@ def main(
         with open(output_filename, "w") as f:
             json.dump(aggregated_results, f, indent=2)
         print(f"Saved {len(aggregated_results)} results to {output_filename}")
+
+        # Optionally upload to HuggingFace Hub
+        if hf_repo_id is not None:
+            from datasets import Dataset as HFDataset
+            hf_split_name = f"{model_nickname}/{dataset_name.lower()}"
+            hf_upload = HFDataset.from_list(aggregated_results)
+            hf_upload.push_to_hub(hf_repo_id, config_name=hf_split_name)
+            print(f"Uploaded {len(aggregated_results)} results to {hf_repo_id} (config: {hf_split_name})")
 
         # Clear answer LLM
         del answer_llm
@@ -503,6 +527,12 @@ if __name__ == "__main__":
         default="mode",
         choices=["correct", "incorrect", "mode"],
         help="How to select base answer: 'correct' (random correct), 'incorrect' (random incorrect), 'mode' (most common)",
+    )
+    parser.add_argument(
+        "--hf_repo_id",
+        type=str,
+        default=None,
+        help="HuggingFace repo ID to upload results to (e.g. 'org/dataset-name'). Each dataset is uploaded as a separate config named '<model>/<dataset>'.",
     )
     args = parser.parse_args()
 

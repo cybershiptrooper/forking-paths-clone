@@ -29,3 +29,5 @@ results/circuitviz*
 CLAUDE.md
 .DS_Store
 cluster.md
+.env
+*.patch

@@ -23,13 +23,21 @@
         "hf_split": null,
         "type": "multiple choice"
     },
-    "MATH": {
-        "name": "MATH",
+    "MATH_mcq": {
+        "name": "MATH_mcq",
         "source": "data/mc_evaluation/math-mc",
         "hf": false,
         "hf_name": null,
         "hf_split": null,
         "type": "multiple choice"
+    },
+    "MATH_open": {
+        "name": "MATH_open",
+        "source": "EleutherAI/hendrycks_math",
+        "hf": true,
+        "hf_name": null,
+        "hf_split": "test",
+        "type": "open ended"
     },
     "PythonIO": {
         "name": "PythonIO",
