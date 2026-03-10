@@ -3,16 +3,14 @@ data_path: data/collection/deepseek_llama_8b/math_open.json
 prompt_index: 6
 reward_type: correctness
 objective: kl_divergence
-masking_algorithm: nodewise_activation_patching
-# masking_algorithm: nodewise_attribution
+# masking_algorithm: nodewise_activation_patching
+masking_algorithm: nodewise_attribution_attention
 num_new_branches: 16
 mask_granularity: pair
-mask_mode: prefix
+mask_mode: both
 # num_ig_steps: 2
-# layers_to_analyse: all 
-layers_to_analyse: [1, 8, 14, 20, 28]
+layers_to_analyse: all
 max_new_tokens: 5000
-analysis_timestep: 2801 # 1416 # 2801
-sentence_gap: 4
+analysis_timestep: 1416
+sentence_gap: 1
 output_dir: results/circuit_discovery/reward_test
-answer_only: true
