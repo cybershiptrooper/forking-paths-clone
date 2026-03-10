@@ -986,7 +986,7 @@ function connSection(title, list, field, sents) {
     const barW = Math.round(50*norm);
     const col = e.score<0 ? '#9333ea' : '#4caf50';
     h += `<li><span>S${idx} L${e.layer}: ${t}</span>`;
-    h += `<span class="mono">${e.score.toFixed(4)} <span class="bar" style="width:${barW}px;background:${col}"></span></span></li>`;
+    h += `<span class="mono">${e.score.toExponential(2)} <span class="bar" style="width:${barW}px;background:${col}"></span></span></li>`;
   }
   h += '</ul>';
   if (list.length>20) h += `<div style="font-size:10px;color:#94a3b8">…and ${list.length-20} more</div>`;
