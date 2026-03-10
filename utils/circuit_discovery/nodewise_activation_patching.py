@@ -19,7 +19,7 @@ from utils.masks import (
 )
 from utils.utils import Sentence
 from utils.circuit_discovery.base import CircuitDiscovery
-from utils.circuit_discovery.common import make_llama_attention_forward, apply_sentence_mask
+from utils.circuit_discovery.common import make_attention_forward, apply_sentence_mask
 
 
 class NodewiseActivationPatching(CircuitDiscovery):
@@ -164,7 +164,7 @@ class NodewiseActivationPatching(CircuitDiscovery):
         clean_logits_list = self._get_clean_logits(input_ids, continuations)
 
         # ----- Patch target layers with all-ones masks -----
-        forward_fn = make_llama_attention_forward(apply_sentence_mask)
+        forward_fn = make_attention_forward(self.model_type, apply_sentence_mask)
         masks = {
             l: torch.ones(num_heads, num_sents, num_sents, device=device)
             for l in self.layers

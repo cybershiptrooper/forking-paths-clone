@@ -13,7 +13,7 @@ from tqdm import tqdm
 from utils.masks import NodeMask, build_gap_filter, build_mode_filter, build_combined_filter, build_causal_filter
 from utils.utils import Sentence
 from utils.circuit_discovery.base import CircuitDiscovery
-from utils.circuit_discovery.common import make_llama_attention_forward, apply_sentence_mask
+from utils.circuit_discovery.common import make_attention_forward, apply_sentence_mask
 
 
 _ALLOWED_PAIR_AGGREGATIONS = {"sum", "mean"}
@@ -90,7 +90,7 @@ class NodewiseAttribution(CircuitDiscovery):
         combined_filter = build_combined_filter(gap_filter, mode_filter, causal_filter)
 
         # Build the patched forward with sentence-mask injection
-        forward_fn = make_llama_attention_forward(apply_sentence_mask)
+        forward_fn = make_attention_forward(self.model_type, apply_sentence_mask)
 
         # 0. Optionally ablate all non-target layers
         non_target_handles = []

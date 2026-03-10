@@ -23,7 +23,7 @@ from transformers import LlamaConfig, LlamaForCausalLM
 
 from utils.utils import Sentence
 from utils.masks import build_gap_filter, build_mode_filter, build_causal_filter, build_combined_filter
-from utils.circuit_discovery.common import make_llama_attention_forward, apply_sentence_mask
+from utils.circuit_discovery.common import make_attention_forward, apply_sentence_mask
 from utils.circuit_discovery.nodewise_activation_patching import NodewiseActivationPatching
 from utils.objectives import get_objective
 

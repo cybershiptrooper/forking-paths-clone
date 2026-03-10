@@ -71,6 +71,7 @@ ATTENTION_MODULE_PATHS = {
     "llama": lambda model, layer: model.model.layers[layer].self_attn,
     "qwen2": lambda model, layer: model.model.layers[layer].self_attn,
     "qwen": lambda model, layer: model.model.layers[layer].self_attn,
+    "qwen3": lambda model, layer: model.model.layers[layer].self_attn,
     # Easy to add new architectures:
     # "phi": lambda model, layer: model.model.layers[layer].mixer,
     # "mistral": lambda model, layer: model.model.layers[layer].self_attn,

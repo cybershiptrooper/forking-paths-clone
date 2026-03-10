@@ -2,7 +2,7 @@
 
 from utils.circuit_discovery.base import CircuitDiscovery
 from utils.circuit_discovery.common import (
-    make_llama_attention_forward,
+    make_attention_forward,
     apply_sentence_mask,
     expand_sentence_mask_to_tokens,
 )
@@ -21,7 +21,7 @@ __all__ = [
     "NodewiseAttributionAttention",
     "NodewiseActivationPatching",
     "create_circuit_discovery",
-    "make_llama_attention_forward",
+    "make_attention_forward",
     "apply_sentence_mask",
     "expand_sentence_mask_to_tokens",
 ]

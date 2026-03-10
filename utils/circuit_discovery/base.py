@@ -8,7 +8,7 @@ import torch
 
 from utils.masks import NodeMask
 from utils.utils import Sentence, get_attention_module
-from utils.circuit_discovery.common import make_llama_attention_forward, apply_sentence_mask
+from utils.circuit_discovery.common import make_attention_forward, apply_sentence_mask
 
 
 class AblationHandle:
@@ -63,6 +63,7 @@ class CircuitDiscovery(ABC):
         self.ablate_non_target_layers = ablate_non_target_layers
         self.renormalize_masked_attention = renormalize_masked_attention
         self.mask_granularity = mask_granularity
+        self.model_type = model.config.model_type
 
     def _build_token_to_sentence_map(
         self, sentences: List[Sentence], seq_len: int
@@ -173,7 +174,7 @@ class CircuitDiscovery(ABC):
         target_set = set(self.layers)
         non_target = [l for l in range(num_layers) if l not in target_set]
 
-        forward_fn = make_llama_attention_forward(apply_sentence_mask)
+        forward_fn = make_attention_forward(self.model_type, apply_sentence_mask)
         handles = []
         for layer_idx in non_target:
             attn_module = get_attention_module(self.model, layer_idx)

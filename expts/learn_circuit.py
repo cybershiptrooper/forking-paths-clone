@@ -113,6 +113,7 @@ def _resolve_layers_to_analyse(layers_to_analyse, model):
 
 def main(
     model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    model_to_analyse: str = None,
     prompt: str = None,
     num_new_branches: int = 8,
     masking_algorithm: str = "nodewise_attribution",
@@ -144,6 +145,9 @@ def main(
     answer_only: bool = False,
     judge_model: str = "meta-llama/llama-3.2-3b-instruct",
 ):
+    # Default model_to_analyse to model_name
+    if model_to_analyse is None:
+        model_to_analyse = model_name
     if thresholds is None:
         thresholds = [0.01, 0.05, 0.1, 0.2, 0.5]
 
@@ -344,10 +348,10 @@ def main(
     # Step 4: Load HuggingFace model (eager attention)
     # =====================================================================
     print("\n" + "=" * 80)
-    print("Step 4: Loading model with eager attention...")
+    print(f"Step 4: Loading model with eager attention ({model_to_analyse})...")
     print("=" * 80)
 
-    model, tokenizer = load_model_eager(model_name, device=device)
+    model, tokenizer = load_model_eager(model_to_analyse, device=device)
     input_ids = input_ids.to(device)
     layers_to_analyse_is_all = (
         isinstance(layers_to_analyse, list)
@@ -583,6 +587,14 @@ if __name__ == "__main__":
         "--model_name",
         type=str,
         default="deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+        help="Model for vLLM generation (branches).",
+    )
+    parser.add_argument(
+        "--model_to_analyse",
+        type=str,
+        default=None,
+        help="Model loaded with eager attention for circuit discovery. "
+        "Defaults to --model_name if not specified.",
     )
     parser.add_argument("--prompt", type=str, default=None)
     parser.add_argument("--num_new_branches", type=int, default=8)

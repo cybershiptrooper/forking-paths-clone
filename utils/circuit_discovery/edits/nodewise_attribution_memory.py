@@ -13,7 +13,7 @@ from tqdm import tqdm
 
 from utils.circuit_discovery.base import CircuitDiscovery
 from utils.circuit_discovery.common import (
-    make_llama_attention_forward,
+    make_attention_forward,
     apply_sentence_mask,
 )
 from utils.masks import (
@@ -108,7 +108,7 @@ class NodewiseAttribution(CircuitDiscovery):
         num_sents: int,
         device: torch.device,
     ) -> Dict[int, torch.Tensor]:
-        forward_fn = make_llama_attention_forward(ap_ig_attention_injection)
+        forward_fn = make_attention_forward(self.model_type, ap_ig_attention_injection)
         masks = self._make_layer_masks(mask_value, num_heads, num_sents, device)
         handles = self._patch_model(
             masks,
@@ -232,7 +232,7 @@ class NodewiseAttribution(CircuitDiscovery):
         combined_filter_cpu = combined_filter.detach().cpu()
 
         # Build the patched forward with AP-IG injection
-        forward_fn = make_llama_attention_forward(ap_ig_attention_injection)
+        forward_fn = make_attention_forward(self.model_type, ap_ig_attention_injection)
 
         non_target_handles = []
         if self.ablate_non_target_layers:
