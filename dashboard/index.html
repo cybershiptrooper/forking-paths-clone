@@ -353,7 +353,7 @@ document.getElementById('server-masks').addEventListener('change', e => {
 });
 fetch('/api/masks').then(r=>r.json()).then(ps => {
   const sel = document.getElementById('server-masks');
-  ps.forEach(p => { const o = document.createElement('option'); o.value=p; o.textContent=p.split('/').pop(); sel.appendChild(o); });
+  ps.forEach(p => { const o = document.createElement('option'); o.value=p; const ci=p.indexOf('circuitviz/'); o.textContent=ci>=0 ? p.slice(ci+'circuitviz/'.length) : p; sel.appendChild(o); });
 }).catch(()=>{});
 
 // ══════════════════════════════════════════════════════════════
