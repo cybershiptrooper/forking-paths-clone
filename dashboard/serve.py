@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from glob import glob
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -75,7 +76,7 @@ class DashboardHandler(SimpleHTTPRequestHandler):
 
 
 def main():
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
+    port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else 8765))
     server = HTTPServer(("0.0.0.0", port), DashboardHandler)
     print(f"Circuit Tracer Dashboard: http://localhost:{port}")
     print(f"Serving masks from: {ROOT}")

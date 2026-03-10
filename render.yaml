@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: circuit-tracer-dashboard
+    runtime: docker
+    dockerfilePath: dashboard/Dockerfile
+    dockerContext: .
+    branch: visualise
+    plan: free
+    envVars:
+      - key: PORT
+        value: "10000"
