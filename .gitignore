@@ -31,3 +31,4 @@ CLAUDE.md
 cluster.md
 .env
 *.patch
+.superset
