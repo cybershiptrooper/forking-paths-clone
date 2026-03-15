@@ -10,7 +10,7 @@ usage() {
     echo "Usage: $0 [--start | --stop]"
     echo "  --start   Launch a dev pod, update SSH config, and set up the repo"
     echo "  --stop    Stop the running dev pod"
-    exit 1
+    # exit 1
 }
 
 update_ssh_config() {
@@ -54,11 +54,12 @@ start_pod() {
     echo "Starting dev pod on pi-mentee-login..."
 
     # Start pod and get the node it landed on
-    ssh pi-mentee-login "pod" || true
+    # Use login shell (-l) so that profile/bashrc paths are sourced
+    ssh pi-mentee-login "bash -lc 'pod'" || true
 
     echo "Checking where the pod landed..."
     local node
-    node=$(ssh pi-mentee-login "squeue --me --noheader -o '%N'" | head -1 | tr -d '[:space:]')
+    node=$(ssh pi-mentee-login "bash -lc 'squeue --me --noheader -o \"%N\"'" 2>/dev/null | awk 'NR==1{print}' | tr -d '[:space:]')
 
     if [[ -z "$node" ]]; then
         echo "ERROR: No running pod found. Check manually with: ssh pi-mentee-login squeue --me"
@@ -107,9 +108,16 @@ REMOTE_SETUP
 }
 
 stop_pod() {
-    echo "Stopping dev pod..."
-    ssh pi-mentee-login "scancel --me"
-    echo "All your pods have been stopped."
+    echo "Current jobs:"
+    ssh pi-mentee-login "bash -lc 'squeue --me'" || true
+
+    echo ""
+    echo "Cancelling all jobs..."
+    ssh pi-mentee-login "bash -lc 'scancel --me && echo Cancelled successfully || echo Failed to cancel'"
+
+    echo ""
+    echo "Remaining jobs:"
+    ssh pi-mentee-login "bash -lc 'squeue --me'" || true
 }
 
 # Parse arguments

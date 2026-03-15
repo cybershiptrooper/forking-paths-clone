@@ -25,7 +25,7 @@ from utils.circuit_discovery.common import (
 )
 
 
-class NodewiseActivationPatching(CircuitDiscovery):
+class NodewiseActivationPatchingBatch(CircuitDiscovery):
     """Nodewise activation patching (leave-one-out ablation scanning).
 
     For each (layer, head, src_sentence, tgt_sentence) edge — at the chosen

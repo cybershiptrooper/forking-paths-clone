@@ -10,12 +10,20 @@ from utils.circuit_discovery.nodewise_attribution_attention import (
 from utils.circuit_discovery.nodewise_activation_patching import (
     NodewiseActivationPatching,
 )
+from utils.circuit_discovery.edits.nodewise_patching_kv_cache import (
+    NodewiseActivationPatchingKVCache,
+)
+from utils.circuit_discovery.edits.nodewise_patching_batch import (
+    NodewiseActivationPatchingBatch,
+)
 
 
 ALGORITHMS = {
     "nodewise_attribution": MaskIGNodewiseAttribution,
     "nodewise_attribution_attention": AttentionAPIGNodewiseAttribution,
     "nodewise_activation_patching": NodewiseActivationPatching,
+    "nodewise_activation_patching_kv_cache": NodewiseActivationPatchingKVCache,
+    "nodewise_activation_patching_batch": NodewiseActivationPatchingBatch,
     # Future:
     # "subnetwork_probing": SubnetworkProbing,
     # "EAP": EdgeAttributionPatching,

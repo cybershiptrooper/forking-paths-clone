@@ -389,7 +389,7 @@ def main(
     # Step 5: Circuit discovery
     # =====================================================================
     # Cost warning for per-head activation patching
-    if masking_algorithm == "nodewise_activation_patching" and mask_granularity == "head":
+    if "nodewise_activation_patching" in masking_algorithm and mask_granularity == "head":
         from utils.masks import (
             build_gap_filter as _bgf,
             build_mode_filter as _bmf,
@@ -603,9 +603,11 @@ if __name__ == "__main__":
         choices=[
             "nodewise_attribution",
             "nodewise_attribution_attention",
-            "nodewise_activation_patching",
             "EAP",
             "subnetwork_probing",
+            "nodewise_activation_patching",
+            "nodewise_activation_patching_kv_cache",
+            "nodewise_activation_patching_batch",
         ],
         default="nodewise_attribution",
     )

@@ -11,3 +11,4 @@
 # uv run python -m expts.learn_circuit --config expt_configs/ig50/pair/prefix_gap1.yaml
 
 uv run python -m expts.learn_circuit --config expts/configs/reward_test.yaml
+uv run python -m expts.learn_circuit --config expts/configs/activation_patching_layer.yaml
