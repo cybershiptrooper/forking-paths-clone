@@ -33,3 +33,4 @@ cluster.md
 *.patch
 .superset
 .claude
+roadmap/
