@@ -8,13 +8,15 @@ Provides helpers for:
 """
 
 import types
-from typing import Callable
+from typing import Callable, Optional
 
 import torch
 
 from utils.utils import Sentence, get_attention_module
 from utils.masks import NodeMask, build_gap_filter, apply_gap_filter, build_mode_filter, build_combined_filter, build_causal_filter
 from utils.cot_analysis import split_tokens_into_sentences
+from utils.importance_sampling import chain_log_prob, importance_weights, effective_sample_size, snis_answer_probs
+from utils.objectives import is_global_objective
 from utils.circuit_discovery.common import (
     make_attention_forward,
     apply_sentence_mask,
@@ -409,6 +411,69 @@ def eval_with_masks(
 
 
 # ------------------------------------------------------------------
+# Global (IS-based) metric evaluation
+# ------------------------------------------------------------------
+
+
+def eval_global_metric(
+    model: torch.nn.Module,
+    binary_masks: dict[int, torch.Tensor],
+    layers: list[int],
+    input_ids: torch.Tensor,
+    continuations: list[torch.Tensor],
+    chain_logprobs_clean: torch.Tensor,
+    answer_ids: torch.Tensor,
+    num_answers: int,
+    objective_fn: Callable,
+    token_to_sent: torch.Tensor,
+    gap_filter: torch.Tensor,
+    renormalize: bool,
+) -> dict:
+    """Evaluate a global (IS-based) objective with masks installed.
+
+    Returns dict with metric value, N_eff, per-answer probabilities, and
+    importance weight diagnostics.
+    """
+    device = next(model.parameters()).device
+    prefix_len = input_ids.shape[-1]
+
+    handles = install_mask_hooks(
+        model, layers, binary_masks, token_to_sent, gap_filter, renormalize
+    )
+
+    chain_lps: list[torch.Tensor] = []
+    with torch.no_grad():
+        for cont in continuations:
+            full_input = torch.cat([input_ids, cont], dim=-1)
+            logits = model(full_input).logits
+            lp = chain_log_prob(logits.float(), full_input, prefix_len)
+            chain_lps.append(lp)
+
+    chain_lps_t = torch.stack(chain_lps).to(device)
+
+    # Compute IS weights and answer probs
+    w = importance_weights(chain_lps_t, chain_logprobs_clean.to(device))
+    n_eff = effective_sample_size(w)
+    p_m = snis_answer_probs(w, answer_ids.to(device), num_answers)
+
+    # Compute the objective value
+    metric = objective_fn(
+        chain_lps_t, chain_logprobs_clean.to(device),
+        answer_ids.to(device), num_answers,
+    ).item()
+
+    remove_handles(handles)
+
+    return {
+        "metric": metric,
+        "n_eff": n_eff,
+        "n_eff_ratio": n_eff / len(continuations),
+        "p_m": p_m.detach().cpu().tolist(),
+        "log_weights": (chain_lps_t - chain_logprobs_clean.to(device)).detach().cpu().tolist(),
+    }
+
+
+# ------------------------------------------------------------------
 # Main threshold sweep
 # ------------------------------------------------------------------
 
@@ -429,6 +494,8 @@ def evaluate_at_thresholds(
     num_random_samples: int = 5,
     branch_rewards: list[float] | None = None,
     position_mask_overrides: list[torch.Tensor | None] | None = None,
+    answer_ids: Optional[torch.Tensor] = None,
+    num_answers: Optional[int] = None,
 ) -> list[dict]:
     """Evaluate objective value and sparsity at different mask thresholds.
 
@@ -481,6 +548,27 @@ def evaluate_at_thresholds(
     print("Computing clean logits for threshold evaluation...")
     clean_logits_list = compute_clean_logits(model, input_ids, continuations)
 
+    # Determine if we're using a global objective
+    objective_name = getattr(objective_fn, "__name__", "unknown")
+    use_global = is_global_objective(objective_name)
+
+    # For global objectives: compute clean chain logprobs (proposal distribution)
+    chain_logprobs_clean = None
+    if use_global:
+        if answer_ids is None or num_answers is None:
+            raise ValueError(
+                f"Global objective '{objective_name}' requires answer_ids and "
+                f"num_answers in evaluate_at_thresholds()."
+            )
+        chain_logprobs_clean = []
+        prefix_len = input_ids.shape[-1]
+        for ci, cont in enumerate(continuations):
+            full_input = torch.cat([input_ids, cont], dim=-1)
+            clean_logits = clean_logits_list[ci][:, : full_input.shape[-1]]
+            lp = chain_log_prob(clean_logits, full_input.cpu(), prefix_len)
+            chain_logprobs_clean.append(lp.detach())
+        chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
+
     # Pre-generate K random score masks by permuting learned scores
     print(f"Generating {num_random_samples} random score masks (permuted)...")
     random_score_masks = build_random_score_masks(
@@ -519,6 +607,24 @@ def evaluate_at_thresholds(
             branch_rewards=branch_rewards,
             position_mask_overrides=position_mask_overrides,
         )
+
+        # Evaluate global metric if applicable
+        global_result = None
+        if use_global:
+            global_result = eval_global_metric(
+                model=model,
+                binary_masks=binary_masks,
+                layers=layers,
+                input_ids=input_ids,
+                continuations=continuations,
+                chain_logprobs_clean=chain_logprobs_clean,
+                answer_ids=answer_ids,
+                num_answers=num_answers,
+                objective_fn=objective_fn,
+                token_to_sent=token_to_sent,
+                gap_filter=combined_filter,
+                renormalize=renormalize_masked_attention,
+            )
 
         # Evaluate K random score masks at this threshold
         random_objectives = []
@@ -569,11 +675,26 @@ def evaluate_at_thresholds(
             entry["random_reward_weighted_objectives"] = random_objectives
         if per_sent_kl_branches:
             entry["per_sentence_kl"] = per_sent_kl_branches
+        # Add global (IS-based) metric results
+        if global_result is not None:
+            entry["global_metric"] = global_result["metric"]
+            entry["n_eff"] = global_result["n_eff"]
+            entry["n_eff_ratio"] = global_result["n_eff_ratio"]
+            entry["answer_probs_masked"] = global_result["p_m"]
+            entry["log_weights"] = global_result["log_weights"]
         results.append(entry)
+        extra = ""
+        if global_result is not None:
+            extra = (
+                f" | global={global_result['metric']:.6f}"
+                f" | N_eff={global_result['n_eff']:.1f}"
+                f" ({global_result['n_eff_ratio']:.1%})"
+            )
         print(
             f"  threshold={threshold:.1e} | sparsity={sparsity:.2%} "
             f"| KL={avg_kl:.6f} | objective={avg_objective:.6f} "
             f"| random KL={mean_random_kl:.6f} (K={num_random_samples})"
+            f"{extra}"
         )
 
     remove_handles(non_target_handles)

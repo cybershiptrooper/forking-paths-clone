@@ -20,7 +20,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from utils.utils import set_seed, clear_cuda, Sentence
 from utils.cot_analysis import split_tokens_into_sentences
-from utils.objectives import get_objective
+from utils.objectives import get_objective, is_global_objective
+from utils.importance_sampling import extract_answer_ids, reward_based_answer_ids
 from utils.masks import NodeMask
 from utils.circuit_discovery.factory import create_circuit_discovery
 from utils.circuit_eval import evaluate_at_thresholds
@@ -144,6 +145,7 @@ def main(
     dataset_type: str = "open ended",
     answer_only: bool = False,
     judge_model: str = "meta-llama/llama-3.2-3b-instruct",
+    judge_answers: bool = False,
 ):
     # Default model_to_analyse to model_name
     if model_to_analyse is None:
@@ -344,6 +346,50 @@ def main(
         )
         print(f"CoT length rewards: {branch_rewards}")
 
+    # Extract answer IDs for global objectives (answer_kl, reward_gap)
+    answer_ids_tensor = None
+    num_answers = None
+    answer_labels = None
+    if is_global_objective(objective):
+        if branch_rewards is not None:
+            # Option C: reward-based bucketing
+            # correctness (+1/-1) → binary; cot_length (continuous) → per-value
+            use_binary = reward_type == "correctness"
+            answer_ids_list, answer_labels = reward_based_answer_ids(
+                branch_rewards, binary=use_binary,
+            )
+            grouping_method = "reward_binary" if use_binary else "reward_unique"
+        elif judge_answers:
+            # Option B: LLM judge clustering (+ Option A normalization)
+            from openai import OpenAI
+            from dotenv import load_dotenv
+            load_dotenv()
+            openrouter_key = os.getenv("OPENROUTER_API_KEY")
+            if not openrouter_key:
+                raise ValueError(
+                    "--judge_answers requires OPENROUTER_API_KEY in environment."
+                )
+            judge_client = OpenAI(
+                base_url="https://openrouter.ai/api/v1", api_key=openrouter_key,
+            )
+            answer_ids_list, answer_labels = extract_answer_ids(
+                branches, prefix_text,
+                judge_client=judge_client, judge_model=judge_model, question=prompt,
+            )
+            del judge_client
+            grouping_method = "judge"
+        else:
+            # Option A: normalized \\boxed{} extraction (default)
+            answer_ids_list, answer_labels = extract_answer_ids(branches, prefix_text)
+            grouping_method = "boxed_normalized"
+
+        answer_ids_tensor = torch.tensor(answer_ids_list, dtype=torch.long)
+        num_answers = len(answer_labels)
+        print(f"\nAnswer groups ({num_answers}, method={grouping_method}):")
+        for aid, label in enumerate(answer_labels):
+            count = sum(1 for a in answer_ids_list if a == aid)
+            print(f"  [{aid}] {label!r}: {count} branches")
+
     # =====================================================================
     # Step 4: Load HuggingFace model (eager attention)
     # =====================================================================
@@ -449,6 +495,8 @@ def main(
         num_prefix_sentences=num_prefix_sentences,
         branch_rewards=branch_rewards,
         position_mask_overrides=position_mask_overrides,
+        answer_ids=answer_ids_tensor,
+        num_answers=num_answers,
     )
 
     # Add sentence text to metadata
@@ -506,6 +554,8 @@ def main(
         num_random_samples=num_random_samples,
         branch_rewards=branch_rewards,
         position_mask_overrides=position_mask_overrides,
+        answer_ids=answer_ids_tensor,
+        num_answers=num_answers,
     )
 
     node_mask.metadata["threshold_evaluation"] = threshold_results
@@ -520,6 +570,10 @@ def main(
     node_mask.metadata["answer_only"] = answer_only
     if correct_answer is not None:
         node_mask.metadata["correct_answer"] = correct_answer
+    if answer_labels is not None:
+        node_mask.metadata["answer_labels"] = answer_labels
+        node_mask.metadata["answer_ids"] = answer_ids_tensor.tolist()
+        node_mask.metadata["num_answers"] = num_answers
 
     # =====================================================================
     # Step 7: Save results
@@ -633,8 +687,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--objective",
-        choices=["kl_divergence", "log_prob"],
+        choices=["kl_divergence", "log_prob", "answer_kl", "reward_gap"],
         default="kl_divergence",
+        help="Local: kl_divergence, log_prob (per-token). "
+        "Global: answer_kl (Obj 1, faithfulness), reward_gap (Obj 2, reward).",
     )
     parser.add_argument(
         "--layers_to_analyse",
@@ -767,6 +823,12 @@ if __name__ == "__main__":
         type=str,
         default="meta-llama/llama-3.2-3b-instruct",
         help="Model for LLM-based answer judging (OpenRouter).",
+    )
+    parser.add_argument(
+        "--judge_answers",
+        action="store_true",
+        help="Use LLM judge to cluster branch answers by mathematical "
+        "equivalence (for global objectives). Requires OPENROUTER_API_KEY.",
     )
     # First parse to check for --config
     args, _ = parser.parse_known_args()

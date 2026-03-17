@@ -1,13 +1,20 @@
 """Loss functions for circuit discovery optimization.
 
-Each objective takes (clean_logits, masked_logits, position_mask) and returns
-a differentiable scalar loss. clean_logits should be detached (no grad);
-masked_logits should have grad for backpropagation through the mask.
+Local objectives (Objective 3 / contrastive KL):
+    Take (clean_logits, masked_logits, position_mask) and return a
+    differentiable scalar loss. Per-token, per-chain.
+
+Global objectives (Objectives 1 & 2 / faithfulness, reward):
+    Take (chain_logprobs_masked, chain_logprobs_clean, answer_ids, num_answers)
+    and return a differentiable scalar loss. Operate across all chains via
+    importance sampling.
 """
 
 import torch
 import torch.nn.functional as F
 from typing import Optional
+
+from utils.importance_sampling import importance_weights, snis_answer_probs
 
 
 def kl_divergence_loss(
@@ -81,10 +88,106 @@ OBJECTIVES = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Global objectives (Objectives 1 & 2)
+# ---------------------------------------------------------------------------
+
+
+def answer_distribution_kl_loss(
+    chain_logprobs_masked: torch.Tensor,
+    chain_logprobs_clean: torch.Tensor,
+    answer_ids: torch.Tensor,
+    num_answers: int,
+    **kwargs,
+) -> torch.Tensor:
+    """KL(P_clean || P_m) over the answer distribution — Objective 1 (Faithfulness).
+
+    P_clean is estimated by counting (chains were sampled from clean model).
+    P_m is estimated via self-normalized importance sampling.
+
+    Args:
+        chain_logprobs_masked: (N,) log-probs under masked model (has grad)
+        chain_logprobs_clean: (N,) log-probs under clean model (detached)
+        answer_ids: (N,) integer answer IDs
+        num_answers: number of distinct answers
+
+    Returns:
+        Scalar KL divergence (differentiable w.r.t. chain_logprobs_masked).
+    """
+    N = chain_logprobs_masked.shape[0]
+    device = chain_logprobs_masked.device
+
+    # P_clean: simple counting (chains were sampled from the clean model)
+    p_clean = torch.zeros(num_answers, device=device)
+    for a in range(num_answers):
+        p_clean[a] = (answer_ids == a).float().sum() / N
+
+    # P_m: importance sampling
+    w = importance_weights(chain_logprobs_masked, chain_logprobs_clean)
+    p_m = snis_answer_probs(w, answer_ids, num_answers)
+
+    # KL(P_clean || P_m) — only over answers with non-zero P_clean
+    active = p_clean > 0
+    kl = (
+        p_clean[active]
+        * torch.log(p_clean[active] / p_m[active].clamp(min=1e-10))
+    ).sum()
+    return kl
+
+
+def reward_gap_loss(
+    chain_logprobs_masked: torch.Tensor,
+    chain_logprobs_clean: torch.Tensor,
+    answer_ids: torch.Tensor,
+    num_answers: int,
+    target_answer: int = 0,
+    **kwargs,
+) -> torch.Tensor:
+    """Negative reward gap -(P_m(A) - max_{a!=A} P_m(a)) — Objective 2 (Reward).
+
+    Minimizing this loss maximizes the probability gap for the target answer.
+
+    Args:
+        chain_logprobs_masked: (N,) log-probs under masked model (has grad)
+        chain_logprobs_clean: (N,) log-probs under clean model (detached)
+        answer_ids: (N,) integer answer IDs
+        num_answers: number of distinct answers
+        target_answer: which answer ID to promote (default 0)
+
+    Returns:
+        Scalar loss (differentiable w.r.t. chain_logprobs_masked).
+    """
+    w = importance_weights(chain_logprobs_masked, chain_logprobs_clean)
+    p_m = snis_answer_probs(w, answer_ids, num_answers)
+
+    p_target = p_m[target_answer]
+    other_mask = torch.ones(num_answers, dtype=torch.bool, device=p_m.device)
+    other_mask[target_answer] = False
+
+    if other_mask.any():
+        p_best_other = p_m[other_mask].max()
+    else:
+        p_best_other = torch.zeros(1, device=p_m.device)
+
+    return -(p_target - p_best_other)
+
+
+GLOBAL_OBJECTIVES = {
+    "answer_kl": answer_distribution_kl_loss,
+    "reward_gap": reward_gap_loss,
+}
+
+
+def is_global_objective(name: str) -> bool:
+    """Check if an objective is a global (outcome-level, IS-based) objective."""
+    return name in GLOBAL_OBJECTIVES
+
+
 def get_objective(name: str):
-    """Get objective function by name."""
-    if name not in OBJECTIVES:
-        raise ValueError(
-            f"Unknown objective: {name}. Available: {list(OBJECTIVES.keys())}"
-        )
-    return OBJECTIVES[name]
+    """Get objective function by name (local or global)."""
+    if name in OBJECTIVES:
+        return OBJECTIVES[name]
+    if name in GLOBAL_OBJECTIVES:
+        return GLOBAL_OBJECTIVES[name]
+    all_names = list(OBJECTIVES.keys()) + list(GLOBAL_OBJECTIVES.keys())
+    raise ValueError(f"Unknown objective: {name}. Available: {all_names}")

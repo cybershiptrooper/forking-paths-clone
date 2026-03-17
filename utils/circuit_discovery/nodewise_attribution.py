@@ -12,6 +12,8 @@ from tqdm import tqdm
 
 from utils.masks import NodeMask, build_gap_filter, build_mode_filter, build_combined_filter, build_causal_filter
 from utils.utils import Sentence
+from utils.objectives import is_global_objective
+from utils.importance_sampling import chain_log_prob
 from utils.circuit_discovery.base import CircuitDiscovery
 from utils.circuit_discovery.common import make_attention_forward, apply_sentence_mask
 
@@ -106,9 +108,31 @@ class NodewiseAttribution(CircuitDiscovery):
                 gap_filter=combined_filter,
             )
 
+        # Determine if we're using a global objective
+        objective_name = getattr(self.objective_fn, "__name__", "unknown")
+        use_global = is_global_objective(objective_name)
+        answer_ids = kwargs.get("answer_ids")
+        num_answers = kwargs.get("num_answers")
+        if use_global and (answer_ids is None or num_answers is None):
+            raise ValueError(
+                f"Global objective '{objective_name}' requires answer_ids and "
+                f"num_answers to be passed to discover()."
+            )
+
         # 1. Pre-compute clean logits (with non-target layers ablated if enabled)
         print("Computing clean logits...")
         clean_logits_list = self._get_clean_logits(input_ids, continuations)
+
+        # For global objectives: also compute clean chain logprobs (proposal)
+        chain_logprobs_clean = None
+        if use_global:
+            chain_logprobs_clean = []
+            for ci, cont in enumerate(continuations):
+                full_input = torch.cat([input_ids, cont], dim=-1)
+                clean_logits = clean_logits_list[ci][:, : full_input.shape[-1]]
+                lp = chain_log_prob(clean_logits, full_input.cpu(), prefix_len)
+                chain_logprobs_clean.append(lp.detach())
+            chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
 
         # 2. Integrated gradients
         granularity = self.mask_granularity
@@ -176,48 +200,102 @@ class NodewiseAttribution(CircuitDiscovery):
                 forward_fn,
             )
 
-            # Forward with grad for each continuation
-            for cont_idx, cont in enumerate(continuations):
-                full_input = torch.cat([input_ids, cont], dim=-1)
-                full_len = full_input.shape[-1]
-                position_mask = self._build_position_mask(full_len, prefix_len, device)
-                if position_mask_overrides is not None and position_mask_overrides[cont_idx] is not None:
-                    position_mask = position_mask_overrides[cont_idx].to(device)
-                clean_logits = clean_logits_list[cont_idx][:, :full_len].to(device)
+            if use_global:
+                # --- Global objective: two-pass approach ---
+                # Pass 1: forward all chains without grad to get chain logprobs
+                chain_lps_detached = []
+                for cont in continuations:
+                    full_input = torch.cat([input_ids, cont], dim=-1)
+                    with torch.no_grad(), torch.amp.autocast("cuda"):
+                        logits = self.model(full_input).logits
+                    lp = chain_log_prob(logits.float(), full_input, prefix_len)
+                    chain_lps_detached.append(lp.detach())
+                chain_lps_detached = torch.stack(chain_lps_detached)
 
-                # Zero grads from previous continuation
-                if granularity == "pair":
-                    if raw_masks.grad is not None:
-                        raw_masks.grad.detach_()
-                        raw_masks.grad.zero_()
-                else:
-                    for l in self.layers:
-                        rm = raw_masks[l]
-                        if rm.grad is not None:
-                            rm.grad.detach_()
-                            rm.grad.zero_()
-
-                with torch.amp.autocast("cuda"):
-                    logits = self.model(full_input).logits
-
-                # Cast to float32 to match clean_logits precision — avoids
-                # spurious KL from bfloat16-vs-float32 log_softmax differences.
-                loss = self.objective_fn(
-                    clean_logits, logits.float(), position_mask, token_ids=full_input
+                # Compute per-chain gradient weights via autograd on small graph
+                chain_lps_param = chain_lps_detached.clone().requires_grad_(True)
+                global_loss = self.objective_fn(
+                    chain_lps_param, chain_logprobs_clean,
+                    answer_ids.to(device), num_answers,
                 )
-                if branch_rewards is not None:
-                    loss = loss * branch_rewards[cont_idx]
-                loss.backward()
+                global_loss.backward()
+                per_chain_weights = chain_lps_param.grad.detach()  # (N,)
 
-                # Accumulate grads
-                if granularity == "pair":
-                    if raw_masks.grad is not None:
-                        accumulated_grads += raw_masks.grad.detach().cpu()
-                else:
-                    for l in self.layers:
-                        rm = raw_masks[l]
-                        if rm.grad is not None:
-                            accumulated_grads[l] += rm.grad.detach().cpu()
+                # Pass 2: forward each chain with grad, weight by per-chain gradient
+                for cont_idx, cont in enumerate(continuations):
+                    full_input = torch.cat([input_ids, cont], dim=-1)
+
+                    # Zero grads from previous continuation
+                    if granularity == "pair":
+                        if raw_masks.grad is not None:
+                            raw_masks.grad.detach_()
+                            raw_masks.grad.zero_()
+                    else:
+                        for l in self.layers:
+                            rm = raw_masks[l]
+                            if rm.grad is not None:
+                                rm.grad.detach_()
+                                rm.grad.zero_()
+
+                    with torch.amp.autocast("cuda"):
+                        logits = self.model(full_input).logits
+
+                    lp = chain_log_prob(logits.float(), full_input, prefix_len)
+                    weighted_loss = lp * per_chain_weights[cont_idx]
+                    weighted_loss.backward()
+
+                    # Accumulate grads
+                    if granularity == "pair":
+                        if raw_masks.grad is not None:
+                            accumulated_grads += raw_masks.grad.detach().cpu()
+                    else:
+                        for l in self.layers:
+                            rm = raw_masks[l]
+                            if rm.grad is not None:
+                                accumulated_grads[l] += rm.grad.detach().cpu()
+            else:
+                # --- Local objective: per-chain forward + backward ---
+                for cont_idx, cont in enumerate(continuations):
+                    full_input = torch.cat([input_ids, cont], dim=-1)
+                    full_len = full_input.shape[-1]
+                    position_mask = self._build_position_mask(full_len, prefix_len, device)
+                    if position_mask_overrides is not None and position_mask_overrides[cont_idx] is not None:
+                        position_mask = position_mask_overrides[cont_idx].to(device)
+                    clean_logits = clean_logits_list[cont_idx][:, :full_len].to(device)
+
+                    # Zero grads from previous continuation
+                    if granularity == "pair":
+                        if raw_masks.grad is not None:
+                            raw_masks.grad.detach_()
+                            raw_masks.grad.zero_()
+                    else:
+                        for l in self.layers:
+                            rm = raw_masks[l]
+                            if rm.grad is not None:
+                                rm.grad.detach_()
+                                rm.grad.zero_()
+
+                    with torch.amp.autocast("cuda"):
+                        logits = self.model(full_input).logits
+
+                    # Cast to float32 to match clean_logits precision — avoids
+                    # spurious KL from bfloat16-vs-float32 log_softmax differences.
+                    loss = self.objective_fn(
+                        clean_logits, logits.float(), position_mask, token_ids=full_input
+                    )
+                    if branch_rewards is not None:
+                        loss = loss * branch_rewards[cont_idx]
+                    loss.backward()
+
+                    # Accumulate grads
+                    if granularity == "pair":
+                        if raw_masks.grad is not None:
+                            accumulated_grads += raw_masks.grad.detach().cpu()
+                    else:
+                        for l in self.layers:
+                            rm = raw_masks[l]
+                            if rm.grad is not None:
+                                accumulated_grads[l] += rm.grad.detach().cpu()
 
             # Cleanup
             self._unpatch_model(handles)
