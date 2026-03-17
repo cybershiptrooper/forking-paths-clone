@@ -629,6 +629,8 @@ def evaluate_at_thresholds(
         # Evaluate K random score masks at this threshold
         random_objectives = []
         random_kl_divergences = []
+        random_global_metrics = []
+        random_n_effs = []
         granularity = node_mask.granularity
         for k in range(num_random_samples):
             rand_binary = build_binary_masks(
@@ -658,6 +660,25 @@ def evaluate_at_thresholds(
             random_objectives.append(rand_obj)
             random_kl_divergences.append(rand_kl)
 
+            # Global metric for random baseline
+            if use_global:
+                rand_global = eval_global_metric(
+                    model=model,
+                    binary_masks=rand_binary,
+                    layers=layers,
+                    input_ids=input_ids,
+                    continuations=continuations,
+                    chain_logprobs_clean=chain_logprobs_clean,
+                    answer_ids=answer_ids,
+                    num_answers=num_answers,
+                    objective_fn=objective_fn,
+                    token_to_sent=token_to_sent,
+                    gap_filter=combined_filter,
+                    renormalize=renormalize_masked_attention,
+                )
+                random_global_metrics.append(rand_global["metric"])
+                random_n_effs.append(rand_global["n_eff"])
+
         mean_random_kl = sum(random_kl_divergences) / len(random_kl_divergences)
         entry = {
             "threshold": threshold,
@@ -682,13 +703,22 @@ def evaluate_at_thresholds(
             entry["n_eff_ratio"] = global_result["n_eff_ratio"]
             entry["answer_probs_masked"] = global_result["p_m"]
             entry["log_weights"] = global_result["log_weights"]
+        if random_global_metrics:
+            mean_rand_global = sum(random_global_metrics) / len(random_global_metrics)
+            entry["random_global_metric"] = mean_rand_global
+            entry["random_global_metrics"] = random_global_metrics
+            entry["random_n_effs"] = random_n_effs
         results.append(entry)
         extra = ""
         if global_result is not None:
+            rand_global_str = ""
+            if random_global_metrics:
+                rand_global_str = f" | rand_global={mean_rand_global:.6f}"
             extra = (
                 f" | global={global_result['metric']:.6f}"
                 f" | N_eff={global_result['n_eff']:.1f}"
                 f" ({global_result['n_eff_ratio']:.1%})"
+                f"{rand_global_str}"
             )
         print(
             f"  threshold={threshold:.1e} | sparsity={sparsity:.2%} "

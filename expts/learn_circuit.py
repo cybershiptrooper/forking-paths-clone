@@ -559,6 +559,7 @@ def main(
     )
 
     node_mask.metadata["threshold_evaluation"] = threshold_results
+    node_mask.metadata["objective"] = objective
     node_mask.metadata["seed"] = seed
     node_mask.metadata["temperature"] = temperature
     node_mask.metadata["max_new_tokens"] = max_new_tokens
