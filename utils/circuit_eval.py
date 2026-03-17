@@ -328,8 +328,17 @@ def eval_with_masks(
 
     *avg_objective* is the (optionally reward-weighted) objective value.
     *avg_kl* is always the plain KL divergence (for comparison).
+
+    For global objectives (answer_kl, reward_gap), this function falls back to
+    per-token KL divergence for ``avg_objective`` since global metrics need
+    chain-level IS and are computed separately by :func:`eval_global_metric`.
     """
     from utils.objectives import kl_divergence_loss
+
+    # If objective is global, fall back to local KL for per-branch evaluation.
+    # The actual global metric is computed by eval_global_metric separately.
+    objective_name = getattr(objective_fn, "__name__", "unknown")
+    local_fn = kl_divergence_loss if is_global_objective(objective_name) else objective_fn
 
     device = next(model.parameters()).device
     prefix_len = input_ids.shape[-1]
@@ -360,7 +369,7 @@ def eval_with_masks(
             out_device = logits.device
             clean = clean_logits_list[cont_idx][:, :full_len].to(out_device)
 
-            objective_value = objective_fn(
+            objective_value = local_fn(
                 clean, logits, pos_mask.to(out_device), token_ids=full_input,
             )
             weight = branch_rewards[cont_idx] if branch_rewards is not None else 1.0
