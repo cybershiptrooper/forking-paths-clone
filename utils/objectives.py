@@ -178,9 +178,16 @@ GLOBAL_OBJECTIVES = {
 }
 
 
+_GLOBAL_FUNC_NAMES = {fn.__name__ for fn in GLOBAL_OBJECTIVES.values()}
+
+
 def is_global_objective(name: str) -> bool:
-    """Check if an objective is a global (outcome-level, IS-based) objective."""
-    return name in GLOBAL_OBJECTIVES
+    """Check if an objective is a global (outcome-level, IS-based) objective.
+
+    Accepts both the registry key (e.g. ``"answer_kl"``) and the Python
+    function name (e.g. ``"answer_distribution_kl_loss"``).
+    """
+    return name in GLOBAL_OBJECTIVES or name in _GLOBAL_FUNC_NAMES
 
 
 def get_objective(name: str):

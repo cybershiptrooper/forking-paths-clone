@@ -18,6 +18,8 @@ from utils.masks import (
     build_combined_filter,
 )
 from utils.utils import Sentence
+from utils.objectives import is_global_objective
+from utils.importance_sampling import chain_log_prob
 from utils.circuit_discovery.base import CircuitDiscovery
 from utils.circuit_discovery.common import (
     make_attention_forward,
@@ -127,6 +129,29 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
                 obj_sum += obj.item() * weight
         return obj_sum / total
 
+    def _compute_global_metric(
+        self,
+        input_ids: torch.Tensor,
+        continuations: List[torch.Tensor],
+        prefix_len: int,
+        device: torch.device,
+        chain_logprobs_clean: torch.Tensor,
+        answer_ids: torch.Tensor,
+        num_answers: int,
+    ) -> float:
+        """Forward all chains, compute global IS-based objective metric."""
+        chain_lps = []
+        for cont in continuations:
+            full_input = torch.cat([input_ids, cont], dim=-1)
+            with torch.amp.autocast("cuda"):
+                logits = self.model(full_input).logits
+            lp = chain_log_prob(logits.float(), full_input, prefix_len)
+            chain_lps.append(lp.detach())
+        chain_lps = torch.stack(chain_lps).to(device)
+        return self.objective_fn(
+            chain_lps, chain_logprobs_clean, answer_ids, num_answers
+        ).item()
+
     # ------------------------------------------------------------------
     # Main entry point
     # ------------------------------------------------------------------
@@ -164,6 +189,17 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
             num_prefix_sentences if num_prefix_sentences is not None else num_sents
         )
         granularity = self.mask_granularity
+
+        # Determine if we're using a global objective
+        objective_name = getattr(self.objective_fn, "__name__", "unknown")
+        use_global = is_global_objective(objective_name)
+        answer_ids = kwargs.get("answer_ids")
+        num_answers = kwargs.get("num_answers")
+        if use_global and (answer_ids is None or num_answers is None):
+            raise ValueError(
+                f"Global objective '{objective_name}' requires answer_ids and "
+                f"num_answers to be passed to discover()."
+            )
 
         # ----- Build mappings -----
         max_cont_len = max(c.shape[-1] for c in continuations)
@@ -216,6 +252,17 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
         print("Computing clean logits...")
         clean_logits_list = self._get_clean_logits(input_ids, continuations)
 
+        # For global objectives: compute clean chain logprobs (proposal)
+        chain_logprobs_clean = None
+        if use_global:
+            chain_logprobs_clean = []
+            for ci, cont in enumerate(continuations):
+                full_input = torch.cat([input_ids, cont], dim=-1)
+                clean_logits = clean_logits_list[ci][:, : full_input.shape[-1]]
+                lp = chain_log_prob(clean_logits, full_input.cpu(), prefix_len)
+                chain_logprobs_clean.append(lp.detach())
+            chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
+
         # ----- Patch target layers with all-ones masks -----
         forward_fn = make_attention_forward(self.model_type, apply_sentence_mask)
         masks = {
@@ -236,26 +283,30 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
         else:  # "pair"
             accumulated = torch.zeros(num_sents, num_sents)
 
+        # Helper to compute the metric for the current mask configuration
+        def _compute_metric() -> float:
+            if use_global:
+                return self._compute_global_metric(
+                    input_ids, continuations, prefix_len, device,
+                    chain_logprobs_clean, answer_ids.to(device), num_answers,
+                )
+            else:
+                return self._compute_mean_kl(
+                    input_ids, continuations, clean_logits_list,
+                    prefix_len, device,
+                    branch_rewards=branch_rewards,
+                    position_mask_overrides=position_mask_overrides,
+                )
+
         with torch.no_grad():
             if granularity == "pair":
                 for pair_idx in tqdm(
                     range(num_active), desc="Activation patching (pair)"
                 ):
                     i, j = active_pairs[pair_idx].tolist()
-                    # Ablate this pair across all layers
                     for l in self.layers:
                         masks[l][:, i, j] = 0.0
-                    mean_kl = self._compute_mean_kl(
-                        input_ids,
-                        continuations,
-                        clean_logits_list,
-                        prefix_len,
-                        device,
-                        branch_rewards=branch_rewards,
-                        position_mask_overrides=position_mask_overrides,
-                    )
-                    accumulated[i, j] = mean_kl
-                    # Restore
+                    accumulated[i, j] = _compute_metric()
                     for l in self.layers:
                         masks[l][:, i, j] = 1.0
 
@@ -265,14 +316,7 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
                     for pair_idx in range(num_active):
                         i, j = active_pairs[pair_idx].tolist()
                         masks[l][:, i, j] = 0.0
-                        mean_kl = self._compute_mean_kl(
-                            input_ids,
-                            continuations,
-                            clean_logits_list,
-                            prefix_len,
-                            device,
-                        )
-                        accumulated[l][i, j] = mean_kl
+                        accumulated[l][i, j] = _compute_metric()
                         masks[l][:, i, j] = 1.0
                         pbar.update(1)
                 pbar.close()
@@ -284,14 +328,7 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
                         for pair_idx in range(num_active):
                             i, j = active_pairs[pair_idx].tolist()
                             masks[l][h, i, j] = 0.0
-                            mean_kl = self._compute_mean_kl(
-                                input_ids,
-                                continuations,
-                                clean_logits_list,
-                                prefix_len,
-                                device,
-                            )
-                            accumulated[l][h, i, j] = mean_kl
+                            accumulated[l][h, i, j] = _compute_metric()
                             masks[l][h, i, j] = 1.0
                             pbar.update(1)
                 pbar.close()
