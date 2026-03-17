@@ -19,7 +19,6 @@ dependencies = [
     "sentence-transformers>=2.2.0",
     "streamlit>=1.51.0",
     "torch>=2.0.0",
-    "transformer-lens>=2.17.0",
     "transformers>=4.30.0",
     "vllm>=0.11.0",
 ]

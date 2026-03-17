@@ -268,7 +268,8 @@ class NodewiseAttribution(CircuitDiscovery):
             position_mask = self._build_position_mask(full_len, prefix_len, device)
             if position_mask_overrides is not None and position_mask_overrides[cont_idx] is not None:
                 position_mask = position_mask_overrides[cont_idx].to(device)
-            clean_logits = clean_logits_list[cont_idx][:, :full_len].to(device)
+            # Keep clean_logits on CPU; moved to logits' device before objective
+            clean_logits_cpu = clean_logits_list[cont_idx][:, :full_len]
 
             clean_acts = self._capture_attention_maps(
                 full_input,
@@ -321,8 +322,12 @@ class NodewiseAttribution(CircuitDiscovery):
                     with torch.amp.autocast("cuda"):
                         logits = self.model(full_input).logits
 
+                    # Move clean logits and position mask to logits' device
+                    # (handles device_map="auto" where lm_head may be on a different GPU)
+                    out_device = logits.device
                     loss = self.objective_fn(
-                        clean_logits, logits.float(), position_mask, token_ids=full_input
+                        clean_logits_cpu.to(out_device), logits.float(),
+                        position_mask.to(out_device), token_ids=full_input,
                     )
                     if branch_rewards is not None:
                         loss = loss * branch_rewards[cont_idx]

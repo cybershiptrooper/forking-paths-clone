@@ -18,3 +18,4 @@ sentence_gap: 2
 output_dir: results/circuit_discovery/reward_test
 answer_only: true
 ablate_non_target_layers: true
+# device: auto

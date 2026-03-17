@@ -13,8 +13,9 @@ mask_mode: prefix
 # layers_to_analyse: all 
 layers_to_analyse: all
 max_new_tokens: 8000
-analysis_timestep: 1416 # 3000 # 1416 # 2801
+analysis_timestep: 1126 # 3000 # 1416 # 2801
 sentence_gap: 2
-output_dir: results/circuit_discovery/reward_test
+output_dir: results/circuit_discovery/patch_at_1126
 answer_only: true
 ablate_non_target_layers: true
+device: auto

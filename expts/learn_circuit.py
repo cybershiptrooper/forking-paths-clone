@@ -352,7 +352,8 @@ def main(
     print("=" * 80)
 
     model, tokenizer = load_model_eager(model_to_analyse, device=device)
-    input_ids = input_ids.to(device)
+    target_device = next(model.parameters()).device
+    input_ids = input_ids.to(target_device)
     layers_to_analyse_is_all = (
         isinstance(layers_to_analyse, list)
         and len(layers_to_analyse) == 1
@@ -364,7 +365,7 @@ def main(
     # Convert branches to tensors
     continuations = []
     for b in branches:
-        cont_ids = torch.tensor([b["token_ids"]], device=device)
+        cont_ids = torch.tensor([b["token_ids"]], device=target_device)
         continuations.append(cont_ids)
 
     # Build answer-only position masks if requested
@@ -377,7 +378,7 @@ def main(
                 b["text"], b["token_ids"], tokenizer, prefix_len
             )
             if pm is not None:
-                pm = pm.to(device)
+                pm = pm.to(target_device)
             position_mask_overrides.append(pm)
         n_found = sum(1 for pm in position_mask_overrides if pm is not None)
         print(f"  Found answer tokens in {n_found}/{len(branches)} branches")

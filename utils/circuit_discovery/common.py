@@ -28,6 +28,7 @@ def expand_sentence_mask_to_tokens(
     q_len: int,
     k_len: int,
     cache_position: Optional[torch.Tensor] = None,
+    out_dtype: Optional[torch.dtype] = None,
 ) -> torch.Tensor:
     """Expand (num_heads, num_sents, num_sents) mask to (num_heads, q_len, k_len).
 
@@ -42,6 +43,8 @@ def expand_sentence_mask_to_tokens(
         q_len: number of query positions in current forward
         k_len: number of key positions (total including cache)
         cache_position: (q_len,) absolute positions of current queries, or None
+        out_dtype: dtype for the output tensor. If None, uses mask.dtype.
+            Pass e.g. torch.bfloat16 to avoid a large float32 intermediate.
 
     Returns:
         (num_heads, q_len, k_len) differentiable token-level mask
@@ -50,8 +53,10 @@ def expand_sentence_mask_to_tokens(
     device = mask.device
 
     # Get sentence indices for query and key positions
+    # Ensure token_to_sent is on the same device as mask (handles device_map="auto")
+    token_to_sent = token_to_sent.to(device)
     if cache_position is not None:
-        q_sent = token_to_sent[cache_position.long()]  # (q_len,)
+        q_sent = token_to_sent[cache_position.to(device).long()]  # (q_len,)
     else:
         q_sent = token_to_sent[:q_len]  # (q_len,)
     k_sent = token_to_sent[:k_len]  # (k_len,)
@@ -70,6 +75,10 @@ def expand_sentence_mask_to_tokens(
     k_idx = k_sent.clone().to(device)
     q_idx[q_sent == -1] = num_sents
     k_idx[k_sent == -1] = num_sents
+
+    # Cast the small padded tensor before the expensive expansion
+    if out_dtype is not None and padded.dtype != out_dtype:
+        padded = padded.to(out_dtype)
 
     # Advanced indexing: token_mask[h, i, j] = padded[h, q_idx[i], k_idx[j]]
     token_mask = padded[:, q_idx][:, :, k_idx]  # (num_heads, q_len, k_len)
@@ -100,20 +109,21 @@ def apply_sentence_mask(
     gap_filter = getattr(module, "_gap_filter", None)
 
     if mask is not None and token_to_sent is not None:
-        original_dtype = attn_weights.dtype
         token_mask = expand_sentence_mask_to_tokens(
-            mask, token_to_sent, gap_filter, q_len, k_len, cache_position
+            mask, token_to_sent, gap_filter, q_len, k_len, cache_position,
+            out_dtype=attn_weights.dtype,
         )
-        # token_mask: (num_heads, q_len, k_len)
+        # token_mask: (num_heads, q_len, k_len) in attn_weights dtype
         # attn_weights: (bsz, num_heads, q_len, k_len)
-        # Compute in float32 for numerical stability, then cast back
-        attn_weights = attn_weights.float() * token_mask.unsqueeze(0)
+        # Move to attn_weights device (handles device_map="auto" multi-GPU)
+        token_mask = token_mask.to(device=attn_weights.device)
+        # Mask in native dtype (bf16) and in-place to avoid large allocations
+        attn_weights.mul_(token_mask.unsqueeze(0))
         renormalize = getattr(module, "_renormalize_masked_attn", True)
         if renormalize:
-            row_sums = attn_weights.sum(dim=-1, keepdim=True) + 1e-12
-            attn_weights = (attn_weights / row_sums).to(original_dtype)
-        else:
-            attn_weights = attn_weights.to(original_dtype)
+            row_sums = attn_weights.sum(dim=-1, keepdim=True)
+            row_sums.add_(1e-6)
+            attn_weights.div_(row_sums)
 
     return attn_weights
 

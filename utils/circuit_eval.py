@@ -354,16 +354,20 @@ def eval_with_masks(
                 pos_mask = position_mask_overrides[cont_idx].to(device)
 
             logits = model(full_input).logits
-            clean = clean_logits_list[cont_idx][:, :full_len].to(device)
+            # Move everything to logits' device (handles device_map="auto")
+            out_device = logits.device
+            clean = clean_logits_list[cont_idx][:, :full_len].to(out_device)
 
             objective_value = objective_fn(
-                clean, logits, pos_mask, token_ids=full_input
+                clean, logits, pos_mask.to(out_device), token_ids=full_input,
             )
             weight = branch_rewards[cont_idx] if branch_rewards is not None else 1.0
             total_objective += objective_value.item() * weight
 
             # Always compute plain KL for reporting
-            plain_kl = kl_divergence_loss(clean, logits, default_pos_mask)
+            plain_kl = kl_divergence_loss(
+                clean, logits, default_pos_mask.to(out_device),
+            )
             total_kl += plain_kl.item()
             total_branches += 1
 

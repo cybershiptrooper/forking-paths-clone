@@ -9,6 +9,9 @@
 # # Pair-level granularity (sentence-wise, shared across all layers/heads)
 # uv run python -m expts.learn_circuit --config expt_configs/ig50/pair/prefix_gap0.yaml
 # uv run python -m expts.learn_circuit --config expt_configs/ig50/pair/prefix_gap1.yaml
-
-uv run python -m expts.learn_circuit --config expts/configs/reward_test.yaml
+export HF_HOME=~/.cache/huggingface
+export HF_HUB_CACHE=~/.cache/huggingface/hub
+export HF_DATASETS_CACHE=~/.cache/huggingface/datasets
+unset HF_CACHE_DIR
+# uv run python -m expts.learn_circuit --config expts/configs/reward_test.yaml
 uv run python -m expts.learn_circuit --config expts/configs/activation_patching_layer.yaml
