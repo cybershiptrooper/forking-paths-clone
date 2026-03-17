@@ -269,8 +269,18 @@
     <div id="detail-panel">
       <h2>Threshold Evaluation</h2>
       <div id="threshold-chart-section" style="display:none;">
-        <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px;">Click on chart to set threshold. Sparsity vs KL (colored by threshold).</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px;">Click on chart to set threshold. Sparsity vs metric (colored by threshold).</div>
         <div id="threshold-chart-container"><canvas id="threshold-chart"></canvas></div>
+      </div>
+      <div id="neff-chart-section" style="display:none;">
+        <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px;">N_eff / N ratio vs sparsity. Green = healthy (&gt;0.1), red = unreliable.</div>
+        <div id="neff-chart-container" style="width:100%;height:120px;background:var(--bg);border-radius:6px;position:relative;overflow:hidden;">
+          <canvas id="neff-chart"></canvas>
+        </div>
+      </div>
+      <div id="answer-probs-section" style="display:none;">
+        <h2 style="margin-top:10px;">Answer Probabilities</h2>
+        <div id="answer-probs-content" class="detail-box" style="font-size:11px;"></div>
       </div>
       <div id="no-threshold-eval" class="detail-box" style="font-size:10px;color:var(--text-dim);">
         No threshold_evaluation data in this mask.
@@ -417,7 +427,7 @@ function reprocess() {
   syncThresholdFromSlider();
   document.getElementById('influence-value').textContent =
     document.getElementById('influence-slider').value;
-  processData(); render(); renderThresholdChart();
+  processData(); render(); renderThresholdChart(); renderNeffChart(); updateAnswerProbs();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -498,7 +508,7 @@ function boot() {
   syncThresholdFromSlider();
 
   processData(); render();
-  initThresholdChart(); renderThresholdChart();
+  initThresholdChart(); renderThresholdChart(); renderNeffChart();
 }
 
 function getAllScores() {
@@ -1003,6 +1013,8 @@ function initThresholdChart() {
   const te = meta.threshold_evaluation;
   if (!Array.isArray(te) || te.length === 0) {
     document.getElementById('threshold-chart-section').style.display = 'none';
+    document.getElementById('neff-chart-section').style.display = 'none';
+    document.getElementById('answer-probs-section').style.display = 'none';
     document.getElementById('no-threshold-eval').style.display = '';
     thresholdEvalData = null;
     return;
@@ -1013,18 +1025,36 @@ function initThresholdChart() {
     thresholdEvalData = null;
     return;
   }
-  // Determine which metric keys are available
+
+  // Determine which metric to display (priority: global > reward > kl)
+  const hasGlobal = entries.some(e => 'global_metric' in e);
   const hasReward = entries.some(e => 'reward_weighted_objective' in e);
-  const metricKey = hasReward ? 'reward_weighted_objective' : 'kl_divergence';
-  const metricLabel = hasReward ? 'Reward-Weighted' : 'KL Divergence';
+
+  let metricKey, metricLabel, randomKey, randomSingleKey;
+  if (hasGlobal) {
+    metricKey = 'global_metric';
+    // Detect objective type from metadata
+    const objName = meta.objective || '';
+    metricLabel = objName === 'reward_gap' ? 'Reward Gap (IS)' : 'Answer KL (IS)';
+    randomKey = 'random_global_metrics';
+    randomSingleKey = 'random_global_metric';
+  } else if (hasReward) {
+    metricKey = 'reward_weighted_objective';
+    metricLabel = 'Reward-Weighted';
+    randomKey = 'random_reward_weighted_objectives';
+    randomSingleKey = 'random_reward_weighted_objective';
+  } else {
+    metricKey = 'kl_divergence';
+    metricLabel = 'KL Divergence';
+    randomKey = 'random_kl_divergences';
+    randomSingleKey = 'random_kl_divergence';
+  }
 
   const thresholds = entries.map(e => e.threshold);
   const sparsities = entries.map(e => e.sparsity);
   const metrics = entries.map(e => e[metricKey] ?? NaN);
 
   // Random baselines
-  const randomKey = hasReward ? 'random_reward_weighted_objectives' : 'random_kl_divergences';
-  const randomSingleKey = hasReward ? 'random_reward_weighted_objective' : 'random_kl_divergence';
   let randomMean = null, randomStdLow = null, randomStdHigh = null;
   const hasMultiRandom = entries.every(e => Array.isArray(e[randomKey]) && e[randomKey].length > 0);
   if (hasMultiRandom) {
@@ -1039,9 +1069,37 @@ function initThresholdChart() {
     randomMean = entries.map(e => e[randomSingleKey]);
   }
 
-  thresholdEvalData = { thresholds, sparsities, metrics, metricLabel, randomMean, randomStdLow, randomStdHigh };
+  // N_eff data
+  const hasNeff = entries.some(e => 'n_eff_ratio' in e);
+  const nEffRatios = hasNeff ? entries.map(e => e.n_eff_ratio ?? NaN) : null;
+  const randomNeffs = hasNeff ? entries.map(e => {
+    const rn = e.random_n_effs;
+    if (Array.isArray(rn) && rn.length > 0) {
+      const N = meta.num_branches || rn.length;
+      return rn.reduce((a,b) => a + b, 0) / rn.length / N;
+    }
+    return NaN;
+  }) : null;
+
+  // Answer probabilities data
+  const hasAnswerProbs = entries.some(e => Array.isArray(e.answer_probs_masked));
+  const answerLabels = meta.answer_labels || null;
+
+  thresholdEvalData = {
+    entries, thresholds, sparsities, metrics, metricLabel,
+    randomMean, randomStdLow, randomStdHigh,
+    nEffRatios, randomNeffs, hasNeff,
+    hasAnswerProbs, answerLabels,
+  };
   document.getElementById('threshold-chart-section').style.display = '';
   document.getElementById('no-threshold-eval').style.display = 'none';
+
+  // Show/hide N_eff chart
+  document.getElementById('neff-chart-section').style.display = hasNeff ? '' : 'none';
+
+  // Show/hide answer probs
+  document.getElementById('answer-probs-section').style.display = hasAnswerProbs ? '' : 'none';
+  if (hasAnswerProbs) updateAnswerProbs();
 }
 
 function renderThresholdChart() {
@@ -1205,9 +1263,175 @@ function drawStar(c, cx, cy, spikes, outerR, innerR) {
 }
 
 // ══════════════════════════════════════════════════════════════
+// N_eff Chart (N_eff/N ratio vs Sparsity)
+// ══════════════════════════════════════════════════════════════
+
+function renderNeffChart() {
+  if (!thresholdEvalData || !thresholdEvalData.hasNeff) return;
+  const container = document.getElementById('neff-chart-container');
+  const cvs = document.getElementById('neff-chart');
+  const W = container.clientWidth, H = container.clientHeight;
+  cvs.width = W * devicePixelRatio; cvs.height = H * devicePixelRatio;
+  cvs.style.width = W + 'px'; cvs.style.height = H + 'px';
+  const c = cvs.getContext('2d');
+  c.scale(devicePixelRatio, devicePixelRatio);
+  c.clearRect(0, 0, W, H);
+
+  const { sparsities, nEffRatios, randomNeffs } = thresholdEvalData;
+  const n = sparsities.length;
+  if (n === 0) return;
+
+  const pad = { top: 12, right: 14, bottom: 28, left: 44 };
+
+  // Sort by sparsity
+  const idx = d3.range(n).sort((a, b) => sparsities[a] - sparsities[b]);
+  const sortedSp = idx.map(i => sparsities[i]);
+  const sortedNeff = idx.map(i => nEffRatios[i]);
+  const validIdx = d3.range(n).filter(i => !isNaN(sortedNeff[i]));
+  if (validIdx.length === 0) return;
+
+  const spMin = d3.min(validIdx, i => sortedSp[i]);
+  const spMax = d3.max(validIdx, i => sortedSp[i]);
+
+  const xScale = d3.scaleLinear().domain([spMin, spMax]).range([pad.left, W - pad.right]);
+  const yScale = d3.scaleLinear().domain([0, 1]).range([H - pad.bottom, pad.top]);
+
+  // Grid
+  c.strokeStyle = '#e2e8f0'; c.lineWidth = 0.5;
+  const xTicks = xScale.ticks(5);
+  const yTicks = [0, 0.1, 0.25, 0.5, 0.75, 1.0];
+  for (const t of xTicks) { c.beginPath(); c.moveTo(xScale(t), pad.top); c.lineTo(xScale(t), H - pad.bottom); c.stroke(); }
+  for (const t of yTicks) { c.beginPath(); c.moveTo(pad.left, yScale(t)); c.lineTo(W - pad.right, yScale(t)); c.stroke(); }
+
+  // 0.1 threshold line (red dashed)
+  c.strokeStyle = 'rgba(239,68,68,0.5)'; c.lineWidth = 1; c.setLineDash([4, 3]);
+  c.beginPath(); c.moveTo(pad.left, yScale(0.1)); c.lineTo(W - pad.right, yScale(0.1)); c.stroke();
+  c.setLineDash([]);
+  c.fillStyle = 'rgba(239,68,68,0.6)'; c.font = '8px monospace'; c.textAlign = 'left';
+  c.fillText('N_eff/N = 0.1', pad.left + 2, yScale(0.1) - 3);
+
+  // Random baseline N_eff (if available)
+  if (randomNeffs) {
+    const sortedRN = idx.map(i => randomNeffs[i]);
+    const validRN = validIdx.filter(i => !isNaN(sortedRN[i]));
+    if (validRN.length > 0) {
+      c.strokeStyle = 'orange'; c.lineWidth = 1.5; c.setLineDash([4, 3]);
+      c.beginPath();
+      for (let i = 0; i < validRN.length; i++) {
+        const vi = validRN[i];
+        const x = xScale(sortedSp[vi]), y = yScale(Math.min(sortedRN[vi], 1));
+        i === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
+      }
+      c.stroke(); c.setLineDash([]);
+    }
+  }
+
+  // N_eff line
+  c.strokeStyle = '#64748b'; c.lineWidth = 1;
+  c.beginPath();
+  for (let i = 0; i < validIdx.length; i++) {
+    const vi = validIdx[i];
+    const x = xScale(sortedSp[vi]), y = yScale(Math.min(sortedNeff[vi], 1));
+    i === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
+  }
+  c.stroke();
+
+  // Data points (green = healthy, red = unreliable)
+  for (const vi of validIdx) {
+    const x = xScale(sortedSp[vi]), y = yScale(Math.min(sortedNeff[vi], 1));
+    c.beginPath(); c.arc(x, y, 3, 0, Math.PI * 2);
+    c.fillStyle = sortedNeff[vi] >= 0.1 ? '#4caf50' : '#ef4444';
+    c.fill(); c.strokeStyle = '#1e293b'; c.lineWidth = 0.5; c.stroke();
+  }
+
+  // Axis labels
+  c.fillStyle = '#64748b'; c.font = '9px monospace'; c.textAlign = 'center';
+  for (const t of xTicks) c.fillText((t * 100).toFixed(0) + '%', xScale(t), H - pad.bottom + 14);
+  c.textAlign = 'right';
+  for (const t of yTicks) c.fillText(t.toFixed(1), pad.left - 4, yScale(t) + 3);
+
+  c.fillStyle = '#94a3b8'; c.font = '9px sans-serif'; c.textAlign = 'center';
+  c.fillText('Sparsity', (pad.left + W - pad.right) / 2, H - 2);
+  c.save(); c.translate(10, (pad.top + H - pad.bottom) / 2);
+  c.rotate(-Math.PI / 2); c.fillText('N_eff / N', 0, 0); c.restore();
+}
+
+// ══════════════════════════════════════════════════════════════
+// Answer Probabilities Display
+// ══════════════════════════════════════════════════════════════
+
+function updateAnswerProbs() {
+  if (!thresholdEvalData || !thresholdEvalData.hasAnswerProbs) return;
+  const el = document.getElementById('answer-probs-content');
+  const { entries, answerLabels } = thresholdEvalData;
+
+  // Find nearest entry to current threshold
+  const currentThreshold = getThreshold();
+  let nearestIdx = 0, nearestDist = Infinity;
+  for (let i = 0; i < entries.length; i++) {
+    const dist = Math.abs(entries[i].threshold - currentThreshold);
+    if (dist < nearestDist) { nearestDist = dist; nearestIdx = i; }
+  }
+  const entry = entries[nearestIdx];
+  const probs = entry.answer_probs_masked;
+  if (!Array.isArray(probs)) { el.innerHTML = 'No answer probs at this threshold.'; return; }
+
+  // P_clean from metadata
+  const meta = maskData.metadata || {};
+  const answerIds = meta.answer_ids || [];
+  const N = answerIds.length || 1;
+  const numAnswers = meta.num_answers || probs.length;
+  const pClean = new Array(numAnswers).fill(0);
+  for (const aid of answerIds) { if (aid < numAnswers) pClean[aid]++; }
+  for (let i = 0; i < numAnswers; i++) pClean[i] /= N;
+
+  const nEff = entry.n_eff ?? null;
+  const nEffRatio = entry.n_eff_ratio ?? null;
+
+  let html = '<div style="margin-bottom:6px;">';
+  html += `<b>Threshold:</b> ${entry.threshold.toExponential(2)} &nbsp; `;
+  html += `<b>Sparsity:</b> ${(entry.sparsity * 100).toFixed(1)}%`;
+  if (nEff !== null) {
+    const color = nEffRatio >= 0.1 ? '#4caf50' : '#ef4444';
+    html += `<br><b>N_eff:</b> ${nEff.toFixed(1)} / ${N}`;
+    html += ` <span style="color:${color};font-weight:600;">(${(nEffRatio * 100).toFixed(1)}%)</span>`;
+  }
+  html += '</div>';
+
+  html += '<table style="width:100%;border-collapse:collapse;font-size:10px;">';
+  html += '<tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:2px 4px;">Answer</th>';
+  html += '<th style="text-align:right;padding:2px 4px;">P_clean</th>';
+  html += '<th style="text-align:right;padding:2px 4px;">P_masked</th>';
+  html += '<th style="padding:2px 4px;"></th></tr>';
+
+  for (let i = 0; i < probs.length; i++) {
+    const label = (answerLabels && answerLabels[i]) ? answerLabels[i] : `Answer ${i}`;
+    const pc = pClean[i] || 0;
+    const pm = probs[i] || 0;
+    const maxP = Math.max(pc, pm, 0.01);
+    const barClean = (pc / maxP) * 60;
+    const barMasked = (pm / maxP) * 60;
+    html += `<tr style="border-bottom:1px solid var(--border);">`;
+    html += `<td style="padding:3px 4px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${label}">${label}</td>`;
+    html += `<td style="text-align:right;padding:3px 4px;">${(pc * 100).toFixed(1)}%</td>`;
+    html += `<td style="text-align:right;padding:3px 4px;">${(pm * 100).toFixed(1)}%</td>`;
+    html += '<td style="padding:3px 4px;">';
+    html += `<span class="bar" style="width:${barClean}px;background:#60a5fa;opacity:0.6;"></span>`;
+    html += `<span class="bar" style="width:${barMasked}px;background:#4caf50;"></span>`;
+    html += '</td></tr>';
+  }
+  html += '</table>';
+  html += '<div style="margin-top:4px;font-size:9px;color:var(--text-dim);">';
+  html += '<span class="bar" style="width:10px;background:#60a5fa;opacity:0.6;"></span> P_clean &nbsp;';
+  html += '<span class="bar" style="width:10px;background:#4caf50;"></span> P_masked</div>';
+
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
 // Resize
 // ══════════════════════════════════════════════════════════════
-window.addEventListener('resize', () => { if (processed) { render(); renderThresholdChart(); } });
+window.addEventListener('resize', () => { if (processed) { render(); renderThresholdChart(); renderNeffChart(); } });
 
 // ══════════════════════════════════════════════════════════════
 // Guided Tour
@@ -1277,7 +1501,7 @@ const tourSteps = [
   {
     target: () => document.getElementById('threshold-chart-container'),
     title: 'Threshold Chart',
-    body: 'If the mask includes threshold_evaluation data, this scatter plot shows Sparsity vs KL divergence (or reward-weighted objective). Points are colored by threshold (viridis). The star marker shows the current threshold. <b>Click a point</b> to jump to that threshold. Orange dashed line = random baseline.',
+    body: 'If the mask includes threshold_evaluation data, this scatter plot shows Sparsity vs the primary metric (answer KL, reward gap, or local KL). Points are colored by threshold (viridis). The star marker shows the current threshold. <b>Click a point</b> to jump to that threshold. Orange dashed line = random baseline. For IS-based objectives, an N_eff chart and per-answer probabilities are shown below.',
     arrow: 'right',
   },
   {

@@ -727,17 +727,20 @@ def nearest_threshold_entry(
 def build_threshold_vs_metrics_figure(
     threshold_eval: Sequence[dict],
     selected_threshold: float,
+    metric_key: str = "kl_divergence",
 ) -> go.Figure | None:
     entries = _valid_threshold_entries(threshold_eval)
     if not entries:
         return None
 
+    metric_label = "Reward-Weighted Objective" if metric_key == "reward_weighted_objective" else "KL Divergence"
+
     thresholds = np.array([float(entry["threshold"]) for entry in entries], dtype=float)
     sparsities = np.array(
         [float(entry.get("sparsity", np.nan)) for entry in entries], dtype=float
     )
-    kl_scores = np.array(
-        [float(entry.get("kl_divergence", np.nan)) for entry in entries], dtype=float
+    metric_scores = np.array(
+        [float(entry.get(metric_key, np.nan)) for entry in entries], dtype=float
     )
 
     fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -746,15 +749,15 @@ def build_threshold_vs_metrics_figure(
         secondary_y=False,
     )
     fig.add_trace(
-        go.Scatter(x=thresholds, y=kl_scores, mode="lines+markers", name="KL Divergence"),
+        go.Scatter(x=thresholds, y=metric_scores, mode="lines+markers", name=metric_label),
         secondary_y=True,
     )
     fig.add_vline(x=float(selected_threshold), line_dash="dash", line_color="#444")
     fig.update_xaxes(title_text="Threshold", tickformat=".1e")
     fig.update_yaxes(title_text="Sparsity", secondary_y=False, tickformat=".1%")
-    fig.update_yaxes(title_text="KL Divergence", secondary_y=True)
+    fig.update_yaxes(title_text=metric_label, secondary_y=True)
     fig.update_layout(
-        title="Threshold vs Sparsity/KL Divergence",
+        title=f"Threshold vs Sparsity/{metric_label}",
         height=520,
         font=dict(size=14),
         hoverlabel=dict(font_size=15, align="left"),
@@ -766,17 +769,22 @@ def build_threshold_vs_metrics_figure(
 def build_sparsity_vs_kl_figure(
     threshold_eval: Sequence[dict],
     selected_threshold: float,
+    metric_key: str = "kl_divergence",
 ) -> go.Figure | None:
     entries = _valid_threshold_entries(threshold_eval)
     if not entries:
         return None
+
+    metric_label = "Reward-Weighted Objective" if metric_key == "reward_weighted_objective" else "KL Divergence"
+    random_key = "random_reward_weighted_objectives" if metric_key == "reward_weighted_objective" else "random_kl_divergences"
+    random_single_key = "random_reward_weighted_objective" if metric_key == "reward_weighted_objective" else "random_kl_divergence"
 
     thresholds = np.array([float(entry["threshold"]) for entry in entries], dtype=float)
     sparsities = np.array(
         [float(entry.get("sparsity", np.nan)) for entry in entries], dtype=float
     )
     kl_scores = np.array(
-        [float(entry.get("kl_divergence", np.nan)) for entry in entries], dtype=float
+        [float(entry.get(metric_key, np.nan)) for entry in entries], dtype=float
     )
 
     sort_idx = np.argsort(sparsities)
@@ -805,7 +813,7 @@ def build_sparsity_vs_kl_figure(
             customdata=np.stack([thresholds], axis=1),
             hovertemplate=(
                 "Sparsity: %{x:.2%}<br>"
-                "KL: %{y:.3e}<br>"
+                f"{metric_label}: " + "%{y:.3e}<br>"
                 "Threshold: %{customdata[0]:.1e}<extra></extra>"
             ),
             name="Threshold points",
@@ -814,14 +822,14 @@ def build_sparsity_vs_kl_figure(
 
     # Check for per-sample random KLs (K random masks)
     has_multi_random = all(
-        "random_kl_divergences" in entry
-        and isinstance(entry["random_kl_divergences"], list)
-        and len(entry["random_kl_divergences"]) > 0
+        random_key in entry
+        and isinstance(entry[random_key], list)
+        and len(entry[random_key]) > 0
         for entry in entries
     )
     if has_multi_random:
         random_all = np.array(
-            [entry["random_kl_divergences"] for entry in entries], dtype=float
+            [entry[random_key] for entry in entries], dtype=float
         )  # shape (num_thresholds, K)
         random_mean = random_all.mean(axis=1)
         random_std = random_all.std(axis=1)
@@ -857,11 +865,11 @@ def build_sparsity_vs_kl_figure(
             )
         )
     elif all(
-        "random_kl_divergence" in entry and entry["random_kl_divergence"] is not None
+        random_single_key in entry and entry[random_single_key] is not None
         for entry in entries
     ):
         random_scores = np.array(
-            [float(entry["random_kl_divergence"]) for entry in entries], dtype=float
+            [float(entry[random_single_key]) for entry in entries], dtype=float
         )
         fig.add_trace(
             go.Scatter(
@@ -885,9 +893,9 @@ def build_sparsity_vs_kl_figure(
         )
     )
     fig.update_layout(
-        title="Sparsity vs KL Divergence",
+        title=f"Sparsity vs {metric_label}",
         xaxis_title="Sparsity",
-        yaxis_title="KL Divergence",
+        yaxis_title=metric_label,
         height=520,
         font=dict(size=14),
         hoverlabel=dict(font_size=15, align="left"),
