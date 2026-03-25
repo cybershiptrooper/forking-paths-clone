@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from glob import glob
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -13,6 +14,7 @@ from urllib.parse import parse_qs, urlparse
 ROOT = Path(__file__).resolve().parent.parent
 DASHBOARD_DIR = Path(__file__).resolve().parent
 DEFAULT_MASK_GLOB = "results/circuitviz/**/*.json"
+DEFAULT_MASK_GLOB = "results/circuit_discovery/**/*.json"
 
 
 class DashboardHandler(SimpleHTTPRequestHandler):
@@ -69,13 +71,13 @@ class DashboardHandler(SimpleHTTPRequestHandler):
 
     def log_message(self, format, *args):
         # Quieter logging
-        if "/api/" in (args[0] if args else ""):
+        if "/api/" in (str(args[0]) if args else ""):
             return
         super().log_message(format, *args)
 
 
 def main():
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
+    port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else "8765"))
     server = HTTPServer(("0.0.0.0", port), DashboardHandler)
     print(f"Circuit Tracer Dashboard: http://localhost:{port}")
     print(f"Serving masks from: {ROOT}")
