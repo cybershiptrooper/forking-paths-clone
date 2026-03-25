@@ -232,7 +232,7 @@ def split_tokens_into_sentences(
         has_delimiter = any(delim in decoded_token for delim in SENTENCE_DELIMITERS)
         
         # Also check for </think> tag which may span tokens
-        is_think_end = "</think>" in decoded_token or token.lower() in ["</think>", "think>"]
+        is_think_end = "</think>" in decoded_token or token.lower() in ["</think>", "<think>"]
         
         if has_delimiter or is_think_end:
             # Check if we have enough tokens for a sentence

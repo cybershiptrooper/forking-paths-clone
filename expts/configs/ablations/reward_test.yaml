@@ -10,7 +10,7 @@ mask_granularity: pair
 mask_mode: both
 # num_ig_steps: 2
 layers_to_analyse: all
-max_new_tokens: 5000
+max_sampling_tokens: 5000
 analysis_timestep: 1416
 sentence_gap: 1
 output_dir: results/circuit_discovery/reward_test

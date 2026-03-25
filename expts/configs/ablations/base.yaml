@@ -17,7 +17,7 @@ ablate_non_target_layers: true
 renormalize_masked_attention: true
 num_ig_steps: 10
 num_random_samples: 1
-max_new_tokens: 200
+max_sampling_tokens: 200
 min_sentence_length: 10
 temperature: 0.6
 seed: 42

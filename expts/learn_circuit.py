@@ -20,10 +20,10 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from utils.utils import set_seed, clear_cuda, Sentence
 from utils.cot_analysis import split_tokens_into_sentences
-from utils.objectives import get_objective, is_global_objective
+from utils.objectives import get_objective
 from utils.importance_sampling import extract_answer_ids, reward_based_answer_ids
 from utils.masks import NodeMask
-from utils.circuit_discovery.factory import create_circuit_discovery
+from utils.circuit_discovery.factory import create_circuit_discovery, get_available_algorithms
 from utils.circuit_eval import evaluate_at_thresholds
 from utils.rewards import (
     extract_boxed,
@@ -52,7 +52,7 @@ def generate_branches(
     prefix_text: str,
     num_branches: int,
     temperature: float,
-    max_new_tokens: int,
+    max_sampling_tokens: int,
     seed: int,
 ) -> list[dict]:
     """Generate multiple continuations from prefix using vLLM.
@@ -64,7 +64,7 @@ def generate_branches(
     sampling_params = SamplingParams(
         n=num_branches,
         temperature=temperature,
-        max_tokens=max_new_tokens,
+        max_tokens=max_sampling_tokens,
         seed=seed,
     )
     outputs = llm.generate([prefix_text], sampling_params)
@@ -131,13 +131,14 @@ def main(
     num_ig_steps: int = 10,
     no_negate_scores: bool = False,
     num_random_samples: int = 5,
-    max_new_tokens: int = 150,
+    max_sampling_tokens: int = 150,
+    num_tokens_to_analyse: int = None,
     min_sentence_length: int = 10,
     temperature: float = 0.6,
     seed: int = 42,
     device: str = "cuda",
     output_dir: str = "results/circuit_discovery",
-    thresholds: list[float] = None,
+    sparsities: list[float] = None,
     reward_type: str = "none",
     correct_answer: str = None,
     data_path: str = None,
@@ -146,12 +147,18 @@ def main(
     answer_only: bool = False,
     judge_model: str = "meta-llama/llama-3.2-3b-instruct",
     judge_answers: bool = False,
+    file_name: str = None,
 ):
     # Default model_to_analyse to model_name
     if model_to_analyse is None:
         model_to_analyse = model_name
-    if thresholds is None:
-        thresholds = [0.01, 0.05, 0.1, 0.2, 0.5]
+    if sparsities is None:
+        sparsities = [0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5,
+                       0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0]
+
+    # Default num_tokens_to_analyse to max_sampling_tokens
+    if num_tokens_to_analyse is None:
+        num_tokens_to_analyse = max_sampling_tokens
 
     set_seed(seed)
     os.makedirs(output_dir, exist_ok=True)
@@ -227,7 +234,7 @@ def main(
         base_params = SamplingParams(
             n=1,
             temperature=temperature,
-            max_tokens=max_new_tokens,
+            max_tokens=max_sampling_tokens,
             seed=seed,
         )
         base_outputs = llm.generate([formatted_text], base_params)
@@ -253,7 +260,7 @@ def main(
     branch_params = SamplingParams(
         n=num_new_branches,
         temperature=temperature,
-        max_tokens=max_new_tokens,
+        max_tokens=max_sampling_tokens,
         seed=seed,
     )
     branch_outputs = llm.generate([prefix_text], branch_params)
@@ -346,49 +353,82 @@ def main(
         )
         print(f"CoT length rewards: {branch_rewards}")
 
-    # Extract answer IDs for global objectives (answer_kl, reward_gap)
+    # Extract answer IDs (always, for all metrics including IS and contrastive)
     answer_ids_tensor = None
     num_answers = None
     answer_labels = None
-    if is_global_objective(objective):
-        if branch_rewards is not None:
-            # Option C: reward-based bucketing
-            # correctness (+1/-1) → binary; cot_length (continuous) → per-value
-            use_binary = reward_type == "correctness"
-            answer_ids_list, answer_labels = reward_based_answer_ids(
-                branch_rewards, binary=use_binary,
+    if branch_rewards is not None:
+        # Option C: reward-based bucketing
+        # correctness (+1/-1) → binary; cot_length (continuous) → per-value
+        use_binary = reward_type == "correctness"
+        answer_ids_list, answer_labels = reward_based_answer_ids(
+            branch_rewards, binary=use_binary,
+        )
+        grouping_method = "reward_binary" if use_binary else "reward_unique"
+    elif judge_answers:
+        # Option B: LLM judge clustering (+ Option A normalization)
+        from openai import OpenAI
+        from dotenv import load_dotenv
+        load_dotenv()
+        openrouter_key = os.getenv("OPENROUTER_API_KEY")
+        if not openrouter_key:
+            raise ValueError(
+                "--judge_answers requires OPENROUTER_API_KEY in environment."
             )
-            grouping_method = "reward_binary" if use_binary else "reward_unique"
-        elif judge_answers:
-            # Option B: LLM judge clustering (+ Option A normalization)
+        judge_client = OpenAI(
+            base_url="https://openrouter.ai/api/v1", api_key=openrouter_key,
+        )
+        answer_ids_list, answer_labels = extract_answer_ids(
+            branches, prefix_text,
+            judge_client=judge_client, judge_model=judge_model, question=prompt,
+        )
+        del judge_client
+        grouping_method = "judge"
+    else:
+        # Option A: normalized \\boxed{} extraction (default)
+        answer_ids_list, answer_labels = extract_answer_ids(branches, prefix_text)
+        grouping_method = "boxed_normalized"
+
+        # Auto-fallback to judge if >50% of branches lack a boxed answer
+        no_answer_count = sum(
+            1 for label in answer_labels if label.startswith("__no_answer_")
+        )
+        no_answer_branches = sum(
+            1 for a in answer_ids_list
+            if answer_labels[a].startswith("__no_answer_")
+        )
+        if no_answer_branches > len(branches) * 0.5:
+            print(
+                f"  {no_answer_branches}/{len(branches)} branches lack "
+                f"\\boxed{{}} answers. Falling back to judge model..."
+            )
             from openai import OpenAI
             from dotenv import load_dotenv
             load_dotenv()
             openrouter_key = os.getenv("OPENROUTER_API_KEY")
             if not openrouter_key:
                 raise ValueError(
-                    "--judge_answers requires OPENROUTER_API_KEY in environment."
+                    "More than 50% of branches lack \\boxed{} answers. "
+                    "Judge-based answer extraction requires OPENROUTER_API_KEY "
+                    "in the environment."
                 )
             judge_client = OpenAI(
                 base_url="https://openrouter.ai/api/v1", api_key=openrouter_key,
             )
             answer_ids_list, answer_labels = extract_answer_ids(
                 branches, prefix_text,
-                judge_client=judge_client, judge_model=judge_model, question=prompt,
+                judge_client=judge_client, judge_model=judge_model,
+                question=prompt,
             )
             del judge_client
-            grouping_method = "judge"
-        else:
-            # Option A: normalized \\boxed{} extraction (default)
-            answer_ids_list, answer_labels = extract_answer_ids(branches, prefix_text)
-            grouping_method = "boxed_normalized"
+            grouping_method = "judge_fallback"
 
-        answer_ids_tensor = torch.tensor(answer_ids_list, dtype=torch.long)
-        num_answers = len(answer_labels)
-        print(f"\nAnswer groups ({num_answers}, method={grouping_method}):")
-        for aid, label in enumerate(answer_labels):
-            count = sum(1 for a in answer_ids_list if a == aid)
-            print(f"  [{aid}] {label!r}: {count} branches")
+    answer_ids_tensor = torch.tensor(answer_ids_list, dtype=torch.long)
+    num_answers = len(answer_labels)
+    print(f"\nAnswer groups ({num_answers}, method={grouping_method}):")
+    for aid, label in enumerate(answer_labels):
+        count = sum(1 for a in answer_ids_list if a == aid)
+        print(f"  [{aid}] {label!r}: {count} branches")
 
     # =====================================================================
     # Step 4: Load HuggingFace model (eager attention)
@@ -413,6 +453,15 @@ def main(
     for b in branches:
         cont_ids = torch.tensor([b["token_ids"]], device=target_device)
         continuations.append(cont_ids)
+
+    # Truncate continuations for discovery: optimize mask over only the first
+    # num_tokens_to_analyse tokens, but keep full continuations for eval and
+    # answer extraction (which need the complete branch to find \boxed{}).
+    if num_tokens_to_analyse < max_sampling_tokens:
+        discovery_continuations = [c[:, :num_tokens_to_analyse] for c in continuations]
+        print(f"  Truncating continuations for discovery: {max_sampling_tokens} -> {num_tokens_to_analyse} tokens")
+    else:
+        discovery_continuations = continuations
 
     # Build answer-only position masks if requested
     if answer_only:
@@ -490,7 +539,7 @@ def main(
     node_mask = discoverer.discover(
         input_ids=input_ids,
         sentences=sentences,
-        continuations=continuations,
+        continuations=discovery_continuations,
         mask_mode=mask_mode,
         num_prefix_sentences=num_prefix_sentences,
         branch_rewards=branch_rewards,
@@ -514,30 +563,10 @@ def main(
     print("Step 6: Evaluating sparsity vs KL at thresholds...")
     print("=" * 80)
 
-    # Extend thresholds to include the min and max scores from the learned mask
-    granularity = node_mask.granularity
-    if granularity == "head":
-        all_scores = [
-            v
-            for layer_heads in node_mask.scores.values()
-            for head_scores in layer_heads.values()
-            for row in head_scores
-            for v in row
-        ]
-    elif granularity == "layer":
-        all_scores = [
-            v
-            for layer_scores in node_mask.scores.values()
-            for row in layer_scores
-            for v in row
-        ]
-    else:  # "pair"
-        all_scores = [v for row in node_mask.scores for v in row]
-    if all_scores:
-        score_min = min(all_scores)
-        score_max = max(all_scores)
-        print(f"  NodeMask score range: [{score_min:.4e}, {score_max:.4e}]")
-        thresholds = sorted(set(thresholds) | {score_min, score_max})
+    # Compute thresholds dynamically from target sparsities
+    thresholds = node_mask.thresholds_for_sparsities(sparsities)
+    print(f"  Target sparsities: {sparsities}")
+    print(f"  Derived {len(thresholds)} thresholds from mask scores")
 
     threshold_results = evaluate_at_thresholds(
         model=model,
@@ -556,13 +585,15 @@ def main(
         position_mask_overrides=position_mask_overrides,
         answer_ids=answer_ids_tensor,
         num_answers=num_answers,
+        num_tokens_to_analyse=num_tokens_to_analyse,
     )
 
     node_mask.metadata["threshold_evaluation"] = threshold_results
     node_mask.metadata["objective"] = objective
     node_mask.metadata["seed"] = seed
     node_mask.metadata["temperature"] = temperature
-    node_mask.metadata["max_new_tokens"] = max_new_tokens
+    node_mask.metadata["max_sampling_tokens"] = max_sampling_tokens
+    node_mask.metadata["num_tokens_to_analyse"] = num_tokens_to_analyse
     node_mask.metadata["num_branches"] = num_new_branches
     node_mask.metadata["num_random_samples"] = num_random_samples
     node_mask.metadata["reward_type"] = reward_type
@@ -582,23 +613,28 @@ def main(
     print("\n" + "=" * 80)
     print("Step 7: Saving results...")
     print("=" * 80)
-    layers_str = (
-        "_all"
-        if layers_to_analyse_is_all
-        else "_".join(str(l) for l in layers_to_analyse)
-    )
-    if masking_algorithm == "nodewise_activation_patching":
-        output_file = os.path.join(
-            output_dir,
-            f"circuit_{masking_algorithm}_layers{layers_str}"
-            f"_branches{num_new_branches}.json",
-        )
+    if file_name is not None:
+        if not file_name.endswith(".json"):
+            file_name += ".json"
+        output_file = os.path.join(output_dir, file_name)
     else:
-        output_file = os.path.join(
-            output_dir,
-            f"circuit_{masking_algorithm}_layers{layers_str}"
-            f"_branches{num_new_branches}_ig{num_ig_steps}.json",
+        layers_str = (
+            "_all"
+            if layers_to_analyse_is_all
+            else "_".join(str(l) for l in layers_to_analyse)
         )
+        if "activation_patching" in masking_algorithm:
+            output_file = os.path.join(
+                output_dir,
+                f"circuit_{masking_algorithm}_layers{layers_str}"
+                f"_branches{num_new_branches}.json",
+            )
+        else:
+            output_file = os.path.join(
+                output_dir,
+                f"circuit_{masking_algorithm}_layers{layers_str}"
+                f"_branches{num_new_branches}_ig{num_ig_steps}.json",
+            )
     node_mask.to_json(output_file)
     print(f"Saved NodeMask to {output_file}")
 
@@ -656,15 +692,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_new_branches", type=int, default=8)
     parser.add_argument(
         "--masking_algorithm",
-        choices=[
-            "nodewise_attribution",
-            "nodewise_attribution_attention",
-            "EAP",
-            "subnetwork_probing",
-            "nodewise_activation_patching",
-            "nodewise_activation_patching_kv_cache",
-            "nodewise_activation_patching_batch",
-        ],
+        choices=get_available_algorithms(),
         default="nodewise_attribution",
     )
     parser.add_argument(
@@ -733,7 +761,12 @@ if __name__ == "__main__":
         help="Store raw IG scores (positive = increases KL). "
         "Default negates so positive = helps retention.",
     )
-    parser.add_argument("--max_new_tokens", type=int, default=150)
+    parser.add_argument("--max_sampling_tokens", type=int, default=150,
+        help="Max tokens for vLLM generation (base completion and branches).")
+    parser.add_argument("--num_tokens_to_analyse", type=int, default=None,
+        help="Number of continuation tokens to use for local KL objectives. "
+        "Defaults to max_sampling_tokens. Set lower to analyse only the "
+        "beginning of each branch while still sampling to completion.")
     parser.add_argument("--temperature", type=float, default=0.6)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default="cuda")
@@ -745,44 +778,13 @@ if __name__ == "__main__":
         help="Minimum number of tokens for a sentence (after splitting).",
     )
     parser.add_argument(
-        "--thresholds",
+        "--sparsities",
         type=float,
         nargs="+",
-        default=[
-            -5e-3,
-            -1e-3,
-            -5e-4,
-            -1e-4,
-            -5e-5,
-            -1e-5,
-            -5e-6,
-            -1e-6,
-            -5e-7,
-            -5e-8,
-            -1e-8,
-            -1e-9,
-            -1e-10,
-            -1e-11,
-            -1e-12,
-            0.0,
-            1e-12,
-            1e-11,
-            1e-10,
-            1e-9,
-            1e-8,
-            5e-8,
-            1e-7,
-            5e-7,
-            1e-6,
-            5e-6,
-            1e-5,
-            5e-5,
-            1e-4,
-            5e-4,
-            1e-3,
-            5e-3,
-        ],
-        help="Thresholds for sparsity-vs-KL evaluation",
+        default=[0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5,
+                 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0],
+        help="Target sparsity levels (0-1) for evaluation. Thresholds are "
+        "computed dynamically from the learned mask scores.",
     )
     parser.add_argument(
         "--reward_type",
@@ -830,6 +832,13 @@ if __name__ == "__main__":
         action="store_true",
         help="Use LLM judge to cluster branch answers by mathematical "
         "equivalence (for global objectives). Requires OPENROUTER_API_KEY.",
+    )
+    parser.add_argument(
+        "--file_name",
+        type=str,
+        default=None,
+        help="Custom output file name (saved under --output_dir). "
+        "Auto-appends .json if missing. Overrides the default naming convention.",
     )
     # First parse to check for --config
     args, _ = parser.parse_known_args()

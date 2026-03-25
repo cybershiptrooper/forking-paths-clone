@@ -205,25 +205,98 @@ class NodeMask(MaskResult):
     # JSON serialization
     # ------------------------------------------------------------------
 
-    def to_json(self, path: str):
-        """Serialize to JSON file."""
+    @staticmethod
+    def _matrix_to_sparse(matrix: List[List[float]], combined_filter: torch.Tensor) -> List[List]:
+        """Convert a 2D score matrix to sparse [i, j, score] triples.
+
+        Only positions where ``combined_filter[i][j]`` is False (i.e. active /
+        learnable) are stored.
+        """
+        triples: List[List] = []
+        for i, row in enumerate(matrix):
+            for j, val in enumerate(row):
+                if not bool(combined_filter[i, j]):
+                    triples.append([i, j, val])
+        return triples
+
+    @staticmethod
+    def _sparse_to_matrix(triples: List[List], num_sents: int, fill_value: float = 1.0) -> List[List[float]]:
+        """Reconstruct a full S x S matrix from sparse [i, j, score] triples.
+
+        Positions not present in *triples* are filled with *fill_value* (1.0,
+        matching the frozen-at-1.0 convention used by the combined filter).
+        """
+        matrix = [[fill_value] * num_sents for _ in range(num_sents)]
+        for i, j, score in triples:
+            matrix[i][j] = score
+        return matrix
+
+    def _build_combined_filter_from_metadata(self) -> Optional[torch.Tensor]:
+        """Build the combined filter from metadata fields, or return None."""
+        num_sents = len(self.sentences)
+        sentence_gap = self.metadata.get("sentence_gap")
+        mask_mode = self.metadata.get("mask_mode")
+        num_prefix_sents = self.metadata.get("num_prefix_sentences")
+
+        gap_filter = build_gap_filter(num_sents, sentence_gap)
+        causal_filter = build_causal_filter(num_sents)
+
+        if mask_mode is not None and num_prefix_sents is not None:
+            mode_filter = build_mode_filter(num_prefix_sents, num_sents, mask_mode)
+        else:
+            mode_filter = torch.zeros(num_sents, num_sents, dtype=torch.bool)
+
+        return build_combined_filter(gap_filter, mode_filter, causal_filter)
+
+    def to_json(self, path: str, sparse: bool = False):
+        """Serialize to JSON file.
+
+        Parameters
+        ----------
+        path : str
+            Destination file path.
+        sparse : bool, optional
+            If True (default), store only active positions as ``[i, j, score]``
+            triples instead of full S x S matrices. This is strictly better for
+            storage and is backward-compatible (``from_json`` detects the format
+            automatically).
+        """
         g = self.granularity
 
-        if g == "head":
-            serialized_scores = {
-                str(layer): {
-                    str(head): scores
-                    for head, scores in heads.items()
+        if sparse:
+            combined_filter = self._build_combined_filter_from_metadata()
+
+            if g == "head":
+                serialized_scores = {
+                    str(layer): {
+                        str(head): self._matrix_to_sparse(scores, combined_filter)
+                        for head, scores in heads.items()
+                    }
+                    for layer, heads in self.scores.items()
                 }
-                for layer, heads in self.scores.items()
-            }
-        elif g == "layer":
-            serialized_scores = {
-                str(layer): scores
-                for layer, scores in self.scores.items()
-            }
-        else:  # "pair"
-            serialized_scores = self.scores
+            elif g == "layer":
+                serialized_scores = {
+                    str(layer): self._matrix_to_sparse(scores, combined_filter)
+                    for layer, scores in self.scores.items()
+                }
+            else:  # "pair"
+                serialized_scores = self._matrix_to_sparse(self.scores, combined_filter)
+        else:
+            if g == "head":
+                serialized_scores = {
+                    str(layer): {
+                        str(head): scores
+                        for head, scores in heads.items()
+                    }
+                    for layer, heads in self.scores.items()
+                }
+            elif g == "layer":
+                serialized_scores = {
+                    str(layer): scores
+                    for layer, scores in self.scores.items()
+                }
+            else:  # "pair"
+                serialized_scores = self.scores
 
         data = {
             "mask_type": "NodeMask",
@@ -235,31 +308,59 @@ class NodeMask(MaskResult):
             "metadata": self.metadata,
             "scores": serialized_scores,
         }
+        if sparse:
+            data["scores_format"] = "sparse"
         with open(path, "w") as f:
             json.dump(data, f, indent=2)
 
     @classmethod
     def from_json(cls, path: str) -> "NodeMask":
-        """Deserialize from JSON file."""
+        """Deserialize from JSON file.
+
+        Supports both dense (legacy) and sparse formats.  The format is
+        auto-detected via the ``scores_format`` field in the JSON.
+        """
         with open(path, "r") as f:
             data = json.load(f)
 
         metadata = data.get("metadata", {})
         g = metadata.get("mask_granularity", "head")
+        scores_format = data.get("scores_format", "dense")
 
         raw = data["scores"]
-        if g == "head":
-            scores = {
-                int(layer): {
-                    int(head): scores
-                    for head, scores in heads.items()
+
+        if scores_format == "sparse":
+            num_sents = len(data["sentences"])
+
+            if g == "head":
+                scores = {
+                    int(layer): {
+                        int(head): cls._sparse_to_matrix(triples, num_sents)
+                        for head, triples in heads.items()
+                    }
+                    for layer, heads in raw.items()
                 }
-                for layer, heads in raw.items()
-            }
-        elif g == "layer":
-            scores = {int(layer): scores for layer, scores in raw.items()}
-        else:  # "pair"
-            scores = raw  # already a 2D list
+            elif g == "layer":
+                scores = {
+                    int(layer): cls._sparse_to_matrix(triples, num_sents)
+                    for layer, triples in raw.items()
+                }
+            else:  # "pair"
+                scores = cls._sparse_to_matrix(raw, num_sents)
+        else:
+            # Legacy dense format
+            if g == "head":
+                scores = {
+                    int(layer): {
+                        int(head): scores
+                        for head, scores in heads.items()
+                    }
+                    for layer, heads in raw.items()
+                }
+            elif g == "layer":
+                scores = {int(layer): scores for layer, scores in raw.items()}
+            else:  # "pair"
+                scores = raw  # already a 2D list
 
         return cls(
             model_name=data["model_name"],
@@ -270,6 +371,89 @@ class NodeMask(MaskResult):
             metadata=metadata,
             scores=scores,
         )
+
+    # ------------------------------------------------------------------
+    # Threshold computation from target sparsities
+    # ------------------------------------------------------------------
+
+    def _collect_active_scores(
+        self, combined_filter: Optional[torch.Tensor] = None,
+    ) -> List[float]:
+        """Collect all learnable (non-frozen) score values as a flat list."""
+        g = self.granularity
+        values: List[float] = []
+
+        def _gather_2d(scores_2d: List[List[float]]) -> None:
+            for i, row in enumerate(scores_2d):
+                for j, val in enumerate(row):
+                    if combined_filter is not None and bool(combined_filter[i, j]):
+                        continue
+                    values.append(val)
+
+        if g == "head":
+            for layer_heads in self.scores.values():
+                for head_scores in layer_heads.values():
+                    _gather_2d(head_scores)
+        elif g == "layer":
+            for layer_scores in self.scores.values():
+                _gather_2d(layer_scores)
+        else:  # "pair"
+            _gather_2d(self.scores)
+
+        return values
+
+    def thresholds_for_sparsities(
+        self,
+        target_sparsities: Optional[List[float]] = None,
+        combined_filter: Optional[torch.Tensor] = None,
+    ) -> List[float]:
+        """Compute score thresholds that achieve the given sparsity levels.
+
+        Parameters
+        ----------
+        target_sparsities : list of float, optional
+            Desired sparsity fractions in [0, 1]. Defaults to a standard set
+            covering 0% through 100%.
+        combined_filter : torch.Tensor, optional
+            Boolean filter (True = frozen). If None, built from metadata.
+
+        Returns
+        -------
+        list of float
+            Sorted, deduplicated thresholds (one per achievable sparsity).
+        """
+        if target_sparsities is None:
+            target_sparsities = [
+                0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5,
+                0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0,
+            ]
+
+        if combined_filter is None:
+            combined_filter = self._build_combined_filter_from_metadata()
+
+        values = self._collect_active_scores(combined_filter)
+        if not values:
+            return [0.0]
+
+        sorted_vals = sorted(values)
+        n = len(sorted_vals)
+        thresholds: List[float] = []
+
+        for sp in target_sparsities:
+            if sp <= 0.0:
+                # 0% sparsity: threshold below the minimum score
+                thresholds.append(sorted_vals[0] - 1.0)
+            elif sp >= 1.0:
+                # 100% sparsity: threshold above the maximum score
+                thresholds.append(sorted_vals[-1] + 1.0)
+            else:
+                # Index such that (idx / n) ≈ sp
+                idx = int(sp * n)
+                idx = min(idx, n - 1)
+                thresholds.append(sorted_vals[idx])
+
+        # Deduplicate and sort
+        return sorted(set(thresholds))
 
     # ------------------------------------------------------------------
     # Aggregation helpers (used by visualization)

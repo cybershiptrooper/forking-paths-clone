@@ -16,6 +16,7 @@ data/collection
 data/forking_paths
 playground.ipynb
 
+# custom
 plots
 thought_anchors
 *rollouts*
@@ -33,4 +34,5 @@ cluster.md
 *.patch
 .superset
 .claude
+*old*
 roadmap/

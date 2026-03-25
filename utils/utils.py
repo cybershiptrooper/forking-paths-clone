@@ -44,7 +44,7 @@ SENTENCE_DELIMITERS = [
     ".",
     "!",
     "?",
-    "\n"
+    "\n",
 ]
 
 # Sentence = (start_token_idx, end_token_idx)
