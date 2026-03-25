@@ -377,19 +377,43 @@ def main() -> None:
         if not threshold_eval:
             st.info("No threshold evaluation data found in this mask.")
         else:
-            # Check if reward-weighted data is available
-            has_reward_metric = any(
-                "reward_weighted_objective" in entry for entry in threshold_eval
+            # Build list of available metrics from the threshold_evaluation entries
+            first_entry = threshold_eval[0] if threshold_eval else {}
+            available_metrics = []
+
+            # Always-available local metrics
+            available_metrics.append(("KL Divergence vs Sparsity", "kl_divergence"))
+            # Backward compat: old field name
+            if any("reward_weighted_objective" in e for e in threshold_eval):
+                available_metrics.append(("Reward-Weighted KL vs Sparsity", "reward_weighted_objective"))
+            if "reward_weighted_kl" in first_entry:
+                available_metrics.append(("Reward-Weighted KL vs Sparsity", "reward_weighted_kl"))
+            # IS-based metrics
+            if "answer_kl" in first_entry:
+                available_metrics.append(("Answer KL vs Sparsity", "answer_kl"))
+            # Backward compat: old generic global_metric field
+            elif "global_metric" in first_entry:
+                available_metrics.append(("Global Metric vs Sparsity", "global_metric"))
+            if "reward_gap" in first_entry:
+                available_metrics.append(("Reward Gap vs Sparsity", "reward_gap"))
+            if "n_eff_ratio" in first_entry:
+                available_metrics.append(("N_eff / N vs Sparsity", "n_eff_ratio"))
+            # Contrastive metrics
+            if "kl_a" in first_entry:
+                available_metrics.append(("KL_A (target) vs Sparsity", "kl_a"))
+            if "kl_b" in first_entry:
+                available_metrics.append(("KL_B (other) vs Sparsity", "kl_b"))
+            if "contrastive_loss" in first_entry:
+                available_metrics.append(("Contrastive Loss vs Sparsity", "contrastive_loss"))
+
+            metric_labels = [m[0] for m in available_metrics]
+            metric_keys = [m[1] for m in available_metrics]
+            selected_metric_label = st.radio(
+                "Metric",
+                metric_labels,
+                horizontal=True,
             )
-            if has_reward_metric:
-                metric_mode = st.radio(
-                    "Metric",
-                    ["KL Divergence", "Reward-Weighted"],
-                    horizontal=True,
-                )
-                metric_key = "reward_weighted_objective" if metric_mode == "Reward-Weighted" else "kl_divergence"
-            else:
-                metric_key = "kl_divergence"
+            metric_key = metric_keys[metric_labels.index(selected_metric_label)]
 
             st.subheader("Threshold vs Metrics")
             threshold_fig = build_threshold_vs_metrics_figure(

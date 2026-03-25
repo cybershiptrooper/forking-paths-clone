@@ -1,17 +1,16 @@
-# Head-level granularity (matches original ig50 experiments)
-# uv run python -m expts.learn_circuit --config expt_configs/ig50/head/prefix_gap0.yaml
-# uv run python -m expts.learn_circuit --config expt_configs/ig50/head/prefix_gap1.yaml
-
-# # Layer-level granularity
-# uv run python -m expts.learn_circuit --config expt_configs/ig50/layer/prefix_gap0.yaml
-# uv run python -m expts.learn_circuit --config expt_configs/ig50/layer/prefix_gap1.yaml
-
-# # Pair-level granularity (sentence-wise, shared across all layers/heads)
-# uv run python -m expts.learn_circuit --config expt_configs/ig50/pair/prefix_gap0.yaml
-# uv run python -m expts.learn_circuit --config expt_configs/ig50/pair/prefix_gap1.yaml
 export HF_HOME=~/.cache/huggingface
 export HF_HUB_CACHE=~/.cache/huggingface/hub
 export HF_DATASETS_CACHE=~/.cache/huggingface/datasets
 unset HF_CACHE_DIR
-# uv run python -m expts.learn_circuit --config expts/configs/reward_test.yaml
-uv run python -m expts.learn_circuit --config expts/configs/activation_patching_layer.yaml
+
+# Auto-select the first GPU with >75 GB free memory
+FREE_GPU=$(nvidia-smi --query-gpu=index,memory.free --format=csv,noheader,nounits | awk -F', ' '$2 > 75000 {print $1; exit}')
+if [ -z "$FREE_GPU" ]; then
+  echo "No GPU with >75 GB free memory available"
+  exit 1
+fi
+echo "Using physical GPU $FREE_GPU"
+
+CUDA_VISIBLE_DEVICES=$FREE_GPU uv run python -m expts.learn_circuit --config expts/configs/answer_kl_patching.yaml
+
+# CUDA_VISIBLE_DEVICES=$FREE_GPU uv run python -m expts.learn_circuit --config expts/configs/thought_anchors.yaml
