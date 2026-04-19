@@ -17,7 +17,7 @@ from vllm import LLM
 from transformers.generation.streamers import BaseStreamer
 from tqdm import tqdm
 
-from utils.activation_patching_controlled import (
+from utils.activation_patching_effecient import (
     ablate_sentences,
     load_custom_model_eager,
 )
@@ -25,7 +25,7 @@ from utils.attention_analysis import select_top_sentences_by_mean_score
 from utils.answer_utils import parse_answer
 from utils.cot_analysis import get_convergence_for_index, split_tokens_into_sentences
 from utils.utils import MODEL_METADATA, Sentence, clear_cuda
-from expts.visualize_attention import make_prompt_mcq
+from expts.legacy.visualize_attention import make_prompt_mcq
 import random
 
 
@@ -412,31 +412,9 @@ def main(
 
     print(f"Generation prefix length: {len(generation_prefix)} tokens")
 
-    # Define source sentences (queries that should not see the targets)
-    # We want to prevent generated tokens from attending to the ablated sentences
-    # The generated tokens start at len(generation_prefix) and we'll ablate for the first 200 tokens
-    ablation_length = 200
-    source_sentences = [
-        Sentence(
-            start=len(generation_prefix),
-            end=len(generation_prefix) + ablation_length
-        )
-    ]
-
-    print(f"\nAblation configuration:")
-    print(f"  Target sentences (keys to hide): {len(adjusted_sentences)} sentences")
-    for i, sent in enumerate(adjusted_sentences):
-        print(f"    {i+1}. tokens {sent.start}-{sent.end}")
-    print(f"  Source sentences (queries to block): {source_sentences}")
-
     # Register ablation hooks
-    print(f"\nRegistering ablation hooks for layers: {layers_parsed}...")
-    handles = ablate_sentences(
-        model,
-        sentences_to_ablate=adjusted_sentences,  # TARGETS (Keys)
-        ablate_from_sentences=source_sentences,  # SOURCES (Queries)
-        layers=layers_parsed,
-    )
+    print(f"Registering ablation hooks for layers: {layers_parsed}...")
+    handles = ablate_sentences(model, adjusted_sentences, layers=layers_parsed)
 
     new_output_texts = []
     try:
@@ -667,7 +645,7 @@ def main(
     random_str = "random" if random_sentences else "top_k"
     output_file = os.path.join(
         output_dir,
-        f"test_controlled_ablation_example_{idx_str}_offset{offset_from_convergence}_num_sentences{num_sentences_to_ablate}_{random_str}.json",
+        f"ablation_example_{idx_str}_offset{offset_from_convergence}_num_sentences{num_sentences_to_ablate}_{random_str}.json",
     )
     with open(output_file, "w") as f:
         json.dump(results, f, indent=2)

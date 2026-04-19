@@ -583,9 +583,8 @@ def main(
         num_random_samples=num_random_samples,
         branch_rewards=branch_rewards,
         position_mask_overrides=position_mask_overrides,
-        answer_ids=answer_ids_tensor,
-        num_answers=num_answers,
-        num_tokens_to_analyse=num_tokens_to_analyse,
+        answer_ids_fine=answer_ids_tensor,
+        num_answers_fine=num_answers,
     )
 
     node_mask.metadata["threshold_evaluation"] = threshold_results
