@@ -402,40 +402,44 @@ def eval_all_metrics(
     branch_rewards: list[float] | None = None,
     position_mask_overrides: list[torch.Tensor | None] | None = None,
     chain_logprobs_clean: Optional[torch.Tensor] = None,
-    answer_ids: Optional[torch.Tensor] = None,
-    num_answers: Optional[int] = None,
-    num_tokens_to_analyse: Optional[int] = None,
+    answer_ids_fine: Optional[torch.Tensor] = None,
+    num_answers_fine: Optional[int] = None,
+    answer_ids_binary: Optional[torch.Tensor] = None,
+    num_answers_binary: Optional[int] = None,
     collect_per_sentence: bool = True,
     use_chunked_forward: bool = True,
     chunk_size: int = 2048,
+    temperature: float = 1.0,
 ) -> dict:
     """Run model with *binary_masks* and compute all metrics in a single pass.
 
     For each continuation, one forward pass yields logits from which we extract:
 
     **Local metrics (always computed):**
-    - ``kl_divergence``: plain unweighted mean per-token KL over the
-      ``num_tokens_to_analyse`` window (or all continuation tokens if None).
+    - ``kl_divergence``: plain unweighted mean per-token KL over the full
+      continuation (all tokens after the prefix).
     - ``reward_weighted_kl``: same KL multiplied by per-branch reward weights
       (only when ``branch_rewards`` is provided).
     - ``per_sentence_kl``: per-sentence mean KL for each branch.
 
-    **IS-based metrics (when ``answer_ids`` is provided):**
-    - ``answer_kl``: KL(P_clean || P_m) over the answer distribution.
-    - ``reward_gap``, ``p_target``, ``p_best_other``: reward gap decomposition.
-    - ``answer_probs_masked``: per-answer probabilities under the masked model.
+    **IS-based metrics (when ``answer_ids_fine`` is provided):**
+    - ``answer_kl``: KL(P_clean || P_m) over the fine-grained answer
+      distribution (each distinct answer is its own bucket, ``__no_answer``
+      variants merged).
+
+    **IS-based metrics (when ``answer_ids_binary`` is provided):**
+    - ``reward_gap``, ``p_target``, ``p_best_other``: reward gap using binary
+      correct/incorrect bucketing.
+    - ``answer_probs_masked``: per-answer probabilities (binary).
     - ``n_eff``, ``n_eff_ratio``: effective sample size diagnostics.
     - ``log_weights``: raw log importance weights.
 
-    **Contrastive metrics (when ``answer_ids`` is provided):**
-    - ``kl_a``: mean per-token KL over target-answer chains.
-    - ``kl_b``: mean per-token KL over other-answer chains.
+    **Contrastive metrics (when ``answer_ids_binary`` is provided):**
+    - ``kl_a``: mean per-token KL over correct-answer chains.
+    - ``kl_b``: mean per-token KL over incorrect-answer chains.
     - ``contrastive_loss``: ``kl_a - kl_b``.
 
     Args:
-        num_tokens_to_analyse: If set, local KL is computed over only the
-            first N continuation tokens. Chain logprobs for IS metrics
-            always use the full branch.
         collect_per_sentence: Whether to compute per-sentence KL breakdown.
         use_chunked_forward: If True, use KV-cache chunked forward to reduce
             peak attention memory from O(seq^2) to O(chunk * seq).  Set to
@@ -444,14 +448,20 @@ def eval_all_metrics(
     """
     from utils.objectives import (
         answer_distribution_kl_loss,
+        answer_distribution_kl_loss_weighted,
         reward_gap_loss,
     )
 
     device = next(model.parameters()).device
     prefix_len = input_ids.shape[-1]
-    compute_is = (
-        answer_ids is not None
-        and num_answers is not None
+    compute_is_fine = (
+        answer_ids_fine is not None
+        and num_answers_fine is not None
+        and chain_logprobs_clean is not None
+    )
+    compute_is_binary = (
+        answer_ids_binary is not None
+        and num_answers_binary is not None
         and chain_logprobs_clean is not None
     )
 
@@ -492,13 +502,9 @@ def eval_all_metrics(
                 log_masked, log_clean, log_target=True, reduction="none"
             ).sum(dim=-1)  # (1, seq_len)
 
-            # Local KL window: first num_tokens_to_analyse continuation tokens
+            # Local KL: always average over the full continuation
             cont_len = full_len - prefix_len
-            if num_tokens_to_analyse is not None:
-                analyse_len = min(num_tokens_to_analyse, cont_len)
-            else:
-                analyse_len = cont_len
-            analyse_end = prefix_len + analyse_len
+            analyse_end = full_len
 
             # Build position mask for local KL
             local_pos_mask = torch.zeros(1, full_len, device=out_device)
@@ -544,8 +550,8 @@ def eval_all_metrics(
                 per_sent_kl_branches.append(sent_kl_list)
 
             # --- Chain log-prob for IS metrics (over FULL branch) ---
-            if compute_is:
-                lp = chain_log_prob(logits.float(), full_input, prefix_len)
+            if compute_is_fine or compute_is_binary:
+                lp = chain_log_prob(logits.float(), full_input, prefix_len, temperature=temperature)
                 chain_lps.append(lp)
 
             total_branches += 1
@@ -568,47 +574,65 @@ def eval_all_metrics(
     if per_sent_kl_branches:
         result["per_sentence_kl"] = per_sent_kl_branches
 
-    # --- IS-based metrics ---
-    if compute_is:
+    # --- IS-based metrics (shared importance weights) ---
+    if compute_is_fine or compute_is_binary:
         chain_lps_t = torch.stack(chain_lps).to(device)
         clean_lps = chain_logprobs_clean.to(device)
-        answer_ids_dev = answer_ids.to(device)
 
         w = importance_weights(chain_lps_t, clean_lps)
         n_eff = effective_sample_size(w)
-        p_m = snis_answer_probs(w, answer_ids_dev, num_answers)
-
-        # Answer KL (Objective 1)
-        answer_kl = answer_distribution_kl_loss(
-            chain_lps_t, clean_lps, answer_ids_dev, num_answers,
-        ).item()
-
-        # Reward gap (Objective 2)
-        target_answer = 0
-        p_target = p_m[target_answer].item()
-        other_mask = torch.ones(num_answers, dtype=torch.bool, device=device)
-        other_mask[target_answer] = False
-        p_best_other = p_m[other_mask].max().item() if other_mask.any() else 0.0
-        reward_gap = p_target - p_best_other
-
-        result["answer_kl"] = answer_kl
-        result["reward_gap"] = reward_gap
-        result["p_target"] = p_target
-        result["p_best_other"] = p_best_other
-        result["answer_probs_masked"] = p_m.detach().cpu().tolist()
         result["n_eff"] = n_eff
         result["n_eff_ratio"] = n_eff / len(continuations)
         result["log_weights"] = (
             (chain_lps_t - clean_lps).detach().cpu().tolist()
         )
 
-    # --- Contrastive metrics (group per-branch KL by answer_ids) ---
-    if answer_ids is not None and num_answers is not None:
+    # Answer KL uses fine-grained buckets (each distinct answer is its own bucket)
+    if compute_is_fine:
+        answer_ids_fine_dev = answer_ids_fine.to(device)
+        p_m_fine = snis_answer_probs(w, answer_ids_fine_dev, num_answers_fine)
+
+        # Paper-style (Eq. 1) outcome distribution under the masked model:
+        # within-sample histogram weighted by softmax(chain_logprobs_masked).
+        sample_weights_m = torch.softmax(chain_lps_t, dim=0)
+        p_m_weighted = torch.zeros(num_answers_fine, device=device)
+        for a in range(num_answers_fine):
+            a_mask = (answer_ids_fine_dev == a).float()
+            p_m_weighted[a] = (sample_weights_m * a_mask).sum()
+
+        answer_kl = answer_distribution_kl_loss(
+            chain_lps_t, clean_lps, answer_ids_fine_dev, num_answers_fine,
+        ).item()
+        answer_kl_w = answer_distribution_kl_loss_weighted(
+            chain_lps_t, clean_lps, answer_ids_fine_dev, num_answers_fine,
+        ).item()
+
+        result["answer_kl"] = answer_kl
+        result["answer_kl_weighted"] = answer_kl_w
+        result["answer_probs_masked_fine"] = p_m_fine.detach().cpu().tolist()
+        result["answer_probs_masked_weighted"] = p_m_weighted.detach().cpu().tolist()
+
+    # Reward gap uses binary buckets (correct vs incorrect)
+    if compute_is_binary:
+        answer_ids_binary_dev = answer_ids_binary.to(device)
+        p_m_binary = snis_answer_probs(w, answer_ids_binary_dev, num_answers_binary)
+
+        p_target = p_m_binary[0].item()   # correct
+        p_other = p_m_binary[1].item() if num_answers_binary > 1 else 0.0
+        reward_gap = p_target - p_other
+
+        result["reward_gap"] = reward_gap
+        result["p_target"] = p_target
+        result["p_best_other"] = p_other
+        result["answer_probs_masked"] = p_m_binary.detach().cpu().tolist()
+
+    # --- Contrastive metrics (group per-branch KL by binary answer_ids) ---
+    if answer_ids_binary is not None and num_answers_binary is not None:
         target_answer = 0
         kl_a_vals = []
         kl_b_vals = []
         for i, bkl in enumerate(per_branch_kl):
-            if answer_ids[i].item() == target_answer:
+            if answer_ids_binary[i].item() == target_answer:
                 kl_a_vals.append(bkl)
             else:
                 kl_b_vals.append(bkl)
@@ -642,11 +666,13 @@ def evaluate_at_thresholds(
     num_random_samples: int = 5,
     branch_rewards: list[float] | None = None,
     position_mask_overrides: list[torch.Tensor | None] | None = None,
-    answer_ids: Optional[torch.Tensor] = None,
-    num_answers: Optional[int] = None,
-    num_tokens_to_analyse: Optional[int] = None,
+    answer_ids_fine: Optional[torch.Tensor] = None,
+    num_answers_fine: Optional[int] = None,
+    answer_ids_binary: Optional[torch.Tensor] = None,
+    num_answers_binary: Optional[int] = None,
     use_chunked_forward: bool = True,
     chunk_size: int = 2048,
+    temperature: float = 1.0,
 ) -> list[dict]:
     """Evaluate all metrics at different mask thresholds.
 
@@ -655,8 +681,12 @@ def evaluate_at_thresholds(
     contrastive) are computed in a single forward pass per continuation.
 
     Args:
-        num_tokens_to_analyse: If set, local KL metrics use only the first N
-            continuation tokens.  IS metrics always use the full branch.
+        answer_ids_fine: Fine-grained answer IDs (each distinct answer is its
+            own bucket, ``__no_answer`` variants merged).  Used for ``answer_kl``.
+        num_answers_fine: Number of fine-grained answer buckets.
+        answer_ids_binary: Binary answer IDs (0=correct, 1=incorrect).
+            Used for ``reward_gap``.
+        num_answers_binary: Number of binary answer buckets (always 2).
     """
     device = next(model.parameters()).device
     num_heads = model.config.num_attention_heads
@@ -694,7 +724,9 @@ def evaluate_at_thresholds(
             device,
         )
 
-    # Compute clean logits
+    # Compute clean logits (no target-layer masks; ratio-based renormalization
+    # in apply_sentence_mask ensures patched forwards are bit-identical to
+    # unpatched when mask=1, so no all-ones hooks are needed here).
     print("Computing clean logits for threshold evaluation...")
     clean_logits_list = compute_clean_logits(
         model, input_ids, continuations,
@@ -702,16 +734,32 @@ def evaluate_at_thresholds(
         chunk_size=chunk_size,
     )
 
-    # Compute clean chain logprobs when answer_ids are available (for IS metrics)
+    # Compute clean chain logprobs when any answer_ids are available (for IS metrics)
     chain_logprobs_clean = None
-    if answer_ids is not None and num_answers is not None:
+    has_fine = answer_ids_fine is not None and num_answers_fine is not None
+    has_binary = answer_ids_binary is not None and num_answers_binary is not None
+    if has_fine or has_binary:
         chain_logprobs_clean = []
         for ci, cont in enumerate(continuations):
             full_input = torch.cat([input_ids, cont], dim=-1)
             clean_logits = clean_logits_list[ci][:, : full_input.shape[-1]]
-            lp = chain_log_prob(clean_logits, full_input.cpu(), prefix_len)
+            lp = chain_log_prob(clean_logits, full_input.cpu(), prefix_len, temperature=temperature)
             chain_logprobs_clean.append(lp.detach())
         chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
+
+    # Paper-style (Eq. 1) outcome distribution under the clean model.
+    # Threshold-independent — computed once and stashed on node_mask.metadata
+    # so the dashboard can read it at top level.
+    if has_fine and chain_logprobs_clean is not None:
+        answer_ids_fine_dev_top = answer_ids_fine.to(device)
+        sample_weights_clean = torch.softmax(chain_logprobs_clean.detach(), dim=0)
+        p_clean_weighted = torch.zeros(num_answers_fine, device=device)
+        for a in range(num_answers_fine):
+            a_mask = (answer_ids_fine_dev_top == a).float()
+            p_clean_weighted[a] = (sample_weights_clean * a_mask).sum()
+        node_mask.metadata["answer_probs_clean_weighted"] = (
+            p_clean_weighted.cpu().tolist()
+        )
 
     # Shared kwargs for eval_all_metrics
     shared_kwargs = dict(
@@ -727,11 +775,13 @@ def evaluate_at_thresholds(
         branch_rewards=branch_rewards,
         position_mask_overrides=position_mask_overrides,
         chain_logprobs_clean=chain_logprobs_clean,
-        answer_ids=answer_ids,
-        num_answers=num_answers,
-        num_tokens_to_analyse=num_tokens_to_analyse,
+        answer_ids_fine=answer_ids_fine,
+        num_answers_fine=num_answers_fine,
+        answer_ids_binary=answer_ids_binary,
+        num_answers_binary=num_answers_binary,
         use_chunked_forward=use_chunked_forward,
         chunk_size=chunk_size,
+        temperature=temperature,
     )
 
     # Pre-generate K random score masks by permuting learned scores
@@ -806,26 +856,36 @@ def evaluate_at_thresholds(
         if "per_sentence_kl" in learned:
             entry["per_sentence_kl"] = learned["per_sentence_kl"]
 
-        # IS-based metrics
+        # IS-based shared diagnostics
+        if "n_eff" in learned:
+            entry["n_eff"] = learned["n_eff"]
+            entry["n_eff_ratio"] = learned["n_eff_ratio"]
+            entry["log_weights"] = learned["log_weights"]
+            entry["random_n_effs"] = [r.get("n_eff", 0.0) for r in random_results]
+
+        # Answer KL (fine-grained buckets)
         if "answer_kl" in learned:
             entry["answer_kl"] = learned["answer_kl"]
+            entry["answer_kl_weighted"] = learned["answer_kl_weighted"]
+            entry["answer_probs_masked_fine"] = learned["answer_probs_masked_fine"]
+            entry["answer_probs_masked_weighted"] = learned["answer_probs_masked_weighted"]
+            entry["random_answer_kl"] = _mean_field(random_results, "answer_kl")
+            entry["random_answer_kls"] = [r.get("answer_kl", 0.0) for r in random_results]
+            entry["random_answer_kl_weighted"] = _mean_field(random_results, "answer_kl_weighted")
+            entry["random_answer_kl_weighteds"] = [r.get("answer_kl_weighted", 0.0) for r in random_results]
+
+        # Reward gap (binary buckets)
+        if "reward_gap" in learned:
             entry["reward_gap"] = learned["reward_gap"]
             entry["p_target"] = learned["p_target"]
             entry["p_best_other"] = learned["p_best_other"]
             entry["answer_probs_masked"] = learned["answer_probs_masked"]
-            entry["n_eff"] = learned["n_eff"]
-            entry["n_eff_ratio"] = learned["n_eff_ratio"]
-            entry["log_weights"] = learned["log_weights"]
-
-            entry["random_answer_kl"] = _mean_field(random_results, "answer_kl")
-            entry["random_answer_kls"] = [r.get("answer_kl", 0.0) for r in random_results]
             entry["random_reward_gap"] = _mean_field(random_results, "reward_gap")
             entry["random_reward_gaps"] = [r.get("reward_gap", 0.0) for r in random_results]
             entry["random_p_target"] = _mean_field(random_results, "p_target")
             entry["random_p_targets"] = [r.get("p_target", 0.0) for r in random_results]
             entry["random_p_best_other"] = _mean_field(random_results, "p_best_other")
             entry["random_p_best_others"] = [r.get("p_best_other", 0.0) for r in random_results]
-            entry["random_n_effs"] = [r.get("n_eff", 0.0) for r in random_results]
 
         # Contrastive metrics
         if "kl_a" in learned:
@@ -847,10 +907,12 @@ def evaluate_at_thresholds(
         extra_parts = []
         if "answer_kl" in learned:
             extra_parts.append(f"answer_kl={learned['answer_kl']:.6f}")
-            extra_parts.append(f"reward_gap={learned['reward_gap']:.4f}")
-            extra_parts.append(
-                f"N_eff={learned['n_eff']:.1f} ({learned['n_eff_ratio']:.1%})"
-            )
+            if "reward_gap" in learned:
+                extra_parts.append(f"reward_gap={learned['reward_gap']:.4f}")
+            if "n_eff" in learned:
+                extra_parts.append(
+                    f"N_eff={learned['n_eff']:.1f} ({learned['n_eff_ratio']:.1%})"
+                )
         if "kl_a" in learned:
             extra_parts.append(
                 f"kl_a={learned['kl_a']:.6f} kl_b={learned['kl_b']:.6f}"

@@ -34,17 +34,39 @@ def kl_divergence_loss(
     Returns:
         Scalar KL divergence loss (differentiable w.r.t. masked_logits).
     """
-    clean_log_probs = F.log_softmax(clean_logits.detach().float(), dim=-1)
-    masked_log_probs = F.log_softmax(masked_logits.float(), dim=-1)
+    seq_len = clean_logits.shape[1]
+    KL_CHUNK = 4096  # chunk along seq dim to avoid materialising (seq, vocab) all at once
 
-    # KL(P || Q) = sum P * (log P - log Q)
-    kl = F.kl_div(
-        masked_log_probs, clean_log_probs, log_target=True, reduction="none"
-    ).sum(dim=-1)  # (batch, seq_len)
+    if seq_len <= KL_CHUNK:
+        # Short sequence — original path (no chunking overhead)
+        clean_log_probs = F.log_softmax(clean_logits.detach().float(), dim=-1)
+        masked_log_probs = F.log_softmax(masked_logits.float(), dim=-1)
+        kl = F.kl_div(
+            masked_log_probs, clean_log_probs, log_target=True, reduction="none"
+        ).sum(dim=-1)
+        if position_mask is not None:
+            return (kl * position_mask).sum() / position_mask.sum().clamp(min=1)
+        return kl.mean()
 
+    # Long sequence — chunk to cap peak memory at ~512 × vocab × 4 bytes × 3 tensors
+    kl_sum = torch.tensor(0.0, device=masked_logits.device)
+    mask_sum = torch.tensor(0.0, device=masked_logits.device) if position_mask is not None else None
+    count = 0
+    for s in range(0, seq_len, KL_CHUNK):
+        e = min(s + KL_CHUNK, seq_len)
+        c_lp = F.log_softmax(clean_logits[:, s:e].detach().float(), dim=-1)
+        m_lp = F.log_softmax(masked_logits[:, s:e].float(), dim=-1)
+        kl_chunk = F.kl_div(m_lp, c_lp, log_target=True, reduction="none").sum(dim=-1)
+        if position_mask is not None:
+            pm = position_mask[:, s:e]
+            kl_sum = kl_sum + (kl_chunk * pm).sum()
+            mask_sum = mask_sum + pm.sum()
+        else:
+            kl_sum = kl_sum + kl_chunk.sum()
+            count += kl_chunk.numel()
     if position_mask is not None:
-        return (kl * position_mask).sum() / position_mask.sum().clamp(min=1)
-    return kl.mean()
+        return kl_sum / mask_sum.clamp(min=1)
+    return kl_sum / count
 
 
 def log_prob_loss(
@@ -172,8 +194,63 @@ def reward_gap_loss(
     return -(p_target - p_best_other)
 
 
+def answer_distribution_kl_loss_weighted(
+    chain_logprobs_masked: torch.Tensor,
+    chain_logprobs_clean: torch.Tensor,
+    answer_ids: torch.Tensor,
+    num_answers: int,
+    **kwargs,
+) -> torch.Tensor:
+    """KL(P_clean || P_m) — Forking Paths Eq. 1, applied symmetrically.
+
+    Both P_clean and P_m are within-sample weighted histograms (Eq. 1 of
+    Bigelow et al. 2024). Each chain is weighted by its sample probability
+    under the respective model:
+
+        P_clean(a) = sum_{s: a_s=a} softmax(chain_logprobs_clean)[s]
+        P_m(a)     = sum_{s: a_s=a} softmax(chain_logprobs_masked)[s]
+
+    Neither side is an unbiased estimator of a true marginal — they are
+    the paper's "outcome distribution" objects, computed under each model.
+    Gradient flows through chain_logprobs_masked via P_m.
+
+    Args:
+        chain_logprobs_masked: (N,) log-probs under masked model (has grad)
+        chain_logprobs_clean: (N,) log-probs under clean model (detached)
+        answer_ids: (N,) integer answer IDs
+        num_answers: number of distinct answers
+
+    Returns:
+        Scalar KL divergence (differentiable w.r.t. chain_logprobs_masked).
+    """
+    device = chain_logprobs_masked.device
+
+    # P_clean: weighted by sample probability under clean model (detached)
+    sample_weights_clean = torch.softmax(chain_logprobs_clean.detach(), dim=0)
+    p_clean = torch.zeros(num_answers, device=device)
+    for a in range(num_answers):
+        mask = (answer_ids == a).float().to(device)
+        p_clean[a] = (sample_weights_clean * mask).sum()
+
+    # P_m: weighted by sample probability under masked model (has grad)
+    sample_weights_m = torch.softmax(chain_logprobs_masked, dim=0)
+    p_m = torch.zeros(num_answers, device=device)
+    for a in range(num_answers):
+        mask = (answer_ids == a).float().to(device)
+        p_m[a] = (sample_weights_m * mask).sum()
+
+    # KL(P_clean || P_m) — only over answers with non-zero P_clean
+    active = p_clean > 0
+    kl = (
+        p_clean[active]
+        * torch.log(p_clean[active] / p_m[active].clamp(min=1e-10))
+    ).sum()
+    return kl
+
+
 GLOBAL_OBJECTIVES = {
     "answer_kl": answer_distribution_kl_loss,
+    "answer_kl_weighted": answer_distribution_kl_loss_weighted,
     "reward_gap": reward_gap_loss,
 }
 

@@ -18,6 +18,8 @@ def chain_log_prob(
     logits: torch.Tensor,
     token_ids: torch.Tensor,
     prefix_len: int,
+    temperature: float = 1.0,
+    apply_temperature: bool = True,
 ) -> torch.Tensor:
     """Log-probability of a continuation under a model.
 
@@ -27,11 +29,16 @@ def chain_log_prob(
         logits: (1, seq_len, vocab) model output logits (may require grad)
         token_ids: (1, seq_len) full token sequence (prompt + continuation)
         prefix_len: number of prompt tokens (continuation starts here)
+        temperature: sampling temperature used during generation.
+        apply_temperature: if True (default), scale logits by 1/temperature
+            before computing log-probs so they match the actual sampling
+            distribution. Set to False to use raw (temperature=1) logits.
 
     Returns:
         Scalar log-probability (differentiable w.r.t. logits).
     """
-    log_probs = F.log_softmax(logits.float(), dim=-1)
+    scaled = logits.float() / temperature if apply_temperature and temperature != 1.0 else logits.float()
+    log_probs = F.log_softmax(scaled, dim=-1)
     seq_len = token_ids.shape[-1]
     # logits[t] predicts token_ids[t+1]
     # Continuation tokens: token_ids[prefix_len .. seq_len-1]
@@ -244,6 +251,74 @@ def _cluster_with_judge(
             answer_ids[idx] = cid
 
     return answer_ids, labels
+
+
+def merge_no_answer_variants(
+    answer_ids: list[int],
+    answer_labels: list[str],
+) -> tuple[list[int], list[str], int]:
+    """Merge all ``__no_answer_*`` labels into a single ``__no_answer`` bucket.
+
+    Args:
+        answer_ids: per-branch integer answer IDs
+        answer_labels: unique answer label strings
+
+    Returns:
+        (new_answer_ids, new_answer_labels, new_num_answers)
+    """
+    no_answer_indices = [
+        i for i, label in enumerate(answer_labels) if label.startswith("__no_answer")
+    ]
+    if len(no_answer_indices) <= 1:
+        return answer_ids, answer_labels, len(answer_labels)
+
+    # Build old-to-new ID mapping
+    new_labels: list[str] = []
+    old_to_new: dict[int, int] = {}
+    merged_id: int | None = None
+    for old_id, label in enumerate(answer_labels):
+        if label.startswith("__no_answer"):
+            if merged_id is None:
+                merged_id = len(new_labels)
+                new_labels.append("__no_answer")
+            old_to_new[old_id] = merged_id
+        else:
+            old_to_new[old_id] = len(new_labels)
+            new_labels.append(label)
+
+    new_ids = [old_to_new[a] for a in answer_ids]
+    return new_ids, new_labels, len(new_labels)
+
+
+def build_binary_answer_ids(
+    answer_ids: list[int],
+    answer_labels: list[str],
+    correct_answer: str,
+) -> tuple[list[int], list[str], int]:
+    """Build binary (correct / incorrect) answer IDs from fine-grained labels.
+
+    Matches *correct_answer* against *answer_labels* using
+    :func:`normalize_answer`.  Any label that matches is mapped to bucket 0
+    (``"correct"``), everything else to bucket 1 (``"incorrect"``).
+
+    Args:
+        answer_ids: per-branch fine-grained integer answer IDs
+        answer_labels: unique answer label strings
+        correct_answer: ground-truth answer string
+
+    Returns:
+        (binary_answer_ids, ["correct", "incorrect"], 2)
+    """
+    target_norm = normalize_answer(correct_answer)
+    correct_old_ids = set()
+    for old_id, label in enumerate(answer_labels):
+        if label.startswith("__no_answer"):
+            continue
+        if normalize_answer(label) == target_norm:
+            correct_old_ids.add(old_id)
+
+    binary_ids = [0 if a in correct_old_ids else 1 for a in answer_ids]
+    return binary_ids, ["correct", "incorrect"], 2
 
 
 def reward_based_answer_ids(

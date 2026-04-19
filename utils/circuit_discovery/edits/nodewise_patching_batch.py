@@ -145,7 +145,7 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
             full_input = torch.cat([input_ids, cont], dim=-1)
             with torch.amp.autocast("cuda"):
                 logits = self.model(full_input).logits
-            lp = chain_log_prob(logits.float(), full_input, prefix_len)
+            lp = chain_log_prob(logits.float(), full_input, prefix_len, temperature=self.temperature)
             chain_lps.append(lp.detach())
         chain_lps = torch.stack(chain_lps).to(device)
         return self.objective_fn(
@@ -259,7 +259,7 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
             for ci, cont in enumerate(continuations):
                 full_input = torch.cat([input_ids, cont], dim=-1)
                 clean_logits = clean_logits_list[ci][:, : full_input.shape[-1]]
-                lp = chain_log_prob(clean_logits, full_input.cpu(), prefix_len)
+                lp = chain_log_prob(clean_logits, full_input.cpu(), prefix_len, temperature=self.temperature)
                 chain_logprobs_clean.append(lp.detach())
             chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
 

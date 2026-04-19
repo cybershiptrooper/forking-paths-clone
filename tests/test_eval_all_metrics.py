@@ -5,7 +5,8 @@ Tests cover:
 - H2: Contrastive grouping (kl_a, kl_b, contrastive_loss)
 - H3: Edge case — answer_ids is None (IS + contrastive fields absent)
 - H4: Edge case — single answer group (degenerate metrics)
-- H5: num_tokens_to_analyse truncation
+- H5: KL always uses full continuation (no truncation)
+- H6: Fine-grained vs binary answer grouping
 
 Usage:
     uv run python tests/test_eval_all_metrics.py
@@ -150,15 +151,10 @@ def make_test_data(
     )
 
 
-def _compute_expected_kl(clean_logits, masked_logits, prefix_len, num_tokens=None):
+def _compute_expected_kl(clean_logits, masked_logits, prefix_len):
     """Compute expected mean per-token KL, matching eval_all_metrics logic."""
     full_len = clean_logits.shape[1]
-    cont_len = full_len - prefix_len
-    if num_tokens is not None:
-        analyse_len = min(num_tokens, cont_len)
-    else:
-        analyse_len = cont_len
-    analyse_end = prefix_len + analyse_len
+    analyse_end = full_len
 
     log_c = F.log_softmax(clean_logits.float(), dim=-1)
     log_m = F.log_softmax(masked_logits.float(), dim=-1)
@@ -216,8 +212,10 @@ def test_forward_pass_count_with_answer_ids():
         chain_logprobs_clean.append(lp.detach())
     chain_logprobs_clean = torch.stack(chain_logprobs_clean)
 
-    data["answer_ids"] = torch.tensor([0, 0, 1, 1])
-    data["num_answers"] = 2
+    data["answer_ids_fine"] = torch.tensor([0, 0, 1, 1])
+    data["num_answers_fine"] = 2
+    data["answer_ids_binary"] = torch.tensor([0, 0, 1, 1])
+    data["num_answers_binary"] = 2
     data["chain_logprobs_clean"] = chain_logprobs_clean
     data["model"]._forward_count = 0
 
@@ -294,7 +292,7 @@ def test_reward_weighted_kl_no_rewards():
 
 
 def test_contrastive_grouping():
-    """kl_a and kl_b should group per-branch KL by answer_ids."""
+    """kl_a and kl_b should group per-branch KL by answer_ids_binary."""
     data = make_test_data(num_branches=4)
     prefix_len = data["input_ids"].shape[-1]
 
@@ -307,8 +305,8 @@ def test_contrastive_grouping():
         chain_logprobs_clean.append(lp.detach())
     chain_logprobs_clean = torch.stack(chain_logprobs_clean)
 
-    data["answer_ids"] = torch.tensor([0, 0, 1, 1])
-    data["num_answers"] = 2
+    data["answer_ids_binary"] = torch.tensor([0, 0, 1, 1])
+    data["num_answers_binary"] = 2
     data["chain_logprobs_clean"] = chain_logprobs_clean
 
     result = eval_all_metrics(**data)
@@ -359,7 +357,7 @@ def test_no_answer_ids():
 
 
 def test_single_answer_group():
-    """With num_answers=1, answer_kl should be ~0, contrastive metrics trivial."""
+    """With num_answers_fine=1, answer_kl should be ~0."""
     data = make_test_data(num_branches=4)
     prefix_len = data["input_ids"].shape[-1]
 
@@ -371,9 +369,12 @@ def test_single_answer_group():
         chain_logprobs_clean.append(lp.detach())
     chain_logprobs_clean = torch.stack(chain_logprobs_clean)
 
-    # All branches in the same group
-    data["answer_ids"] = torch.tensor([0, 0, 0, 0])
-    data["num_answers"] = 1
+    # All branches in the same fine-grained group
+    data["answer_ids_fine"] = torch.tensor([0, 0, 0, 0])
+    data["num_answers_fine"] = 1
+    # Binary: all correct (single group)
+    data["answer_ids_binary"] = torch.tensor([0, 0, 0, 0])
+    data["num_answers_binary"] = 1
     data["chain_logprobs_clean"] = chain_logprobs_clean
 
     result = eval_all_metrics(**data)
@@ -383,39 +384,21 @@ def test_single_answer_group():
         f"answer_kl should be ~0 for single group, got {result['answer_kl']}"
     )
 
-    # kl_a = mean of all branches (all are target=0), kl_b = 0 (no other group)
-    assert result["kl_a"] == result["kl_divergence"], (
-        f"kl_a should equal kl_divergence when all branches are target, "
-        f"got {result['kl_a']} vs {result['kl_divergence']}"
-    )
-    assert result["kl_b"] == 0.0, f"kl_b should be 0 with no other group, got {result['kl_b']}"
-
     print("[PASS] test_single_answer_group")
 
 
 # ---------------------------------------------------------------------------
-# H5: num_tokens_to_analyse truncation
+# H5: KL always uses full continuation
 # ---------------------------------------------------------------------------
 
 
-def test_num_tokens_to_analyse():
-    """KL should be computed over only the first N tokens when truncated."""
+def test_kl_uses_full_continuation():
+    """KL should always average over all continuation tokens."""
     data = make_test_data(num_branches=2, cont_len=50)
 
-    # Full analysis
-    result_full = eval_all_metrics(**data)
+    result = eval_all_metrics(**data)
 
-    # Truncated to 10 tokens
-    data_trunc = dict(data)
-    data_trunc["num_tokens_to_analyse"] = 10
-    result_trunc = eval_all_metrics(**data_trunc)
-
-    # Results should differ (different number of tokens averaged over)
-    assert result_full["kl_divergence"] != result_trunc["kl_divergence"], (
-        "Truncated and full KL should differ"
-    )
-
-    # Verify truncated matches hand computation
+    # Verify it matches hand computation over full continuation
     prefix_len = data["input_ids"].shape[-1]
     expected_kls = []
     model = data["model"]
@@ -425,62 +408,14 @@ def test_num_tokens_to_analyse():
             full = torch.cat([data["input_ids"], cont], dim=-1)
             logits = model(full).logits
             clean = data["clean_logits_list"][ci][:, : full.shape[-1]]
-            kl = _compute_expected_kl(clean, logits, prefix_len, num_tokens=10)
+            kl = _compute_expected_kl(clean, logits, prefix_len)
             expected_kls.append(kl.item())
 
     expected_mean = sum(expected_kls) / len(expected_kls)
-    assert abs(result_trunc["kl_divergence"] - expected_mean) < 1e-5, (
-        f"Truncated KL mismatch: {result_trunc['kl_divergence']} vs {expected_mean}"
+    assert abs(result["kl_divergence"] - expected_mean) < 1e-5, (
+        f"KL mismatch: {result['kl_divergence']} vs {expected_mean}"
     )
-    print("[PASS] test_num_tokens_to_analyse")
-
-
-def test_truncation_does_not_affect_is_metrics():
-    """IS metrics should use full branch even when num_tokens_to_analyse is set."""
-    # Use a deterministic model (seed noise) so repeated forward passes match
-    torch.manual_seed(999)
-    data = make_test_data(num_branches=4, cont_len=50)
-    prefix_len = data["input_ids"].shape[-1]
-
-    chain_logprobs_clean = []
-    for ci, cont in enumerate(data["continuations"]):
-        full = torch.cat([data["input_ids"], cont], dim=-1)
-        cl = data["clean_logits_list"][ci][:, : full.shape[-1]]
-        lp = chain_log_prob(cl, full, prefix_len)
-        chain_logprobs_clean.append(lp.detach())
-    chain_logprobs_clean = torch.stack(chain_logprobs_clean)
-
-    common = dict(
-        answer_ids=torch.tensor([0, 0, 1, 1]),
-        num_answers=2,
-        chain_logprobs_clean=chain_logprobs_clean,
-    )
-
-    # Run both with the same seed so the mock model's noise is identical
-    torch.manual_seed(42)
-    result_full = eval_all_metrics(**data, **common)
-    torch.manual_seed(42)
-    result_trunc = eval_all_metrics(**data, **common, num_tokens_to_analyse=10)
-
-    # IS metrics should be identical (chain logprob uses full branch,
-    # and model noise is seeded to be the same)
-    assert abs(result_full["answer_kl"] - result_trunc["answer_kl"]) < 1e-6, (
-        f"answer_kl should not change with truncation: "
-        f"{result_full['answer_kl']} vs {result_trunc['answer_kl']}"
-    )
-    assert abs(result_full["n_eff"] - result_trunc["n_eff"]) < 1e-6, (
-        f"n_eff should not change with truncation"
-    )
-
-    # But local KL and contrastive should differ
-    assert result_full["kl_divergence"] != result_trunc["kl_divergence"], (
-        "kl_divergence should differ with truncation"
-    )
-    assert result_full["kl_a"] != result_trunc["kl_a"], (
-        "kl_a should differ with truncation (uses local KL)"
-    )
-
-    print("[PASS] test_truncation_does_not_affect_is_metrics")
+    print("[PASS] test_kl_uses_full_continuation")
 
 
 # ---------------------------------------------------------------------------
@@ -489,7 +424,7 @@ def test_truncation_does_not_affect_is_metrics():
 
 
 def test_answer_probs_sum_to_one():
-    """answer_probs_masked should sum to ~1.0."""
+    """answer_probs_masked (binary) should sum to ~1.0."""
     data = make_test_data(num_branches=4)
     prefix_len = data["input_ids"].shape[-1]
 
@@ -501,21 +436,29 @@ def test_answer_probs_sum_to_one():
         chain_logprobs_clean.append(lp.detach())
     chain_logprobs_clean = torch.stack(chain_logprobs_clean)
 
-    data["answer_ids"] = torch.tensor([0, 0, 1, 1])
-    data["num_answers"] = 2
+    data["answer_ids_fine"] = torch.tensor([0, 0, 1, 1])
+    data["num_answers_fine"] = 2
+    data["answer_ids_binary"] = torch.tensor([0, 0, 1, 1])
+    data["num_answers_binary"] = 2
     data["chain_logprobs_clean"] = chain_logprobs_clean
 
     result = eval_all_metrics(**data)
 
+    # Binary probs sum to 1
     prob_sum = sum(result["answer_probs_masked"])
     assert abs(prob_sum - 1.0) < 1e-5, (
         f"answer_probs_masked should sum to 1.0, got {prob_sum}"
+    )
+    # Fine-grained probs sum to 1
+    prob_sum_fine = sum(result["answer_probs_masked_fine"])
+    assert abs(prob_sum_fine - 1.0) < 1e-5, (
+        f"answer_probs_masked_fine should sum to 1.0, got {prob_sum_fine}"
     )
     print("[PASS] test_answer_probs_sum_to_one")
 
 
 def test_reward_gap_decomposition():
-    """reward_gap should equal p_target - p_best_other."""
+    """reward_gap should equal p_target - p_best_other (binary buckets)."""
     data = make_test_data(num_branches=4)
     prefix_len = data["input_ids"].shape[-1]
 
@@ -527,8 +470,8 @@ def test_reward_gap_decomposition():
         chain_logprobs_clean.append(lp.detach())
     chain_logprobs_clean = torch.stack(chain_logprobs_clean)
 
-    data["answer_ids"] = torch.tensor([0, 0, 1, 1])
-    data["num_answers"] = 2
+    data["answer_ids_binary"] = torch.tensor([0, 0, 1, 1])
+    data["num_answers_binary"] = 2
     data["chain_logprobs_clean"] = chain_logprobs_clean
 
     result = eval_all_metrics(**data)
@@ -570,9 +513,8 @@ if __name__ == "__main__":
     print("\n--- H4: Single answer group ---")
     test_single_answer_group()
 
-    print("\n--- H5: num_tokens_to_analyse truncation ---")
-    test_num_tokens_to_analyse()
-    test_truncation_does_not_affect_is_metrics()
+    print("\n--- H5: KL uses full continuation ---")
+    test_kl_uses_full_continuation()
 
     print("\n--- IS metric value checks ---")
     test_answer_probs_sum_to_one()

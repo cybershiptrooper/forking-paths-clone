@@ -49,6 +49,8 @@ class CircuitDiscovery(ABC):
         ablate_non_target_layers: bool = False,
         renormalize_masked_attention: bool = True,
         mask_granularity: str = "head",
+        temperature: float = 1.0,
+        torch_compile: bool = False,
         **kwargs,
     ):
         if mask_granularity not in ("head", "layer", "pair"):
@@ -63,7 +65,9 @@ class CircuitDiscovery(ABC):
         self.ablate_non_target_layers = ablate_non_target_layers
         self.renormalize_masked_attention = renormalize_masked_attention
         self.mask_granularity = mask_granularity
+        self.temperature = temperature
         self.model_type = model.config.model_type
+        self._torch_compile = torch_compile
 
     def _build_token_to_sentence_map(
         self, sentences: List[Sentence], seq_len: int
@@ -84,10 +88,11 @@ class CircuitDiscovery(ABC):
     ) -> List[torch.Tensor]:
         """Pre-compute clean logits (no mask) for each continuation.
 
-        Uses the same autocast context as the IG forward pass so that the
-        precision of clean and masked logits matches. Without this, KL at
-        alpha=1 (identity mask) is spuriously non-zero due to float32-vs-
-        bfloat16 differences, biasing all IG gradients.
+        No patching is needed here: ``apply_sentence_mask`` uses
+        ratio-based renormalization (``pre_sum / post_sum``) which is
+        exactly 1.0 when the mask is all-ones, so patched and unpatched
+        forwards produce bit-identical results.  See
+        ``expts/circuit_debug/rough_kl_debug.py`` for verification.
         """
         clean_logits_list = []
         self.model.eval()
@@ -141,10 +146,35 @@ class CircuitDiscovery(ABC):
             attn_module.forward = types.MethodType(custom_forward_fn, attn_module)
             handles.append(AblationHandle(attn_module, original_forward))
 
+        if self._torch_compile:
+            self._compile_model()
         return handles
 
+    def _compile_model(self):
+        """Compile individual decoder layers for faster forward passes.
+
+        Called automatically by ``_patch_model`` when ``torch_compile=True``.
+        No-op if already compiled.  Compiles decoder layers only (not the
+        outer model) to avoid torch._dynamo issues with ``create_causal_mask``.
+        """
+        if hasattr(self, "_uncompiled_layers"):
+            return  # already compiled
+        layers = self.model.model.layers
+        self._uncompiled_layers = {i: layers[i] for i in range(len(layers))}
+        for i in range(len(layers)):
+            layers[i] = torch.compile(layers[i], mode="default")
+
+    def _decompile_model(self):
+        """Restore original (uncompiled) decoder layers."""
+        if hasattr(self, "_uncompiled_layers"):
+            layers = self.model.model.layers
+            for i, original in self._uncompiled_layers.items():
+                layers[i] = original
+            del self._uncompiled_layers
+
     def _unpatch_model(self, handles: List[AblationHandle]):
-        """Restore original forwards."""
+        """Restore original forwards (decompiles first if needed)."""
+        self._decompile_model()
         for h in handles:
             h.remove()
 

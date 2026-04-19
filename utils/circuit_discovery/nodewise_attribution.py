@@ -130,7 +130,7 @@ class NodewiseAttribution(CircuitDiscovery):
             for ci, cont in enumerate(continuations):
                 full_input = torch.cat([input_ids, cont], dim=-1)
                 clean_logits = clean_logits_list[ci][:, : full_input.shape[-1]]
-                lp = chain_log_prob(clean_logits, full_input.cpu(), prefix_len)
+                lp = chain_log_prob(clean_logits, full_input.cpu(), prefix_len, temperature=self.temperature)
                 chain_logprobs_clean.append(lp.detach())
             chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
 
@@ -208,7 +208,7 @@ class NodewiseAttribution(CircuitDiscovery):
                     full_input = torch.cat([input_ids, cont], dim=-1)
                     with torch.no_grad(), torch.amp.autocast("cuda"):
                         logits = self.model(full_input).logits
-                    lp = chain_log_prob(logits.float(), full_input, prefix_len)
+                    lp = chain_log_prob(logits.float(), full_input, prefix_len, temperature=self.temperature)
                     chain_lps_detached.append(lp.detach())
                 chain_lps_detached = torch.stack(chain_lps_detached)
 
@@ -240,7 +240,7 @@ class NodewiseAttribution(CircuitDiscovery):
                     with torch.amp.autocast("cuda"):
                         logits = self.model(full_input).logits
 
-                    lp = chain_log_prob(logits.float(), full_input, prefix_len)
+                    lp = chain_log_prob(logits.float(), full_input, prefix_len, temperature=self.temperature)
                     weighted_loss = lp * per_chain_weights[cont_idx]
                     weighted_loss.backward()
 

@@ -89,7 +89,7 @@ def expand_sentence_mask_to_tokens(
 # Composable injection building blocks
 # ---------------------------------------------------------------------------
 
-def apply_sentence_mask(
+def apply_sentence_mask_old(
     module,
     attn_weights: torch.Tensor,
     q_len: int,
@@ -121,9 +121,47 @@ def apply_sentence_mask(
         attn_weights.mul_(token_mask.unsqueeze(0))
         renormalize = getattr(module, "_renormalize_masked_attn", True)
         if renormalize:
-            row_sums = attn_weights.sum(dim=-1, keepdim=True)
-            row_sums.add_(1e-6)
-            attn_weights.div_(row_sums)
+            # Accumulate row sums in float32 to avoid bf16 precision errors
+            # that compound across layers and tokens (causing spurious IS drift).
+            row_sums = attn_weights.sum(dim=-1, keepdim=True, dtype=torch.float32)
+            row_sums.add_(1e-16)
+            attn_weights.div_(row_sums.to(attn_weights.dtype))
+
+    return attn_weights
+
+
+def apply_sentence_mask(
+    module,
+    attn_weights: torch.Tensor,
+    q_len: int,
+    k_len: int,
+    cache_position: Optional[torch.Tensor],
+) -> torch.Tensor:
+    """Drop-in replacement for ``apply_sentence_mask`` with ratio renorm."""
+    mask = getattr(module, "_circuit_mask", None)
+    token_to_sent = getattr(module, "_token_to_sent", None)
+    gap_filter = getattr(module, "_gap_filter", None)
+
+    if mask is not None and token_to_sent is not None:
+        token_mask = expand_sentence_mask_to_tokens(
+            mask, token_to_sent, gap_filter, q_len, k_len, cache_position,
+            out_dtype=attn_weights.dtype,
+        )
+        token_mask = token_mask.to(device=attn_weights.device)
+
+        renormalize = getattr(module, "_renormalize_masked_attn", True)
+        if renormalize:
+            # Pre-mask row sums in float32
+            pre_sum = attn_weights.sum(dim=-1, keepdim=True, dtype=torch.float32)
+            # Apply mask
+            attn_weights.mul_(token_mask.unsqueeze(0))
+            # Post-mask row sums in float32
+            post_sum = attn_weights.sum(dim=-1, keepdim=True, dtype=torch.float32)
+            # Ratio: when mask=1, pre_sum==post_sum → scale=1.0 exactly.
+            scale = pre_sum / (post_sum + 1e-16)
+            attn_weights.mul_(scale.to(attn_weights.dtype))
+        else:
+            attn_weights.mul_(token_mask.unsqueeze(0))
 
     return attn_weights
 
