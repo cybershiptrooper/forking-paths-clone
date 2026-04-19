@@ -1,3 +1,4 @@
+import re
 from typing import List
 from vllm import LLM, SamplingParams
 
@@ -87,13 +88,13 @@ def parse_answer(
         List of records for each generated branch, with added data for the extracted answer.
     """
     # parse final answers
-    sampling_params = SamplingParams(temperature=0., max_tokens=3)
-    
+    sampling_params = SamplingParams(temperature=0., max_tokens=200)
+
     def list_choices(datapoint):
         # ignore if not multiple choice
         if datapoint["dataset_type"] != "multiple choice":
             return None
-        
+
         # join letters & answers into single string, like in the question prompt
         choices = '\n'.join(f"{letter}) {option}"
             for letter, option in zip(datapoint["all_letters"], datapoint["all_answers"])
@@ -115,9 +116,29 @@ def parse_answer(
     for i in range(len(answers_dataset)):
         parse_output = parse_outputs[i].outputs[0]
         results.append({
-            'raw_answer': parse_output.text, 
-            'clean_answer': parse_output.text.strip("\" {}\n\t"),
+            'raw_answer': parse_output.text,
+            'clean_answer': _extract_parsed_answer(parse_output.text),
             **answers_dataset[i] # tack onto datapoint
         })
-        
+
     return results
+
+
+def _extract_parsed_answer(raw_text: str) -> str:
+    """Extract the answer from the parser LLM's JSON-like output.
+
+    The parser continues from a prefix like ``{\\n    "final_answer":``,
+    so *raw_text* looks like ``' "1440"\\n}'`` or ``' "\\\\frac{42}{5}"\\n}'``.
+    We extract the content between the first pair of double-quotes that is
+    followed (after optional whitespace) by ``}``, preserving LaTeX braces.
+    """
+    # Try "answer" } pattern (handles LaTeX braces inside correctly)
+    m = re.search(r'"(.*?)"\s*}', raw_text, re.DOTALL)
+    if m:
+        return m.group(1)
+    # Try just a quoted string (output may have been truncated before })
+    m = re.search(r'"(.*?)"', raw_text, re.DOTALL)
+    if m:
+        return m.group(1)
+    # Fallback: strip outer whitespace and quotes only
+    return raw_text.strip().strip('"').strip()

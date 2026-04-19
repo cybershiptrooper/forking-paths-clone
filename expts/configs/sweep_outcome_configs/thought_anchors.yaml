@@ -1,0 +1,4 @@
+base_config: expts/configs/sweep_outcome_configs/base.yaml
+
+objective: answer_kl
+file_name: thought_anchors

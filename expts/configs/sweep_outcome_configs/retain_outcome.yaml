@@ -1,0 +1,5 @@
+base_config: expts/configs/sweep_outcome_configs/base.yaml
+
+objective: answer_kl
+file_name: retain_outcome_dist
+batch_chunk_size: 2

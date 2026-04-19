@@ -20,7 +20,7 @@ playground.ipynb
 plots
 thought_anchors
 *rollouts*
-*log*
+*log
 .cursor
 *rough*
 results/attention*
@@ -35,4 +35,5 @@ cluster.md
 .superset
 .claude
 *old*
-roadmap/
+# roadmap/
+cache/

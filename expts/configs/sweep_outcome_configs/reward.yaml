@@ -1,0 +1,6 @@
+base_config: expts/configs/sweep_outcome_configs/base.yaml
+
+reward_type: correctness
+objective: reward_gap
+file_name: reward_with_importance_sampling
+batch_chunk_size: 2

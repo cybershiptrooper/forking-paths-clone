@@ -1,17 +1,17 @@
 model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
 data_path: data/collection/deepseek_llama_8b/math_open.json
 prompt_index: 6
-# reward_type: correctness
 objective: answer_kl
-masking_algorithm: nodewise_activation_patching_flash
+masking_algorithm: nodewise_activation_patching_kv_cache
 num_new_branches: 32
 mask_granularity: pair
 mask_mode: prefix
 layers_to_analyse: all
 max_sampling_tokens: 10000
+num_tokens_to_analyse: 50
 analysis_timestep: 1126
 sentence_gap: 4
-output_dir: results/circuit_discovery/v4
-file_name: retain_outcome_dist_at_1126_32_branches_flash
+output_dir: results/circuit_discovery
+file_name: benchmark_baseline
 ablate_non_target_layers: true
 device: cuda:0

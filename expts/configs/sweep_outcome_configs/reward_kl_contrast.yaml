@@ -1,0 +1,7 @@
+base_config: expts/configs/sweep_outcome_configs/base.yaml
+
+file_name: reward_per_token_kl
+objective: kl_divergence
+reward_type: correctness
+batch_chunk_size: 4
+torch_compile: false

@@ -1,0 +1,5 @@
+base_config: expts/configs/sweep_outcome_configs/base.yaml
+
+objective: answer_kl_weighted
+file_name: retain_outcome_dist_forking_paths_metric
+batch_chunk_size: 2
