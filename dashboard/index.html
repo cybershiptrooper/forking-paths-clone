@@ -415,8 +415,8 @@
     <div id="compare-chart-area">
       <div id="compare-metric-bar">
         <select id="compare-metric-select" onchange="onCompareMetricChange()"></select>
-        <select id="compare-threshold-select" onchange="onCompareMetricChange()" style="display:none;">
-          <option value="">— threshold for heatmap —</option>
+        <select id="compare-threshold-select" onchange="onCompareSparsityChange()" style="display:none;">
+          <option value="">— sparsity —</option>
         </select>
         <div id="compare-legend"></div>
       </div>
@@ -449,6 +449,7 @@
 // State
 // ══════════════════════════════════════════════════════════════
 let maskData = null;
+let resampleData = null;       // sidecar from evaluate_mask_resample.py
 let processed = null;
 let selectedNode = null;       // { layer, sentence }
 let highlightSentence = null;  // sentence index (from legend click)
@@ -530,13 +531,26 @@ let canvas, ctx, svgRoot;
 document.getElementById('file-input').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
-  r.onload = ev => { try { maskData = JSON.parse(ev.target.result); boot(); } catch(err){ alert(err); }};
+  r.onload = ev => { try { maskData = JSON.parse(ev.target.result); resampleData = null; boot(); } catch(err){ alert(err); }};
   r.readAsText(f);
 });
 document.getElementById('server-masks').addEventListener('change', e => {
   if (!e.target.value) return;
-  fetch('/api/mask?path=' + encodeURIComponent(e.target.value))
-    .then(r=>r.json()).then(d => { maskData = d; boot(); }).catch(console.error);
+  const maskPath = e.target.value;
+  fetch('/api/mask?path=' + encodeURIComponent(maskPath))
+    .then(r=>r.json()).then(d => {
+      maskData = d;
+      // Try to load resample sidecar
+      resampleData = null;
+      fetch('/api/resample?path=' + encodeURIComponent(maskPath))
+        .then(r=>r.json()).then(sd => {
+          resampleData = sd;
+          // Re-init chart dropdown so the resample option appears
+          if (resampleData && thresholdEvalData) { initThresholdChart(); onMetricChange(); }
+        })
+        .catch(() => { resampleData = null; });
+      boot();
+    }).catch(console.error);
 });
 fetch('/api/masks').then(r=>r.json()).then(ps => {
   const sel = document.getElementById('server-masks');
@@ -1476,11 +1490,14 @@ const METRIC_DEFS = [
   { key: 'per_sentence_kl',   label: 'Per-sentence KL (across chains)',   chartType: 'line_per_sentence' },
   { key: 'per_sentence_kl_heatmap', label: 'Per-sentence KL heatmap (by answer)', chartType: 'heatmap_per_sentence' },
   { key: 'answer_kl',         label: 'Answer KL vs Sparsity',             chartType: 'line+random' },
+  { key: 'answer_kl_weighted', label: 'Answer KL (weighted) vs Sparsity',  chartType: 'line+random' },
   { key: 'reward_gap',        label: 'Reward Gap vs Sparsity',            chartType: 'line+random' },
   { key: 'p_target',          label: 'P(target) vs Sparsity',             chartType: 'line+random' },
   { key: 'p_best_other',      label: 'P(best other) vs Sparsity',         chartType: 'line+random' },
   { key: 'n_eff_ratio',       label: 'N_eff / N vs Sparsity',             chartType: 'line+threshold' },
   { key: 'answer_probs_masked', label: 'Per-answer Probabilities',        chartType: 'table' },
+  { key: 'answer_probs_masked_weighted', label: 'Per-answer Probabilities (Eq. 1 weighted)', chartType: 'table_weighted' },
+  { key: 'resample_comparison', label: 'Resample Comparison',             chartType: 'resample', alwaysAvailable: false },
   { key: 'log_weights',       label: 'Log-weight Histogram',              chartType: 'histogram' },
   { key: 'kl_a',              label: 'KL_A vs Sparsity',                  chartType: 'line+random' },
   { key: 'kl_b',              label: 'KL_B vs Sparsity',                  chartType: 'line+random' },
@@ -1524,6 +1541,9 @@ function initThresholdChart() {
       const meta = maskData.metadata || {};
       available = ('per_sentence_kl' in firstEntry) && Array.isArray(meta.answer_ids);
     }
+    if (def.key === 'resample_comparison') {
+      available = resampleData != null && Array.isArray(resampleData.thresholds);
+    }
     if (def.key === 'tag_distribution') {
       available = (maskData.sentences || []).some(s => s.function_tags && s.function_tags.length);
     }
@@ -1562,12 +1582,16 @@ function initThresholdChart() {
 
   // Answer probabilities data
   const hasAnswerProbs = entries.some(e => Array.isArray(e.answer_probs_masked));
+  const hasAnswerProbsWeighted = entries.some(e => Array.isArray(e.answer_probs_masked_weighted));
   const answerLabels = meta.answer_labels || null;
+  const answerProbsCleanWeighted = Array.isArray(meta.answer_probs_clean_weighted)
+    ? meta.answer_probs_clean_weighted : null;
 
   thresholdEvalData = {
     entries, thresholds, sparsities, availableMetrics,
     nEffRatios, randomNeffs, hasNeff,
-    hasAnswerProbs, answerLabels,
+    hasAnswerProbs, hasAnswerProbsWeighted,
+    answerLabels, answerProbsCleanWeighted,
   };
   document.getElementById('threshold-chart-section').style.display = '';
   document.getElementById('no-threshold-eval').style.display = 'none';
@@ -1581,7 +1605,9 @@ function onMetricChange() {
   const def = METRIC_DEFS.find(d => d.key === metricKey);
   if (!def) return;
 
-  if (def.chartType === 'tag_bar') {
+  if (def.chartType === 'resample') {
+    renderResampleComparison();
+  } else if (def.chartType === 'tag_bar') {
     renderTagDistributionChart();
   } else if (def.chartType === 'line_per_sentence') {
     renderPerSentenceKLChart();
@@ -1591,6 +1617,8 @@ function onMetricChange() {
     renderLogWeightHistogram();
   } else if (def.chartType === 'table') {
     renderAnswerProbsAsMainChart();
+  } else if (def.chartType === 'table_weighted') {
+    renderWeightedAnswerProbsAsMainChart();
   } else if (def.chartType === 'line+threshold') {
     renderNeffAsMainChart();
   } else {
@@ -1874,18 +1902,23 @@ function renderAnswerProbsAsMainChart() {
   const container = document.getElementById('threshold-chart-container');
   const { entries, answerLabels } = thresholdEvalData;
   const entry = _findNearestEntry();
-  const probs = entry.answer_probs_masked;
+  // Prefer the fine-grained probs so they line up with meta.answer_labels
+  // (answer_probs_masked is the 2-bucket binary correct/incorrect vector and
+  // doesn't match the fine-grained P_clean histogram).
+  const probs = Array.isArray(entry.answer_probs_masked_fine)
+    ? entry.answer_probs_masked_fine
+    : entry.answer_probs_masked;
   if (!Array.isArray(probs)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No answer probs.</div>'; return; }
 
   const meta = maskData.metadata || {};
   const answerIds = meta.answer_ids || [];
   const N = answerIds.length || 1;
-  const numAnswers = meta.num_answers || probs.length;
+  const numAnswers = Math.max(meta.num_answers || 0, probs.length);
   const pClean = new Array(numAnswers).fill(0);
   for (const aid of answerIds) { if (aid < numAnswers) pClean[aid]++; }
   for (let i = 0; i < numAnswers; i++) pClean[i] /= N;
 
-  const labels = d3.range(probs.length).map(i => (answerLabels && answerLabels[i]) ? answerLabels[i] : 'Answer ' + i);
+  const labels = d3.range(numAnswers).map(i => (answerLabels && answerLabels[i]) ? answerLabels[i] : 'Answer ' + i);
 
   const traces = [
     { x: labels, y: pClean.map(v => v * 100), type: 'bar', name: 'P_clean', marker: { color: '#60a5fa', opacity: 0.7 }, hovertemplate: '%{x}<br>P_clean=%{y:.1f}%<extra></extra>' },
@@ -1898,10 +1931,114 @@ function renderAnswerProbsAsMainChart() {
 
   const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group',
     title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 },
-    xaxis: { gridcolor: '#e2e8f0' },
+    xaxis: { type: 'category', gridcolor: '#e2e8f0' },
     yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
   };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+function renderWeightedAnswerProbsAsMainChart() {
+  if (!thresholdEvalData) return;
+  const container = document.getElementById('threshold-chart-container');
+  const { answerLabels, answerProbsCleanWeighted } = thresholdEvalData;
+  const entry = _findNearestEntry();
+  const probsM = entry ? entry.answer_probs_masked_weighted : null;
+  if (!Array.isArray(probsM) || !Array.isArray(answerProbsCleanWeighted)) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Paper-style (Eq. 1) weighted answer probs not available — re-run evaluate_mask.py to populate <code>answer_probs_clean_weighted</code> and <code>answer_probs_masked_weighted</code>.</div>';
+    return;
+  }
+
+  const numAnswers = probsM.length;
+  const labels = d3.range(numAnswers).map(i => (answerLabels && answerLabels[i]) ? answerLabels[i] : 'Answer ' + i);
+
+  const traces = [
+    { x: labels, y: answerProbsCleanWeighted.map(v => v * 100), type: 'bar', name: 'P_clean (weighted)', marker: { color: '#60a5fa', opacity: 0.7 }, hovertemplate: '%{x}<br>P_clean weighted=%{y:.1f}%<extra></extra>' },
+    { x: labels, y: probsM.map(v => v * 100), type: 'bar', name: 'P_masked (weighted)', marker: { color: '#f97316' }, hovertemplate: '%{x}<br>P_masked weighted=%{y:.1f}%<extra></extra>' },
+  ];
+
+  const titleText = `Sparsity: ${(entry.sparsity * 100).toFixed(1)}% | Eq. 1 outcome distributions (paper-style, within-sample reweighting)`;
+
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group',
+    title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 },
+    xaxis: { type: 'category', gridcolor: '#e2e8f0' },
+    yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
+  };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+function renderResampleComparison() {
+  const container = document.getElementById('threshold-chart-container');
+  if (!resampleData || !Array.isArray(resampleData.thresholds) || resampleData.thresholds.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No resample data available. Run evaluate_mask_resample.py.</div>';
+    return;
+  }
+
+  // Find the resample entry closest to the current threshold
+  const ct = getThreshold();
+  let bestIdx = 0, bestDist = Infinity;
+  for (let i = 0; i < resampleData.thresholds.length; i++) {
+    const d = Math.abs(resampleData.thresholds[i].threshold - ct);
+    if (d < bestDist) { bestDist = d; bestIdx = i; }
+  }
+  const rEntry = resampleData.thresholds[bestIdx];
+  const allLabels = resampleData.answer_labels || [];
+  if (allLabels.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No answer labels.</div>';
+    return;
+  }
+
+  // 1) Unmasked (original) — frequency distribution
+  const origDist = resampleData.original.answer_distribution || {};
+  const origVals = allLabels.map(l => (origDist[l] || 0) * 100);
+
+  // 2) Masked without resampling (IS-based) — from existing evaluation
+  const isDist = rEntry.masked_is_answer_distribution || {};
+  const isVals = allLabels.map(l => (isDist[l] || 0) * 100);
+  const hasIS = Object.keys(isDist).length > 0;
+
+  // 3) Masked with resampling — frequency distribution
+  const resDist = rEntry.resample_answer_distribution || {};
+  const resVals = allLabels.map(l => (resDist[l] || 0) * 100);
+
+  // Truncate labels for display
+  const displayLabels = allLabels.map(l => l.length > 30 ? l.slice(0, 27) + '...' : l);
+
+  const traces = [
+    {
+      x: displayLabels, y: origVals, type: 'bar', name: 'Unmasked',
+      marker: { color: '#60a5fa', opacity: 0.8 },
+      hovertemplate: '%{x}<br>Unmasked: %{y:.1f}%<extra></extra>',
+    },
+  ];
+  if (hasIS) {
+    traces.push({
+      x: displayLabels, y: isVals, type: 'bar', name: 'Masked (IS)',
+      marker: { color: '#4caf50', opacity: 0.8 },
+      hovertemplate: '%{x}<br>Masked (IS): %{y:.1f}%<extra></extra>',
+    });
+  }
+  traces.push({
+    x: displayLabels, y: resVals, type: 'bar', name: 'Masked (resample)',
+    marker: { color: '#f59e0b', opacity: 0.8 },
+    hovertemplate: '%{x}<br>Masked (resample): %{y:.1f}%<extra></extra>',
+  });
+
+  const sparsity = rEntry.sparsity;
+  const nResample = resampleData.num_resample_branches || '?';
+  const nOrig = (resampleData.original.branches || []).length || '?';
+  let titleText = `Sparsity: ${(sparsity * 100).toFixed(1)}%`;
+  titleText += ` | Original: ${nOrig} branches | Resample: ${nResample} branches`;
+
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group',
+    title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 },
+    xaxis: { type: 'category', gridcolor: '#e2e8f0', tickangle: allLabels.length > 5 ? -45 : 0 },
+    yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
+    margin: { ...PLOTLY_LAYOUT_BASE.margin, b: allLabels.length > 5 ? 100 : 52 },
+  };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+
+  // Click on chart → jump to threshold
+  container.on('plotly_click', function() { /* no-op — stays at current threshold */ });
 }
 
 function renderNeffAsMainChart() {
@@ -2567,23 +2704,20 @@ function initCompareMetricDropdown() {
   select.innerHTML = '';
   if (compareMasks.length === 0) return;
 
-  // Determine which metrics are available in ALL masks
+  // Determine which metrics are available in ANY mask
   const firstEntries = compareMasks.map(m => {
     const te = (m.data.metadata || {}).threshold_evaluation;
     return (Array.isArray(te) && te.length > 0) ? te[0] : null;
   });
 
   for (const def of COMPARE_METRIC_DEFS) {
-    let available = true;
-    for (const entry of firstEntries) {
-      if (!entry) { available = false; break; }
-      if (def.alwaysAvailable) continue;
-      if (def.key === 'per_sentence_kl_heatmap') {
-        const hasPSK = 'per_sentence_kl' in entry;
-        if (!hasPSK) { available = false; break; }
-      } else {
-        if (!(def.key in entry) || entry[def.key] == null) { available = false; break; }
-      }
+    let available = false;
+    if (def.alwaysAvailable) {
+      available = firstEntries.some(e => e != null);
+    } else if (def.key === 'per_sentence_kl_heatmap') {
+      available = firstEntries.some(e => e && 'per_sentence_kl' in e);
+    } else {
+      available = firstEntries.some(e => e && def.key in e && e[def.key] != null);
     }
     if (available) {
       const opt = document.createElement('option');
@@ -2608,27 +2742,43 @@ function initCompareMetricDropdown() {
   }
 }
 
-// ── Threshold dropdown for heatmaps ──
+// ── Sparsity dropdown for compare tab ──
+// Populated with sparsities from the first mask. Per-mask lookups use
+// _findEntryAtSparsity so comparisons are meaningful across masks whose
+// raw mask-score scales differ.
 function initCompareThresholdDropdown() {
   const select = document.getElementById('compare-threshold-select');
-  select.innerHTML = '<option value="">— select threshold —</option>';
+  select.innerHTML = '<option value="">— select sparsity —</option>';
   if (compareMasks.length === 0) return;
 
-  // Use thresholds from first mask
+  // Use sparsities from first mask as the reference grid
   const te = (compareMasks[0].data.metadata || {}).threshold_evaluation || [];
   for (const entry of te) {
-    if (entry && typeof entry.threshold === 'number') {
+    if (entry && typeof entry.sparsity === 'number') {
       const opt = document.createElement('option');
-      opt.value = entry.threshold;
-      opt.textContent = `t=${entry.threshold.toExponential(2)} (${(entry.sparsity * 100).toFixed(1)}%)`;
+      opt.value = entry.sparsity;
+      opt.textContent = `sparsity ${(entry.sparsity * 100).toFixed(1)}% (t=${entry.threshold.toExponential(2)})`;
       select.appendChild(opt);
     }
   }
-  // Default to ~30%
+  // Default to ~30% through the sparsity list
   if (te.length > 0) {
     const defaultIdx = Math.round((te.length - 1) * 0.3);
-    select.value = te[defaultIdx].threshold;
+    select.value = te[defaultIdx].sparsity;
   }
+}
+
+// Sparsity-dropdown change: re-render the current chart WITHOUT re-initialising
+// the dropdown (which would reset the user's selection to the default).
+function onCompareSparsityChange() {
+  if (compareMasks.length === 0) return;
+  const metricKey = document.getElementById('compare-metric-select').value;
+  const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey);
+  if (!def) return;
+  if (def.chartType === 'heatmap_per_sentence') renderCompareHeatmaps();
+  else if (def.chartType === 'histogram') renderCompareHistogram();
+  else if (def.chartType === 'table') renderCompareAnswerProbs();
+  else if (def.chartType === 'table_weighted') renderCompareWeightedAnswerProbs();
 }
 
 // ── Main compare render dispatcher ──
@@ -2660,6 +2810,12 @@ function onCompareMetricChange() {
     thresholdSelect.style.display = '';
     initCompareThresholdDropdown();
     renderCompareAnswerProbs();
+  } else if (def.chartType === 'table_weighted') {
+    chartContainer.style.display = '';
+    heatmapGrid.style.display = 'none';
+    thresholdSelect.style.display = '';
+    initCompareThresholdDropdown();
+    renderCompareWeightedAnswerProbs();
   } else {
     // line+random or line+threshold
     chartContainer.style.display = '';
@@ -2675,20 +2831,20 @@ function _getThresholdEntries(maskData) {
   return te.filter(e => e && typeof e.threshold === 'number' && typeof e.sparsity === 'number');
 }
 
-function _findEntryAtThreshold(entries, threshold) {
+function _findEntryAtSparsity(entries, sparsity) {
   let idx = 0, best = Infinity;
   for (let i = 0; i < entries.length; i++) {
-    const d = Math.abs(entries[i].threshold - threshold);
+    const d = Math.abs(entries[i].sparsity - sparsity);
     if (d < best) { best = d; idx = i; }
   }
   return entries[idx];
 }
 
-function _getSelectedCompareThreshold() {
+function _getSelectedCompareSparsity() {
   const v = parseFloat(document.getElementById('compare-threshold-select').value);
   if (isNaN(v) && compareMasks.length > 0) {
     const te = _getThresholdEntries(compareMasks[0].data);
-    if (te.length > 0) return te[Math.round((te.length - 1) * 0.3)].threshold;
+    if (te.length > 0) return te[Math.round((te.length - 1) * 0.3)].sparsity;
   }
   return v;
 }
@@ -2714,7 +2870,7 @@ function computeCombinedRandomBaseline(metricKey) {
     for (const m of compareMasks) {
       const entries = _getThresholdEntries(m.data);
       // Find closest entry by sparsity
-      const entry = _findEntryAtThreshold(entries, refEntries[si].threshold);
+      const entry = _findEntryAtSparsity(entries, refEntries[si].sparsity);
       if (entry && Array.isArray(entry[randomArrayKey])) {
         allSamples.push(...entry[randomArrayKey]);
       }
@@ -2825,17 +2981,18 @@ function renderCompareLineChart() {
   }
 
   // One learned-mask line per mask
+  const missingMasks = [];
   for (let mi = 0; mi < compareMasks.length; mi++) {
     const m = compareMasks[mi];
     const entries = _getThresholdEntries(m.data);
     const n = entries.length;
-    if (n === 0) continue;
+    if (n === 0) { missingMasks.push(m.name); continue; }
 
     const idx = d3.range(n).sort((a, b) => entries[a].sparsity - entries[b].sparsity);
     const sortedSp = idx.map(i => entries[i].sparsity);
     const sortedM = idx.map(i => entries[i][metricKey] ?? NaN);
     const validIdx = d3.range(n).filter(i => !isNaN(sortedM[i]));
-    if (validIdx.length === 0) continue;
+    if (validIdx.length === 0) { missingMasks.push(m.name); continue; }
 
     const xVals = validIdx.map(i => sortedSp[i]);
     const yVals = validIdx.map(i => sortedM[i]);
@@ -2873,6 +3030,12 @@ function renderCompareLineChart() {
       ...(def.chartType === 'line+threshold' ? { range: [0, 1.05] } : {}),
     },
     height: 420,
+    ...(missingMasks.length > 0 ? { annotations: [{
+      text: 'No ' + metricKey + ' for: ' + missingMasks.join(', '),
+      xref: 'paper', yref: 'paper', x: 0.5, y: 1.0,
+      xanchor: 'center', yanchor: 'bottom',
+      showarrow: false, font: { size: 10, color: '#94a3b8' },
+    }] } : {}),
   };
 
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
@@ -2884,12 +3047,12 @@ function renderCompareLineChart() {
 function renderCompareHeatmaps() {
   const grid = document.getElementById('compare-heatmap-grid');
   grid.innerHTML = '';
-  const threshold = _getSelectedCompareThreshold();
-  if (isNaN(threshold)) { grid.innerHTML = '<em style="color:var(--text-dim);padding:10px;">Select a threshold.</em>'; return; }
+  const sparsity = _getSelectedCompareSparsity();
+  if (isNaN(sparsity)) { grid.innerHTML = '<em style="color:var(--text-dim);padding:10px;">Select a sparsity.</em>'; return; }
 
   for (const m of compareMasks) {
     const entries = _getThresholdEntries(m.data);
-    const entry = _findEntryAtThreshold(entries, threshold);
+    const entry = _findEntryAtSparsity(entries, sparsity);
     const meta = m.data.metadata || {};
     const answerIds = meta.answer_ids || [];
     const answerLabels = meta.answer_labels || [];
@@ -2944,13 +3107,13 @@ function renderCompareHeatmaps() {
 // ══════════════════════════════════════════════════════════════
 function renderCompareHistogram() {
   const container = document.getElementById('compare-chart-container');
-  const threshold = _getSelectedCompareThreshold();
-  if (isNaN(threshold)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a threshold.</div>'; return; }
+  const sparsity = _getSelectedCompareSparsity();
+  if (isNaN(sparsity)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a sparsity.</div>'; return; }
 
   const traces = [];
   for (const m of compareMasks) {
     const entries = _getThresholdEntries(m.data);
-    const entry = _findEntryAtThreshold(entries, threshold);
+    const entry = _findEntryAtSparsity(entries, sparsity);
     const logWeights = entry ? entry.log_weights : null;
     if (!Array.isArray(logWeights) || logWeights.length === 0) continue;
 
@@ -2974,8 +3137,8 @@ function renderCompareHistogram() {
 // ══════════════════════════════════════════════════════════════
 function renderCompareAnswerProbs() {
   const container = document.getElementById('compare-chart-container');
-  const threshold = _getSelectedCompareThreshold();
-  if (isNaN(threshold)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a threshold.</div>'; return; }
+  const sparsity = _getSelectedCompareSparsity();
+  if (isNaN(sparsity)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a sparsity.</div>'; return; }
 
   const traces = [];
 
@@ -2996,8 +3159,15 @@ function renderCompareAnswerProbs() {
 
   for (const m of compareMasks) {
     const entries = _getThresholdEntries(m.data);
-    const entry = _findEntryAtThreshold(entries, threshold);
-    const probs = entry ? entry.answer_probs_masked : null;
+    const entry = _findEntryAtSparsity(entries, sparsity);
+    // Prefer the fine-grained probs so they line up with meta.answer_labels;
+    // answer_probs_masked is binary (correct/incorrect) and would collapse the
+    // incorrect mass onto a single fine-grained label.
+    const probs = entry
+      ? (Array.isArray(entry.answer_probs_masked_fine)
+          ? entry.answer_probs_masked_fine
+          : entry.answer_probs_masked)
+      : null;
     if (!Array.isArray(probs)) continue;
     traces.push({
       x: labels, y: probs.map(v => v * 100), type: 'bar', name: m.name,
@@ -3007,7 +3177,55 @@ function renderCompareAnswerProbs() {
 
   const layout = {
     ...PLOTLY_LAYOUT_BASE, barmode: 'group', height: 400,
-    xaxis: { gridcolor: '#e2e8f0' },
+    xaxis: { type: 'category', gridcolor: '#e2e8f0' },
+    yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
+  };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+// ══════════════════════════════════════════════════════════════
+// Compare: Paper-style (Eq. 1) weighted answer probabilities
+// ══════════════════════════════════════════════════════════════
+function renderCompareWeightedAnswerProbs() {
+  const container = document.getElementById('compare-chart-container');
+  const sparsity = _getSelectedCompareSparsity();
+  if (isNaN(sparsity)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a sparsity.</div>'; return; }
+
+  const traces = [];
+
+  // P_clean (weighted) from first mask's top-level metadata.
+  // Same for every threshold; same across compatible masks.
+  const meta0 = compareMasks[0].data.metadata || {};
+  const pCleanW = Array.isArray(meta0.answer_probs_clean_weighted)
+    ? meta0.answer_probs_clean_weighted : null;
+  const answerLabels0 = meta0.answer_labels || [];
+  if (!pCleanW) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Paper-style (Eq. 1) weighted answer probs not available — re-run evaluate_mask.py to populate <code>answer_probs_clean_weighted</code> and <code>answer_probs_masked_weighted</code>.</div>';
+    return;
+  }
+  const numAnswers = pCleanW.length;
+  const labels = d3.range(numAnswers).map(i => answerLabels0[i] || 'Answer ' + i);
+
+  traces.push({
+    x: labels, y: pCleanW.map(v => v * 100), type: 'bar', name: 'P_clean (weighted)',
+    marker: { color: '#94a3b8', opacity: 0.5 },
+  });
+
+  for (const m of compareMasks) {
+    const entries = _getThresholdEntries(m.data);
+    const entry = _findEntryAtSparsity(entries, sparsity);
+    const probs = entry ? entry.answer_probs_masked_weighted : null;
+    if (!Array.isArray(probs)) continue;
+    traces.push({
+      x: labels, y: probs.map(v => v * 100), type: 'bar', name: m.name,
+      marker: { color: m.color },
+    });
+  }
+
+  const layout = {
+    ...PLOTLY_LAYOUT_BASE, barmode: 'group', height: 400,
+    title: { text: 'Eq. 1 outcome distributions (paper-style, within-sample reweighting)', font: { size: 10, color: '#64748b' }, x: 0 },
+    xaxis: { type: 'category', gridcolor: '#e2e8f0' },
     yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
   };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);

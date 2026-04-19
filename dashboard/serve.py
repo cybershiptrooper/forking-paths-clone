@@ -35,6 +35,13 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                 self._serve_mask(path)
             else:
                 self._json_response({"error": "missing ?path="}, 400)
+        elif parsed.path == "/api/resample":
+            qs = parse_qs(parsed.query)
+            path = qs.get("path", [None])[0]
+            if path:
+                self._serve_resample(path)
+            else:
+                self._json_response({"error": "missing ?path="}, 400)
         else:
             super().do_GET()
 
@@ -57,6 +64,23 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             return
 
         with open(full) as f:
+            data = json.load(f)
+        self._json_response(data)
+
+    def _serve_resample(self, rel_path: str):
+        """Serve the resample sidecar for a mask, if it exists."""
+        mask_full = ROOT / rel_path
+        stem = mask_full.stem
+        sidecar = mask_full.with_name(f"{stem}_resample.json")
+        if not sidecar.exists():
+            self._json_response(None)
+            return
+        try:
+            sidecar.resolve().relative_to(ROOT.resolve())
+        except ValueError:
+            self._json_response({"error": "path outside project"}, 403)
+            return
+        with open(sidecar) as f:
             data = json.load(f)
         self._json_response(data)
 
