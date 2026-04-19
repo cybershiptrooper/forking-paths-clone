@@ -11,6 +11,7 @@ if [ -z "$FREE_GPU" ]; then
 fi
 echo "Using physical GPU $FREE_GPU"
 
-CUDA_VISIBLE_DEVICES=$FREE_GPU uv run python -m expts.learn_circuit --config expts/configs/answer_kl_patching.yaml
+CONFIG=${1:-expts/configs/answer_kl_patching.yaml}
+echo "Config: $CONFIG"
 
-# CUDA_VISIBLE_DEVICES=$FREE_GPU uv run python -m expts.learn_circuit --config expts/configs/thought_anchors.yaml
+CUDA_VISIBLE_DEVICES=$FREE_GPU uv run python -m expts.circuit_discovery.learn_and_evaluate --config $CONFIG
