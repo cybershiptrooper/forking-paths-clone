@@ -1,52 +1,59 @@
-"""Figure 6 analysis from Thought Anchors (Bogdan et al., arXiv 2506.19143).
+"""Attention suppression circuit discovery (Thought Anchors, Bogdan et al. 2506.19143).
 
-Computes two analyses given a mask JSON with sentence boundaries:
+For each sentence i in the prefix, suppresses all attention to i across all
+layers and heads, then measures the KL divergence at each subsequent sentence j.
+The resulting (S, S) suppression scores are packaged as a pair-granularity
+NodeMask that can be evaluated by evaluate_mask.py.
 
-1. **Attention suppression matrix**: For each sentence, suppress all attention
-   to it across all layers/heads and measure KL divergence at every other
-   sentence. Produces an (S, S) causal impact matrix.
-
-2. **Receiver head attention**: Capture clean attention from all heads, aggregate
-   to sentence level, find the top-K heads with highest kurtosis (sharpest
-   focus), and compute per-sentence vertical attention (how much attention each
-   sentence receives from later sentences via these heads).
-
-Results are saved into the mask JSON under ``metadata``.
+Pipeline:
+1. Tokenize input, split into sentences (identical to learn_circuit.py)
+2. Get or generate branches via completion cache
+3. Extract answer IDs for evaluation metrics
+4. Load model with eager attention
+5. Compute suppression scores (S+1 forward passes on the prefix)
+6. Save as NodeMask with cache_key for evaluation
 
 Usage:
-    python expts/thought_anchor_analysis.py \\
-        --mask results/circuit_discovery/test_global_2.json
+    uv run python -m expts.thought_anchor_analysis \\
+        --config expts/configs/tests/answer_kl_patching_test.yaml
 
-    python expts/thought_anchor_analysis.py \\
-        --mask results/circuit_discovery/test_global_2.json \\
-        --top_k 32 --min_gap 4
+    uv run python -m expts.circuit_discovery.evaluate_mask \\
+        --mask_path results/circuit_discovery/answer_kl_patching_test_suppression.json
 """
 
+import os
 import argparse
 import json
-import os
-import types
 
 import torch
 import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from utils.utils import Sentence, get_attention_module, set_seed, clear_cuda
+from utils.utils import set_seed, clear_cuda, Sentence, get_attention_module
+from utils.cot_analysis import (
+    split_tokens_into_sentences,
+    remove_bos_from_sentences,
+    chunk_sentences,
+)
+from utils.objectives import get_objective
+from utils.importance_sampling import extract_answer_ids, reward_based_answer_ids
+from utils.masks import NodeMask
 from utils.circuit_eval import (
     build_token_to_sent_map,
     install_mask_hooks,
     remove_handles,
 )
-from utils.circuit_discovery.common import make_attention_forward
-from utils.circuit_discovery.base import AblationHandle
+from utils.completion_cache import get_or_generate, DEFAULT_CACHE_DIR
+from utils.rewards import (
+    extract_boxed,
+    compute_correctness_rewards,
+    compute_cot_length_rewards,
+    find_answer_token_positions,
+)
 
-
-# ------------------------------------------------------------------
-# Model loading (same as learn_circuit.py)
-# ------------------------------------------------------------------
 
 def load_model_eager(model_name: str, device: str = "cuda"):
-    """Load model with eager attention for circuit analysis."""
+    """Load model with eager attention for suppression analysis."""
     print(f"Loading {model_name} with eager attention...")
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
@@ -59,133 +66,22 @@ def load_model_eager(model_name: str, device: str = "cuda"):
     return model, tokenizer
 
 
-# ------------------------------------------------------------------
-# Attention capture
-# ------------------------------------------------------------------
+def compute_suppression_scores(
+    model,
+    input_ids,
+    sentences,
+    token_to_sent,
+    sentence_gap,
+):
+    """Suppress attention to each sentence and measure KL at subsequent sentences.
 
-def aggregate_attn_to_sentences(attn_weights, token_to_sent, num_sents):
-    """Aggregate token-level attention to sentence-level using einsum.
-
-    Args:
-        attn_weights: (1, H, q_len, k_len) post-softmax attention.
-        token_to_sent: (total_seq_len,) int tensor, -1 for unassigned tokens.
-        num_sents: number of sentences.
-
-    Returns:
-        (H, S, S) mean attention per head per sentence pair, on CPU.
-    """
-    attn = attn_weights[0].float()  # (H, q_len, k_len)
-    H, q_len, k_len = attn.shape
-    device = attn.device
-
-    q_sent = token_to_sent[:q_len].to(device)
-    k_sent = token_to_sent[:k_len].to(device)
-
-    q_onehot = torch.zeros(q_len, num_sents, device=device)
-    q_onehot[q_sent >= 0, q_sent[q_sent >= 0]] = 1.0
-
-    k_onehot = torch.zeros(k_len, num_sents, device=device)
-    k_onehot[k_sent >= 0, k_sent[k_sent >= 0]] = 1.0
-
-    sent_attn = torch.einsum("hqk,qs,kt->hst", attn, q_onehot, k_onehot)
-    counts = torch.einsum("qs,kt->st", q_onehot, k_onehot).clamp(min=1)
-
-    return (sent_attn / counts.unsqueeze(0)).cpu()
-
-
-def capture_clean_pass(model, input_ids, token_to_sent, num_sents):
-    """Run a clean forward pass, capturing sentence-level attention from every layer.
+    For each sentence i, zeros all attention to i across all layers/heads,
+    runs a forward pass on the prefix, and measures per-sentence KL.
 
     Returns:
-        clean_logits: (1, seq_len, vocab) on CPU.
-        sent_attns: dict[int, Tensor] mapping layer → (H, S, S).
-    """
-    num_layers = model.config.num_hidden_layers
-
-    def capture_injection(module, attn_weights, q_len, k_len, cache_position):
-        module._sent_attn = aggregate_attn_to_sentences(
-            attn_weights, token_to_sent, num_sents,
-        )
-        return attn_weights  # pass through unmodified
-
-    forward_fn = make_attention_forward(model.config.model_type, capture_injection)
-    handles = []
-    for layer_idx in range(num_layers):
-        attn_module = get_attention_module(model, layer_idx)
-        original_forward = attn_module.forward
-        attn_module.forward = types.MethodType(forward_fn, attn_module)
-        handles.append(AblationHandle(attn_module, original_forward))
-
-    model.eval()
-    with torch.no_grad():
-        outputs = model(input_ids)
-    clean_logits = outputs.logits.cpu()
-
-    sent_attns = {}
-    for layer_idx in range(num_layers):
-        attn_module = get_attention_module(model, layer_idx)
-        sent_attns[layer_idx] = attn_module._sent_attn
-        del attn_module._sent_attn
-
-    remove_handles(handles)
-    return clean_logits, sent_attns
-
-
-# ------------------------------------------------------------------
-# Receiver head analysis
-# ------------------------------------------------------------------
-
-def compute_receiver_heads(sent_attns, top_k=32, min_gap=4):
-    """Find high-kurtosis (receiver) heads and their vertical attention.
-
-    Vertical attention for sentence j = mean attention j receives from
-    sentences i where i − j ≥ min_gap, averaged across tokens.
-
-    Returns:
-        receiver_heads: list of (layer, head, kurtosis) sorted descending.
-        vertical_attention: list[float] of length S.
-    """
-    num_sents = next(iter(sent_attns.values())).shape[-1]
-    all_heads = []  # (layer, head, kurtosis, vert_vector)
-
-    for layer_idx, attn in sent_attns.items():
-        H = attn.shape[0]
-        for h in range(H):
-            head_attn = attn[h]  # (S, S): head_attn[i, j] = attn from sent i → sent j
-
-            # Vertical attention per sentence j
-            vert = torch.zeros(num_sents)
-            for j in range(num_sents):
-                future = head_attn[j + min_gap:, j]  # attention TO j from i >= j+min_gap
-                if future.numel() > 0:
-                    vert[j] = future.mean()
-
-            # Excess kurtosis
-            std = vert.std()
-            if std > 1e-8:
-                kurt = ((vert - vert.mean()) / std).pow(4).mean().item() - 3.0
-            else:
-                kurt = 0.0
-
-            all_heads.append((layer_idx, h, kurt, vert))
-
-    all_heads.sort(key=lambda x: x[2], reverse=True)
-    top = all_heads[:top_k]
-
-    avg_vertical = torch.stack([h[3] for h in top]).mean(dim=0)
-    receiver_heads = [(l, h, k) for l, h, k, _ in top]
-    return receiver_heads, avg_vertical.tolist()
-
-
-# ------------------------------------------------------------------
-# Attention suppression matrix
-# ------------------------------------------------------------------
-
-def compute_suppression_matrix(model, input_ids, sentences, token_to_sent, clean_logits):
-    """Suppress attention to each sentence and measure KL at all others.
-
-    Returns:
-        list[list[float]] of shape (S, S) where [suppressed][affected] = KL.
+        scores: list[list[float]] of shape (S, S) where scores[src][tgt] =
+            KL at sentence src when attention to tgt is suppressed.
+            Higher = tgt is more important for src.
     """
     num_sents = len(sentences)
     num_heads = model.config.num_attention_heads
@@ -194,28 +90,32 @@ def compute_suppression_matrix(model, input_ids, sentences, token_to_sent, clean
     device = next(model.parameters()).device
     seq_len = input_ids.shape[-1]
 
-    # No gap filter — we want to suppress any column freely
+    # No gap filter for suppression — we want to freely zero any column
     gap_filter = torch.zeros(num_sents, num_sents, dtype=torch.bool, device=device)
 
-    # Clean log-probs (on CPU to save GPU memory)
-    log_clean = F.log_softmax(clean_logits.float(), dim=-1)
+    # Clean forward pass
+    model.eval()
+    with torch.no_grad():
+        clean_logits = model(input_ids).logits
+    log_clean = F.log_softmax(clean_logits.float().cpu(), dim=-1)
+    del clean_logits
+    torch.cuda.empty_cache()
 
-    # Install hooks once with an all-ones mask, then swap the mask each iteration
+    # Install hooks once with all-ones mask, then swap per iteration
     ones_mask = torch.ones(num_heads, num_sents, num_sents, device=device)
     binary_masks = {layer: ones_mask for layer in all_layers}
     handles = install_mask_hooks(
         model, all_layers, binary_masks, token_to_sent, gap_filter, renormalize=True,
     )
 
-    suppression_matrix = torch.zeros(num_sents, num_sents)
-    model.eval()
+    # suppression_kl[i][j] = KL at sentence j when attention to i is suppressed
+    suppression_kl = [[0.0] * num_sents for _ in range(num_sents)]
 
     for s_suppress in range(num_sents):
-        # Build suppression mask: zero out column s_suppress
+        # Zero out column s_suppress (all attention TO this sentence)
         mask = torch.ones(num_heads, num_sents, num_sents, device=device)
         mask[:, :, s_suppress] = 0.0
 
-        # Update mask on every layer's attention module
         for layer_idx in all_layers:
             attn_module = get_attention_module(model, layer_idx)
             attn_module._circuit_mask = mask
@@ -229,193 +129,484 @@ def compute_suppression_matrix(model, input_ids, sentences, token_to_sent, clean
         ).sum(dim=-1)[0]  # (seq_len,)
 
         for s_affected in range(num_sents):
+            if s_affected < s_suppress + sentence_gap:
+                continue
             start = sentences[s_affected].start
             end = min(sentences[s_affected].end, seq_len - 1)
             if start >= seq_len:
                 continue
-            suppression_matrix[s_suppress, s_affected] = (
+            suppression_kl[s_suppress][s_affected] = (
                 kl_tokens[start : end + 1].mean().item()
             )
 
-        max_kl = suppression_matrix[s_suppress].max().item()
+        max_kl = max(suppression_kl[s_suppress])
         print(f"  [{s_suppress}/{num_sents - 1}] max KL = {max_kl:.4f}")
 
         del logits, log_masked, kl_tokens
         torch.cuda.empty_cache()
 
     remove_handles(handles)
-    return suppression_matrix.tolist()
+
+    # Transpose: scores[src][tgt] = importance of tgt for src
+    scores = [[0.0] * num_sents for _ in range(num_sents)]
+    for i in range(num_sents):
+        for j in range(num_sents):
+            scores[j][i] = suppression_kl[i][j]
+
+    return scores
 
 
-# ------------------------------------------------------------------
-# Input reconstruction
-# ------------------------------------------------------------------
+def main(
+    model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    prompt: str = None,
+    num_new_branches: int = 8,
+    analysis_timestep: int = None,
+    objective: str = "kl_divergence",
+    sentence_gap: int = 1,
+    sentence_chunk: int = 1,
+    mask_mode: str = "prefix",
+    renormalize_masked_attention: bool = True,
+    max_sampling_tokens: int = 150,
+    num_tokens_to_analyse: int = None,
+    min_sentence_length: int = 10,
+    temperature: float = 0.6,
+    seed: int = 42,
+    device: str = "cuda",
+    output_dir: str = "results/circuit_discovery",
+    reward_type: str = "none",
+    correct_answer: str = None,
+    data_path: str = None,
+    prompt_index: int = None,
+    dataset_type: str = "open ended",
+    answer_only: bool = False,
+    judge_model: str = "meta-llama/llama-3.2-3b-instruct",
+    judge_answers: bool = False,
+    file_name: str = None,
+    cache_dir: str = DEFAULT_CACHE_DIR,
+    # Accepted but ignored (for config compatibility with learn_circuit.py)
+    model_to_analyse: str = None,
+    masking_algorithm: str = None,
+    pair_aggregation: str = None,
+    mask_granularity: str = None,
+    layers_to_analyse=None,
+    ablate_non_target_layers: bool = False,
+    num_ig_steps: int = None,
+    no_negate_scores: bool = False,
+    num_random_samples: int = 5,
+    sparsities: list[float] = None,
+    **kwargs,
+):
+    if num_tokens_to_analyse is None:
+        num_tokens_to_analyse = max_sampling_tokens
 
-def reconstruct_input(sentences_raw, tokenizer, device):
-    """Reconstruct input_ids from sentence texts stored in the mask JSON.
+    set_seed(seed)
+    os.makedirs(output_dir, exist_ok=True)
 
-    Concatenates sentence texts and prepends the BOS token to approximate
-    the original tokenized input.
-    """
-    full_text = "".join(s["text"] for s in sentences_raw)
-    token_ids = tokenizer.encode(full_text, add_special_tokens=True)
-    input_ids = torch.tensor([token_ids], device=device)
-
-    expected_end = sentences_raw[-1]["end"] + 1
-    actual_len = input_ids.shape[-1]
-    if abs(actual_len - expected_end) > 3:
-        print(
-            f"  WARNING: Reconstructed {actual_len} tokens but mask expects "
-            f"{expected_end}. Provide --prompt for exact reconstruction."
-        )
-    # Clip or pad to match expected length
-    if actual_len > expected_end:
-        input_ids = input_ids[:, :expected_end]
-    return input_ids
-
-
-# ------------------------------------------------------------------
-# Main
-# ------------------------------------------------------------------
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Thought Anchors Figure 6: suppression matrix + receiver heads.",
-    )
-    parser.add_argument("--mask", required=True, help="Path to mask JSON file")
-    parser.add_argument("--prompt", default=None, help="Original prompt text")
-    parser.add_argument("--data_path", default=None, help="Path to data JSON")
-    parser.add_argument("--prompt_index", type=int, default=None)
-    parser.add_argument("--top_k", type=int, default=32, help="Number of receiver heads")
-    parser.add_argument("--min_gap", type=int, default=4, help="Min sentence gap for receiver analysis")
-    parser.add_argument("--device", default="cuda")
-    parser.add_argument("--seed", type=int, default=42)
-    args = parser.parse_args()
-
-    set_seed(args.seed)
-
-    # Load mask JSON
-    with open(args.mask) as f:
-        data = json.load(f)
-
-    model_name = data["model_name"]
-    sentences_raw = data["sentences"]
-    sentences = [Sentence(start=s["start"], end=s["end"]) for s in sentences_raw]
-    num_sents = len(sentences)
-
-    print(f"Mask: {args.mask}")
-    print(f"Model: {model_name}")
-    print(f"Sentences: {num_sents}")
-
-    # Load model
-    model, tokenizer = load_model_eager(model_name, device=args.device)
-    device = next(model.parameters()).device
-
-    # Reconstruct input_ids
-    if args.prompt is not None:
-        chat = [{"role": "user", "content": args.prompt}]
-        formatted = tokenizer.apply_chat_template(
-            chat, tokenize=False, add_generation_prompt=True,
-        )
-        # We only have the prompt tokens; the rest were generated.
-        # Reconstruct from sentence texts for the generated part.
-        prompt_ids = tokenizer.encode(formatted)
-        gen_text = "".join(
-            s["text"] for s in sentences_raw
-            if s["start"] >= len(prompt_ids)
-        )
-        if gen_text:
-            gen_ids = tokenizer.encode(gen_text, add_special_tokens=False)
-            all_ids = prompt_ids + gen_ids
-        else:
-            all_ids = prompt_ids
-        expected_end = sentences_raw[-1]["end"] + 1
-        input_ids = torch.tensor([all_ids[:expected_end]], device=device)
-    elif args.data_path and args.prompt_index is not None:
-        with open(args.data_path) as f:
+    # =====================================================================
+    # Step 0: Load data from collection JSON if provided
+    # =====================================================================
+    if data_path is not None and prompt_index is not None:
+        print(f"Loading record {prompt_index} from {data_path}...")
+        with open(data_path) as f:
             records = json.load(f)
-        prompt = records[args.prompt_index]["question"]
-        chat = [{"role": "user", "content": prompt}]
-        formatted = tokenizer.apply_chat_template(
-            chat, tokenize=False, add_generation_prompt=True,
+        record = records[prompt_index]
+        prompt = record["question"]
+        if correct_answer is None and "correct_answer" in record:
+            correct_answer = extract_boxed(record["correct_answer"]) or record["correct_answer"]
+        if "dataset_type" in record:
+            dataset_type = record["dataset_type"]
+        print(f"  Question: {prompt[:120]}...")
+        print(f"  Correct answer: {correct_answer}")
+
+    branch_rewards = None
+
+    # =====================================================================
+    # Step 1: Prepare input
+    # =====================================================================
+    print("=" * 80)
+    print("Step 1: Preparing input...")
+    print("=" * 80)
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    if prompt is None:
+        prompt = (
+            "A rectangular band formation is a formation with $m$ band members "
+            "in each of $r$ rows, where $m$ and $r$ are integers. A particular "
+            "band has less than 100 band members. The director arranges them in "
+            "a rectangular formation and finds that he has two members left over. "
+            "If he increases the number of members in each row by 1 and reduces "
+            "the number of rows by 2, there are exactly enough places in the new "
+            "formation for each band member. What is the largest number of "
+            "members the band could have?"
         )
-        prompt_ids = tokenizer.encode(formatted)
-        gen_text = "".join(
-            s["text"] for s in sentences_raw
-            if s["start"] >= len(prompt_ids)
-        )
-        if gen_text:
-            gen_ids = tokenizer.encode(gen_text, add_special_tokens=False)
-            all_ids = prompt_ids + gen_ids
-        else:
-            all_ids = prompt_ids
-        expected_end = sentences_raw[-1]["end"] + 1
-        input_ids = torch.tensor([all_ids[:expected_end]], device=device)
+    chat = [{"role": "user", "content": prompt}]
+    formatted_text = tokenizer.apply_chat_template(
+        chat, tokenize=False, add_generation_prompt=True
+    )
+    inputs = tokenizer(formatted_text, return_tensors="pt")
+    input_ids = inputs["input_ids"]
+    prompt_len = input_ids.shape[-1]
+
+    if analysis_timestep is None:
+        analysis_timestep = prompt_len + 200
     else:
-        print("No --prompt provided, reconstructing from sentence texts...")
-        input_ids = reconstruct_input(sentences_raw, tokenizer, device)
+        analysis_timestep = prompt_len + analysis_timestep
 
-    print(f"Input: {input_ids.shape[-1]} tokens, {num_sents} sentences")
+    print(f"Prompt length: {prompt_len} tokens")
+    print(f"Analysis timestep: {analysis_timestep}")
 
-    # Build token-to-sentence map
+    # =====================================================================
+    # Step 2: Get or generate branches (cached)
+    # =====================================================================
+    print("\n" + "=" * 80)
+    print("Step 2: Getting branches (cached)...")
+    print("=" * 80)
+
+    cached = get_or_generate(
+        model_name=model_name,
+        formatted_text=formatted_text,
+        prompt_len=prompt_len,
+        analysis_timestep=analysis_timestep,
+        num_branches=num_new_branches,
+        temperature=temperature,
+        max_sampling_tokens=max_sampling_tokens,
+        seed=seed,
+        cache_dir=cache_dir,
+    )
+    input_ids = torch.tensor([cached["input_ids"]])
+    branches = cached["branches"]
+    cache_key = cached["cache_key"]
+
+    if input_ids.shape[-1] < analysis_timestep:
+        print(
+            f"Warning: base completion shorter than expected "
+            f"({input_ids.shape[-1]} < {analysis_timestep}). "
+            f"Adjusting analysis_timestep."
+        )
+        analysis_timestep = input_ids.shape[-1]
+
+    prefix_text = tokenizer.decode(input_ids[0, :analysis_timestep])
+
+    # Compute correctness rewards (uses OpenRouter, not vLLM)
+    if reward_type == "correctness":
+        if correct_answer is None:
+            raise ValueError(
+                "--reward_type correctness requires --correct_answer or "
+                "--data_path + --prompt_index with a correct_answer field."
+            )
+        from openai import OpenAI
+        from dotenv import load_dotenv
+        load_dotenv()
+        openrouter_key = os.getenv("OPENROUTER_API_KEY")
+        if not openrouter_key:
+            raise ValueError("OPENROUTER_API_KEY not found in environment.")
+        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=openrouter_key)
+        branch_rewards = compute_correctness_rewards(
+            branches, correct_answer, prompt, prefix_text, client, judge_model
+        )
+        del client
+        print(f"Correctness rewards: {branch_rewards}")
+
+    for i, b in enumerate(branches):
+        reward_str = f" reward={branch_rewards[i]:+.1f}" if branch_rewards is not None else ""
+        print(f"  Branch {i}: {len(b['token_ids'])} tokens{reward_str} — {repr(b['text'][:80])}...")
+
+    # =====================================================================
+    # Step 3: Split into sentences
+    # =====================================================================
+    print("\n" + "=" * 80)
+    print("Step 3: Splitting into sentences...")
+    print("=" * 80)
+
+    token_ids_for_splitting = input_ids[0, :analysis_timestep]
+    sentences = split_tokens_into_sentences(
+        token_ids_for_splitting, tokenizer, min_sentence_length=min_sentence_length
+    )
+    sentences = remove_bos_from_sentences(sentences)
+    sentences = chunk_sentences(sentences, sentence_chunk)
+    num_prefix_sentences = len(sentences)
+
+    # Optionally add generation sentences (for "generation" / "both" modes)
+    gen_sentences_raw = []
+    first_branch_tokens = None
+    if mask_mode in ("generation", "both"):
+        first_branch_tokens = torch.tensor(branches[0]["token_ids"])
+        gen_sentences_raw = split_tokens_into_sentences(
+            first_branch_tokens, tokenizer, min_sentence_length=min_sentence_length
+        )
+        gen_sentences_raw = chunk_sentences(gen_sentences_raw, sentence_chunk)
+        gen_sentences = [
+            Sentence(start=s.start + analysis_timestep, end=s.end + analysis_timestep)
+            for s in gen_sentences_raw
+        ]
+        sentences = list(sentences) + gen_sentences
+        print(f"Mask mode '{mask_mode}': added {len(gen_sentences)} generation sentences")
+
+    print(f"Found {len(sentences)} sentence chunks ({num_prefix_sentences} prefix):")
+    for i, s in enumerate(sentences):
+        label = "P" if i < num_prefix_sentences else "G"
+        if i < num_prefix_sentences:
+            text = tokenizer.decode(input_ids[0, s.start : s.end + 1])
+        else:
+            raw = gen_sentences_raw[i - num_prefix_sentences]
+            text = tokenizer.decode(first_branch_tokens[raw.start : raw.end + 1].tolist())
+        print(f"  {label}{i}: [{s.start}:{s.end}] = {repr(text)}")
+
+    # Compute CoT length rewards
+    if reward_type == "cot_length":
+        branch_rewards = compute_cot_length_rewards(
+            branches, tokenizer, min_sentence_length=min_sentence_length
+        )
+        print(f"CoT length rewards: {branch_rewards}")
+
+    # =====================================================================
+    # Step 4: Extract answer IDs
+    # =====================================================================
+    print("\n" + "=" * 80)
+    print("Step 4: Extracting answer IDs...")
+    print("=" * 80)
+
+    answer_ids_tensor = None
+    num_answers = None
+    answer_labels = None
+    if branch_rewards is not None:
+        use_binary = reward_type == "correctness"
+        answer_ids_list, answer_labels = reward_based_answer_ids(
+            branch_rewards, binary=use_binary,
+        )
+        grouping_method = "reward_binary" if use_binary else "reward_unique"
+    elif judge_answers:
+        from openai import OpenAI
+        from dotenv import load_dotenv
+        load_dotenv()
+        openrouter_key = os.getenv("OPENROUTER_API_KEY")
+        if not openrouter_key:
+            raise ValueError("--judge_answers requires OPENROUTER_API_KEY in environment.")
+        judge_client = OpenAI(
+            base_url="https://openrouter.ai/api/v1", api_key=openrouter_key,
+        )
+        answer_ids_list, answer_labels = extract_answer_ids(
+            branches, prefix_text,
+            judge_client=judge_client, judge_model=judge_model, question=prompt,
+        )
+        del judge_client
+        grouping_method = "judge"
+    else:
+        answer_ids_list, answer_labels = extract_answer_ids(branches, prefix_text)
+        grouping_method = "boxed_normalized"
+
+        no_answer_branches = sum(
+            1 for a in answer_ids_list
+            if answer_labels[a].startswith("__no_answer_")
+        )
+        if no_answer_branches > len(branches) * 0.5:
+            print(
+                f"  {no_answer_branches}/{len(branches)} branches lack "
+                f"\\boxed{{}} answers. Falling back to judge model..."
+            )
+            from openai import OpenAI
+            from dotenv import load_dotenv
+            load_dotenv()
+            openrouter_key = os.getenv("OPENROUTER_API_KEY")
+            if not openrouter_key:
+                raise ValueError(
+                    "More than 50% of branches lack \\boxed{} answers. "
+                    "Judge-based answer extraction requires OPENROUTER_API_KEY "
+                    "in the environment."
+                )
+            judge_client = OpenAI(
+                base_url="https://openrouter.ai/api/v1", api_key=openrouter_key,
+            )
+            answer_ids_list, answer_labels = extract_answer_ids(
+                branches, prefix_text,
+                judge_client=judge_client, judge_model=judge_model,
+                question=prompt,
+            )
+            del judge_client
+            grouping_method = "judge_fallback"
+
+    answer_ids_tensor = torch.tensor(answer_ids_list, dtype=torch.long)
+    num_answers = len(answer_labels)
+    print(f"\nAnswer groups ({num_answers}, method={grouping_method}):")
+    for aid, label in enumerate(answer_labels):
+        count = sum(1 for a in answer_ids_list if a == aid)
+        print(f"  [{aid}] {label!r}: {count} branches")
+
+    # =====================================================================
+    # Step 5: Load model with eager attention
+    # =====================================================================
+    print("\n" + "=" * 80)
+    print(f"Step 5: Loading model with eager attention ({model_name})...")
+    print("=" * 80)
+
+    model, tokenizer = load_model_eager(model_name, device=device)
+    target_device = next(model.parameters()).device
+    input_ids = input_ids.to(target_device)
+
+    # =====================================================================
+    # Step 6: Compute suppression scores
+    # =====================================================================
+    print("\n" + "=" * 80)
+    print(f"Step 6: Computing attention suppression scores ({len(sentences)} sentences)...")
+    print("=" * 80)
+
     token_to_sent = build_token_to_sent_map(
-        sentences, input_ids.shape[-1], device,
+        sentences, input_ids.shape[-1], target_device,
     )
 
-    # ------------------------------------------------------------------
-    # Step 1: Capture clean attention + logits
-    # ------------------------------------------------------------------
-    print("\nStep 1: Capturing clean attention from all layers...")
-    clean_logits, sent_attns = capture_clean_pass(
-        model, input_ids, token_to_sent, num_sents,
+    scores = compute_suppression_scores(
+        model=model,
+        input_ids=input_ids,
+        sentences=sentences,
+        token_to_sent=token_to_sent,
+        sentence_gap=sentence_gap,
     )
 
-    # ------------------------------------------------------------------
-    # Step 2: Receiver head analysis
-    # ------------------------------------------------------------------
-    print(f"\nStep 2: Computing receiver heads (top-{args.top_k}, min_gap={args.min_gap})...")
-    receiver_heads, vertical_attention = compute_receiver_heads(
-        sent_attns, top_k=args.top_k, min_gap=args.min_gap,
+    # =====================================================================
+    # Step 7: Package as NodeMask and save
+    # =====================================================================
+    print("\n" + "=" * 80)
+    print("Step 7: Saving NodeMask...")
+    print("=" * 80)
+
+    # Build sentence dicts with text
+    sentence_dicts = []
+    for i, s in enumerate(sentences):
+        if i < num_prefix_sentences:
+            text = tokenizer.decode(input_ids[0, s.start : s.end + 1])
+        else:
+            raw = gen_sentences_raw[i - num_prefix_sentences]
+            text = tokenizer.decode(first_branch_tokens[raw.start : raw.end + 1].tolist())
+        sentence_dicts.append({"start": s.start, "end": s.end, "text": text})
+
+    node_mask = NodeMask(
+        model_name=model_name,
+        algorithm="attention_suppression",
+        layers=list(range(model.config.num_hidden_layers)),
+        sentences=sentence_dicts,
+        objective_name=objective,
+        metadata={
+            "mask_granularity": "pair",
+            "sentence_gap": sentence_gap,
+            "num_heads": model.config.num_attention_heads,
+            "mask_mode": mask_mode,
+            "num_prefix_sentences": num_prefix_sentences,
+            "num_continuations": len(branches),
+            "negate_scores": False,
+            "cache_key": cache_key,
+            "renormalize_masked_attention": renormalize_masked_attention,
+            "objective": objective,
+            "seed": seed,
+            "temperature": temperature,
+            "max_sampling_tokens": max_sampling_tokens,
+            "num_tokens_to_analyse": num_tokens_to_analyse,
+            "num_branches": num_new_branches,
+            "reward_type": reward_type,
+            "answer_only": answer_only,
+        },
+        scores=scores,
     )
-    del sent_attns
 
-    print("Top 5 receiver heads:")
-    for l, h, k in receiver_heads[:5]:
-        print(f"  Layer {l}, Head {h}: kurtosis = {k:.2f}")
+    if branch_rewards is not None:
+        node_mask.metadata["branch_rewards"] = branch_rewards
+    if correct_answer is not None:
+        node_mask.metadata["correct_answer"] = correct_answer
+    if answer_labels is not None:
+        node_mask.metadata["answer_labels"] = answer_labels
+        node_mask.metadata["answer_ids"] = answer_ids_tensor.tolist()
+        node_mask.metadata["num_answers"] = num_answers
 
-    # ------------------------------------------------------------------
-    # Step 3: Suppression matrix
-    # ------------------------------------------------------------------
-    print(f"\nStep 3: Computing suppression matrix ({num_sents} forward passes)...")
-    suppression_matrix = compute_suppression_matrix(
-        model, input_ids, sentences, token_to_sent, clean_logits,
-    )
+    # Determine output path
+    if file_name is not None:
+        base = file_name.removesuffix(".json")
+        output_file = os.path.join(output_dir, f"{base}_suppression.json")
+    else:
+        output_file = os.path.join(
+            output_dir, f"attention_suppression_branches{num_new_branches}.json"
+        )
+    node_mask.to_json(output_file)
+    print(f"Saved NodeMask to {output_file}")
 
-    # ------------------------------------------------------------------
-    # Step 4: Save results
-    # ------------------------------------------------------------------
-    data["metadata"]["suppression_matrix"] = suppression_matrix
-    data["metadata"]["receiver_head_attention"] = vertical_attention
-    data["metadata"]["receiver_heads"] = [
-        {"layer": l, "head": h, "kurtosis": round(k, 4)}
-        for l, h, k in receiver_heads
-    ]
-    data["metadata"]["figure6_config"] = {
-        "top_k": args.top_k,
-        "min_gap": args.min_gap,
-    }
+    # Print summary
+    print("\nSummary:")
+    print(f"  Algorithm: attention_suppression")
+    print(f"  Sentences: {len(sentences)}")
+    print(f"  Layers: all ({model.config.num_hidden_layers})")
+    print(f"  Mask granularity: pair")
+    print(f"  Sentence gap: {sentence_gap}")
+    print(f"  Branches: {num_new_branches}")
+    print(f"  Objective: {objective}")
+    print(f"  Cache key: {cache_key}")
+    if branch_rewards is not None:
+        print(f"  Branch rewards: {branch_rewards}")
 
-    with open(args.mask, "w") as f:
-        json.dump(data, f, indent=2)
-
-    print(f"\nDone. Updated {args.mask} with:")
-    print(f"  metadata.suppression_matrix: [{num_sents} x {num_sents}]")
-    print(f"  metadata.receiver_head_attention: [{num_sents}]")
-    print(f"  metadata.receiver_heads: [{len(receiver_heads)} heads]")
-
+    # Cleanup
     del model
     clear_cuda()
+    print("\nDone!")
+
+    return output_file
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Attention suppression circuit discovery (Thought Anchors)"
+    )
+    parser.add_argument("--config", type=str, default=None,
+        help="Path to YAML/JSON config file. CLI args override config values.")
+    parser.add_argument("--model_name", type=str,
+        default="deepseek-ai/DeepSeek-R1-Distill-Llama-8B")
+    parser.add_argument("--prompt", type=str, default=None)
+    parser.add_argument("--num_new_branches", type=int, default=8)
+    parser.add_argument("--analysis_timestep", type=int, default=None)
+    parser.add_argument("--objective",
+        choices=["kl_divergence", "log_prob", "answer_kl", "reward_gap"],
+        default="kl_divergence")
+    parser.add_argument("--sentence_gap", type=int, default=1)
+    parser.add_argument("--sentence_chunk", type=int, default=1)
+    parser.add_argument("--mask_mode", choices=["prefix", "generation", "both"],
+        default="prefix")
+    parser.add_argument("--no_renormalize_masked_attention",
+        dest="renormalize_masked_attention", action="store_false")
+    parser.add_argument("--max_sampling_tokens", type=int, default=150)
+    parser.add_argument("--num_tokens_to_analyse", type=int, default=None)
+    parser.add_argument("--min_sentence_length", type=int, default=10)
+    parser.add_argument("--temperature", type=float, default=0.6)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--device", default="cuda")
+    parser.add_argument("--output_dir", default="results/circuit_discovery")
+    parser.add_argument("--reward_type",
+        choices=["none", "correctness", "cot_length"], default="none")
+    parser.add_argument("--correct_answer", type=str, default=None)
+    parser.add_argument("--data_path", type=str, default=None)
+    parser.add_argument("--prompt_index", type=int, default=None)
+    parser.add_argument("--dataset_type",
+        choices=["open ended", "multiple choice", "alignment"],
+        default="open ended")
+    parser.add_argument("--answer_only", action="store_true")
+    parser.add_argument("--judge_model", type=str,
+        default="meta-llama/llama-3.2-3b-instruct")
+    parser.add_argument("--judge_answers", action="store_true")
+    parser.add_argument("--file_name", type=str, default=None)
+    parser.add_argument("--cache_dir", type=str, default=DEFAULT_CACHE_DIR)
+    # Accepted for config compatibility with learn_circuit.py (ignored)
+    parser.add_argument("--model_to_analyse", type=str, default=None)
+    parser.add_argument("--masking_algorithm", type=str, default=None)
+    parser.add_argument("--pair_aggregation", type=str, default=None)
+    parser.add_argument("--mask_granularity", type=str, default=None)
+    parser.add_argument("--layers_to_analyse", nargs="+", default=None)
+    parser.add_argument("--ablate_non_target_layers", action="store_true")
+    parser.add_argument("--num_ig_steps", type=int, default=None)
+    parser.add_argument("--no_negate_scores", action="store_true")
+    parser.add_argument("--num_random_samples", type=int, default=5)
+    parser.add_argument("--sparsities", type=float, nargs="+", default=None)
+
+    args, _ = parser.parse_known_args()
+    if args.config:
+        from utils.expt_config import load_config
+        config = load_config(args.config)
+        parser.set_defaults(**{k: v for k, v in config.items() if k != "config"})
+    args = parser.parse_args()
+    kwargs = vars(args)
+    kwargs.pop("config", None)
+    main(**kwargs)
