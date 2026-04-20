@@ -194,6 +194,7 @@ def main(
     no_negate_scores: bool = False,
     num_random_samples: int = 5,
     sparsities: list[float] = None,
+    importance_sampling_method: str = "snis",
     **kwargs,
 ):
     if num_tokens_to_analyse is None:
@@ -503,6 +504,7 @@ def main(
             "num_branches": num_new_branches,
             "reward_type": reward_type,
             "answer_only": answer_only,
+            "importance_sampling_method": importance_sampling_method,
         },
         scores=scores,
     )
@@ -600,6 +602,11 @@ if __name__ == "__main__":
     parser.add_argument("--no_negate_scores", action="store_true")
     parser.add_argument("--num_random_samples", type=int, default=5)
     parser.add_argument("--sparsities", type=float, nargs="+", default=None)
+    parser.add_argument("--importance_sampling_method",
+        choices=["snis", "geometric_mean"], default="snis",
+        help="IS method saved into mask metadata so evaluate_mask.py uses it "
+        "when computing IS-based metrics (does not affect suppression scores "
+        "themselves, which are computed by raw KL).")
 
     args, _ = parser.parse_known_args()
     if args.config:
