@@ -1,0 +1,7 @@
+base_config: expts/configs/geometric_mean_configs/base.yaml
+
+objective: answer_kl
+importance_sampling_method: geometric_mean
+file_name: retain_outcome_dist_geometric_mean
+batch_chunk_size: 2
+device: cuda:1

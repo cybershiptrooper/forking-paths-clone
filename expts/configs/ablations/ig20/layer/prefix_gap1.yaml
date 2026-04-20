@@ -1,4 +1,0 @@
-base_config: expt_configs/ig50/base.yaml
-mask_granularity: layer
-sentence_gap: 1
-output_dir: results/circuitviz/ig50_layer_prefix_gap1
