@@ -12,7 +12,7 @@ After optimization (batched SVG shapes + 2 global traces + per-layer box traces)
 import time
 
 from utils.masks import load_mask
-from utils.circuit_streamlit_plotly import build_sentence_connection_figure
+from utils.circuit_streamlit_plotly_legacy import build_sentence_connection_figure
 
 MASK_PATH = (
     "results/circuitviz/ig50_prefix_gap_1/"

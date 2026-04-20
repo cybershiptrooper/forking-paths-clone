@@ -7,7 +7,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from utils.circuit_streamlit_plotly import (
+from utils.circuit_streamlit_plotly_legacy import (
     build_attention_pattern_figure,
     build_circuit_graph_figure,
     build_full_circuit_figure,
