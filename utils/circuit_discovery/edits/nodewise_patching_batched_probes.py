@@ -216,6 +216,7 @@ class NodewiseActivationPatchingBatchedProbes(CircuitDiscovery):
         chain_logprobs_clean: torch.Tensor,
         answer_ids: torch.Tensor,
         num_answers: int,
+        chain_lengths: Optional[torch.Tensor] = None,
     ) -> List[float]:
         """Compute global IS-based objective for B probes."""
         # Collect chain log-probs per probe across all continuations
@@ -234,6 +235,8 @@ class NodewiseActivationPatchingBatchedProbes(CircuitDiscovery):
             chain_lps = torch.stack(all_chain_lps[b]).to(device)
             m = self.objective_fn(
                 chain_lps, chain_logprobs_clean, answer_ids.to(device), num_answers,
+                chain_lengths=chain_lengths,
+                is_method=self.importance_sampling_method,
             ).item()
             metrics.append(m)
         return metrics
@@ -252,12 +255,14 @@ class NodewiseActivationPatchingBatchedProbes(CircuitDiscovery):
         chain_logprobs_clean: Optional[torch.Tensor],
         answer_ids: Optional[torch.Tensor],
         num_answers: Optional[int],
+        chain_lengths: Optional[torch.Tensor] = None,
     ) -> List[float]:
         """Dispatch to local or global batch metric computation."""
         if use_global:
             return self._compute_batch_metrics_global(
                 B, input_ids, continuations, prefix_len, device,
                 chain_logprobs_clean, answer_ids, num_answers,
+                chain_lengths=chain_lengths,
             )
         return self._compute_batch_metrics_local(
             B, input_ids, continuations, clean_logits_list, prefix_len,
@@ -359,6 +364,12 @@ class NodewiseActivationPatchingBatchedProbes(CircuitDiscovery):
                 chain_logprobs_clean.append(lp.detach())
             chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
 
+        # Per-chain continuation lengths — used by non-SNIS IS methods.
+        chain_lengths = torch.tensor(
+            [c.shape[-1] for c in continuations],
+            dtype=torch.long, device=device,
+        )
+
         # ----- Patch target layers (batched injection) -----
         forward_fn = make_attention_forward(self.model_type, _batched_injection)
         masks = {
@@ -410,6 +421,7 @@ class NodewiseActivationPatchingBatchedProbes(CircuitDiscovery):
                         prefix_len, device, branch_rewards,
                         position_mask_overrides, use_global,
                         chain_logprobs_clean, answer_ids, num_answers,
+                        chain_lengths=chain_lengths,
                     )
 
                     for b, (i, j) in enumerate(pair_coords):
@@ -450,6 +462,7 @@ class NodewiseActivationPatchingBatchedProbes(CircuitDiscovery):
                             branch_rewards, position_mask_overrides,
                             use_global, chain_logprobs_clean,
                             answer_ids, num_answers,
+                            chain_lengths=chain_lengths,
                         )
 
                         for b, (i, j) in enumerate(pair_coords):
@@ -492,6 +505,7 @@ class NodewiseActivationPatchingBatchedProbes(CircuitDiscovery):
                                 branch_rewards, position_mask_overrides,
                                 use_global, chain_logprobs_clean,
                                 answer_ids, num_answers,
+                                chain_lengths=chain_lengths,
                             )
 
                             for b, (i, j) in enumerate(pair_coords):
@@ -540,6 +554,7 @@ class NodewiseActivationPatchingBatchedProbes(CircuitDiscovery):
                 "num_prefix_sentences": num_prefix_sents,
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,
+                "importance_sampling_method": self.importance_sampling_method,
             },
             scores=scores,
         )

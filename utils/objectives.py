@@ -120,6 +120,8 @@ def answer_distribution_kl_loss(
     chain_logprobs_clean: torch.Tensor,
     answer_ids: torch.Tensor,
     num_answers: int,
+    chain_lengths: Optional[torch.Tensor] = None,
+    is_method: str = "snis",
     **kwargs,
 ) -> torch.Tensor:
     """KL(P_clean || P_m) over the answer distribution — Objective 1 (Faithfulness).
@@ -132,6 +134,9 @@ def answer_distribution_kl_loss(
         chain_logprobs_clean: (N,) log-probs under clean model (detached)
         answer_ids: (N,) integer answer IDs
         num_answers: number of distinct answers
+        chain_lengths: (N,) per-chain continuation lengths (required for
+            is_method='geometric_mean').
+        is_method: importance-sampling method, forwarded to importance_weights.
 
     Returns:
         Scalar KL divergence (differentiable w.r.t. chain_logprobs_masked).
@@ -145,7 +150,10 @@ def answer_distribution_kl_loss(
         p_clean[a] = (answer_ids == a).float().sum() / N
 
     # P_m: importance sampling
-    w = importance_weights(chain_logprobs_masked, chain_logprobs_clean)
+    w = importance_weights(
+        chain_logprobs_masked, chain_logprobs_clean,
+        method=is_method, chain_lengths=chain_lengths,
+    )
     p_m = snis_answer_probs(w, answer_ids, num_answers)
 
     # KL(P_clean || P_m) — only over answers with non-zero P_clean
@@ -163,6 +171,8 @@ def reward_gap_loss(
     answer_ids: torch.Tensor,
     num_answers: int,
     target_answer: int = 0,
+    chain_lengths: Optional[torch.Tensor] = None,
+    is_method: str = "snis",
     **kwargs,
 ) -> torch.Tensor:
     """Negative reward gap -(P_m(A) - max_{a!=A} P_m(a)) — Objective 2 (Reward).
@@ -175,11 +185,17 @@ def reward_gap_loss(
         answer_ids: (N,) integer answer IDs
         num_answers: number of distinct answers
         target_answer: which answer ID to promote (default 0)
+        chain_lengths: (N,) per-chain continuation lengths (required for
+            is_method='geometric_mean').
+        is_method: importance-sampling method, forwarded to importance_weights.
 
     Returns:
         Scalar loss (differentiable w.r.t. chain_logprobs_masked).
     """
-    w = importance_weights(chain_logprobs_masked, chain_logprobs_clean)
+    w = importance_weights(
+        chain_logprobs_masked, chain_logprobs_clean,
+        method=is_method, chain_lengths=chain_lengths,
+    )
     p_m = snis_answer_probs(w, answer_ids, num_answers)
 
     p_target = p_m[target_answer]
@@ -199,6 +215,8 @@ def answer_distribution_kl_loss_weighted(
     chain_logprobs_clean: torch.Tensor,
     answer_ids: torch.Tensor,
     num_answers: int,
+    chain_lengths: Optional[torch.Tensor] = None,
+    is_method: str = "snis",
     **kwargs,
 ) -> torch.Tensor:
     """KL(P_clean || P_m) — Forking Paths Eq. 1, applied symmetrically.

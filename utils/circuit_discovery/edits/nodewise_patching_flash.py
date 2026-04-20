@@ -626,21 +626,25 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
         chain_logprobs_clean, answer_ids, num_answers,
         prefix_kv_cache=None,
         prefix_last_logits=None,
+        chain_lengths: Optional[torch.Tensor] = None,
     ) -> float:
         if prefix_kv_cache is not None:
             return self._compute_global_metric_batched(
                 input_ids, continuations, prefix_len, device,
                 chain_logprobs_clean, answer_ids, num_answers,
                 prefix_kv_cache, prefix_last_logits,
+                chain_lengths=chain_lengths,
             )
         return self._compute_global_metric_sequential(
             input_ids, continuations, prefix_len, device,
             chain_logprobs_clean, answer_ids, num_answers,
+            chain_lengths=chain_lengths,
         )
 
     def _compute_global_metric_sequential(
         self, input_ids, continuations, prefix_len, device,
         chain_logprobs_clean, answer_ids, num_answers,
+        chain_lengths: Optional[torch.Tensor] = None,
     ) -> float:
         chain_lps = []
         for cont in continuations:
@@ -655,12 +659,15 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
         chain_lps = torch.stack(chain_lps).to(device)
         return self.objective_fn(
             chain_lps, chain_logprobs_clean, answer_ids, num_answers,
+            chain_lengths=chain_lengths,
+            is_method=self.importance_sampling_method,
         ).item()
 
     def _compute_global_metric_batched(
         self, input_ids, continuations, prefix_len, device,
         chain_logprobs_clean, answer_ids, num_answers,
         prefix_kv_cache, prefix_last_logits,
+        chain_lengths: Optional[torch.Tensor] = None,
     ) -> float:
         """Chunked batched forward, then per-branch chain log-prob extraction."""
         B = len(continuations)
@@ -726,6 +733,8 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
         chain_lps = torch.stack(chain_lps).to(device)
         return self.objective_fn(
             chain_lps, chain_logprobs_clean, answer_ids, num_answers,
+            chain_lengths=chain_lengths,
+            is_method=self.importance_sampling_method,
         ).item()
 
     # ------------------------------------------------------------------
@@ -853,6 +862,12 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
                 chain_logprobs_clean.append(lp.detach())
             chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
 
+        # Per-chain continuation lengths — used by non-SNIS IS methods.
+        chain_lengths = torch.tensor(
+            [c.shape[-1] for c in continuations],
+            dtype=torch.long, device=device,
+        )
+
         # ----- Probe loop (no gradients) -----
         self.model.eval()
 
@@ -875,6 +890,7 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
                     chain_logprobs_clean, answer_ids.to(device), num_answers,
                     prefix_kv_cache=prefix_kv,
                     prefix_last_logits=prefix_last_logits,
+                    chain_lengths=chain_lengths,
                 )
             return self._compute_mean_kl(
                 input_ids, continuations, clean_logits_list,
@@ -976,6 +992,7 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
                 "num_prefix_sentences": num_prefix_sents,
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,
+                "importance_sampling_method": self.importance_sampling_method,
             },
             scores=scores,
         )

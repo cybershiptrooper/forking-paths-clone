@@ -410,6 +410,8 @@ def eval_all_metrics(
     use_chunked_forward: bool = True,
     chunk_size: int = 2048,
     temperature: float = 1.0,
+    is_method: str = "snis",
+    chain_lengths: Optional[torch.Tensor] = None,
 ) -> dict:
     """Run model with *binary_masks* and compute all metrics in a single pass.
 
@@ -579,13 +581,21 @@ def eval_all_metrics(
         chain_lps_t = torch.stack(chain_lps).to(device)
         clean_lps = chain_logprobs_clean.to(device)
 
-        w = importance_weights(chain_lps_t, clean_lps)
+        chain_lengths_dev = (
+            chain_lengths.to(device) if chain_lengths is not None else None
+        )
+        w = importance_weights(
+            chain_lps_t, clean_lps,
+            method=is_method, chain_lengths=chain_lengths_dev,
+        )
         n_eff = effective_sample_size(w)
         result["n_eff"] = n_eff
         result["n_eff_ratio"] = n_eff / len(continuations)
         result["log_weights"] = (
             (chain_lps_t - clean_lps).detach().cpu().tolist()
         )
+        result["chain_weights_normalized"] = w.detach().cpu().tolist()
+        result["importance_sampling_method"] = is_method
 
     # Answer KL uses fine-grained buckets (each distinct answer is its own bucket)
     if compute_is_fine:
@@ -602,9 +612,11 @@ def eval_all_metrics(
 
         answer_kl = answer_distribution_kl_loss(
             chain_lps_t, clean_lps, answer_ids_fine_dev, num_answers_fine,
+            chain_lengths=chain_lengths_dev, is_method=is_method,
         ).item()
         answer_kl_w = answer_distribution_kl_loss_weighted(
             chain_lps_t, clean_lps, answer_ids_fine_dev, num_answers_fine,
+            chain_lengths=chain_lengths_dev, is_method=is_method,
         ).item()
 
         result["answer_kl"] = answer_kl
@@ -673,6 +685,7 @@ def evaluate_at_thresholds(
     use_chunked_forward: bool = True,
     chunk_size: int = 2048,
     temperature: float = 1.0,
+    importance_sampling_method: str = "snis",
 ) -> list[dict]:
     """Evaluate all metrics at different mask thresholds.
 
@@ -761,6 +774,11 @@ def evaluate_at_thresholds(
             p_clean_weighted.cpu().tolist()
         )
 
+    # Per-chain continuation lengths — invariant across thresholds.
+    chain_lengths = torch.tensor(
+        [c.shape[-1] for c in continuations], dtype=torch.long, device=device,
+    )
+
     # Shared kwargs for eval_all_metrics
     shared_kwargs = dict(
         layers=layers,
@@ -782,6 +800,8 @@ def evaluate_at_thresholds(
         use_chunked_forward=use_chunked_forward,
         chunk_size=chunk_size,
         temperature=temperature,
+        is_method=importance_sampling_method,
+        chain_lengths=chain_lengths,
     )
 
     # Pre-generate K random score masks by permuting learned scores
@@ -861,6 +881,8 @@ def evaluate_at_thresholds(
             entry["n_eff"] = learned["n_eff"]
             entry["n_eff_ratio"] = learned["n_eff_ratio"]
             entry["log_weights"] = learned["log_weights"]
+            entry["chain_weights_normalized"] = learned["chain_weights_normalized"]
+            entry["importance_sampling_method"] = learned["importance_sampling_method"]
             entry["random_n_effs"] = [r.get("n_eff", 0.0) for r in random_results]
 
         # Answer KL (fine-grained buckets)

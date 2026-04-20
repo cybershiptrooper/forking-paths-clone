@@ -161,6 +161,14 @@ def evaluate(
     print(f"  Target sparsities: {sparsities}")
     print(f"  Derived {len(thresholds)} thresholds from mask scores")
 
+    is_method = meta.get("importance_sampling_method")
+    if is_method is None:
+        print(
+            "  Warning: mask has no 'importance_sampling_method' in metadata "
+            "(produced before the Part 1 refactor). Defaulting to 'snis'."
+        )
+        is_method = "snis"
+
     threshold_results = evaluate_at_thresholds(
         model=model,
         node_mask=node_mask,
@@ -181,6 +189,7 @@ def evaluate(
         answer_ids_binary=answer_ids_binary,
         num_answers_binary=num_answers_binary,
         temperature=meta.get("temperature", 1.0),
+        importance_sampling_method=is_method,
     )
 
     # =====================================================================

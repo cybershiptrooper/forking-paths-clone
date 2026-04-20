@@ -222,6 +222,16 @@ if __name__ == "__main__":
         help="Number of continuations per forward-pass chunk in flash patching. "
         "Lower values reduce GPU memory usage (default: algorithm's own default, typically 4).",
     )
+    parser.add_argument(
+        "--importance_sampling_method",
+        choices=["snis", "geometric_mean"],
+        default="snis",
+        help="Importance-sampling reweighting method. "
+        "'snis' is the standard self-normalised estimator; "
+        "'geometric_mean' divides each chain's log-ratio by its length "
+        "before softmax, mitigating SNIS collapse on long chains. "
+        "See notes/reward_gap_goodhart.md.",
+    )
     # First parse to check for --config
     args, _ = parser.parse_known_args()
     if args.config:

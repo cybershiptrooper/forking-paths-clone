@@ -57,6 +57,9 @@ class CircuitDiscovery(ABC):
             raise ValueError(
                 f"mask_granularity must be 'head', 'layer', or 'pair', got {mask_granularity!r}"
             )
+        self.importance_sampling_method = kwargs.pop(
+            "importance_sampling_method", "snis",
+        )
         self.model = model
         self.tokenizer = tokenizer
         self.layers = layers

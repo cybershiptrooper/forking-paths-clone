@@ -103,6 +103,8 @@ Each entry in `metadata.threshold_evaluation` contains metrics computed at a spe
 | `n_eff` | Effective sample size from importance weights. |
 | `n_eff_ratio` | N_eff / N. Values > 0.1 are considered healthy. |
 | `log_weights` | Array of raw log importance weights per chain. |
+| `chain_weights_normalized` | Per-chain SNIS-normalised weights at this threshold (length N, sums to 1). Derived from `log_weights` and the configured IS method. |
+| `importance_sampling_method` | IS method used to produce `chain_weights_normalized`. `"snis"` or `"geometric_mean"`. |
 | `kl_a` | Mean per-token KL over target-answer branches. **Objective 3 metric.** |
 | `kl_b` | Mean per-token KL over other-answer branches. **Objective 3 metric.** |
 | `contrastive_loss` | `kl_a - kl_b`. Lower = better contrastive circuit. |
@@ -130,6 +132,7 @@ The detail panel contains an interactive dropdown for selecting which metric to 
 | N_eff / N vs Sparsity | `n_eff_ratio` | Line + threshold + error bars | IS health diagnostic. Red dashed line at 0.1. Error bars from random samples. |
 | Per-answer Probabilities | `answer_probs_masked` | Grouped bar | P_clean vs P_masked for each answer group at the selected threshold. |
 | Log-weight Histogram | `log_weights` | Histogram | Distribution of log importance weights. Healthy = concentrated near 0. |
+| Per-chain IS weights | `chain_weights_normalized` | Per-chain bars | One bar per chain at the selected threshold, coloured by answer bucket. Dashed line at 1/N. Visual check for SNIS collapse. |
 | KL_A vs Sparsity | `kl_a` | Line + random band | **Obj 3.** Mean per-token KL for target-answer chains. Should stay low. |
 | KL_B vs Sparsity | `kl_b` | Line + random band | **Obj 3.** Mean per-token KL for other-answer chains. Should stay at/above random. |
 | Contrastive Loss vs Sparsity | `contrastive_loss` | Line + random band | **Obj 3.** KL_A − KL_B. More negative = better contrastive separation. |

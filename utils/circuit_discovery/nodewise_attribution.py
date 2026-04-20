@@ -134,6 +134,12 @@ class NodewiseAttribution(CircuitDiscovery):
                 chain_logprobs_clean.append(lp.detach())
             chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
 
+        # Per-chain continuation lengths — used by non-SNIS IS methods.
+        chain_lengths = torch.tensor(
+            [c.shape[-1] for c in continuations],
+            dtype=torch.long, device=device,
+        )
+
         # 2. Integrated gradients
         granularity = self.mask_granularity
         if granularity == "head":
@@ -217,6 +223,8 @@ class NodewiseAttribution(CircuitDiscovery):
                 global_loss = self.objective_fn(
                     chain_lps_param, chain_logprobs_clean,
                     answer_ids.to(device), num_answers,
+                    chain_lengths=chain_lengths,
+                    is_method=self.importance_sampling_method,
                 )
                 global_loss.backward()
                 per_chain_weights = chain_lps_param.grad.detach()  # (N,)
@@ -361,6 +369,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 "pair_aggregation": self.pair_aggregation,
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,
+                "importance_sampling_method": self.importance_sampling_method,
             },
             scores=scores,
         )

@@ -18,6 +18,37 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+try:
+    import pytest  # noqa: F401
+    _HAS_PYTEST = True
+except ImportError:  # run standalone without pytest installed
+    _HAS_PYTEST = False
+
+    class _RaisesCtx:
+        def __init__(self, exc, match=None):
+            self.exc = exc
+            self.match = match
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, tb):
+            import re
+            if exc_type is None:
+                raise AssertionError(f"Did not raise {self.exc}")
+            if not issubclass(exc_type, self.exc):
+                return False
+            if self.match is not None and not re.search(self.match, str(exc_val)):
+                return False
+            return True
+
+    class _PytestShim:
+        @staticmethod
+        def raises(exc, match=None):
+            return _RaisesCtx(exc, match=match)
+
+    pytest = _PytestShim()  # type: ignore[assignment]
+
 import torch
 import torch.nn.functional as F
 
@@ -824,6 +855,88 @@ def test_importance_weights_large_difference():
     print("[PASS] test_importance_weights_large_difference")
 
 
+def test_importance_weights_snis_default_matches_old_behavior():
+    """method='snis' produces bit-identical output to the unparameterised call."""
+    log_p_target = torch.tensor([-3.0, -4.0, -5.0, -6.0])
+    log_p_proposal = torch.tensor([-4.5, -3.5, -4.0, -5.5])
+    w_default = importance_weights(log_p_target, log_p_proposal)
+    w_snis = importance_weights(log_p_target, log_p_proposal, method="snis")
+    assert torch.allclose(w_default, w_snis, atol=0.0, rtol=0.0)
+    print("[PASS] test_importance_weights_snis_default_matches_old_behavior")
+
+
+def test_importance_weights_geometric_mean_requires_lengths():
+    log_p_target = torch.tensor([-3.0, -4.0])
+    log_p_proposal = torch.tensor([-4.5, -3.5])
+    with pytest.raises(ValueError, match="chain_lengths"):
+        importance_weights(log_p_target, log_p_proposal, method="geometric_mean")
+    print("[PASS] test_importance_weights_geometric_mean_requires_lengths")
+
+
+def test_importance_weights_geometric_mean_equal_lengths_equals_tempered_snis():
+    """When all T_i are equal, geometric_mean is SNIS at temperature T."""
+    log_p_target = torch.tensor([-3.0, -4.0, -5.0])
+    log_p_proposal = torch.tensor([-4.5, -3.5, -4.0])
+    T = 100
+    chain_lengths = torch.full((3,), T, dtype=torch.long)
+
+    w_geo = importance_weights(
+        log_p_target, log_p_proposal,
+        method="geometric_mean", chain_lengths=chain_lengths,
+    )
+
+    log_w = (log_p_target - log_p_proposal) / T
+    log_w = log_w - log_w.max()
+    expected = torch.exp(log_w) / torch.exp(log_w).sum()
+
+    assert torch.allclose(w_geo, expected, atol=1e-6)
+    print("[PASS] test_importance_weights_geometric_mean_equal_lengths_equals_tempered_snis")
+
+
+def test_importance_weights_geometric_mean_unequal_lengths_smoke():
+    """With mixed lengths, softmax inputs are log_w_i / T_i — no crash, sums to 1."""
+    log_p_target = torch.tensor([-30.0, -4.0, -5.0])
+    log_p_proposal = torch.tensor([-45.0, -3.5, -4.0])
+    chain_lengths = torch.tensor([10000, 100, 50], dtype=torch.long)
+
+    w = importance_weights(
+        log_p_target, log_p_proposal,
+        method="geometric_mean", chain_lengths=chain_lengths,
+    )
+    assert torch.isfinite(w).all()
+    assert abs(w.sum().item() - 1.0) < 1e-6
+    print("[PASS] test_importance_weights_geometric_mean_unequal_lengths_smoke")
+
+
+def test_importance_weights_unknown_method_raises():
+    with pytest.raises(ValueError, match="Unknown importance sampling method"):
+        importance_weights(
+            torch.tensor([-3.0]), torch.tensor([-4.0]),
+            method="not_a_method",
+        )
+    print("[PASS] test_importance_weights_unknown_method_raises")
+
+
+def test_answer_distribution_kl_loss_threads_is_method():
+    """The objective forwards is_method + chain_lengths to importance_weights."""
+    chain_lps_m = torch.tensor([-100.0, -200.0, -250.0], requires_grad=True)
+    chain_lps_c = torch.tensor([-105.0, -195.0, -155.0])
+    answer_ids = torch.tensor([0, 0, 1])
+    chain_lengths = torch.tensor([100, 100, 100], dtype=torch.long)
+
+    loss_snis = answer_distribution_kl_loss(
+        chain_lps_m, chain_lps_c, answer_ids, 2, is_method="snis",
+    )
+    loss_geo = answer_distribution_kl_loss(
+        chain_lps_m, chain_lps_c, answer_ids, 2,
+        is_method="geometric_mean", chain_lengths=chain_lengths,
+    )
+    assert not torch.allclose(loss_snis, loss_geo), (
+        "Geometric mean should differ from SNIS in this regime"
+    )
+    print("[PASS] test_answer_distribution_kl_loss_threads_is_method")
+
+
 def test_answer_kl_numerical_stability():
     """Should handle extreme importance weights gracefully."""
     # One chain has much higher logprob under masked model
@@ -862,6 +975,11 @@ if __name__ == "__main__":
     test_importance_weights_gradient_flows()
     test_importance_weights_proposal_detached()
     test_importance_weights_large_difference()
+    test_importance_weights_snis_default_matches_old_behavior()
+    test_importance_weights_geometric_mean_requires_lengths()
+    test_importance_weights_geometric_mean_equal_lengths_equals_tempered_snis()
+    test_importance_weights_geometric_mean_unequal_lengths_smoke()
+    test_importance_weights_unknown_method_raises()
 
     print()
     print("=" * 60)
@@ -930,6 +1048,7 @@ if __name__ == "__main__":
     test_answer_kl_manual_computation()
     test_answer_kl_single_answer()
     test_answer_kl_numerical_stability()
+    test_answer_distribution_kl_loss_threads_is_method()
 
     print()
     print("=" * 60)

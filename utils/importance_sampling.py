@@ -52,17 +52,43 @@ def chain_log_prob(
 def importance_weights(
     log_p_target: torch.Tensor,
     log_p_proposal: torch.Tensor,
+    method: str = "snis",
+    chain_lengths: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
-    """Self-normalized importance weights.
+    """Self-normalised importance weights with configurable length handling.
 
     Args:
-        log_p_target: (N,) log-probs under target (masked) model
-        log_p_proposal: (N,) log-probs under proposal (clean) model
+        log_p_target: (N,) log-probs under target (masked) model.
+        log_p_proposal: (N,) log-probs under proposal (clean) model.
+        method: IS method. One of:
+            - "snis" (default): standard self-normalised importance sampling.
+            - "geometric_mean": divide log-ratio by chain length before softmax.
+              Mitigates SNIS collapse on long chains; see
+              notes/reward_gap_goodhart.md and notes/answer_kl_objectives.md.
+        chain_lengths: (N,) int tensor of per-chain continuation lengths.
+            Required when method != "snis". Ignored for "snis".
 
     Returns:
-        (N,) normalized weights summing to 1, differentiable w.r.t. log_p_target
+        (N,) normalized weights summing to 1, differentiable w.r.t.
+        log_p_target.
     """
     log_w = log_p_target - log_p_proposal.detach()
+    if method == "snis":
+        pass
+    elif method == "geometric_mean":
+        if chain_lengths is None:
+            raise ValueError(
+                "importance_weights(method='geometric_mean') requires chain_lengths"
+            )
+        lengths = chain_lengths.to(
+            device=log_w.device, dtype=log_w.dtype,
+        ).clamp_min(1.0)
+        log_w = log_w / lengths
+    else:
+        raise ValueError(
+            f"Unknown importance sampling method: {method!r}. "
+            f"Available: 'snis', 'geometric_mean'."
+        )
     # Shift for numerical stability before exp
     log_w = log_w - log_w.detach().max()
     w = torch.exp(log_w)

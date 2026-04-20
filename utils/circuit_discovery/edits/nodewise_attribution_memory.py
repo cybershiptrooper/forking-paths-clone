@@ -405,6 +405,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 "pair_aggregation": self.pair_aggregation,
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,
+                "importance_sampling_method": self.importance_sampling_method,
             },
             scores=scores,
         )

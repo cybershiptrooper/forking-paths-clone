@@ -85,6 +85,7 @@ class NodewiseActivationPatching(CircuitDiscovery):
         chain_logprobs_clean: torch.Tensor,
         answer_ids: torch.Tensor,
         num_answers: int,
+        chain_lengths: Optional[torch.Tensor] = None,
     ) -> float:
         """Forward all chains, compute global IS-based objective metric."""
         chain_lps = []
@@ -96,7 +97,9 @@ class NodewiseActivationPatching(CircuitDiscovery):
             chain_lps.append(lp.detach())
         chain_lps = torch.stack(chain_lps).to(device)
         return self.objective_fn(
-            chain_lps, chain_logprobs_clean, answer_ids, num_answers
+            chain_lps, chain_logprobs_clean, answer_ids, num_answers,
+            chain_lengths=chain_lengths,
+            is_method=self.importance_sampling_method,
         ).item()
 
     # ------------------------------------------------------------------
@@ -210,6 +213,12 @@ class NodewiseActivationPatching(CircuitDiscovery):
                 chain_logprobs_clean.append(lp.detach())
             chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
 
+        # Per-chain continuation lengths — used by non-SNIS IS methods.
+        chain_lengths = torch.tensor(
+            [c.shape[-1] for c in continuations],
+            dtype=torch.long, device=device,
+        )
+
         # ----- Patch target layers with all-ones masks -----
         forward_fn = make_attention_forward(self.model_type, apply_sentence_mask)
         masks = {
@@ -241,6 +250,7 @@ class NodewiseActivationPatching(CircuitDiscovery):
                 return self._compute_global_metric(
                     input_ids, continuations, prefix_len, device,
                     chain_logprobs_clean, answer_ids.to(device), num_answers,
+                    chain_lengths=chain_lengths,
                 )
             else:
                 return self._compute_mean_kl(
@@ -328,6 +338,7 @@ class NodewiseActivationPatching(CircuitDiscovery):
                 "num_prefix_sentences": num_prefix_sents,
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,
+                "importance_sampling_method": self.importance_sampling_method,
             },
             scores=scores,
         )

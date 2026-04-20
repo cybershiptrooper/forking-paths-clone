@@ -228,6 +228,14 @@ def test_forward_pass_count_with_answer_ids():
     for key in ["answer_kl", "reward_gap", "n_eff", "answer_probs_masked"]:
         assert key in result, f"{key} should be present with answer_ids"
 
+    # chain_weights_normalized should be present with length N and sum to 1.
+    assert "chain_weights_normalized" in result, (
+        "chain_weights_normalized should be present with answer_ids"
+    )
+    cwn = result["chain_weights_normalized"]
+    assert len(cwn) == len(data["continuations"])
+    assert abs(sum(cwn) - 1.0) < 1e-5
+
     print("[PASS] test_forward_pass_count_with_answer_ids")
 
 

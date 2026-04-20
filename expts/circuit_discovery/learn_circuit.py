@@ -109,6 +109,7 @@ def main(
     cache_dir: str = "cache/completions",
     batch_chunk_size: int = None,
     torch_compile: bool = False,
+    importance_sampling_method: str = "snis",
 ):
     # Default model_to_analyse to model_name
     if model_to_analyse is None:
@@ -474,6 +475,7 @@ def main(
         pair_aggregation=pair_aggregation,
         mask_granularity=mask_granularity,
         temperature=temperature,
+        importance_sampling_method=importance_sampling_method,
     )
     if batch_chunk_size is not None:
         discovery_kwargs["batch_chunk_size"] = batch_chunk_size
@@ -527,6 +529,7 @@ def main(
     # Save cache key so evaluate_mask.py can load branches/input_ids
     node_mask.metadata["cache_key"] = cache_key
     node_mask.metadata["renormalize_masked_attention"] = renormalize_masked_attention
+    node_mask.metadata["importance_sampling_method"] = importance_sampling_method
 
     if file_name is not None:
         if not file_name.endswith(".json"):
@@ -749,6 +752,16 @@ if __name__ == "__main__":
         default=None,
         help="Number of continuations per forward-pass chunk in flash patching. "
         "Lower values reduce GPU memory usage (default: algorithm's own default, typically 4).",
+    )
+    parser.add_argument(
+        "--importance_sampling_method",
+        choices=["snis", "geometric_mean"],
+        default="snis",
+        help="Importance-sampling reweighting method. "
+        "'snis' is the standard self-normalised estimator; "
+        "'geometric_mean' divides each chain's log-ratio by its length "
+        "before softmax, mitigating SNIS collapse on long chains. "
+        "See notes/reward_gap_goodhart.md.",
     )
     # First parse to check for --config
     args, _ = parser.parse_known_args()

@@ -42,6 +42,7 @@ from utils.objectives import (
 
 def simulate_eval_global_metric(
     chain_lps_masked, chain_lps_clean, answer_ids, num_answers, objective_fn,
+    is_method: str = "snis", chain_lengths=None,
 ):
     """Simulate what eval_global_metric computes, without needing a model.
 
@@ -52,13 +53,17 @@ def simulate_eval_global_metric(
     4. Compute the objective
     """
     device = chain_lps_masked.device
-    w = importance_weights(chain_lps_masked, chain_lps_clean.to(device))
+    w = importance_weights(
+        chain_lps_masked, chain_lps_clean.to(device),
+        method=is_method, chain_lengths=chain_lengths,
+    )
     n_eff = effective_sample_size(w)
     p_m = snis_answer_probs(w, answer_ids.to(device), num_answers)
 
     metric = objective_fn(
         chain_lps_masked, chain_lps_clean.to(device),
         answer_ids.to(device), num_answers,
+        is_method=is_method, chain_lengths=chain_lengths,
     ).item()
 
     return {
@@ -67,7 +72,26 @@ def simulate_eval_global_metric(
         "n_eff_ratio": n_eff / len(chain_lps_masked),
         "p_m": p_m.detach().cpu().tolist(),
         "log_weights": (chain_lps_masked - chain_lps_clean.to(device)).detach().cpu().tolist(),
+        "chain_weights_normalized": w.detach().cpu().tolist(),
     }
+
+
+def test_eval_global_metric_geometric_mean():
+    """geometric_mean path runs and returns well-formed weights/metric."""
+    chain_lps_clean = torch.tensor([-200.0, -150.0, -100.0, -120.0])
+    chain_lps_masked = torch.tensor([-220.0, -140.0, -110.0, -118.0])
+    answer_ids = torch.tensor([0, 0, 1, 1])
+    chain_lengths = torch.tensor([1000, 500, 300, 600], dtype=torch.long)
+
+    result = simulate_eval_global_metric(
+        chain_lps_masked, chain_lps_clean, answer_ids, num_answers=2,
+        objective_fn=answer_distribution_kl_loss,
+        is_method="geometric_mean", chain_lengths=chain_lengths,
+    )
+    assert abs(sum(result["chain_weights_normalized"]) - 1.0) < 1e-5
+    assert all(w >= 0 for w in result["chain_weights_normalized"])
+    assert result["n_eff"] > 0
+    print("[PASS] test_eval_global_metric_geometric_mean")
 
 
 # ---------------------------------------------------------------------------
@@ -508,6 +532,7 @@ if __name__ == "__main__":
     test_eval_global_metric_identity_gives_zero_kl()
     test_eval_global_metric_reward_gap()
     test_eval_global_metric_p_m_sums_to_one()
+    test_eval_global_metric_geometric_mean()
 
     print()
     print("=" * 60)

@@ -1499,6 +1499,7 @@ const METRIC_DEFS = [
   { key: 'answer_probs_masked_weighted', label: 'Per-answer Probabilities (Eq. 1 weighted)', chartType: 'table_weighted' },
   { key: 'resample_comparison', label: 'Resample Comparison',             chartType: 'resample', alwaysAvailable: false },
   { key: 'log_weights',       label: 'Log-weight Histogram',              chartType: 'histogram' },
+  { key: 'chain_weights_normalized', label: 'Per-chain IS weights',       chartType: 'per_chain_weights_bar' },
   { key: 'kl_a',              label: 'KL_A vs Sparsity',                  chartType: 'line+random' },
   { key: 'kl_b',              label: 'KL_B vs Sparsity',                  chartType: 'line+random' },
   { key: 'contrastive_loss',  label: 'Contrastive Loss vs Sparsity',      chartType: 'line+random' },
@@ -1546,6 +1547,10 @@ function initThresholdChart() {
     }
     if (def.key === 'tag_distribution') {
       available = (maskData.sentences || []).some(s => s.function_tags && s.function_tags.length);
+    }
+    if (def.key === 'chain_weights_normalized') {
+      available = ('log_weights' in firstEntry) ||
+                  ('chain_weights_normalized' in firstEntry);
     }
     if (available) {
       availableMetrics.push(def);
@@ -1615,6 +1620,8 @@ function onMetricChange() {
     renderPerSentenceKLHeatmap();
   } else if (def.chartType === 'histogram') {
     renderLogWeightHistogram();
+  } else if (def.chartType === 'per_chain_weights_bar') {
+    renderPerChainWeightsChart();
   } else if (def.chartType === 'table') {
     renderAnswerProbsAsMainChart();
   } else if (def.chartType === 'table_weighted') {
@@ -1895,6 +1902,80 @@ function renderLogWeightHistogram() {
     yaxis: { title: { text: 'Count', standoff: 12 }, gridcolor: '#e2e8f0' },
   };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+function renderPerChainWeightsChart() {
+  if (!thresholdEvalData) return;
+  const container = document.getElementById('threshold-chart-container');
+  const entry = _findNearestEntry();
+
+  // Prefer the new field; fall back to recomputing from log_weights (SNIS).
+  let weights = entry.chain_weights_normalized;
+  if (!Array.isArray(weights)) {
+    const lw = entry.log_weights;
+    if (!Array.isArray(lw) || lw.length === 0) {
+      container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No per-chain weight data at this threshold.</div>';
+      return;
+    }
+    const mx = Math.max(...lw);
+    const es = lw.map(v => Math.exp(v - mx));
+    const S = es.reduce((a, b) => a + b, 0);
+    weights = es.map(v => v / S);
+  }
+
+  const meta = maskData.metadata || {};
+  const answerIds = meta.answer_ids || [];
+  const answerLabels = meta.answer_labels || [];
+  const correctAnswer = meta.correct_answer;
+  const N = weights.length;
+
+  const incorrectPalette = ['#dc2626', '#f97316', '#ca8a04', '#be123c', '#7c2d12'];
+  const bucketColors = answerLabels.map((lab, i) => {
+    if (lab === correctAnswer) return '#16a34a';
+    return incorrectPalette[i % incorrectPalette.length];
+  });
+
+  const bucketIndices = {};
+  for (let i = 0; i < N; i++) {
+    const aid = answerIds[i] ?? 0;
+    if (!bucketIndices[aid]) bucketIndices[aid] = [];
+    bucketIndices[aid].push(i);
+  }
+  const traces = Object.entries(bucketIndices).map(([aid, idxs]) => ({
+    x: idxs,
+    y: idxs.map(i => weights[i]),
+    type: 'bar',
+    name: (answerLabels[aid] || 'Ans ' + aid) +
+          (answerLabels[aid] === correctAnswer ? ' (correct)' : ''),
+    marker: { color: bucketColors[aid] || '#94a3b8' },
+    hovertemplate: 'chain %{x}<br>weight=%{y:.3f}<extra></extra>',
+  }));
+
+  const baseline = 1.0 / N;
+  const baselineTrace = {
+    x: [0, N - 1],
+    y: [baseline, baseline],
+    type: 'scatter', mode: 'lines',
+    line: { color: '#64748b', dash: 'dash', width: 1 },
+    name: '1/N uniform',
+    hoverinfo: 'skip',
+  };
+
+  const method = entry.importance_sampling_method
+    || meta.importance_sampling_method || 'snis';
+  const titleText =
+    `IS weights under ${method} | sparsity=${(entry.sparsity * 100).toFixed(1)}%` +
+    (entry.n_eff != null ? ` | N_eff=${entry.n_eff.toFixed(1)}/${N}` : '');
+
+  const layout = { ...PLOTLY_LAYOUT_BASE,
+    barmode: 'stack',
+    title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 },
+    xaxis: { title: { text: 'chain index', standoff: 12 }, gridcolor: '#e2e8f0' },
+    yaxis: { title: { text: 'SNIS weight', standoff: 12 }, gridcolor: '#e2e8f0',
+             range: [0, 1.02] },
+  };
+
+  Plotly.newPlot(container, [...traces, baselineTrace], layout, PLOTLY_CONFIG);
 }
 
 function renderAnswerProbsAsMainChart() {
