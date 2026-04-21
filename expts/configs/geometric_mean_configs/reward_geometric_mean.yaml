@@ -3,5 +3,5 @@ base_config: expts/configs/geometric_mean_configs/base.yaml
 reward_type: correctness
 objective: reward_gap
 importance_sampling_method: geometric_mean
-file_name: reward_with_importance_sampling_geometric_mean
+file_name: reward_with_importance_sampling
 batch_chunk_size: 2

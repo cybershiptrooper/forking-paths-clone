@@ -411,6 +411,7 @@ def eval_all_metrics(
     chunk_size: int = 2048,
     temperature: float = 1.0,
     is_method: str = "snis",
+    is_temperature: Optional[float] = None,
     chain_lengths: Optional[torch.Tensor] = None,
 ) -> dict:
     """Run model with *binary_masks* and compute all metrics in a single pass.
@@ -587,6 +588,7 @@ def eval_all_metrics(
         w = importance_weights(
             chain_lps_t, clean_lps,
             method=is_method, chain_lengths=chain_lengths_dev,
+            temperature=is_temperature,
         )
         n_eff = effective_sample_size(w)
         result["n_eff"] = n_eff
@@ -596,6 +598,8 @@ def eval_all_metrics(
         )
         result["chain_weights_normalized"] = w.detach().cpu().tolist()
         result["importance_sampling_method"] = is_method
+        if is_temperature is not None:
+            result["importance_sampling_temperature"] = float(is_temperature)
 
     # Answer KL uses fine-grained buckets (each distinct answer is its own bucket)
     if compute_is_fine:
@@ -613,10 +617,12 @@ def eval_all_metrics(
         answer_kl = answer_distribution_kl_loss(
             chain_lps_t, clean_lps, answer_ids_fine_dev, num_answers_fine,
             chain_lengths=chain_lengths_dev, is_method=is_method,
+            is_temperature=is_temperature,
         ).item()
         answer_kl_w = answer_distribution_kl_loss_weighted(
             chain_lps_t, clean_lps, answer_ids_fine_dev, num_answers_fine,
             chain_lengths=chain_lengths_dev, is_method=is_method,
+            is_temperature=is_temperature,
         ).item()
 
         result["answer_kl"] = answer_kl
@@ -686,6 +692,7 @@ def evaluate_at_thresholds(
     chunk_size: int = 2048,
     temperature: float = 1.0,
     importance_sampling_method: str = "snis",
+    importance_sampling_temperature: Optional[float] = None,
 ) -> list[dict]:
     """Evaluate all metrics at different mask thresholds.
 
@@ -801,6 +808,7 @@ def evaluate_at_thresholds(
         chunk_size=chunk_size,
         temperature=temperature,
         is_method=importance_sampling_method,
+        is_temperature=importance_sampling_temperature,
         chain_lengths=chain_lengths,
     )
 
@@ -883,6 +891,8 @@ def evaluate_at_thresholds(
             entry["log_weights"] = learned["log_weights"]
             entry["chain_weights_normalized"] = learned["chain_weights_normalized"]
             entry["importance_sampling_method"] = learned["importance_sampling_method"]
+            if "importance_sampling_temperature" in learned:
+                entry["importance_sampling_temperature"] = learned["importance_sampling_temperature"]
             entry["random_n_effs"] = [r.get("n_eff", 0.0) for r in random_results]
 
         # Answer KL (fine-grained buckets)

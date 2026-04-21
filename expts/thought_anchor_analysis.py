@@ -195,6 +195,7 @@ def main(
     num_random_samples: int = 5,
     sparsities: list[float] = None,
     importance_sampling_method: str = "snis",
+    importance_sampling_temperature: float = None,
     **kwargs,
 ):
     if num_tokens_to_analyse is None:
@@ -505,6 +506,7 @@ def main(
             "reward_type": reward_type,
             "answer_only": answer_only,
             "importance_sampling_method": importance_sampling_method,
+            "importance_sampling_temperature": importance_sampling_temperature,
         },
         scores=scores,
     )
@@ -603,10 +605,14 @@ if __name__ == "__main__":
     parser.add_argument("--num_random_samples", type=int, default=5)
     parser.add_argument("--sparsities", type=float, nargs="+", default=None)
     parser.add_argument("--importance_sampling_method",
-        choices=["snis", "geometric_mean"], default="snis",
+        choices=["snis", "geometric_mean", "tempered_snis"], default="snis",
         help="IS method saved into mask metadata so evaluate_mask.py uses it "
         "when computing IS-based metrics (does not affect suppression scores "
         "themselves, which are computed by raw KL).")
+    parser.add_argument("--importance_sampling_temperature",
+        type=float, default=None,
+        help="Scalar temperature T for --importance_sampling_method tempered_snis. "
+        "Saved into mask metadata and used at evaluation time.")
 
     args, _ = parser.parse_known_args()
     if args.config:

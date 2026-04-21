@@ -1,9 +1,10 @@
 # to be run using thought_anchors.sh
-base_config: expts/configs/geometric_mean_configs/base.yaml
+base_config: expts/configs/tempered_snis_configs/base.yaml
 
 objective: answer_kl
-importance_sampling_method: geometric_mean
-file_name: thought_anchors
+importance_sampling_method: tempered_snis
+importance_sampling_temperature: 5.0
+file_name: thought_anchors_t5
 # thought_anchors.sh sets CUDA_VISIBLE_DEVICES to a single free GPU,
 # so the process always sees it as cuda:0.
 device: cuda:0

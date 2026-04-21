@@ -98,26 +98,40 @@ def _generate_branches(
     max_new_tokens: int,
     temperature: float,
     seed: int,
+    batch_size: int = 1,
 ) -> list[dict]:
-    """Generate branches from prefix using HF generate with sampling."""
-    prefix_len = input_ids.shape[-1]
-    branches = []
+    """Generate *num_branches* from *input_ids* with HF generate, sampling.
 
-    for i in range(num_branches):
-        torch.manual_seed(seed + i)
-        torch.cuda.manual_seed_all(seed + i)
+    Sequences are drawn in chunks of *batch_size* via ``num_return_sequences``.
+    Larger batches are much faster on long generations but use more KV-cache
+    memory; tune down if you hit OOM.
+    """
+    prefix_len = input_ids.shape[-1]
+    branches: list[dict] = []
+    produced = 0
+    chunk_idx = 0
+    while produced < num_branches:
+        chunk = min(batch_size, num_branches - produced)
+        chunk_seed = seed + chunk_idx
+        torch.manual_seed(chunk_seed)
+        torch.cuda.manual_seed_all(chunk_seed)
         outputs = model.generate(
             input_ids,
             max_new_tokens=max_new_tokens,
             do_sample=True,
             temperature=temperature,
             top_p=1.0,
-            num_return_sequences=1,
+            num_return_sequences=chunk,
             use_cache=True,
+            pad_token_id=tokenizer.eos_token_id,
         )
-        gen_ids = outputs[0, prefix_len:].tolist()
-        gen_text = tokenizer.decode(gen_ids, skip_special_tokens=True)
-        branches.append({"text": gen_text, "token_ids": gen_ids})
+        # outputs: (chunk, prefix_len + gen_len)
+        for row in outputs:
+            gen_ids = row[prefix_len:].tolist()
+            gen_text = tokenizer.decode(gen_ids, skip_special_tokens=True)
+            branches.append({"text": gen_text, "token_ids": gen_ids})
+        produced += chunk
+        chunk_idx += 1
 
     return branches
 
@@ -130,6 +144,7 @@ def evaluate_resample(
     device: str = "cuda",
     cache_dir: str = DEFAULT_CACHE_DIR,
     seed: int = 42,
+    batch_size: int = 1,
 ):
     """Resample branches through the masked model at each threshold.
 
@@ -219,9 +234,20 @@ def evaluate_resample(
     orig_answers, orig_ids, orig_labels = _extract_answers(orig_texts, prefix_text)
     orig_dist = _answer_distribution(orig_ids, orig_labels)
 
+    correct_answer = meta.get("correct_answer")
+    target_norm = normalize_answer(correct_answer) if correct_answer is not None else None
+    def _fraction_correct(answers: list[str]) -> float | None:
+        if target_norm is None or not answers:
+            return None
+        return sum(1 for a in answers if a == target_norm) / len(answers)
+
+    orig_frac_correct = _fraction_correct(orig_answers)
+
     print(f"\nOriginal answer distribution ({len(cached['branches'])} branches):")
     for ans, prob in sorted(orig_dist.items(), key=lambda x: -x[1]):
         print(f"  {ans}: {prob:.1%}")
+    if orig_frac_correct is not None:
+        print(f"  fraction_correct (vs {correct_answer!r}): {orig_frac_correct:.1%}")
 
     # IS-based answer probs from existing evaluation (if available)
     existing_eval = meta.get("threshold_evaluation", [])
@@ -267,6 +293,7 @@ def evaluate_resample(
             model, tokenizer, input_ids,
             num_resample_branches, max_new_tokens,
             temperature, seed,
+            batch_size=batch_size,
         )
 
         remove_handles(handles)
@@ -278,22 +305,25 @@ def evaluate_resample(
         new_answers, new_ids, new_labels = _extract_answers(new_texts, prefix_text)
         new_dist = _answer_distribution(new_ids, new_labels)
 
-        # Find matching IS-based probs from existing eval
-        is_probs = None
+        # Find matching IS-based fine-grained answer probs from existing eval.
+        # Note: `answer_probs_masked` is BINARY (correct/incorrect) — we want
+        # the fine-grained per-answer vector here, which is saved under
+        # `answer_probs_masked_fine` and aligns with meta["answer_labels"].
+        is_probs_fine = None
         answer_labels_is = meta.get("answer_labels")
         for ev in existing_eval:
             if abs(ev.get("threshold", float("inf")) - threshold) < 1e-12:
-                is_probs = ev.get("answer_probs_masked")
+                is_probs_fine = ev.get("answer_probs_masked_fine")
                 break
 
-        is_dist = None
-        if is_probs is not None and answer_labels_is is not None:
-            is_dist = {
-                answer_labels_is[i]: is_probs[i]
-                for i in range(len(is_probs))
-                if i < len(answer_labels_is)
+        is_dist_fine = None
+        if is_probs_fine is not None and answer_labels_is is not None:
+            is_dist_fine = {
+                answer_labels_is[i]: is_probs_fine[i]
+                for i in range(min(len(is_probs_fine), len(answer_labels_is)))
             }
 
+        frac_correct = _fraction_correct(new_answers)
         entry = {
             "threshold": threshold,
             "sparsity": sparsity,
@@ -302,13 +332,16 @@ def evaluate_resample(
                 for i, b in enumerate(new_branches)
             ],
             "resample_answer_distribution": new_dist,
-            "masked_is_answer_distribution": is_dist,
+            "resample_fraction_correct": frac_correct,
+            "masked_is_answer_distribution_fine": is_dist_fine,
         }
         threshold_results.append(entry)
 
         print(f"    Resample distribution: {new_dist}")
-        if is_dist:
-            print(f"    IS distribution:       {is_dist}")
+        if frac_correct is not None:
+            print(f"    Resample fraction_correct: {frac_correct:.1%}")
+        if is_dist_fine:
+            print(f"    IS (fine) distribution:    {is_dist_fine}")
 
     # ==================================================================
     # Cleanup non-target ablation
@@ -322,8 +355,8 @@ def evaluate_resample(
     all_labels = set(orig_labels)
     for tr in threshold_results:
         all_labels.update(tr["resample_answer_distribution"].keys())
-        if tr["masked_is_answer_distribution"]:
-            all_labels.update(tr["masked_is_answer_distribution"].keys())
+        if tr["masked_is_answer_distribution_fine"]:
+            all_labels.update(tr["masked_is_answer_distribution_fine"].keys())
     all_labels = sorted(all_labels)
 
     sidecar = {
@@ -333,6 +366,9 @@ def evaluate_resample(
         "max_new_tokens": max_new_tokens,
         "temperature": temperature,
         "seed": seed,
+        "batch_size": batch_size,
+        "correct_answer": correct_answer,
+        "correct_answer_normalized": target_norm,
         "answer_labels": all_labels,
         "original": {
             "branches": [
@@ -340,6 +376,7 @@ def evaluate_resample(
                 for i in range(len(orig_texts))
             ],
             "answer_distribution": orig_dist,
+            "fraction_correct": orig_frac_correct,
         },
         "thresholds": threshold_results,
     }
@@ -390,6 +427,12 @@ if __name__ == "__main__":
         "--cache_dir", type=str, default=DEFAULT_CACHE_DIR,
         help="Directory for completion cache.",
     )
+    parser.add_argument(
+        "--batch_size", type=int, default=1,
+        help="Number of sequences generated per model.generate() call (via "
+        "num_return_sequences). Larger is faster but uses more KV-cache "
+        "memory; tune down on OOM.",
+    )
 
     args, _ = parser.parse_known_args()
     if args.config:
@@ -406,4 +449,5 @@ if __name__ == "__main__":
         device=args.device,
         cache_dir=args.cache_dir,
         seed=args.seed,
+        batch_size=args.batch_size,
     )

@@ -60,6 +60,9 @@ class CircuitDiscovery(ABC):
         self.importance_sampling_method = kwargs.pop(
             "importance_sampling_method", "snis",
         )
+        self.importance_sampling_temperature = kwargs.pop(
+            "importance_sampling_temperature", None,
+        )
         self.model = model
         self.tokenizer = tokenizer
         self.layers = layers

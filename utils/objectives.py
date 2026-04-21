@@ -122,6 +122,7 @@ def answer_distribution_kl_loss(
     num_answers: int,
     chain_lengths: Optional[torch.Tensor] = None,
     is_method: str = "snis",
+    is_temperature: Optional[float] = None,
     **kwargs,
 ) -> torch.Tensor:
     """KL(P_clean || P_m) over the answer distribution — Objective 1 (Faithfulness).
@@ -137,6 +138,7 @@ def answer_distribution_kl_loss(
         chain_lengths: (N,) per-chain continuation lengths (required for
             is_method='geometric_mean').
         is_method: importance-sampling method, forwarded to importance_weights.
+        is_temperature: scalar T for is_method='tempered_snis'.
 
     Returns:
         Scalar KL divergence (differentiable w.r.t. chain_logprobs_masked).
@@ -153,6 +155,7 @@ def answer_distribution_kl_loss(
     w = importance_weights(
         chain_logprobs_masked, chain_logprobs_clean,
         method=is_method, chain_lengths=chain_lengths,
+        temperature=is_temperature,
     )
     p_m = snis_answer_probs(w, answer_ids, num_answers)
 
@@ -173,6 +176,7 @@ def reward_gap_loss(
     target_answer: int = 0,
     chain_lengths: Optional[torch.Tensor] = None,
     is_method: str = "snis",
+    is_temperature: Optional[float] = None,
     **kwargs,
 ) -> torch.Tensor:
     """Negative reward gap -(P_m(A) - max_{a!=A} P_m(a)) — Objective 2 (Reward).
@@ -188,6 +192,7 @@ def reward_gap_loss(
         chain_lengths: (N,) per-chain continuation lengths (required for
             is_method='geometric_mean').
         is_method: importance-sampling method, forwarded to importance_weights.
+        is_temperature: scalar T for is_method='tempered_snis'.
 
     Returns:
         Scalar loss (differentiable w.r.t. chain_logprobs_masked).
@@ -195,6 +200,7 @@ def reward_gap_loss(
     w = importance_weights(
         chain_logprobs_masked, chain_logprobs_clean,
         method=is_method, chain_lengths=chain_lengths,
+        temperature=is_temperature,
     )
     p_m = snis_answer_probs(w, answer_ids, num_answers)
 
@@ -217,6 +223,7 @@ def answer_distribution_kl_loss_weighted(
     num_answers: int,
     chain_lengths: Optional[torch.Tensor] = None,
     is_method: str = "snis",
+    is_temperature: Optional[float] = None,
     **kwargs,
 ) -> torch.Tensor:
     """KL(P_clean || P_m) — Forking Paths Eq. 1, applied symmetrically.

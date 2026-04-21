@@ -380,6 +380,16 @@ def test_normalize_answer_fractions():
     print("[PASS] test_normalize_answer_fractions")
 
 
+def test_normalize_answer_dfrac_tfrac_equal_frac():
+    """\\dfrac and \\tfrac are display-size variants and should normalize
+    identically to \\frac (bug: \\dfrac{7}{72} vs \\frac{7}{72} mismatch
+    collapsed binary bucketing at eval time)."""
+    assert normalize_answer("\\dfrac{7}{72}") == normalize_answer("\\frac{7}{72}")
+    assert normalize_answer("\\tfrac{3}{4}") == "0.75"
+    assert normalize_answer("\\dfrac{1}{2}") == "0.5"
+    print("[PASS] test_normalize_answer_dfrac_tfrac_equal_frac")
+
+
 def test_normalize_answer_negative():
     """Negative numbers."""
     assert normalize_answer("-3") == "-3"
@@ -908,6 +918,45 @@ def test_importance_weights_geometric_mean_unequal_lengths_smoke():
     print("[PASS] test_importance_weights_geometric_mean_unequal_lengths_smoke")
 
 
+def test_importance_weights_tempered_snis_requires_temperature():
+    log_p_target = torch.tensor([-3.0, -4.0])
+    log_p_proposal = torch.tensor([-4.5, -3.5])
+    with pytest.raises(ValueError, match="temperature"):
+        importance_weights(log_p_target, log_p_proposal, method="tempered_snis")
+    with pytest.raises(ValueError, match="> 0"):
+        importance_weights(
+            log_p_target, log_p_proposal,
+            method="tempered_snis", temperature=0.0,
+        )
+    print("[PASS] test_importance_weights_tempered_snis_requires_temperature")
+
+
+def test_importance_weights_tempered_snis_t1_equals_snis():
+    """T=1 recovers vanilla SNIS exactly."""
+    log_p_target = torch.tensor([-3.0, -4.0, -5.0, -6.0])
+    log_p_proposal = torch.tensor([-4.5, -3.5, -4.0, -5.5])
+    w_snis = importance_weights(log_p_target, log_p_proposal, method="snis")
+    w_tempered = importance_weights(
+        log_p_target, log_p_proposal,
+        method="tempered_snis", temperature=1.0,
+    )
+    assert torch.allclose(w_snis, w_tempered, atol=1e-7)
+    print("[PASS] test_importance_weights_tempered_snis_t1_equals_snis")
+
+
+def test_importance_weights_tempered_snis_large_t_approaches_uniform():
+    """T -> large smooths weights toward 1/N."""
+    log_p_target = torch.tensor([-3.0, -4.0, -5.0, -6.0])
+    log_p_proposal = torch.tensor([-4.5, -3.5, -4.0, -5.5])
+    N = log_p_target.shape[0]
+    w = importance_weights(
+        log_p_target, log_p_proposal,
+        method="tempered_snis", temperature=1e6,
+    )
+    assert torch.allclose(w, torch.full((N,), 1.0 / N), atol=1e-5)
+    print("[PASS] test_importance_weights_tempered_snis_large_t_approaches_uniform")
+
+
 def test_importance_weights_unknown_method_raises():
     with pytest.raises(ValueError, match="Unknown importance sampling method"):
         importance_weights(
@@ -979,6 +1028,9 @@ if __name__ == "__main__":
     test_importance_weights_geometric_mean_requires_lengths()
     test_importance_weights_geometric_mean_equal_lengths_equals_tempered_snis()
     test_importance_weights_geometric_mean_unequal_lengths_smoke()
+    test_importance_weights_tempered_snis_requires_temperature()
+    test_importance_weights_tempered_snis_t1_equals_snis()
+    test_importance_weights_tempered_snis_large_t_approaches_uniform()
     test_importance_weights_unknown_method_raises()
 
     print()
@@ -1012,6 +1064,7 @@ if __name__ == "__main__":
     print("=" * 60)
     test_normalize_answer_integers()
     test_normalize_answer_fractions()
+    test_normalize_answer_dfrac_tfrac_equal_frac()
     test_normalize_answer_negative()
     test_normalize_answer_latex_cosmetic()
     test_normalize_answer_text_wrapper()

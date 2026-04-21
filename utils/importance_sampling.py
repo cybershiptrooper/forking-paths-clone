@@ -54,6 +54,7 @@ def importance_weights(
     log_p_proposal: torch.Tensor,
     method: str = "snis",
     chain_lengths: Optional[torch.Tensor] = None,
+    temperature: Optional[float] = None,
 ) -> torch.Tensor:
     """Self-normalised importance weights with configurable length handling.
 
@@ -65,8 +66,14 @@ def importance_weights(
             - "geometric_mean": divide log-ratio by chain length before softmax.
               Mitigates SNIS collapse on long chains; see
               notes/reward_gap_goodhart.md and notes/answer_kl_objectives.md.
+            - "tempered_snis": divide log-ratio by a fixed scalar temperature
+              T (independent of chain length) before softmax. T=1 recovers
+              SNIS; T -> inf recovers uniform. See
+              notes/geometric_mean_collapse.md.
         chain_lengths: (N,) int tensor of per-chain continuation lengths.
-            Required when method != "snis". Ignored for "snis".
+            Required for method="geometric_mean". Ignored otherwise.
+        temperature: positive scalar. Required for method="tempered_snis".
+            Ignored otherwise.
 
     Returns:
         (N,) normalized weights summing to 1, differentiable w.r.t.
@@ -84,10 +91,20 @@ def importance_weights(
             device=log_w.device, dtype=log_w.dtype,
         ).clamp_min(1.0)
         log_w = log_w / lengths
+    elif method == "tempered_snis":
+        if temperature is None:
+            raise ValueError(
+                "importance_weights(method='tempered_snis') requires temperature"
+            )
+        if temperature <= 0:
+            raise ValueError(
+                f"tempered_snis temperature must be > 0, got {temperature}"
+            )
+        log_w = log_w / float(temperature)
     else:
         raise ValueError(
             f"Unknown importance sampling method: {method!r}. "
-            f"Available: 'snis', 'geometric_mean'."
+            f"Available: 'snis', 'geometric_mean', 'tempered_snis'."
         )
     # Shift for numerical stability before exp
     log_w = log_w - log_w.detach().max()
@@ -146,6 +163,8 @@ def normalize_answer(answer: str) -> str:
     s = re.sub(r"\\(?:left|right|,|;|!|quad|qquad)\b", "", s)
     # Remove \text{...} wrappers (keep inner text)
     s = re.sub(r"\\text\s*\{([^}]*)\}", r"\1", s)
+    # \dfrac / \tfrac are display-size variants of \frac; collapse to \frac
+    s = re.sub(r"\\(?:d|t)frac\b", r"\\frac", s)
     s = s.strip()
 
     # Try \\frac{num}{den} → decimal

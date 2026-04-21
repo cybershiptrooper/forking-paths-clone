@@ -110,6 +110,7 @@ def main(
     batch_chunk_size: int = None,
     torch_compile: bool = False,
     importance_sampling_method: str = "snis",
+    importance_sampling_temperature: float = None,
 ):
     # Default model_to_analyse to model_name
     if model_to_analyse is None:
@@ -476,6 +477,7 @@ def main(
         mask_granularity=mask_granularity,
         temperature=temperature,
         importance_sampling_method=importance_sampling_method,
+        importance_sampling_temperature=importance_sampling_temperature,
     )
     if batch_chunk_size is not None:
         discovery_kwargs["batch_chunk_size"] = batch_chunk_size
@@ -530,6 +532,7 @@ def main(
     node_mask.metadata["cache_key"] = cache_key
     node_mask.metadata["renormalize_masked_attention"] = renormalize_masked_attention
     node_mask.metadata["importance_sampling_method"] = importance_sampling_method
+    node_mask.metadata["importance_sampling_temperature"] = importance_sampling_temperature
 
     if file_name is not None:
         if not file_name.endswith(".json"):
@@ -755,13 +758,23 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--importance_sampling_method",
-        choices=["snis", "geometric_mean"],
+        choices=["snis", "geometric_mean", "tempered_snis"],
         default="snis",
         help="Importance-sampling reweighting method. "
         "'snis' is the standard self-normalised estimator; "
         "'geometric_mean' divides each chain's log-ratio by its length "
-        "before softmax, mitigating SNIS collapse on long chains. "
-        "See notes/reward_gap_goodhart.md.",
+        "before softmax, mitigating SNIS collapse on long chains; "
+        "'tempered_snis' divides each chain's log-ratio by a fixed scalar "
+        "temperature (set via --importance_sampling_temperature). "
+        "See notes/reward_gap_goodhart.md, notes/geometric_mean_collapse.md.",
+    )
+    parser.add_argument(
+        "--importance_sampling_temperature",
+        type=float,
+        default=None,
+        help="Scalar temperature T for --importance_sampling_method tempered_snis. "
+        "T=1 recovers SNIS, T->inf recovers uniform. "
+        "See notes/geometric_mean_collapse.md (recommends T~std(log_w)).",
     )
     # First parse to check for --config
     args, _ = parser.parse_known_args()

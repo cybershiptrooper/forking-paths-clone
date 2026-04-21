@@ -35,5 +35,14 @@ cluster.md
 .superset
 .claude
 *old*
-# roadmap/
+roadmap/
 cache/
+results/*
+
+TASK.md
+analyse_collected_data.ipynb
+expts/circuit_debug/
+notes/
+optimisation_reports/
+plan.md
+refactor/

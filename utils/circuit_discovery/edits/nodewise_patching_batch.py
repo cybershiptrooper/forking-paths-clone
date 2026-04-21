@@ -153,6 +153,7 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
             chain_lps, chain_logprobs_clean, answer_ids, num_answers,
             chain_lengths=chain_lengths,
             is_method=self.importance_sampling_method,
+            is_temperature=self.importance_sampling_temperature,
         ).item()
 
     # ------------------------------------------------------------------
@@ -381,6 +382,7 @@ class NodewiseActivationPatchingBatch(CircuitDiscovery):
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,
                 "importance_sampling_method": self.importance_sampling_method,
+                "importance_sampling_temperature": self.importance_sampling_temperature,
             },
             scores=scores,
         )

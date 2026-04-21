@@ -1,7 +1,3 @@
-# model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
-# data_path: data/collection/deepseek_llama_8b/math_filtered.json
-# analysis_timestep: 1850
-# seed: 50
 model_name: Qwen/Qwen3-8B
 data_path: data/collection/qwen3_8b/math_filtered.json
 prompt_index: 9
@@ -11,9 +7,9 @@ mask_granularity: pair
 mask_mode: prefix
 layers_to_analyse: all
 max_sampling_tokens: 20000
-analysis_timestep: 1036 # 1140 # 1040
+analysis_timestep: 1036
 sentence_gap: 4
-output_dir: results/circuit_discovery/geometric_mean
+output_dir: results/circuit_discovery/tempered_snis
 ablate_non_target_layers: true
 device: cuda:0
 seed: 42
@@ -22,5 +18,7 @@ temperature: 0.6
 # NEEDED
 # objective: ...
 # file_name: ...
+# importance_sampling_method: tempered_snis
+# importance_sampling_temperature: ...
 # num_tokens_to_analyse: ... (if local)
 # reward_type: ... (if using rewards)

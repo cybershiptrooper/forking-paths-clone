@@ -224,13 +224,23 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--importance_sampling_method",
-        choices=["snis", "geometric_mean"],
+        choices=["snis", "geometric_mean", "tempered_snis"],
         default="snis",
         help="Importance-sampling reweighting method. "
         "'snis' is the standard self-normalised estimator; "
         "'geometric_mean' divides each chain's log-ratio by its length "
-        "before softmax, mitigating SNIS collapse on long chains. "
-        "See notes/reward_gap_goodhart.md.",
+        "before softmax, mitigating SNIS collapse on long chains; "
+        "'tempered_snis' divides each chain's log-ratio by a fixed scalar "
+        "temperature (set via --importance_sampling_temperature). "
+        "See notes/reward_gap_goodhart.md, notes/geometric_mean_collapse.md.",
+    )
+    parser.add_argument(
+        "--importance_sampling_temperature",
+        type=float,
+        default=None,
+        help="Scalar temperature T for --importance_sampling_method tempered_snis. "
+        "T=1 recovers SNIS, T->inf recovers uniform. "
+        "See notes/geometric_mean_collapse.md.",
     )
     # First parse to check for --config
     args, _ = parser.parse_known_args()

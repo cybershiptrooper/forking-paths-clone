@@ -1,0 +1,7 @@
+base_config: expts/configs/tempered_snis_configs/base.yaml
+
+objective: answer_kl
+importance_sampling_method: tempered_snis
+importance_sampling_temperature: 5.0
+file_name: retain_outcome_dist_t5
+batch_chunk_size: 2

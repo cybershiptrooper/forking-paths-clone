@@ -16,7 +16,11 @@ from utils.masks import NodeMask
 from utils.circuit_eval import evaluate_at_thresholds
 from utils.completion_cache import load_from_cache, DEFAULT_CACHE_DIR
 from utils.rewards import find_answer_token_positions
-from utils.importance_sampling import merge_no_answer_variants, build_binary_answer_ids
+from utils.importance_sampling import (
+    merge_no_answer_variants,
+    build_binary_answer_ids,
+    reward_based_answer_ids,
+)
 
 
 DEFAULT_SPARSITIES = [
@@ -101,16 +105,43 @@ def evaluate(
         print(f"  Fine-grained answer groups ({num_answers_fine}): {labels}")
 
     # Build binary answer IDs (for reward_gap) — correct vs incorrect.
+    # Prefer reward-sign bucketing when branch_rewards is available (matches
+    # the learn-phase bucketing exactly). Fall back to string-match against
+    # correct_answer when there are no rewards.
     answer_ids_binary = None
     num_answers_binary = None
     correct_answer = meta.get("correct_answer")
-    if answer_ids_fine is not None and correct_answer is not None:
+    binary_source = None
+    if branch_rewards is not None:
+        bin_ids, bin_labels = reward_based_answer_ids(branch_rewards, binary=True)
+        # reward_based_answer_ids collapses to one label if all rewards share
+        # sign — in that case binary bucketing is meaningless. Skip it.
+        if len(bin_labels) == 2:
+            answer_ids_binary = torch.tensor(bin_ids, dtype=torch.long)
+            num_answers_binary = 2
+            binary_source = "reward_sign"
+    if answer_ids_binary is None and answer_ids_fine is not None and correct_answer is not None:
         bin_ids, bin_labels, num_answers_binary = build_binary_answer_ids(
             ids_list, labels, correct_answer,
         )
         answer_ids_binary = torch.tensor(bin_ids, dtype=torch.long)
-        n_correct = sum(1 for b in bin_ids if b == 0)
-        print(f"  Binary answer groups: {n_correct} correct, {len(bin_ids) - n_correct} incorrect")
+        binary_source = "correct_answer_match"
+    if answer_ids_binary is not None:
+        bin_ids_list = answer_ids_binary.tolist()
+        n_correct = sum(1 for b in bin_ids_list if b == 0)
+        n_incorrect = len(bin_ids_list) - n_correct
+        print(f"  Binary answer groups (source={binary_source}): "
+              f"{n_correct} correct, {n_incorrect} incorrect")
+        if n_correct == 0 or n_incorrect == 0:
+            print(
+                f"  WARNING: binary bucketing collapsed — one side empty. "
+                f"reward_gap / p_target / contrastive metrics will be degenerate."
+            )
+            if binary_source == "correct_answer_match":
+                print(
+                    f"    correct_answer={correct_answer!r} did not match any "
+                    f"label in {labels!r}. Consider updating normalize_answer."
+                )
 
     # Recompute position_mask_overrides if answer_only
     position_mask_overrides = None
@@ -168,6 +199,12 @@ def evaluate(
             "(produced before the Part 1 refactor). Defaulting to 'snis'."
         )
         is_method = "snis"
+    is_temperature = meta.get("importance_sampling_temperature")
+    if is_method == "tempered_snis" and is_temperature is None:
+        raise ValueError(
+            "mask metadata has importance_sampling_method='tempered_snis' "
+            "but no 'importance_sampling_temperature'."
+        )
 
     threshold_results = evaluate_at_thresholds(
         model=model,
@@ -190,6 +227,7 @@ def evaluate(
         num_answers_binary=num_answers_binary,
         temperature=meta.get("temperature", 1.0),
         importance_sampling_method=is_method,
+        importance_sampling_temperature=is_temperature,
     )
 
     # =====================================================================

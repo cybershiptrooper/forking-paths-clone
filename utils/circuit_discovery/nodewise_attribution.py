@@ -225,6 +225,7 @@ class NodewiseAttribution(CircuitDiscovery):
                     answer_ids.to(device), num_answers,
                     chain_lengths=chain_lengths,
                     is_method=self.importance_sampling_method,
+                    is_temperature=self.importance_sampling_temperature,
                 )
                 global_loss.backward()
                 per_chain_weights = chain_lps_param.grad.detach()  # (N,)
@@ -370,6 +371,7 @@ class NodewiseAttribution(CircuitDiscovery):
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,
                 "importance_sampling_method": self.importance_sampling_method,
+                "importance_sampling_temperature": self.importance_sampling_temperature,
             },
             scores=scores,
         )
