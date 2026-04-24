@@ -142,6 +142,8 @@ class NodewiseActivationPatchingBatchedProbes(CircuitDiscovery):
         kwargs.pop("num_ig_steps", None)
         kwargs.pop("pair_aggregation", None)
         kwargs.pop("negate_scores", None)
+        kwargs.pop("include_zero_ablation", None)
+        kwargs.pop("zero_ablation_epsilon", None)
         super().__init__(**kwargs)
         self.probe_batch_size = probe_batch_size
 

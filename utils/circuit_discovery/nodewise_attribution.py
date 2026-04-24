@@ -36,7 +36,24 @@ class NodewiseAttribution(CircuitDiscovery):
       Set `negate_scores=False` to preserve raw (harmful-positive) scores.
     """
 
-    def __init__(self, num_ig_steps: int = 10, negate_scores: bool = True, **kwargs):
+    def __init__(
+        self,
+        num_ig_steps: int = 10,
+        negate_scores: bool = True,
+        include_zero_ablation: bool = True,
+        **kwargs,
+    ):
+        """
+        Args:
+            num_ig_steps: Number of interior Riemann points ({1/N, …, 1}).
+            negate_scores: Flip IG score sign so positive means "helps retention".
+            include_zero_ablation: If True, additionally evaluate at α=0
+                (complete ablation). Adds one forward+backward per
+                continuation. The α=0 gradient is mathematically well-defined
+                in the eager multiply-and-renorm formulation — autograd
+                differentiates through the division-by-sum chain without any
+                log(0) issue.
+        """
         self.pair_aggregation = kwargs.pop("pair_aggregation", "sum")
         if self.pair_aggregation not in _ALLOWED_PAIR_AGGREGATIONS:
             raise ValueError(
@@ -46,6 +63,7 @@ class NodewiseAttribution(CircuitDiscovery):
         super().__init__(**kwargs)
         self.num_ig_steps = num_ig_steps
         self.negate_scores = negate_scores
+        self.include_zero_ablation = include_zero_ablation
 
     def discover(
         self,
@@ -153,12 +171,19 @@ class NodewiseAttribution(CircuitDiscovery):
         else:  # "pair"
             accumulated_grads = torch.zeros(1, num_sents, num_sents)
 
+        # α schedule: right-endpoint {1/N, …, 1}, optionally prepended with 0.
+        start_step = 0 if self.include_zero_ablation else 1
+        num_eval_steps = self.num_ig_steps + (1 if self.include_zero_ablation else 0)
         print(
-            f"Running integrated gradients ({self.num_ig_steps} steps, "
+            f"Running integrated gradients "
+            f"({num_eval_steps} points"
+            f"{' incl. α=0' if self.include_zero_ablation else ''}, "
             f"{len(continuations)} continuations, "
             f"aggregation={self.pair_aggregation}, granularity={granularity})..."
         )
-        for step in tqdm(range(1, self.num_ig_steps + 1), desc="IG steps"):
+        for step in tqdm(
+            range(start_step, self.num_ig_steps + 1), desc="IG steps",
+        ):
             alpha = step / self.num_ig_steps
 
             # Create mask tensors at the appropriate granularity.
@@ -316,7 +341,7 @@ class NodewiseAttribution(CircuitDiscovery):
         # 4. Average gradients → attribution scores
         # Raw IG scores: positive means including the node increases KL (hurts).
         # Negate (default) so positive means including the node *reduces* KL (helps).
-        num_total = self.num_ig_steps * len(continuations)
+        num_total = num_eval_steps * len(continuations)
         sign = -1.0 if self.negate_scores else 1.0
 
         # Normalize by sentence-pair token counts if pair_aggregation == "mean".
@@ -360,6 +385,7 @@ class NodewiseAttribution(CircuitDiscovery):
             objective_name=getattr(self.objective_fn, "__name__", "unknown"),
             metadata={
                 "num_ig_steps": self.num_ig_steps,
+                "include_zero_ablation": self.include_zero_ablation,
                 "num_continuations": len(continuations),
                 "sentence_gap": self.sentence_gap,
                 "num_heads": num_heads,

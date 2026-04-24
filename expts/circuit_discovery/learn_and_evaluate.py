@@ -242,6 +242,39 @@ if __name__ == "__main__":
         "T=1 recovers SNIS, T->inf recovers uniform. "
         "See notes/geometric_mean_collapse.md.",
     )
+    parser.add_argument(
+        "--l0_lambda",
+        type=float,
+        default=None,
+        help="L0 sparsity penalty weight for nodewise_subnetwork_probing_sdpa. "
+        "Ignored by other algorithms.",
+    )
+    parser.add_argument(
+        "--num_training_steps", type=int, default=None,
+        help="Adam steps for nodewise_subnetwork_probing_sdpa.",
+    )
+    parser.add_argument(
+        "--learning_rate", type=float, default=None,
+        help="Adam learning rate for nodewise_subnetwork_probing_sdpa.",
+    )
+    parser.add_argument(
+        "--log_alpha_init", type=float, default=None,
+        help="Initial Hard-Concrete location parameter for SNP.",
+    )
+    parser.add_argument(
+        "--log_every", type=int, default=None,
+        help="SNP: record training-curve point every N steps.",
+    )
+    parser.add_argument(
+        "--plot_every", type=int, default=None,
+        help="SNP: overwrite training-curve PDFs every N steps.",
+    )
+    parser.add_argument(
+        "--gradient_checkpointing",
+        action="store_true",
+        help="Enable activation checkpointing on the analysis model to reduce "
+        "activation memory during IG backward. Forces use_cache=False.",
+    )
     # First parse to check for --config
     args, _ = parser.parse_known_args()
     if args.config:

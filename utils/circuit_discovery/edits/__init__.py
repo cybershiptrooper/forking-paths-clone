@@ -17,6 +17,12 @@ from utils.circuit_discovery.edits.nodewise_patching_batched_probes import (
 from utils.circuit_discovery.edits.nodewise_patching_flash import (
     NodewiseActivationPatchingFlash,
 )
+from utils.circuit_discovery.edits.nodewise_attribution_sdpa import (
+    NodewiseAttributionSDPA,
+)
+from utils.circuit_discovery.edits.nodewise_subnetwork_probing_sdpa import (
+    NodewiseSubnetworkProbingSDPA,
+)
 
 register_patching_method(
     NodewiseActivationPatchingKVCache, "nodewise_activation_patching_kv_cache"
@@ -33,4 +39,10 @@ register_patching_method(
 )
 register_patching_method(
     NodewiseActivationPatchingFlash, "nodewise_activation_patching_flash"
+)
+register_patching_method(
+    NodewiseAttributionSDPA, "nodewise_attribution_sdpa"
+)
+register_patching_method(
+    NodewiseSubnetworkProbingSDPA, "nodewise_subnetwork_probing_sdpa"
 )

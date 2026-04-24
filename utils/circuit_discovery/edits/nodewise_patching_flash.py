@@ -97,8 +97,18 @@ def _expand_mask_to_additive(
 # ---------------------------------------------------------------------------
 
 
-def _make_llama_forward_sdpa():
-    """Build SDPA-based LlamaAttention / Qwen2Attention forward."""
+def _make_llama_forward_sdpa(mask_converter: Callable = None):
+    """Build SDPA-based LlamaAttention / Qwen2Attention forward.
+
+    Args:
+        mask_converter: Callable ``(module, q_len, k_len, cache_position, dtype)
+            -> Optional[Tensor]`` producing an additive mask of shape
+            ``(1, H, q_len, k_len)`` in ``dtype``. Defaults to
+            ``_expand_mask_to_additive`` (binary → 0 / -inf, non-differentiable).
+            Pass a differentiable variant (e.g. ``log(mask)``) for IG.
+    """
+    if mask_converter is None:
+        mask_converter = _expand_mask_to_additive
 
     def _forward(
         self,
@@ -154,7 +164,7 @@ def _make_llama_forward_sdpa():
             if combined_mask.shape[-1] != k_len:
                 combined_mask = combined_mask[:, :, :, :k_len]
 
-        sent_additive = _expand_mask_to_additive(
+        sent_additive = mask_converter(
             self, q_len, k_len, cache_position, query_states.dtype,
         )
         if sent_additive is not None:
@@ -186,8 +196,13 @@ def _make_llama_forward_sdpa():
     return _forward
 
 
-def _make_qwen3_forward_sdpa():
-    """Build SDPA-based Qwen3Attention forward (Q/K RMSNorm)."""
+def _make_qwen3_forward_sdpa(mask_converter: Callable = None):
+    """Build SDPA-based Qwen3Attention forward (Q/K RMSNorm).
+
+    See ``_make_llama_forward_sdpa`` for the ``mask_converter`` contract.
+    """
+    if mask_converter is None:
+        mask_converter = _expand_mask_to_additive
 
     def _forward(
         self,
@@ -245,7 +260,7 @@ def _make_qwen3_forward_sdpa():
             if combined_mask.shape[-1] != k_len:
                 combined_mask = combined_mask[:, :, :, :k_len]
 
-        sent_additive = _expand_mask_to_additive(
+        sent_additive = mask_converter(
             self, q_len, k_len, cache_position, query_states.dtype,
         )
         if sent_additive is not None:
@@ -283,15 +298,24 @@ _SDPA_BUILDERS = {
 }
 
 
-def make_sdpa_attention_forward(model_type: str):
-    """Build an SDPA-based patched attention forward for *model_type*."""
+def make_sdpa_attention_forward(
+    model_type: str,
+    mask_converter: Optional[Callable] = None,
+):
+    """Build an SDPA-based patched attention forward for *model_type*.
+
+    ``mask_converter`` is forwarded to the per-architecture builder and
+    controls how ``_circuit_mask`` becomes an additive pre-softmax bias.
+    Defaults to the binary ``_expand_mask_to_additive`` used by activation
+    patching. IG callers pass a differentiable log-mask variant instead.
+    """
     key = model_type.lower()
     if key not in _SDPA_BUILDERS:
         raise ValueError(
             f"Unsupported model type for SDPA patching: {model_type!r}. "
             f"Supported: {sorted(_SDPA_BUILDERS)}"
         )
-    return _SDPA_BUILDERS[key]()
+    return _SDPA_BUILDERS[key](mask_converter=mask_converter)
 
 
 # ---------------------------------------------------------------------------
@@ -346,6 +370,8 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
         kwargs.pop("num_ig_steps", None)
         kwargs.pop("pair_aggregation", None)
         kwargs.pop("negate_scores", None)
+        kwargs.pop("include_zero_ablation", None)
+        kwargs.pop("zero_ablation_epsilon", None)
         super().__init__(**kwargs)
 
     # ------------------------------------------------------------------

@@ -58,6 +58,11 @@ def evaluate(
     if sparsities is None:
         sparsities = list(DEFAULT_SPARSITIES)
 
+    # ``device="auto"`` means the HF model will be sharded via device_map;
+    # staging tensors still need a concrete device. Use cuda:0 for staging —
+    # they are moved to the model's device after load.
+    tensor_staging_device = "cuda:0" if device == "auto" else device
+
     # =====================================================================
     # Load mask and reconstruct tensors from cache
     # =====================================================================
@@ -84,12 +89,13 @@ def evaluate(
 
     print(f"  Loaded {len(cached['branches'])} branches from cache ({cache_key})")
 
-    input_ids = torch.tensor([cached["input_ids"]], device=device)
+    input_ids = torch.tensor([cached["input_ids"]], device=tensor_staging_device)
     sentences = [
         Sentence(start=s["start"], end=s["end"]) for s in node_mask.sentences
     ]
     continuations = [
-        torch.tensor([b["token_ids"]], device=device) for b in cached["branches"]
+        torch.tensor([b["token_ids"]], device=tensor_staging_device)
+        for b in cached["branches"]
     ]
     branch_rewards = meta.get("branch_rewards")
 
@@ -155,7 +161,7 @@ def evaluate(
                 b["text"], b["token_ids"], tokenizer, prefix_len
             )
             if pm is not None:
-                pm = pm.to(device)
+                pm = pm.to(tensor_staging_device)
             position_mask_overrides.append(pm)
         n_found = sum(1 for pm in position_mask_overrides if pm is not None)
         print(f"  Found answer tokens in {n_found}/{len(cached['branches'])} branches")

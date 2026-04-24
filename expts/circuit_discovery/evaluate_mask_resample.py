@@ -14,6 +14,7 @@ import json
 import os
 
 import torch
+from tqdm.auto import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from utils.utils import Sentence, clear_cuda
@@ -26,6 +27,7 @@ from utils.masks import (
 )
 from utils.circuit_eval import (
     build_binary_masks,
+    build_random_score_masks,
     build_token_to_sent_map,
     install_mask_hooks,
     install_non_target_ablation,
@@ -99,41 +101,73 @@ def _generate_branches(
     temperature: float,
     seed: int,
     batch_size: int = 1,
+    progress_desc: str | None = None,
 ) -> list[dict]:
     """Generate *num_branches* from *input_ids* with HF generate, sampling.
 
     Sequences are drawn in chunks of *batch_size* via ``num_return_sequences``.
     Larger batches are much faster on long generations but use more KV-cache
-    memory; tune down if you hit OOM.
+    memory; tune down if you hit OOM. Generation runs under ``torch.no_grad()``
+    — gradients are not needed for sampling.
     """
     prefix_len = input_ids.shape[-1]
     branches: list[dict] = []
     produced = 0
     chunk_idx = 0
-    while produced < num_branches:
-        chunk = min(batch_size, num_branches - produced)
-        chunk_seed = seed + chunk_idx
-        torch.manual_seed(chunk_seed)
-        torch.cuda.manual_seed_all(chunk_seed)
-        outputs = model.generate(
-            input_ids,
-            max_new_tokens=max_new_tokens,
-            do_sample=True,
-            temperature=temperature,
-            top_p=1.0,
-            num_return_sequences=chunk,
-            use_cache=True,
-            pad_token_id=tokenizer.eos_token_id,
-        )
-        # outputs: (chunk, prefix_len + gen_len)
-        for row in outputs:
-            gen_ids = row[prefix_len:].tolist()
-            gen_text = tokenizer.decode(gen_ids, skip_special_tokens=True)
-            branches.append({"text": gen_text, "token_ids": gen_ids})
-        produced += chunk
-        chunk_idx += 1
+    num_chunks = (num_branches + batch_size - 1) // batch_size
+    pbar = tqdm(
+        total=num_chunks,
+        desc=progress_desc or "generate",
+        unit="batch",
+        leave=False,
+        dynamic_ncols=True,
+    )
+    with torch.no_grad():
+        while produced < num_branches:
+            chunk = min(batch_size, num_branches - produced)
+            chunk_seed = seed + chunk_idx
+            torch.manual_seed(chunk_seed)
+            torch.cuda.manual_seed_all(chunk_seed)
+            outputs = model.generate(
+                input_ids,
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=temperature,
+                top_p=1.0,
+                num_return_sequences=chunk,
+                use_cache=True,
+                pad_token_id=tokenizer.eos_token_id,
+            )
+            # outputs: (chunk, prefix_len + gen_len)
+            for row in outputs:
+                gen_ids = row[prefix_len:].tolist()
+                gen_text = tokenizer.decode(gen_ids, skip_special_tokens=True)
+                branches.append({"text": gen_text, "token_ids": gen_ids})
+            produced += chunk
+            chunk_idx += 1
+            pbar.update(1)
+    pbar.close()
 
     return branches
+
+
+def _sidecar_path_for(
+    mask_path: str,
+    output_dir: str | None,
+    suffix: str = "_resample",
+) -> str:
+    """Path for the resample sidecar JSON.
+
+    If *output_dir* is given, the sidecar is placed there with basename
+    ``<mask_stem><suffix>.json``. Otherwise it lands next to the mask.
+    Callers can change *suffix* (e.g. to ``_resample_random``) to keep
+    multiple sidecars for the same mask separate.
+    """
+    stem, ext = os.path.splitext(mask_path)
+    if output_dir:
+        basename = os.path.basename(stem)
+        return os.path.join(output_dir, f"{basename}{suffix}{ext}")
+    return f"{stem}{suffix}{ext}"
 
 
 def evaluate_resample(
@@ -145,13 +179,22 @@ def evaluate_resample(
     cache_dir: str = DEFAULT_CACHE_DIR,
     seed: int = 42,
     batch_size: int = 1,
+    output_dir: str | None = None,
+    resume: bool = True,
+    random_score_mask: bool = False,
+    random_score_mask_seed: int = 0,
 ):
     """Resample branches through the masked model at each threshold.
 
-    Saves a sidecar JSON at ``<mask_path_stem>_resample.json``.
+    Saves a sidecar JSON at ``<mask_path_stem>_resample.json`` (or under
+    ``output_dir`` if given). After every threshold the sidecar is
+    rewritten so a crashed run can be resumed by re-invoking with the same
+    arguments — completed thresholds are detected by sparsity.
     """
     if sparsities is None:
         sparsities = list(DEFAULT_SPARSITIES)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     # ==================================================================
     # Load mask and reconstruct from cache
@@ -263,19 +306,112 @@ def evaluate_resample(
         )
 
     # ==================================================================
-    # Resample at each threshold
+    # Optional: permute learned scores into a random-baseline mask.
+    # Using the existing build_random_score_masks helper which respects
+    # the combined filter (so structurally-zero / masked-out positions
+    # stay zero) and the mask granularity.
+    # ==================================================================
+    if random_score_mask:
+        torch.manual_seed(random_score_mask_seed)
+        print(
+            f"\n[random baseline] permuting learned scores "
+            f"(seed={random_score_mask_seed})..."
+        )
+        random_scores_list = build_random_score_masks(
+            node_mask, num_samples=1, layers=layers,
+            combined_filter=combined_filter.cpu(),
+        )
+        node_mask.scores = random_scores_list[0]
+
+    # ==================================================================
+    # Resample at each threshold (resumable — reload completed entries)
     # ==================================================================
     thresholds = node_mask.thresholds_for_sparsities(sparsities)
+    sidecar_suffix = (
+        f"_resample_random_seed{random_score_mask_seed}"
+        if random_score_mask
+        else "_resample"
+    )
+    sidecar_path = _sidecar_path_for(mask_path, output_dir, suffix=sidecar_suffix)
+
+    threshold_results: list[dict] = []
+    completed_sparsities: set[float] = set()
+    if resume and os.path.exists(sidecar_path):
+        try:
+            with open(sidecar_path) as f:
+                existing = json.load(f)
+            threshold_results = list(existing.get("thresholds", []))
+            completed_sparsities = {
+                round(e["sparsity"], 6) for e in threshold_results
+                if "sparsity" in e
+            }
+            print(
+                f"Resuming from {sidecar_path}: "
+                f"{len(completed_sparsities)} thresholds already complete."
+            )
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"  Warning: could not read existing sidecar ({e}); "
+                  f"starting fresh.")
+            threshold_results = []
+            completed_sparsities = set()
+
+    def _save_sidecar():
+        """Assemble and write the full sidecar JSON (atomic-ish via tmp + rename)."""
+        all_labels = set(orig_labels)
+        for tr in threshold_results:
+            all_labels.update(tr["resample_answer_distribution"].keys())
+            if tr.get("masked_is_answer_distribution_fine"):
+                all_labels.update(tr["masked_is_answer_distribution_fine"].keys())
+        sidecar = {
+            "mask_path": mask_path,
+            "model_name": node_mask.model_name,
+            "num_resample_branches": num_resample_branches,
+            "max_new_tokens": max_new_tokens,
+            "temperature": temperature,
+            "seed": seed,
+            "batch_size": batch_size,
+            "random_score_mask": random_score_mask,
+            "random_score_mask_seed": (
+                random_score_mask_seed if random_score_mask else None
+            ),
+            "correct_answer": correct_answer,
+            "correct_answer_normalized": target_norm,
+            "answer_labels": sorted(all_labels),
+            "original": {
+                "branches": [
+                    {"text": orig_texts[i], "answer": orig_answers[i]}
+                    for i in range(len(orig_texts))
+                ],
+                "answer_distribution": orig_dist,
+                "fraction_correct": orig_frac_correct,
+            },
+            "thresholds": threshold_results,
+        }
+        tmp_path = sidecar_path + ".tmp"
+        with open(tmp_path, "w") as f:
+            json.dump(sidecar, f, indent=2)
+        os.replace(tmp_path, sidecar_path)
+
     print(f"\nResampling at {len(thresholds)} thresholds...")
     print(f"  Branches per threshold: {num_resample_branches}")
     print(f"  Max new tokens: {max_new_tokens}")
+    print(f"  Batch size: {batch_size}")
+    print(f"  Sidecar: {sidecar_path}")
 
-    threshold_results = []
-
-    for threshold in thresholds:
+    thr_pbar = tqdm(
+        list(zip(thresholds, sparsities)),
+        desc="thresholds",
+        unit="thr",
+        dynamic_ncols=True,
+    )
+    for threshold, _requested_sparsity in thr_pbar:
         sparsity = node_mask.sparsity(threshold, gap_filter=combined_filter.cpu())
 
-        print(f"\n  threshold={threshold:.1e} | sparsity={sparsity:.2%}")
+        if round(sparsity, 6) in completed_sparsities:
+            thr_pbar.set_postfix_str(f"sparsity={sparsity:.2%} (skipped)")
+            continue
+
+        thr_pbar.set_postfix_str(f"sparsity={sparsity:.2%}")
 
         # Build and install mask hooks
         binary_masks = build_binary_masks(
@@ -294,6 +430,7 @@ def evaluate_resample(
             num_resample_branches, max_new_tokens,
             temperature, seed,
             batch_size=batch_size,
+            progress_desc=f"gen s={sparsity:.0%}",
         )
 
         remove_handles(handles)
@@ -336,56 +473,23 @@ def evaluate_resample(
             "masked_is_answer_distribution_fine": is_dist_fine,
         }
         threshold_results.append(entry)
+        completed_sparsities.add(round(sparsity, 6))
 
-        print(f"    Resample distribution: {new_dist}")
-        if frac_correct is not None:
-            print(f"    Resample fraction_correct: {frac_correct:.1%}")
-        if is_dist_fine:
-            print(f"    IS (fine) distribution:    {is_dist_fine}")
+        # Persist after each threshold so a crash doesn't lose the work.
+        _save_sidecar()
+
+        tqdm.write(
+            f"  sparsity={sparsity:.2%} | "
+            f"fraction_correct={frac_correct if frac_correct is None else f'{frac_correct:.1%}'} | "
+            f"dist={new_dist}"
+        )
+    thr_pbar.close()
 
     # ==================================================================
-    # Cleanup non-target ablation
+    # Cleanup non-target ablation + final sidecar flush
     # ==================================================================
     remove_handles(non_target_handles)
-
-    # ==================================================================
-    # Build and save sidecar
-    # ==================================================================
-    # Unify all answer labels across original + all thresholds
-    all_labels = set(orig_labels)
-    for tr in threshold_results:
-        all_labels.update(tr["resample_answer_distribution"].keys())
-        if tr["masked_is_answer_distribution_fine"]:
-            all_labels.update(tr["masked_is_answer_distribution_fine"].keys())
-    all_labels = sorted(all_labels)
-
-    sidecar = {
-        "mask_path": mask_path,
-        "model_name": node_mask.model_name,
-        "num_resample_branches": num_resample_branches,
-        "max_new_tokens": max_new_tokens,
-        "temperature": temperature,
-        "seed": seed,
-        "batch_size": batch_size,
-        "correct_answer": correct_answer,
-        "correct_answer_normalized": target_norm,
-        "answer_labels": all_labels,
-        "original": {
-            "branches": [
-                {"text": orig_texts[i], "answer": orig_answers[i]}
-                for i in range(len(orig_texts))
-            ],
-            "answer_distribution": orig_dist,
-            "fraction_correct": orig_frac_correct,
-        },
-        "thresholds": threshold_results,
-    }
-
-    # Save sidecar alongside mask
-    stem, ext = os.path.splitext(mask_path)
-    sidecar_path = f"{stem}_resample{ext}"
-    with open(sidecar_path, "w") as f:
-        json.dump(sidecar, f, indent=2)
+    _save_sidecar()
 
     print(f"\nSaved resample sidecar to {sidecar_path}")
 
@@ -433,6 +537,27 @@ if __name__ == "__main__":
         "num_return_sequences). Larger is faster but uses more KV-cache "
         "memory; tune down on OOM.",
     )
+    parser.add_argument(
+        "--output_dir", type=str, default=None,
+        help="Directory to save the resample sidecar. Defaults to the mask's "
+        "directory (sidecar written next to the mask).",
+    )
+    parser.add_argument(
+        "--no_resume", dest="resume", action="store_false",
+        help="Disable reading an existing sidecar. By default, existing "
+        "sidecars are loaded and completed sparsities are skipped.",
+    )
+    parser.set_defaults(resume=True)
+    parser.add_argument(
+        "--random_score_mask", action="store_true",
+        help="Replace the learned scores with a random permutation (via "
+        "build_random_score_masks), producing a random-baseline curve. "
+        "Sidecar is saved with suffix _resample_random_seed{N}.",
+    )
+    parser.add_argument(
+        "--random_score_mask_seed", type=int, default=0,
+        help="Seed for the random-score permutation.",
+    )
 
     args, _ = parser.parse_known_args()
     if args.config:
@@ -450,4 +575,8 @@ if __name__ == "__main__":
         cache_dir=args.cache_dir,
         seed=args.seed,
         batch_size=args.batch_size,
+        output_dir=args.output_dir,
+        resume=args.resume,
+        random_score_mask=args.random_score_mask,
+        random_score_mask_seed=args.random_score_mask_seed,
     )

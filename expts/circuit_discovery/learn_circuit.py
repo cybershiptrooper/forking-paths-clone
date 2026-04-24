@@ -31,7 +31,11 @@ from utils.rewards import (
 )
 
 
-def load_model_eager(model_name: str, device: str = "cuda"):
+def load_model_eager(
+    model_name: str,
+    device: str = "cuda",
+    gradient_checkpointing: bool = False,
+):
     """Load model with eager attention for circuit discovery (needs attention weights)."""
     print(f"Loading {model_name} with eager attention...")
     model = AutoModelForCausalLM.from_pretrained(
@@ -41,6 +45,15 @@ def load_model_eager(model_name: str, device: str = "cuda"):
         trust_remote_code=True,
         attn_implementation="eager",
     )
+    if gradient_checkpointing:
+        model.config.use_cache = False
+        model.gradient_checkpointing_enable(
+            gradient_checkpointing_kwargs={"use_reentrant": False}
+        )
+        # Model params are frozen in IG; checkpointing needs at least one
+        # grad-requiring input, so hook embeddings to produce one.
+        model.enable_input_require_grads()
+        print("  Gradient checkpointing: ENABLED (non-reentrant, use_cache=False)")
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     return model, tokenizer
 
@@ -111,6 +124,15 @@ def main(
     torch_compile: bool = False,
     importance_sampling_method: str = "snis",
     importance_sampling_temperature: float = None,
+    gradient_checkpointing: bool = False,
+    include_zero_ablation: bool = True,
+    zero_ablation_epsilon: float = 1e-10,
+    l0_lambda: float = None,
+    num_training_steps: int = None,
+    learning_rate: float = None,
+    log_alpha_init: float = None,
+    log_every: int = None,
+    plot_every: int = None,
 ):
     # Default model_to_analyse to model_name
     if model_to_analyse is None:
@@ -379,7 +401,11 @@ def main(
     print(f"Step 4: Loading model with eager attention ({model_to_analyse})...")
     print("=" * 80)
 
-    model, tokenizer = load_model_eager(model_to_analyse, device=device)
+    model, tokenizer = load_model_eager(
+        model_to_analyse,
+        device=device,
+        gradient_checkpointing=gradient_checkpointing,
+    )
     target_device = next(model.parameters()).device
     input_ids = input_ids.to(target_device)
     layers_to_analyse_is_all = (
@@ -473,6 +499,8 @@ def main(
         renormalize_masked_attention=renormalize_masked_attention,
         num_ig_steps=num_ig_steps,
         negate_scores=not no_negate_scores,
+        include_zero_ablation=include_zero_ablation,
+        zero_ablation_epsilon=zero_ablation_epsilon,
         pair_aggregation=pair_aggregation,
         mask_granularity=mask_granularity,
         temperature=temperature,
@@ -481,6 +509,23 @@ def main(
     )
     if batch_chunk_size is not None:
         discovery_kwargs["batch_chunk_size"] = batch_chunk_size
+    if l0_lambda is not None:
+        discovery_kwargs["l0_lambda"] = l0_lambda
+    for _k, _v in {
+        "num_training_steps": num_training_steps,
+        "learning_rate": learning_rate,
+        "log_alpha_init": log_alpha_init,
+        "log_every": log_every,
+        "plot_every": plot_every,
+    }.items():
+        if _v is not None:
+            discovery_kwargs[_k] = _v
+    # Training-curve log dir lives alongside the mask json: <output_dir>/<stem>/
+    if file_name is not None:
+        _stem = file_name[:-5] if file_name.endswith(".json") else file_name
+    else:
+        _stem = masking_algorithm
+    discovery_kwargs["log_dir"] = os.path.join(output_dir, _stem)
     discovery_kwargs["torch_compile"] = torch_compile
     discoverer = create_circuit_discovery(masking_algorithm, **discovery_kwargs)
 
@@ -767,6 +812,33 @@ if __name__ == "__main__":
         "'tempered_snis' divides each chain's log-ratio by a fixed scalar "
         "temperature (set via --importance_sampling_temperature). "
         "See notes/reward_gap_goodhart.md, notes/geometric_mean_collapse.md.",
+    )
+    parser.add_argument(
+        "--l0_lambda",
+        type=float,
+        default=None,
+        help="L0 sparsity penalty weight for nodewise_subnetwork_probing_sdpa. "
+        "Ignored by other algorithms.",
+    )
+    parser.add_argument(
+        "--num_training_steps", type=int, default=None,
+        help="Adam steps for nodewise_subnetwork_probing_sdpa.",
+    )
+    parser.add_argument(
+        "--learning_rate", type=float, default=None,
+        help="Adam learning rate for nodewise_subnetwork_probing_sdpa.",
+    )
+    parser.add_argument(
+        "--log_alpha_init", type=float, default=None,
+        help="Initial Hard-Concrete location parameter for SNP (default 2.0 ~= mask fully on).",
+    )
+    parser.add_argument(
+        "--log_every", type=int, default=None,
+        help="SNP: record training-curve point every N steps.",
+    )
+    parser.add_argument(
+        "--plot_every", type=int, default=None,
+        help="SNP: overwrite training-curve PDFs every N steps.",
     )
     parser.add_argument(
         "--importance_sampling_temperature",
