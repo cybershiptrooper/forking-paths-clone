@@ -12,6 +12,7 @@ sidecar JSON alongside the mask containing:
 import argparse
 import json
 import os
+import time
 
 import torch
 from tqdm.auto import tqdm
@@ -42,6 +43,12 @@ from utils.rewards import extract_boxed
 DEFAULT_SPARSITIES = [
     0.0, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 1.0,
 ]
+
+# For subnetwork-probing readouts, scores are HC means in [0, 1] with exactly-0
+# entries representing pruned edges. A tiny positive threshold ablates exactly
+# those zero entries (matching the trainer's `_current_sparsity` definition).
+_SUBNET_PROBING_THRESHOLD = 1e-12
+_SUBNET_PROBING_ALGO = "nodewise_subnetwork_probing_sdpa"
 
 
 def _load_model_eager(model_name: str, device: str = "cuda"):
@@ -183,18 +190,30 @@ def evaluate_resample(
     resume: bool = True,
     random_score_mask: bool = False,
     random_score_mask_seed: int = 0,
+    task_name: str | None = None,
+    single_sparsity: float | None = None,
 ):
     """Resample branches through the masked model at each threshold.
 
-    Saves a sidecar JSON at ``<mask_path_stem>_resample.json`` (or under
-    ``output_dir`` if given). After every threshold the sidecar is
-    rewritten so a crashed run can be resumed by re-invoking with the same
-    arguments — completed thresholds are detected by sparsity.
+    Two modes:
+
+    - **Multi-sparsity (default)**: evaluates every entry of *sparsities* and
+      writes one sidecar JSON at ``<mask_path_stem>_resample.json`` (or under
+      ``output_dir`` if given). Resumable across thresholds.
+    - **Single-sparsity** (when *task_name* is set): evaluates exactly one
+      threshold and writes
+      ``<output_dir>/<task_name>/<sparsity>_results.json``. Designed for
+      parallel per-sparsity launches that can't share a single sidecar. For
+      subnetwork-probing masks (algorithm ``nodewise_subnetwork_probing_sdpa``)
+      *single_sparsity* is ignored — the threshold is fixed at a tiny
+      positive value so only HC-mean-exactly-zero entries are ablated, and
+      the actual sparsity is read off the trained mask.
     """
     if sparsities is None:
         sparsities = list(DEFAULT_SPARSITIES)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
+    single_mode = task_name is not None
 
     # ==================================================================
     # Load mask and reconstruct from cache
@@ -324,15 +343,71 @@ def evaluate_resample(
         node_mask.scores = random_scores_list[0]
 
     # ==================================================================
-    # Resample at each threshold (resumable — reload completed entries)
+    # Resolve the threshold(s) to evaluate.
     # ==================================================================
-    thresholds = node_mask.thresholds_for_sparsities(sparsities)
-    sidecar_suffix = (
-        f"_resample_random_seed{random_score_mask_seed}"
-        if random_score_mask
-        else "_resample"
-    )
-    sidecar_path = _sidecar_path_for(mask_path, output_dir, suffix=sidecar_suffix)
+    is_subnet_probing = node_mask.algorithm == _SUBNET_PROBING_ALGO
+
+    if single_mode:
+        if is_subnet_probing:
+            threshold = _SUBNET_PROBING_THRESHOLD
+            actual_sparsity = node_mask.sparsity(
+                threshold, gap_filter=combined_filter.cpu()
+            )
+            if single_sparsity is not None:
+                print(
+                    f"  [info] Ignoring requested sparsity={single_sparsity} "
+                    f"for subnetwork probing — using trained sparsity "
+                    f"{actual_sparsity:.4f}."
+                )
+            print(
+                f"  [single-sparsity] subnetwork probing — "
+                f"trained sparsity = {actual_sparsity:.4f}"
+            )
+        else:
+            if single_sparsity is None:
+                raise ValueError(
+                    "Single-sparsity mode requires --sparsity for "
+                    f"non-subnetwork-probing masks (algorithm "
+                    f"{node_mask.algorithm!r})."
+                )
+            [threshold] = node_mask.thresholds_for_sparsities(
+                [single_sparsity], combined_filter=combined_filter.cpu(),
+            )
+            actual_sparsity = node_mask.sparsity(
+                threshold, gap_filter=combined_filter.cpu()
+            )
+            print(
+                f"  [single-sparsity] requested {single_sparsity:.4f} "
+                f"-> threshold {threshold:.6g} -> actual {actual_sparsity:.4f}"
+            )
+        thresholds = [threshold]
+        sparsities = [actual_sparsity]
+    else:
+        thresholds = node_mask.thresholds_for_sparsities(sparsities)
+
+    # ==================================================================
+    # Output path
+    # ==================================================================
+    if single_mode:
+        base = output_dir or os.path.dirname(mask_path)
+        single_dir = os.path.join(base, task_name)
+        os.makedirs(single_dir, exist_ok=True)
+        suffix_for_random = (
+            f"_random_seed{random_score_mask_seed}"
+            if random_score_mask
+            else ""
+        )
+        single_filename = (
+            f"{actual_sparsity:.4f}{suffix_for_random}_results.json"
+        )
+        sidecar_path = os.path.join(single_dir, single_filename)
+    else:
+        sidecar_suffix = (
+            f"_resample_random_seed{random_score_mask_seed}"
+            if random_score_mask
+            else "_resample"
+        )
+        sidecar_path = _sidecar_path_for(mask_path, output_dir, suffix=sidecar_suffix)
 
     threshold_results: list[dict] = []
     completed_sparsities: set[float] = set()
@@ -365,6 +440,9 @@ def evaluate_resample(
         sidecar = {
             "mask_path": mask_path,
             "model_name": node_mask.model_name,
+            "algorithm": node_mask.algorithm,
+            "task_name": task_name,
+            "single_sparsity_mode": single_mode,
             "num_resample_branches": num_resample_branches,
             "max_new_tokens": max_new_tokens,
             "temperature": temperature,
@@ -412,6 +490,7 @@ def evaluate_resample(
             continue
 
         thr_pbar.set_postfix_str(f"sparsity={sparsity:.2%}")
+        t_start = time.perf_counter()
 
         # Build and install mask hooks
         binary_masks = build_binary_masks(
@@ -436,6 +515,7 @@ def evaluate_resample(
         remove_handles(handles)
         del binary_masks
         torch.cuda.empty_cache()
+        elapsed = time.perf_counter() - t_start
 
         # Extract answers from resampled branches
         new_texts = [b["text"] for b in new_branches]
@@ -464,6 +544,7 @@ def evaluate_resample(
         entry = {
             "threshold": threshold,
             "sparsity": sparsity,
+            "elapsed_seconds": elapsed,
             "resample_branches": [
                 {"text": b["text"], "answer": new_answers[i]}
                 for i, b in enumerate(new_branches)
@@ -481,6 +562,7 @@ def evaluate_resample(
         tqdm.write(
             f"  sparsity={sparsity:.2%} | "
             f"fraction_correct={frac_correct if frac_correct is None else f'{frac_correct:.1%}'} | "
+            f"elapsed={elapsed:.1f}s | "
             f"dist={new_dist}"
         )
     thr_pbar.close()
@@ -558,6 +640,18 @@ if __name__ == "__main__":
         "--random_score_mask_seed", type=int, default=0,
         help="Seed for the random-score permutation.",
     )
+    parser.add_argument(
+        "--task_name", type=str, default=None,
+        help="If set, runs in single-sparsity mode and writes the result to "
+        "<output_dir>/<task_name>/<sparsity>_results.json. Designed for "
+        "parallel per-sparsity launches.",
+    )
+    parser.add_argument(
+        "--sparsity", type=float, default=None,
+        help="Single sparsity to evaluate (only used with --task_name). "
+        "Ignored for nodewise_subnetwork_probing_sdpa masks — there the "
+        "trained mask's own sparsity is used.",
+    )
 
     args, _ = parser.parse_known_args()
     if args.config:
@@ -579,4 +673,6 @@ if __name__ == "__main__":
         resume=args.resume,
         random_score_mask=args.random_score_mask,
         random_score_mask_seed=args.random_score_mask_seed,
+        task_name=args.task_name,
+        single_sparsity=args.sparsity,
     )

@@ -367,6 +367,7 @@
   <div id="tab-bar">
     <button class="active" onclick="setTab('single')">Single Mask</button>
     <button onclick="setTab('compare')">Compare Masks</button>
+    <button onclick="setTab('resample')">Resample Sweep</button>
   </div>
   <div id="tab-single" class="tab-pane active" style="flex-direction:column;">
     <div id="toolbar">
@@ -422,6 +423,47 @@
       </div>
       <div id="compare-chart-container"></div>
       <div id="compare-heatmap-grid" style="display:none;"></div>
+    </div>
+  </div>
+
+  <div id="tab-resample" class="tab-pane" style="flex-direction:column;overflow:hidden;">
+    <div id="resample-toolbar" style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--panel-bg);display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <b style="font-size:12px;">Resample sweep</b>
+      <span class="pill" id="resample-count-badge">0 series</span>
+      <span style="flex:1;"></span>
+      <button onclick="loadResampleSweep()" id="resample-reload-btn"
+              style="font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text-muted);font-weight:600;">
+        Reload
+      </button>
+      <a id="resample-download-csv" download="resample_fraction_correct.csv"
+         style="font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text-muted);font-weight:600;text-decoration:none;display:inline-block;">
+        Download CSV
+      </a>
+    </div>
+    <div id="resample-content" style="flex:1;display:flex;overflow:hidden;">
+      <div id="resample-sidebar" style="width:280px;min-width:240px;border-right:1px solid var(--border);background:var(--panel-bg);overflow-y:auto;padding:10px 12px;font-size:11px;">
+        <div style="font-weight:600;text-transform:uppercase;font-size:10px;color:var(--text-dim);letter-spacing:0.06em;margin-bottom:6px;">Series</div>
+        <div id="resample-series-list" style="display:flex;flex-direction:column;gap:3px;">
+          <em style="color:var(--text-dim)">Loading…</em>
+        </div>
+        <div style="margin-top:10px;">
+          <label style="display:flex;align-items:center;gap:5px;color:var(--text-muted);">
+            <input type="checkbox" id="resample-show-baseline" checked onchange="renderResampleSweep()">
+            Show baseline (no-mask)
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;color:var(--text-muted);margin-top:3px;">
+            <input type="checkbox" id="resample-show-ci" checked onchange="renderResampleSweep()">
+            Show 95% CI bars
+          </label>
+        </div>
+        <div id="resample-meta" style="margin-top:14px;font-size:10px;color:var(--text-dim);line-height:1.55;"></div>
+      </div>
+      <div id="resample-chart-area" style="flex:1;background:var(--bg);position:relative;">
+        <div id="resample-empty" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:13px;">
+          Loading resample data…
+        </div>
+        <div id="resample-chart" style="width:100%;height:100%;"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2661,13 +2703,19 @@ const COMPARE_METRIC_DEFS = METRIC_DEFS.filter(d =>
 
 function setTab(tab) {
   activeTab = tab;
+  const labels = ['single', 'compare', 'resample'];
   document.querySelectorAll('#tab-bar button').forEach((btn, i) => {
-    btn.classList.toggle('active', (i === 0 && tab === 'single') || (i === 1 && tab === 'compare'));
+    btn.classList.toggle('active', labels[i] === tab);
   });
   document.getElementById('tab-single').classList.toggle('active', tab === 'single');
   document.getElementById('tab-compare').classList.toggle('active', tab === 'compare');
+  document.getElementById('tab-resample').classList.toggle('active', tab === 'resample');
   if (tab === 'single' && processed) { render(); onMetricChange(); }
   if (tab === 'compare' && compareMasks.length > 0) onCompareMetricChange();
+  if (tab === 'resample') {
+    if (!window._resampleData) loadResampleSweep();
+    else renderResampleSweep();
+  }
 }
 
 // Populate compare mask checklist from server
@@ -2797,6 +2845,11 @@ function initCompareMetricDropdown() {
       available = firstEntries.some(e => e != null);
     } else if (def.key === 'per_sentence_kl_heatmap') {
       available = firstEntries.some(e => e && 'per_sentence_kl' in e);
+    } else if (def.key === 'resample_comparison') {
+      // Resample data lives in sidecar files, not inside the mask JSON, so
+      // we can't gate availability on threshold_evaluation. Always offer
+      // it; the renderer shows an explicit empty state if no series match.
+      available = true;
     } else {
       available = firstEntries.some(e => e && def.key in e && e[def.key] != null);
     }
@@ -2873,7 +2926,12 @@ function onCompareMetricChange() {
   const heatmapGrid = document.getElementById('compare-heatmap-grid');
   const thresholdSelect = document.getElementById('compare-threshold-select');
 
-  if (def.chartType === 'heatmap_per_sentence') {
+  if (def.chartType === 'resample') {
+    chartContainer.style.display = '';
+    heatmapGrid.style.display = 'none';
+    thresholdSelect.style.display = 'none';
+    renderCompareResampleSweep();
+  } else if (def.chartType === 'heatmap_per_sentence') {
     chartContainer.style.display = 'none';
     heatmapGrid.style.display = '';
     thresholdSelect.style.display = '';
@@ -3311,6 +3369,402 @@ function renderCompareWeightedAnswerProbs() {
   };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// Compare-tab: Resample fraction-correct vs sparsity for selected masks
+// ───────────────────────────────────────────────────────────────────
+
+async function renderCompareResampleSweep() {
+  const container = document.getElementById('compare-chart-container');
+  if (compareMasks.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">Load masks first.</div>';
+    return;
+  }
+  // Ensure global resample data is loaded once.
+  if (!window._resampleData) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Loading resample data…</div>';
+    try {
+      const r = await fetch('/api/resample_sweep');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      window._resampleData = await r.json();
+    } catch (e) {
+      container.innerHTML = `<div style="padding:20px;color:#ef4444;">Error loading /api/resample_sweep: ${e.message}</div>`;
+      return;
+    }
+  }
+  const data = window._resampleData;
+  const allSeries = data.series || [];
+
+  // Match each loaded compare mask to any series whose mask_path equals it.
+  // (m.name is the shortened display name; m.fullPath is the project-relative
+  // path that the resample sidecar/result file stores in `mask_path`.)
+  const matched = [];
+  const missingMasks = [];
+  for (const m of compareMasks) {
+    const seriesForThisMask = allSeries.filter(s => s.mask_path === m.fullPath);
+    if (seriesForThisMask.length === 0) {
+      missingMasks.push(m.name);
+    } else {
+      seriesForThisMask.forEach(s => matched.push({ series: s, mask: m }));
+    }
+  }
+
+  if (matched.length === 0) {
+    container.innerHTML = `<div style="padding:20px;color:#94a3b8;text-align:center;">
+      No resample data found for the selected masks.<br>
+      <span style="font-size:10px;color:#cbd5e1;">Run <code>evaluate_mask_resample.py</code> on these masks first.</span>
+      ${missingMasks.length ? `<br><br><span style="font-size:10px;">Checked: ${missingMasks.length} mask(s).</span>` : ''}
+    </div>`;
+    return;
+  }
+
+  // Build Plotly traces, coloring each entry by its mask's compare color.
+  const traces = [];
+  const baselineShapes = [];
+  // For deterministic per-mask "standalone" symbol assignment.
+  const standaloneCountByMask = new Map();
+
+  for (const { series: s, mask } of matched) {
+    const color = mask.color;
+    const xs = s.points.map(p => p.sparsity);
+    const ys = s.points.map(p => p.fraction_correct);
+    const arrayMinus = s.points.map(p => p.fraction_correct - p.ci_lo);
+    const arrayPlus = s.points.map(p => p.ci_hi - p.fraction_correct);
+    const customdata = s.points.map(p => [
+      p.n_resample_branches ?? '',
+      p.ci_lo != null ? p.ci_lo.toFixed(3) : '—',
+      p.ci_hi != null ? p.ci_hi.toFixed(3) : '—',
+    ]);
+    const hovertemplate =
+      '<b>%{fullData.name}</b><br>' +
+      'sparsity = %{x:.4f}<br>' +
+      'fraction_correct = %{y:.3f}<br>' +
+      '95% CI = [%{customdata[1]} , %{customdata[2]}]<br>' +
+      'n = %{customdata[0]}<extra></extra>';
+
+    const baseLabel = s.baseline_fraction_correct != null
+      ? ` (baseline=${s.baseline_fraction_correct.toFixed(3)})`
+      : '';
+    const traceName = `${mask.name} · ${s.task_name}${baseLabel}`;
+
+    if (s.kind === 'line') {
+      traces.push({
+        type: 'scatter',
+        mode: 'lines+markers',
+        x: xs, y: ys,
+        name: traceName,
+        marker: { color, size: 7 },
+        line: { color, width: 2 },
+        error_y: {
+          type: 'data', symmetric: false,
+          array: arrayPlus, arrayminus: arrayMinus,
+          color, thickness: 1, width: 4,
+        },
+        customdata, hovertemplate,
+        legendgroup: mask.fullPath,
+      });
+    } else {
+      const idx = (standaloneCountByMask.get(mask.fullPath) || 0);
+      standaloneCountByMask.set(mask.fullPath, idx + 1);
+      const symbols = ['square', 'diamond', 'triangle-up', 'triangle-down', 'cross', 'x', 'star'];
+      traces.push({
+        type: 'scatter',
+        mode: 'markers',
+        x: xs, y: ys,
+        name: traceName,
+        marker: {
+          color, size: 14,
+          symbol: symbols[idx % symbols.length],
+          line: { width: 1.2, color: '#1e293b' },
+        },
+        error_y: {
+          type: 'data', symmetric: false,
+          array: arrayPlus, arrayminus: arrayMinus,
+          color, thickness: 1.5, width: 6,
+        },
+        customdata, hovertemplate,
+        legendgroup: mask.fullPath,
+      });
+    }
+
+    if (s.baseline_fraction_correct != null) {
+      baselineShapes.push({
+        type: 'line',
+        xref: 'paper', x0: 0, x1: 1,
+        yref: 'y',
+        y0: s.baseline_fraction_correct,
+        y1: s.baseline_fraction_correct,
+        line: { color, width: 1, dash: 'dot' },
+        opacity: 0.35,
+      });
+    }
+  }
+
+  // Deduplicate baseline shapes if all masks share the same prompt.
+  const uniqBaselines = [];
+  const seenBaselineY = new Set();
+  for (const sh of baselineShapes) {
+    const k = `${sh.line.color}_${sh.y0.toFixed(6)}`;
+    if (!seenBaselineY.has(k)) {
+      seenBaselineY.add(k);
+      uniqBaselines.push(sh);
+    }
+  }
+
+  let titleText = `Resample fraction correct vs sparsity (${matched.length} series across ${compareMasks.length} mask${compareMasks.length === 1 ? '' : 's'}`;
+  if (data.bootstrap_B) titleText += `; ${data.ci_low}–${data.ci_high}% bootstrap CI, B=${data.bootstrap_B}`;
+  titleText += ')';
+  if (missingMasks.length) {
+    titleText += ` — ${missingMasks.length} selected mask(s) had no resample data`;
+  }
+
+  const layout = {
+    ...PLOTLY_LAYOUT_BASE,
+    title: { text: titleText, font: { size: 11, color: '#64748b' }, x: 0 },
+    xaxis: {
+      title: { text: 'Sparsity', standoff: 8 },
+      range: [-0.02, 1.02], gridcolor: '#e2e8f0', zeroline: false,
+    },
+    yaxis: {
+      title: { text: 'Fraction correct (resampled)', standoff: 12 },
+      range: [-0.02, 1.02], gridcolor: '#e2e8f0', zeroline: false,
+    },
+    legend: { font: { size: 10 } },
+    shapes: uniqBaselines,
+    hovermode: 'closest',
+    height: 460,
+  };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+// ───────────────────────────────────────────────────────────────────
+// Resample Sweep tab
+// ───────────────────────────────────────────────────────────────────
+
+const RESAMPLE_LINE_COLORS = [
+  '#2196f3', '#ff9800', '#4caf50', '#e91e63', '#9c27b0',
+  '#00bcd4', '#795548', '#607d8b', '#f44336', '#3f51b5',
+];
+const RESAMPLE_STANDALONE_COLORS = [
+  '#9333ea', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444',
+  '#ec4899', '#14b8a6', '#8b5cf6',
+];
+const RESAMPLE_STANDALONE_SYMBOLS = [
+  'square', 'diamond', 'triangle-up', 'triangle-down', 'cross', 'x', 'star', 'hexagon',
+];
+
+async function loadResampleSweep() {
+  const empty = document.getElementById('resample-empty');
+  empty.style.display = 'flex';
+  empty.textContent = 'Loading resample data…';
+  try {
+    const r = await fetch('/api/resample_sweep');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+    window._resampleData = data;
+    populateResampleSeriesList(data);
+    renderResampleSweep();
+    empty.style.display = 'none';
+  } catch (e) {
+    empty.textContent = `Error loading /api/resample_sweep: ${e.message}`;
+    console.error(e);
+  }
+}
+
+function populateResampleSeriesList(data) {
+  const list = document.getElementById('resample-series-list');
+  const series = data.series || [];
+  document.getElementById('resample-count-badge').textContent =
+    `${series.length} series`;
+  if (series.length === 0) {
+    list.innerHTML = '<em style="color:var(--text-dim)">No resample data found.</em>';
+    return;
+  }
+  // Default: every series visible.
+  if (!window._resampleVisible) {
+    window._resampleVisible = new Set(series.map((s, i) => i));
+  }
+  list.innerHTML = '';
+  series.forEach((s, i) => {
+    const color = colorForResampleSeries(s, i, series);
+    const id = `resample-series-${i}`;
+    const wrapper = document.createElement('label');
+    wrapper.style.cssText = 'display:flex;gap:6px;align-items:center;padding:3px 4px;border-radius:4px;cursor:pointer;';
+    wrapper.onmouseover = () => wrapper.style.background = 'rgba(76,175,80,0.06)';
+    wrapper.onmouseout = () => wrapper.style.background = '';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.id = id;
+    cb.checked = window._resampleVisible.has(i);
+    cb.onchange = () => {
+      if (cb.checked) window._resampleVisible.add(i);
+      else window._resampleVisible.delete(i);
+      renderResampleSweep();
+    };
+    const swatch = document.createElement('span');
+    swatch.style.cssText = `display:inline-block;width:16px;height:8px;border-radius:2px;background:${color};flex:none;`;
+    const text = document.createElement('span');
+    text.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    const kindTag = s.kind === 'standalone'
+      ? '<span style="font-size:9px;color:var(--text-dim);font-weight:600;margin-right:3px;">●</span>'
+      : '<span style="font-size:9px;color:var(--text-dim);font-weight:600;margin-right:3px;">━</span>';
+    text.innerHTML = `${kindTag}<span title="${s.task_name}">${s.task_name}</span>`;
+    wrapper.appendChild(cb);
+    wrapper.appendChild(swatch);
+    wrapper.appendChild(text);
+    list.appendChild(wrapper);
+  });
+
+  // Update CSV download link to the API endpoint that streams the CSV.
+  const a = document.getElementById('resample-download-csv');
+  a.href = '/api/resample_csv';
+
+  // Bootstrap meta line.
+  const meta = document.getElementById('resample-meta');
+  meta.innerHTML = `<b>Bootstrap:</b> B=${data.bootstrap_B}, ${data.ci_low}–${data.ci_high}%<br>
+    <b>Series:</b> ${series.filter(s => s.kind === 'line').length} multi-threshold curves,
+    ${series.filter(s => s.kind === 'standalone').length} single-sparsity points.`;
+}
+
+function colorForResampleSeries(s, i, all) {
+  if (s.kind === 'line') {
+    const lineIdx = all.slice(0, i).filter(x => x.kind === 'line').length;
+    return RESAMPLE_LINE_COLORS[lineIdx % RESAMPLE_LINE_COLORS.length];
+  }
+  const standaloneIdx = all.slice(0, i).filter(x => x.kind === 'standalone').length;
+  return RESAMPLE_STANDALONE_COLORS[standaloneIdx % RESAMPLE_STANDALONE_COLORS.length];
+}
+function symbolForStandalone(s, i, all) {
+  const standaloneIdx = all.slice(0, i).filter(x => x.kind === 'standalone').length;
+  return RESAMPLE_STANDALONE_SYMBOLS[standaloneIdx % RESAMPLE_STANDALONE_SYMBOLS.length];
+}
+
+function renderResampleSweep() {
+  const data = window._resampleData;
+  if (!data) return;
+  const series = data.series || [];
+  const visible = window._resampleVisible || new Set();
+  const showCI = document.getElementById('resample-show-ci').checked;
+  const showBaseline = document.getElementById('resample-show-baseline').checked;
+
+  const traces = [];
+  const baselines = [];
+
+  series.forEach((s, i) => {
+    if (!visible.has(i)) return;
+    const color = colorForResampleSeries(s, i, series);
+    const xs = s.points.map(p => p.sparsity);
+    const ys = s.points.map(p => p.fraction_correct);
+    const arrayMinus = s.points.map(p => p.fraction_correct - p.ci_lo);
+    const arrayPlus = s.points.map(p => p.ci_hi - p.fraction_correct);
+    const baseLabel = s.baseline_fraction_correct != null
+      ? ` (baseline=${s.baseline_fraction_correct.toFixed(3)})`
+      : '';
+
+    const customdata = s.points.map(p => [
+      p.n_resample_branches ?? '',
+      p.ci_lo != null ? p.ci_lo.toFixed(3) : '—',
+      p.ci_hi != null ? p.ci_hi.toFixed(3) : '—',
+    ]);
+    const hovertemplate =
+      '<b>%{fullData.name}</b><br>' +
+      'sparsity = %{x:.4f}<br>' +
+      'fraction_correct = %{y:.3f}<br>' +
+      '95% CI = [%{customdata[1]} , %{customdata[2]}]<br>' +
+      'n = %{customdata[0]}<extra></extra>';
+
+    if (s.kind === 'line') {
+      traces.push({
+        type: 'scatter',
+        mode: 'lines+markers',
+        x: xs,
+        y: ys,
+        name: s.task_name + baseLabel,
+        marker: { color: color, size: 7 },
+        line: { color: color, width: 2 },
+        error_y: showCI ? {
+          type: 'data', symmetric: false,
+          array: arrayPlus, arrayminus: arrayMinus,
+          color: color, thickness: 1, width: 4,
+        } : { visible: false },
+        customdata: customdata,
+        hovertemplate: hovertemplate,
+        legendgroup: s.task_name,
+      });
+    } else {
+      traces.push({
+        type: 'scatter',
+        mode: 'markers',
+        x: xs,
+        y: ys,
+        name: s.task_name + baseLabel,
+        marker: {
+          color: color, size: 14,
+          symbol: symbolForStandalone(s, i, series),
+          line: { width: 1.2, color: '#1e293b' },
+        },
+        error_y: showCI ? {
+          type: 'data', symmetric: false,
+          array: arrayPlus, arrayminus: arrayMinus,
+          color: color, thickness: 1.5, width: 6,
+        } : { visible: false },
+        customdata: customdata,
+        hovertemplate: hovertemplate,
+        legendgroup: s.task_name,
+      });
+    }
+
+    if (showBaseline && s.baseline_fraction_correct != null) {
+      baselines.push({
+        type: 'line',
+        xref: 'paper', x0: 0, x1: 1,
+        yref: 'y',
+        y0: s.baseline_fraction_correct,
+        y1: s.baseline_fraction_correct,
+        line: { color: color, width: 1, dash: 'dot' },
+        opacity: 0.4,
+      });
+    }
+  });
+
+  const layout = {
+    title: {
+      text: 'Resample fraction correct vs sparsity',
+      font: { size: 13 }, x: 0.02,
+    },
+    margin: { l: 50, r: 240, t: 40, b: 45 },
+    xaxis: {
+      title: { text: 'Sparsity', standoff: 8 },
+      range: [-0.02, 1.02],
+      gridcolor: '#e2e8f0', zeroline: false,
+    },
+    yaxis: {
+      title: { text: 'Fraction correct (resampled)', standoff: 12 },
+      range: [-0.02, 1.02],
+      gridcolor: '#e2e8f0', zeroline: false,
+    },
+    legend: {
+      x: 1.02, y: 1, xanchor: 'left', yanchor: 'top',
+      bgcolor: 'rgba(255,255,255,0.9)',
+      bordercolor: '#e2e8f0', borderwidth: 1,
+      font: { size: 10 },
+    },
+    shapes: baselines,
+    hovermode: 'closest',
+    plot_bgcolor: '#fff',
+    paper_bgcolor: '#fff',
+  };
+
+  const cfg = { displaylogo: false, responsive: true };
+  Plotly.react('resample-chart', traces, layout, cfg);
+}
+
+window.addEventListener('resize', () => {
+  if (activeTab === 'resample' && window._resampleData) {
+    Plotly.Plots.resize('resample-chart');
+  }
+});
 </script>
 </body>
 </html>

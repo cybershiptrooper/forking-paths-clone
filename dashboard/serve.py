@@ -15,6 +15,9 @@ ROOT = Path(__file__).resolve().parent.parent
 DASHBOARD_DIR = Path(__file__).resolve().parent
 DEFAULT_MASK_GLOB = "results/circuitviz/**/*.json"
 DEFAULT_MASK_GLOB = "results/circuit_discovery/**/*.json"
+RESAMPLE_DIR = ROOT / "results/circuit_discovery/tempered_snis"
+RESAMPLE_BOOTSTRAP_B = 10_000
+RESAMPLE_BOOTSTRAP_SEED = 0
 
 
 class DashboardHandler(SimpleHTTPRequestHandler):
@@ -42,6 +45,10 @@ class DashboardHandler(SimpleHTTPRequestHandler):
                 self._serve_resample(path)
             else:
                 self._json_response({"error": "missing ?path="}, 400)
+        elif parsed.path == "/api/resample_sweep":
+            self._serve_resample_sweep()
+        elif parsed.path == "/api/resample_csv":
+            self._serve_resample_csv()
         else:
             super().do_GET()
 
@@ -83,6 +90,136 @@ class DashboardHandler(SimpleHTTPRequestHandler):
         with open(sidecar) as f:
             data = json.load(f)
         self._json_response(data)
+
+    def _serve_resample_csv(self):
+        """Stream the matplotlib-side CSV alongside the resample plot."""
+        path = ROOT / "notes/images/resample_evals/resample_fraction_correct_vs_sparsity.csv"
+        if not path.exists():
+            self._json_response({"error": f"not found: {path.relative_to(ROOT)}"}, 404)
+            return
+        body = path.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/csv")
+        self.send_header(
+            "Content-Disposition",
+            'attachment; filename="resample_fraction_correct_vs_sparsity.csv"',
+        )
+        self.send_header("Content-Length", len(body))
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _serve_resample_sweep(self):
+        """Aggregate every resample sidecar + single-sparsity result file under
+        ``RESAMPLE_DIR`` into one payload for the dashboard plot. Bootstrap CIs
+        are computed server-side so the JS just consumes pre-baked numbers.
+        """
+        try:
+            import numpy as np
+        except ImportError:
+            self._json_response(
+                {"error": "numpy required for /api/resample_sweep"}, 500
+            )
+            return
+
+        rng = np.random.default_rng(RESAMPLE_BOOTSTRAP_SEED)
+
+        def _bootstrap_ci(answers, target):
+            n = len(answers)
+            if target is None or n < 2:
+                return None, None
+            correct = np.asarray([1.0 if a == target else 0.0 for a in answers])
+            idx = rng.integers(0, n, size=(RESAMPLE_BOOTSTRAP_B, n))
+            samples = correct[idx].mean(axis=1)
+            return float(np.percentile(samples, 2.5)), float(np.percentile(samples, 97.5))
+
+        if not RESAMPLE_DIR.exists():
+            self._json_response({"series": [], "warning": f"{RESAMPLE_DIR} missing"})
+            return
+
+        series = []
+
+        # Multi-threshold sidecars: one curve per file.
+        for path in sorted(RESAMPLE_DIR.glob("*_resample.json")):
+            try:
+                with open(path) as f:
+                    d = json.load(f)
+            except (OSError, json.JSONDecodeError):
+                continue
+            target = d.get("correct_answer_normalized")
+            baseline = d.get("original", {}).get("fraction_correct")
+            name = path.stem.removesuffix("_resample")
+            points = []
+            for t in d.get("thresholds", []):
+                sp = t.get("sparsity")
+                fc = t.get("resample_fraction_correct")
+                if sp is None or fc is None:
+                    continue
+                answers = [b.get("answer") for b in t.get("resample_branches", [])]
+                lo, hi = _bootstrap_ci(answers, target)
+                points.append({
+                    "sparsity": sp,
+                    "fraction_correct": fc,
+                    "ci_lo": lo if lo is not None else fc,
+                    "ci_hi": hi if hi is not None else fc,
+                    "n_resample_branches": len(answers),
+                })
+            if points:
+                points.sort(key=lambda p: p["sparsity"])
+                series.append({
+                    "kind": "line",
+                    "task_name": name,
+                    "source_file": str(path.relative_to(ROOT)),
+                    "mask_path": d.get("mask_path"),
+                    "baseline_fraction_correct": baseline,
+                    "correct_answer": d.get("correct_answer"),
+                    "points": points,
+                })
+
+        # Single-sparsity result files: one point per file, grouped by parent
+        # directory (which is the task name).
+        for sub in sorted(p for p in RESAMPLE_DIR.iterdir() if p.is_dir()):
+            for path in sorted(sub.glob("*_results.json")):
+                try:
+                    with open(path) as f:
+                        d = json.load(f)
+                except (OSError, json.JSONDecodeError):
+                    continue
+                target = d.get("correct_answer_normalized")
+                baseline = d.get("original", {}).get("fraction_correct")
+                entries = d.get("thresholds", [])
+                if not entries:
+                    continue
+                entry = entries[0]
+                sp = entry.get("sparsity")
+                fc = entry.get("resample_fraction_correct")
+                if sp is None or fc is None:
+                    continue
+                answers = [b.get("answer") for b in entry.get("resample_branches", [])]
+                lo, hi = _bootstrap_ci(answers, target)
+                series.append({
+                    "kind": "standalone",
+                    "task_name": sub.name,
+                    "source_file": str(path.relative_to(ROOT)),
+                    "mask_path": d.get("mask_path"),
+                    "baseline_fraction_correct": baseline,
+                    "correct_answer": d.get("correct_answer"),
+                    "points": [{
+                        "sparsity": sp,
+                        "fraction_correct": fc,
+                        "ci_lo": lo if lo is not None else fc,
+                        "ci_hi": hi if hi is not None else fc,
+                        "n_resample_branches": len(answers),
+                        "elapsed_seconds": entry.get("elapsed_seconds"),
+                    }],
+                })
+
+        self._json_response({
+            "series": series,
+            "bootstrap_B": RESAMPLE_BOOTSTRAP_B,
+            "ci_low": 2.5,
+            "ci_high": 97.5,
+        })
 
     def _json_response(self, obj, status=200):
         body = json.dumps(obj).encode()

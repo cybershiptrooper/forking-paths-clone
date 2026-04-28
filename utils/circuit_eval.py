@@ -233,7 +233,7 @@ def compute_clean_logits(
     """
     prefix_len = input_ids.shape[-1]
     max_cont_len = max(c.shape[-1] for c in continuations)
-    _do_chunk = use_chunked_forward and (prefix_len + max_cont_len) > chunk_size * 2
+    _do_chunk = use_chunked_forward and (prefix_len + max_cont_len) > chunk_size
 
     clean_logits: list[torch.Tensor] = []
     model.eval()
@@ -470,7 +470,7 @@ def eval_all_metrics(
 
     # Auto-select: only chunk when sequences are long enough to benefit
     max_cont_len = max(c.shape[-1] for c in continuations)
-    _do_chunk = use_chunked_forward and (prefix_len + max_cont_len) > chunk_size * 2
+    _do_chunk = use_chunked_forward and (prefix_len + max_cont_len) > chunk_size
 
     handles = install_mask_hooks(
         model, layers, binary_masks, token_to_sent, gap_filter, renormalize
@@ -499,11 +499,25 @@ def eval_all_metrics(
             clean = clean_logits_list[cont_idx][:, :full_len].to(out_device)
 
             # --- Per-token KL (computed for all metrics, not saved raw) ---
-            log_clean = F.log_softmax(clean.detach().float(), dim=-1)
-            log_masked = F.log_softmax(logits.float(), dim=-1)
-            kl_tokens = F.kl_div(
-                log_masked, log_clean, log_target=True, reduction="none"
-            ).sum(dim=-1)  # (1, seq_len)
+            # Chunk over seq dim to bound peak fp32 memory: vocab x seq fp32
+            # tensors can be tens of GB for long sequences with large vocabs.
+            _kl_chunk = 256
+            _kl_parts = []
+            for _i in range(0, logits.shape[1], _kl_chunk):
+                _lc = F.log_softmax(
+                    clean[:, _i : _i + _kl_chunk].detach().float(), dim=-1
+                )
+                _lm = F.log_softmax(
+                    logits[:, _i : _i + _kl_chunk].float(), dim=-1
+                )
+                _kl_parts.append(
+                    F.kl_div(_lm, _lc, log_target=True, reduction="none").sum(dim=-1)
+                )
+                del _lc, _lm
+            kl_tokens = torch.cat(_kl_parts, dim=1)  # (1, seq_len)
+            del _kl_parts
+            # Keep dummy refs so existing `del log_clean, log_masked` below works
+            log_clean = log_masked = kl_tokens
 
             # Local KL: always average over the full continuation
             cont_len = full_len - prefix_len
@@ -554,8 +568,26 @@ def eval_all_metrics(
 
             # --- Chain log-prob for IS metrics (over FULL branch) ---
             if compute_is_fine or compute_is_binary:
-                lp = chain_log_prob(logits.float(), full_input, prefix_len, temperature=temperature)
+                # Chunked equivalent of chain_log_prob to avoid materializing
+                # a full (1, seq, vocab) fp32 tensor.
+                _seq = full_input.shape[-1]
+                _scale = (1.0 / temperature) if temperature != 1.0 else 1.0
+                _targets = full_input[:, prefix_len:_seq]  # (1, cont_len)
+                _cont_lp_parts = []
+                _start = prefix_len - 1
+                _end = _seq - 1
+                _chunk = 256
+                for _i in range(_start, _end, _chunk):
+                    _j = min(_i + _chunk, _end)
+                    _seg = logits[:, _i:_j].float() * _scale
+                    _lp_seg = F.log_softmax(_seg, dim=-1)
+                    _tgt_seg = _targets[:, _i - _start : _j - _start]
+                    _tok_lp = _lp_seg.gather(-1, _tgt_seg.unsqueeze(-1)).squeeze(-1)
+                    _cont_lp_parts.append(_tok_lp)
+                    del _seg, _lp_seg
+                lp = torch.cat(_cont_lp_parts, dim=-1).sum(dim=-1).squeeze(0)
                 chain_lps.append(lp)
+                del _cont_lp_parts
 
             total_branches += 1
 
