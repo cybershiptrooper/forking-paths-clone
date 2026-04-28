@@ -14,7 +14,12 @@ from utils.data_utils import DATASET_TO_FORMAT
 
 
 def load_data(
-    tokenizer: PreTrainedTokenizer, dataset: dict, n: int = 100, shuffle: bool = True
+    tokenizer: PreTrainedTokenizer,
+    dataset: dict,
+    n: int = 100,
+    shuffle: bool = True,
+    start_index: int = 0,
+    math_min_level: int = 3,
 ):
     """
     Load given dataset, using the provided tokenizer to wrap the question in an LLM prompt.
@@ -27,6 +32,13 @@ def load_data(
         number of examples to load
     shuffle : True
         whether or not to randomly sample the n examples or just take the first n
+    start_index : int
+        offset into the (shuffled) dataset to begin sampling from. Use this together
+        with `n` to extend an earlier collection without re-doing the same examples.
+        prompt_id of each returned datapoint will be `start_index + idx` so ids do
+        not collide with earlier runs.
+    math_min_level : int
+        minimum hendrycks_math difficulty level to keep (only applies to MATH_open)
 
     Returns
     list[dict]
@@ -44,9 +56,9 @@ def load_data(
             load_dataset(dataset["source"], cfg, split=dataset["hf_split"])
             for cfg in math_configs
         ])
-        # Keep only problems with difficulty level >= 3
+        # Keep only problems with difficulty level >= math_min_level
         hf_dataset = hf_dataset.filter(
-            lambda x: int(x["level"].split()[-1]) >= 3
+            lambda x: int(x["level"].split()[-1]) >= math_min_level
         )
     elif dataset["hf"]:
         hf_dataset = load_dataset(
@@ -83,8 +95,19 @@ def load_data(
             range(n // 2)
         )
         hf_dataset = concatenate_datasets([dataset_refuse, dataset_comply])
-    elif len(hf_dataset) > n:
-        hf_dataset = hf_dataset.select(range(n))
+    else:
+        end_index = min(start_index + n, len(hf_dataset))
+        if start_index >= len(hf_dataset):
+            raise ValueError(
+                f"start_index={start_index} is past the end of the {dataset['name']} "
+                f"dataset (len={len(hf_dataset)} after filtering)"
+            )
+        hf_dataset = hf_dataset.select(range(start_index, end_index))
+        if end_index - start_index < n:
+            print(
+                f"Warning: only {end_index - start_index} examples available from "
+                f"{dataset['name']} starting at index {start_index} (requested {n})"
+            )
 
     data = []
     for idx, example in enumerate(hf_dataset):
@@ -102,7 +125,7 @@ def load_data(
         data.append(
             {
                 **datapoint,  # pass down info about datapoint
-                "prompt_id": idx,  # track prompt index for re-mapping
+                "prompt_id": start_index + idx,  # track prompt index for re-mapping
                 "dataset_name": dataset["name"],
                 "dataset_type": dataset["type"],
                 "prompt": prompt_str,
@@ -362,6 +385,8 @@ def main(
     # data selection parameters
     num_examples: int = 100,
     shuffle: bool = True,
+    start_index: int = 0,
+    math_min_level: int = 3,
     # generation parameters
     num_paths: int = 10,
     max_new_tokens: int = 10000,
@@ -370,10 +395,13 @@ def main(
     return_logprobs: bool = True,
     enable_prefix_caching: bool = True,
     quantization: Optional[str] = None,
+    tensor_parallel_size: int = 1,
     # base answer selection
     base_answer_type: Literal["correct", "incorrect", "mode"] = "mode",
     # output parameters
     return_alternate_texts: bool = True,
+    output_suffix: str = "",
+    no_append: bool = False,
     seed: int = 42,
     # HuggingFace upload
     hf_repo_id: Optional[str] = None,
@@ -403,6 +431,7 @@ def main(
             dtype="auto",
             enable_prefix_caching=enable_prefix_caching,
             quantization=quantization,
+            tensor_parallel_size=tensor_parallel_size,
         )
 
         dataset = load_data(
@@ -410,6 +439,8 @@ def main(
             datasets_metadata[dataset_name],
             n=num_examples,
             shuffle=shuffle,
+            start_index=start_index,
+            math_min_level=math_min_level,
         )
 
         # Generate all paths in parallel batches (no greedy, all temperature sampled)
@@ -439,11 +470,30 @@ def main(
             return_alternate_texts=return_alternate_texts,
         )
 
-        # Save results
-        output_filename = f"{output_dir}/{dataset_name.lower()}.json"
-        with open(output_filename, "w") as f:
-            json.dump(aggregated_results, f, indent=2)
-        print(f"Saved {len(aggregated_results)} results to {output_filename}")
+        # Save results (append by default if file exists)
+        output_filename = f"{output_dir}/{dataset_name.lower()}{output_suffix}.json"
+        if os.path.exists(output_filename) and not no_append:
+            with open(output_filename) as f:
+                existing = json.load(f)
+            existing_pids = {r["prompt_id"] for r in existing}
+            new_records = [r for r in aggregated_results if r["prompt_id"] not in existing_pids]
+            collisions = len(aggregated_results) - len(new_records)
+            if collisions > 0:
+                print(
+                    f"Skipping {collisions} new record(s) whose prompt_id already exists "
+                    f"in {output_filename} (use --no_append to overwrite instead)."
+                )
+            combined = existing + new_records  # no re-sort: keep existing positions stable
+            with open(output_filename, "w") as f:
+                json.dump(combined, f, indent=2)
+            print(
+                f"Appended {len(new_records)} new records to {output_filename} "
+                f"(was {len(existing)}, now {len(combined)})."
+            )
+        else:
+            with open(output_filename, "w") as f:
+                json.dump(aggregated_results, f, indent=2)
+            print(f"Saved {len(aggregated_results)} results to {output_filename}")
 
         # Optionally upload to HuggingFace Hub
         if hf_repo_id is not None:
@@ -479,6 +529,40 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--shuffle", action="store_true", help="Shuffle the dataset before sampling"
+    )
+    parser.add_argument(
+        "--start_index",
+        type=int,
+        default=0,
+        help=(
+            "Offset into the (shuffled) dataset before taking num_examples. "
+            "Use to extend an earlier collection without re-doing the same examples. "
+            "prompt_id starts at start_index."
+        ),
+    )
+    parser.add_argument(
+        "--math_min_level",
+        type=int,
+        default=3,
+        help="Minimum hendrycks_math difficulty level (1-5) to keep, MATH_open only.",
+    )
+    parser.add_argument(
+        "--output_suffix",
+        type=str,
+        default="",
+        help=(
+            "Suffix appended to the output filename, before .json (e.g. '_v2'). "
+            "By default empty, so the output filename is '<dataset>.json'."
+        ),
+    )
+    parser.add_argument(
+        "--no_append",
+        action="store_true",
+        help=(
+            "If set, overwrite any existing output file rather than appending to it. "
+            "By default we append: read the existing file, drop any new records whose "
+            "prompt_id already appears, concat existing+new, and write back."
+        ),
     )
     parser.add_argument(
         "--num_paths", type=int, default=10, help="Number of paths to generate per prompt"
@@ -520,6 +604,12 @@ if __name__ == "__main__":
         default=None,
         choices=["awq", "gptq", "squeezellm", "fp8"],
         help="Quantization method",
+    )
+    parser.add_argument(
+        "--tensor_parallel_size",
+        type=int,
+        default=1,
+        help="vLLM tensor_parallel_size for the generation LLM (number of GPUs to shard across).",
     )
     parser.add_argument(
         "--base_answer_type",

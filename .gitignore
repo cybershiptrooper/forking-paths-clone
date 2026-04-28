@@ -21,6 +21,7 @@ plots
 thought_anchors
 *rollouts*
 *log
+*logs
 .cursor
 *rough*
 results/attention*
@@ -47,3 +48,6 @@ optimisation_reports/
 plan.md
 refactor/
 .nfs*
+.claudeignore
+todos/*
+claude_scripts/*

@@ -523,7 +523,7 @@ def main(
     # Determine output path
     if file_name is not None:
         base = file_name.removesuffix(".json")
-        output_file = os.path.join(output_dir, f"{base}_suppression.json")
+        output_file = os.path.join(output_dir, f"{base}_attention_suppression.json")
     else:
         output_file = os.path.join(
             output_dir, f"attention_suppression_branches{num_new_branches}.json"

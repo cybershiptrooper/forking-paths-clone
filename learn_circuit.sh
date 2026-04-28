@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# !/usr/bin/env bash
 # Usage: [N_GPUS=N] bash learn_circuit.sh [config.yaml]
 # Finds N GPUs with >75 GB free and runs the pipeline on them.
 set -e

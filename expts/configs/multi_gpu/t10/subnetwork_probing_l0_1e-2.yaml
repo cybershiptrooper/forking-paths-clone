@@ -1,0 +1,12 @@
+base_config: expts/configs/tempered_snis_configs/base.yaml
+
+objective: reward_gap
+masking_algorithm: nodewise_subnetwork_probing_sdpa
+importance_sampling_method: tempered_snis
+importance_sampling_temperature: 10.0
+output_dir: results/circuit_discovery/subnet_probing/reward_gap/t10/
+file_name: l0_1e-2
+num_new_branches: 32
+device: auto
+gradient_checkpointing: true
+l0_lambda: 1.0e-2

@@ -28,7 +28,7 @@ output_dir = c.get('output_dir', 'results/circuit_discovery')
 fn = c.get('file_name')
 if fn:
     base = fn.removesuffix('.json')
-    print(os.path.join(output_dir, f'{base}_suppression.json'))
+    print(os.path.join(output_dir, f'{base}_attention_suppression.json'))
 else:
     nb = c.get('num_new_branches', 8)
     print(os.path.join(output_dir, f'attention_suppression_branches{nb}.json'))

@@ -1,0 +1,10 @@
+base_config: expts/configs/prompts/base.yaml
+
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/math_filtered.json
+prompt_index: 5
+analysis_timestep: 2007 
+seed: 42
+file_name: qwen3_8b_5_at_2000
+judge_model: openai/gpt-4o-mini
+max_sampling_tokens: 30000

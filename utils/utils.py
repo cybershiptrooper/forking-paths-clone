@@ -37,6 +37,10 @@ MODEL_METADATA = {
         "nickname": "qwen3_4b",
         "reasoning": True,
     },
+    "Qwen/Qwen3-14B": {
+        "nickname": "qwen3_14b",
+        "reasoning": True,
+    },
     # Other
     "microsoft/Phi-4-mini-reasoning": {
         "nickname" : "phi_4b",

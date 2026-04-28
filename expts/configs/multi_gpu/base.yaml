@@ -7,7 +7,7 @@ mask_granularity: pair
 mask_mode: prefix
 layers_to_analyse: all
 max_sampling_tokens: 20000
-analysis_timestep: 1036
+analysis_timestep: 2036
 sentence_gap: 4
 output_dir: results/circuit_discovery/subnet_probing
 ablate_non_target_layers: true

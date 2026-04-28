@@ -1,0 +1,9 @@
+base_config: expts/configs/prompts/base.yaml
+
+model_name: Qwen/Qwen3-4B
+data_path: data/collection/qwen3_4b/math_filtered.json
+prompt_index: 3
+analysis_timestep: 2123 # 584 # 609
+seed: 42
+file_name: qwen3_4b_3_at_2500
+max_sampling_tokens: 30000
