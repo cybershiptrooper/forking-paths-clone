@@ -116,7 +116,7 @@ def main(
     prompt_index: int = None,
     dataset_type: str = "open ended",
     answer_only: bool = False,
-    judge_model: str = "meta-llama/llama-3.2-3b-instruct",
+    judge_model: str = "openai/gpt-4o-mini",
     judge_answers: bool = False,
     file_name: str = None,
     cache_dir: str = "cache/completions",
@@ -604,6 +604,9 @@ def main(
     node_mask.to_json(output_file)
     print(f"Saved NodeMask to {output_file}")
 
+    from utils.hf_sync import push_auto
+    push_auto(output_file)
+
     # Print summary
     print("\nSummary:")
     print(f"  Layers: {layers_to_analyse}")
@@ -772,7 +775,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--judge_model",
         type=str,
-        default="meta-llama/llama-3.2-3b-instruct",
+        default="openai/gpt-4o-mini",
         help="Model for LLM-based answer judging (OpenRouter).",
     )
     parser.add_argument(

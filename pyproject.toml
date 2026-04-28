@@ -7,11 +7,13 @@ requires-python = ">=3.12"
 dependencies = [
     "accelerate>=0.20.0",
     "datasets>=4.2.0",
+    "huggingface-hub>=0.35.3",
     "jupyter>=1.1.1",
     "networkx>=3.0",
     "nnsight>=0.1.0",
     "numpy<2",
     "plotly>=6.3.1",
+    "python-dotenv>=1.1.1",
     "rbeast>=0.1.23",
     "scikit-learn>=1.7.2",
     "scipy>=1.11.0",
@@ -21,4 +23,5 @@ dependencies = [
     "torch>=2.0.0",
     "transformers>=4.30.0",
     "vllm>=0.11.0",
+    "wandb>=0.26.1",
 ]

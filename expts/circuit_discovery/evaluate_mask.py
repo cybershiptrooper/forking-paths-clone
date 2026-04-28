@@ -245,6 +245,9 @@ def evaluate(
     node_mask.to_json(mask_path)
     print(f"\nSaved evaluation results to {mask_path}")
 
+    from utils.hf_sync import push_auto
+    push_auto(mask_path)
+
     # Print summary
     print("\nThreshold evaluation:")
     for r in threshold_results:

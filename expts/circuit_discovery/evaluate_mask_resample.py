@@ -575,6 +575,9 @@ def evaluate_resample(
 
     print(f"\nSaved resample sidecar to {sidecar_path}")
 
+    from utils.hf_sync import push_auto
+    push_auto(sidecar_path)
+
     # Cleanup
     del model
     clear_cuda()

@@ -26,11 +26,10 @@ Higher = more important. ``negate_scores`` is not applied.
 import os
 from typing import List, Optional
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import torch
 from tqdm import tqdm
+
+from utils.wandb_logging import init_wandb_run, log_step, finish_wandb_run
 
 from utils.masks import (
     NodeMask,
@@ -134,6 +133,8 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         log_dir: Optional[str] = None,
         log_every: int = 5,
         plot_every: int = 20,
+        wandb_project: Optional[str] = "cot_interp",
+        wandb_run_name: Optional[str] = None,
         **kwargs,
     ):
         """
@@ -173,9 +174,13 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         self.l0_warmup_frac = l0_warmup_frac
         self.l0_ramp_frac = l0_ramp_frac
         self.log_alpha_init = log_alpha_init
+        # log_dir / plot_every kept for backward-compat; training curves now
+        # go to wandb. log_every controls wandb scalar cadence.
         self.log_dir = log_dir
         self.log_every = log_every
         self.plot_every = plot_every
+        self.wandb_project = wandb_project
+        self.wandb_run_name = wandb_run_name
 
     # ------------------------------------------------------------------
     # Patching helpers
@@ -435,11 +440,34 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         )
 
         # ----- Training loop -----
-        log_steps: list[int] = []
-        log_task: list[float] = []
-        log_l0: list[float] = []
-        log_sparsity: list[float] = []
-        plot_dir = self._prepare_log_dir()
+        run_name = self.wandb_run_name
+        if run_name is None and self.log_dir is not None:
+            # Re-use the per-run subdir name as the wandb run name so the
+            # mapping from a saved NodeMask to its training curves is obvious.
+            run_name = os.path.basename(os.path.normpath(self.log_dir))
+        wandb_run = init_wandb_run(
+            project=self.wandb_project,
+            run_name=run_name,
+            config={
+                "algorithm": "nodewise_subnetwork_probing_sdpa",
+                "num_training_steps": self.num_training_steps,
+                "learning_rate": self.learning_rate,
+                "l0_lambda": self.l0_lambda,
+                "l0_lambda_schedule": self.l0_lambda_schedule,
+                "l0_warmup_frac": self.l0_warmup_frac,
+                "l0_ramp_frac": self.l0_ramp_frac,
+                "log_alpha_init": self.log_alpha_init,
+                "mask_granularity": granularity,
+                "num_continuations": len(continuations),
+                "num_layers": len(self.layers),
+                "num_heads": num_heads,
+                "num_sentences": num_sents,
+                "objective": objective_name,
+                "mask_mode": mask_mode,
+                "importance_sampling_method": self.importance_sampling_method,
+                "importance_sampling_temperature": self.importance_sampling_temperature,
+            },
+        )
 
         for step in tqdm(range(self.num_training_steps), desc="SNP steps"):
             sampled = self._sample_masks(log_alpha, granularity)
@@ -470,21 +498,20 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
 
             optim.step()
 
-            if plot_dir is not None and (step % self.log_every == 0):
+            if wandb_run is not None and (step % self.log_every == 0):
                 sparsity_val = self._current_sparsity(log_alpha, granularity)
-                log_steps.append(step)
-                log_task.append(task_loss_val)
-                log_l0.append(l0_val)
-                log_sparsity.append(sparsity_val)
+                log_step(
+                    wandb_run,
+                    step=step,
+                    metrics={
+                        "task_loss": task_loss_val,
+                        "l0_loss": l0_val,
+                        "sparsity": sparsity_val,
+                        "l0_lambda": lam,
+                    },
+                )
 
-            if (
-                plot_dir is not None
-                and log_steps
-                and ((step + 1) % self.plot_every == 0
-                     or step == self.num_training_steps - 1)
-            ):
-                self._flush_plots(plot_dir, log_steps, log_task, log_l0, log_sparsity)
-
+        finish_wandb_run(wandb_run)
         self._unpatch_model(handles)
         if non_target_handles:
             self._unpatch_model(non_target_handles)
@@ -544,12 +571,6 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
     # Logging / plotting
     # ------------------------------------------------------------------
 
-    def _prepare_log_dir(self) -> Optional[str]:
-        if self.log_dir is None:
-            return None
-        os.makedirs(self.log_dir, exist_ok=True)
-        return self.log_dir
-
     def _current_sparsity(self, log_alpha, granularity) -> float:
         """Fraction of entries whose Hard-Concrete mean has hit the clamp at 0.
 
@@ -572,22 +593,6 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             # Exact equality: ``torch.clamp(x, 0, 1)`` produces *bit-exact*
             # 0.0 for any input ≤ 0, so no tolerance is needed or correct.
             return float((m == 0.0).float().mean().item())
-
-    def _flush_plots(self, plot_dir, steps, task, l0, sparsity):
-        """Overwrite three PDFs with the training curves so far."""
-        for name, ys, ylabel in [
-            ("task_loss", task, "task loss (per-step)"),
-            ("l0_loss", l0, "L0 penalty loss"),
-            ("sparsity", sparsity, "fraction of edges off (HC mean < 0.5)"),
-        ]:
-            fig, ax = plt.subplots(figsize=(5, 3.2))
-            ax.plot(steps, ys, marker="o", markersize=3)
-            ax.set_xlabel("training step")
-            ax.set_ylabel(ylabel)
-            ax.grid(True, alpha=0.3)
-            fig.tight_layout()
-            fig.savefig(os.path.join(plot_dir, f"{name}.pdf"))
-            plt.close(fig)
 
     # ------------------------------------------------------------------
     # Per-step loss routines (each builds a scalar and calls backward)
