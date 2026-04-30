@@ -37,16 +37,183 @@ def chain_log_prob(
     Returns:
         Scalar log-probability (differentiable w.r.t. logits).
     """
-    scaled = logits.float() / temperature if apply_temperature and temperature != 1.0 else logits.float()
-    log_probs = F.log_softmax(scaled, dim=-1)
     seq_len = token_ids.shape[-1]
-    # logits[t] predicts token_ids[t+1]
-    # Continuation tokens: token_ids[prefix_len .. seq_len-1]
-    # Predicted by: logits[prefix_len-1 .. seq_len-2]
-    targets = token_ids[:, prefix_len:seq_len]  # (1, cont_len)
-    preds = log_probs[:, prefix_len - 1 : seq_len - 1]  # (1, cont_len, V)
-    token_lp = preds.gather(-1, targets.unsqueeze(-1)).squeeze(-1)  # (1, cont_len)
-    return token_lp.sum(dim=-1).squeeze(0)  # scalar
+
+    # 1. Slice FIRST so cast/logsumexp only touch the (cont_len, V) window
+    pred_logits = logits[:, prefix_len - 1 : seq_len - 1]   # view, no copy
+    targets     = token_ids[:, prefix_len : seq_len]
+
+    # 2. Cast only the slice to fp32 (precision needed for log-softmax)
+    pred_logits = pred_logits.float()
+    if apply_temperature and temperature != 1.0:
+        pred_logits = pred_logits / temperature
+
+    # 3. gather + logsumexp instead of log_softmax + gather
+    target_logits = pred_logits.gather(-1, targets.unsqueeze(-1)).squeeze(-1)   # (1, L)
+    lse           = torch.logsumexp(pred_logits, dim=-1)                        # (1, L)
+    token_lp      = target_logits - lse                                         # (1, L)
+
+    return token_lp.sum(dim=-1).squeeze(0)
+
+
+_LIGER_LOSS = None
+
+
+def _liger_loss():
+    global _LIGER_LOSS
+    if _LIGER_LOSS is None:
+        from liger_kernel.transformers.fused_linear_cross_entropy import (
+            LigerFusedLinearCrossEntropyLoss,
+        )
+        _LIGER_LOSS = LigerFusedLinearCrossEntropyLoss(
+            reduction="sum",
+            accum_dtype=torch.float32,
+        )
+    return _LIGER_LOSS
+
+
+def chain_log_prob_fused(
+    hidden: torch.Tensor,
+    lm_head_weight: torch.Tensor,
+    token_ids: torch.Tensor,
+    prefix_len: int,
+    temperature: float = 1.0,
+    apply_temperature: bool = True,
+    lm_head_bias: Optional[torch.Tensor] = None,
+) -> torch.Tensor:
+    """Memory-efficient chain log-probability via fused linear+cross-entropy.
+
+    Drop-in replacement for ``chain_log_prob`` that takes hidden states and
+    the LM head weight instead of pre-materialised logits. Liger's Triton
+    kernel fuses the lm_head matmul with log-softmax+gather, so the
+    ``(seq_len, vocab)`` tensor that drives chain_log_prob's OOM is never
+    realized. fp32 accumulation preserves precision.
+
+    Args:
+        hidden: (1, seq_len, hidden_size) last hidden state from the base
+            transformer (e.g. ``model.model(input_ids).last_hidden_state``).
+        lm_head_weight: (vocab, hidden_size) — typically ``model.lm_head.weight``.
+        token_ids: (1, seq_len) full token sequence.
+        prefix_len: number of prompt tokens.
+        temperature, apply_temperature: as in ``chain_log_prob``.
+        lm_head_bias: optional (vocab,) — Llama/Qwen3 have no LM-head bias,
+            so this is normally ``None``.
+
+    Returns:
+        Scalar log-probability of the continuation, differentiable w.r.t.
+        ``hidden`` and ``lm_head_weight``.
+    """
+    seq_len = token_ids.shape[-1]
+    pred_h = hidden[0, prefix_len - 1 : seq_len - 1]                    # (cont_len, d)
+    targets = token_ids[0, prefix_len:seq_len].to(torch.long)            # (cont_len,)
+
+    if apply_temperature and temperature != 1.0:
+        # logits = h @ W.T (+ b). With bias=None, scaling h scales logits
+        # exactly. With bias, scale W and b copies instead.
+        if lm_head_bias is None:
+            pred_h = pred_h / temperature
+        else:
+            inv_T = 1.0 / temperature
+            lm_head_weight = lm_head_weight * inv_T
+            lm_head_bias = lm_head_bias * inv_T
+
+    # Multi-GPU sharded models: lm_head and the final transformer block can
+    # live on different devices (accelerate dispatches them independently).
+    # The fused kernel needs all tensors co-located. Move the small tensors
+    # (hidden slice, targets) onto lm_head_weight's device.
+    target_device = lm_head_weight.device
+    pred_h = pred_h.to(target_device).contiguous()
+    targets = targets.to(target_device).contiguous()
+    if lm_head_bias is not None:
+        lm_head_bias = lm_head_bias.to(target_device)
+
+    loss = _liger_loss()(lm_head_weight, pred_h, targets, bias=lm_head_bias)
+    # Return on the caller-facing device (matches the original chain_log_prob
+    # contract, which returned on logits.device — typically the same device
+    # as token_ids in the caller's frame).
+    return (-loss).to(token_ids.device)
+
+
+@torch.compile(dynamic=True)
+def _chunk_logp_compiled(h_chunk: torch.Tensor, W: torch.Tensor, tgt_chunk: torch.Tensor):
+    """Compiled per-chunk log-prob: (h_chunk @ W.T) -> log_softmax-gather.
+
+    Inputs are bf16, internal logits/logsumexp/gather run in fp32.
+    Boundary chunks (smaller than the chunk_size used elsewhere) work via
+    ``dynamic=True`` shape specialisation.
+    """
+    logits = (h_chunk @ W.T).float()                       # (C, V) fp32
+    lse = torch.logsumexp(logits, dim=-1)                  # (C,)
+    tgt_lp = logits.gather(-1, tgt_chunk[:, None]).squeeze(-1)
+    return tgt_lp - lse                                    # (C,)
+
+
+def chain_log_prob_chunked(
+    hidden: torch.Tensor,
+    lm_head_weight: torch.Tensor,
+    token_ids: torch.Tensor,
+    prefix_len: int,
+    temperature: float = 1.0,
+    apply_temperature: bool = True,
+    lm_head_bias: Optional[torch.Tensor] = None,
+    chunk_size: int = 1024,
+) -> torch.Tensor:
+    """Chunked-along-seq, fp32-internal chain log-probability.
+
+    Manual alternative to ``chain_log_prob_fused`` (Liger): no fused Triton
+    kernel — instead, the LM-head matmul + log-softmax + gather are run in
+    chunks of ``chunk_size`` query positions, each chunk compiled via
+    ``torch.compile``. Logits live only inside the per-chunk closure, in
+    fp32 for precision; never materialises the full ``(seq, V)`` tensor.
+
+    Args:
+        hidden: (1, seq_len, hidden_size) last hidden state.
+        lm_head_weight: (vocab, hidden_size).
+        token_ids: (1, seq_len) full token sequence.
+        prefix_len: number of prompt tokens.
+        temperature, apply_temperature: as in ``chain_log_prob``.
+        lm_head_bias: optional (vocab,). Llama/Qwen3 use ``None``.
+        chunk_size: query-positions per chunk. 1024 is a good default for
+            long sequences with vocabularies in the 100k–200k range.
+
+    Returns:
+        Scalar log-probability of the continuation.
+    """
+    seq_len = token_ids.shape[-1]
+    pred_h = hidden[0, prefix_len - 1 : seq_len - 1]                    # (cont_len, d)
+    targets = token_ids[0, prefix_len:seq_len].to(torch.long)            # (cont_len,)
+
+    if apply_temperature and temperature != 1.0:
+        if lm_head_bias is None:
+            pred_h = pred_h / temperature
+        else:
+            inv_T = 1.0 / temperature
+            lm_head_weight = lm_head_weight * inv_T
+            lm_head_bias = lm_head_bias * inv_T
+
+    target_device = lm_head_weight.device
+    pred_h = pred_h.to(target_device).contiguous()
+    targets = targets.to(target_device).contiguous()
+    if lm_head_bias is not None:
+        lm_head_bias = lm_head_bias.to(target_device)
+
+    total = pred_h.new_zeros((), dtype=torch.float32)
+    L = pred_h.shape[0]
+    for i in range(0, L, chunk_size):
+        end = min(i + chunk_size, L)
+        h_chunk = pred_h[i:end]
+        tgt_chunk = targets[i:end]
+        if lm_head_bias is None:
+            chunk_lp = _chunk_logp_compiled(h_chunk, lm_head_weight, tgt_chunk)
+        else:
+            # Bias-aware path (no torch.compile) — Llama/Qwen3 don't hit this.
+            logits = (h_chunk @ lm_head_weight.T + lm_head_bias).float()
+            lse = torch.logsumexp(logits, dim=-1)
+            tgt_lp = logits.gather(-1, tgt_chunk[:, None]).squeeze(-1)
+            chunk_lp = tgt_lp - lse
+        total = total + chunk_lp.sum()
+
+    return total.to(token_ids.device)
 
 
 def importance_weights(

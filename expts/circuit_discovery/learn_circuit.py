@@ -45,6 +45,13 @@ def load_model_eager(
         trust_remote_code=True,
         attn_implementation="eager",
     )
+    # Circuit discovery (patching, attribution/IG, subnetwork probing) only
+    # needs grads to flow *through* model params to a learnable input
+    # (mask / interpolation / log_alpha) — never to land on model params.
+    # Freeze them so backward doesn't allocate fp32 .grad buffers we never
+    # use (~4 GB/shard for a 4B model).
+    for p in model.parameters():
+        p.requires_grad_(False)
     if gradient_checkpointing:
         model.config.use_cache = False
         model.gradient_checkpointing_enable(

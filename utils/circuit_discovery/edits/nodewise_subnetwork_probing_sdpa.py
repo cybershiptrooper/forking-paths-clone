@@ -38,14 +38,14 @@ from utils.masks import (
     build_causal_filter,
     build_combined_filter,
 )
-from utils.utils import Sentence
+from utils.utils import Sentence, clear_cuda
 from utils.objectives import is_global_objective
-from utils.importance_sampling import chain_log_prob
+from utils.importance_sampling import chain_log_prob, chain_log_prob_chunked
 from utils.circuit_discovery.base import CircuitDiscovery
 from utils.circuit_discovery.edits.nodewise_attribution_sdpa import (
     _expand_mask_to_log_additive,
 )
-from utils.circuit_discovery.edits.nodewise_patching_flash import (
+from utils.circuit_discovery.sdpa_forward import (
     make_sdpa_attention_forward,
 )
 
@@ -404,24 +404,34 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             )
 
         print("Computing clean logits (target all-ones, non-target zero-ablated)...")
-        clean_logits_list = self._get_clean_logits(input_ids, continuations)
+        # Local objectives still need the full (seq, V) clean-logits cache.
+        # Global objectives only need the per-chain scalar log-probs, which
+        # we compute directly via chain_log_prob_chunked from hidden states —
+        # avoiding the (seq, V) materialisation entirely for global runs.
+        if use_global:
+            clean_logits_list = None
+            chain_logprobs_clean = []
+            lm_head_weight = self.model.lm_head.weight
+            lm_head_bias = getattr(self.model.lm_head, "bias", None)
+            self.model.eval()
+            with torch.no_grad(), torch.amp.autocast("cuda"):
+                for cont in continuations:
+                    full_input = torch.cat([input_ids, cont], dim=-1)
+                    hidden = self.model.model(full_input).last_hidden_state
+                    lp = chain_log_prob_chunked(
+                        hidden, lm_head_weight, full_input, prefix_len,
+                        temperature=self.temperature, lm_head_bias=lm_head_bias,
+                    )
+                    chain_logprobs_clean.append(lp.detach())
+                    del hidden
+            chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
+        else:
+            clean_logits_list = self._get_clean_logits(input_ids, continuations)
+            chain_logprobs_clean = None
 
         # Swap in the initial stochastic HC sample for training.
         init_masks = self._sample_masks(log_alpha, granularity)
         self._install_masks(init_masks)
-
-        chain_logprobs_clean = None
-        if use_global:
-            chain_logprobs_clean = []
-            for ci, cont in enumerate(continuations):
-                full_input = torch.cat([input_ids, cont], dim=-1)
-                clean_logits = clean_logits_list[ci][:, : full_input.shape[-1]]
-                lp = chain_log_prob(
-                    clean_logits, full_input.cpu(), prefix_len,
-                    temperature=self.temperature,
-                )
-                chain_logprobs_clean.append(lp.detach())
-            chain_logprobs_clean = torch.stack(chain_logprobs_clean).to(device)
 
         chain_lengths = torch.tensor(
             [c.shape[-1] for c in continuations], dtype=torch.long, device=device,
@@ -471,7 +481,25 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
 
         for step in tqdm(range(self.num_training_steps), desc="SNP steps"):
             sampled = self._sample_masks(log_alpha, granularity)
-            self._install_masks(sampled)
+            # Decouple model graph from log_alpha graph: install *detached*
+            # mask leaves so per-branch backwards inside _step_global /
+            # _step_local can use retain_graph=False (frees model saved
+            # tensors as backward visits them, both within and across
+            # branches). After the task step, push accumulated leaf grads
+            # back through the m_sample → log_alpha subgraph in one walk.
+            #
+            # Identity-aware: pair granularity has the same `sampled`
+            # tensor at every layer key. Share one leaf across those keys
+            # so per-layer .grad accumulates into a single tensor.
+            unique_leaves = {}  # id(orig_tensor) -> leaf
+            sampled_leaf = {}
+            for k, v in sampled.items():
+                leaf = unique_leaves.get(id(v))
+                if leaf is None:
+                    leaf = v.detach().requires_grad_(True)
+                    unique_leaves[id(v)] = leaf
+                sampled_leaf[k] = leaf
+            self._install_masks(sampled_leaf)
             optim.zero_grad(set_to_none=True)
 
             if use_global:
@@ -484,6 +512,13 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
                     input_ids, continuations, clean_logits_list,
                     prefix_len, device, branch_rewards, position_mask_overrides,
                 )
+
+            # Push accumulated leaf grads through m_sample → log_alpha.
+            for orig_id, leaf in unique_leaves.items():
+                if leaf.grad is None:
+                    continue
+                orig = next(t for t in sampled.values() if id(t) == orig_id)
+                orig.backward(gradient=leaf.grad)
 
             # Sparsity penalty (independent of the task forward), scheduled λ.
             lam = self._lambda_at_step(step)
@@ -632,11 +667,10 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             if branch_rewards is not None:
                 loss = loss * branch_rewards[cont_idx]
             task_loss_total += float(loss.detach().item())
-            # retain_graph: sampled mask `m` is a non-leaf derived from
-            # log_alpha; the m->log_alpha subgraph is shared across all
-            # branches within a step, so backward on branch i must not
-            # free it before branch i+1.
-            loss.backward(retain_graph=True)
+            # Mask is an installed leaf (see training loop in `discover`),
+            # so each branch's graph is independent; retain_graph=False frees
+            # saved tensors during backward and bounds peak memory.
+            loss.backward()
             del logits, loss
         return task_loss_total
 
@@ -651,16 +685,49 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         gradient flows into Hard-Concrete log_alpha rather than the
         interpolated mask.
         """
+        # Fused linear+CE (Liger): avoids the (seq_len, vocab) fp32 logits
+        # tensor that previously OOMed for long prefixes / large vocabs.
+        lm_head_weight = self.model.lm_head.weight
+        lm_head_bias = getattr(self.model.lm_head, "bias", None)
+
         chain_lps_detached = []
         for cont in continuations:
             full_input = torch.cat([input_ids, cont], dim=-1)
             with torch.no_grad(), torch.amp.autocast("cuda"):
-                logits = self.model(full_input).logits
-            lp = chain_log_prob(
-                logits.float(), full_input, prefix_len, temperature=self.temperature,
+                hidden = self.model.model(full_input).last_hidden_state
+            lp = chain_log_prob_chunked(
+                hidden, lm_head_weight, full_input, prefix_len,
+                temperature=self.temperature, lm_head_bias=lm_head_bias,
             )
             chain_lps_detached.append(lp.detach())
         chain_lps_detached = torch.stack(chain_lps_detached)
+
+        # NaN diagnostic — log first call and any time non-finite is seen.
+        _diag_log = (not getattr(self, "_diag_first_done", False)) or (
+            not torch.isfinite(chain_lps_detached).all()
+            or not torch.isfinite(chain_logprobs_clean).all()
+        )
+        if _diag_log:
+            self._diag_first_done = True
+            cm = chain_lps_detached
+            cc = chain_logprobs_clean
+            print(
+                f"[NAN-DIAG] step_global call: "
+                f"lp_masked finite={torch.isfinite(cm).sum().item()}/{cm.numel()} "
+                f"min={cm[torch.isfinite(cm)].min().item() if torch.isfinite(cm).any() else 'all-bad'} "
+                f"max={cm[torch.isfinite(cm)].max().item() if torch.isfinite(cm).any() else 'all-bad'}",
+                flush=True,
+            )
+            print(
+                f"[NAN-DIAG]                  "
+                f"lp_clean  finite={torch.isfinite(cc).sum().item()}/{cc.numel()} "
+                f"min={cc[torch.isfinite(cc)].min().item() if torch.isfinite(cc).any() else 'all-bad'} "
+                f"max={cc[torch.isfinite(cc)].max().item() if torch.isfinite(cc).any() else 'all-bad'}",
+                flush=True,
+            )
+            if not torch.isfinite(cm).all():
+                bad = (~torch.isfinite(cm)).nonzero(as_tuple=True)[0].tolist()
+                print(f"[NAN-DIAG]   non-finite lp_masked branches: {bad} values={cm[bad].tolist()}", flush=True)
 
         chain_lps_param = chain_lps_detached.clone().requires_grad_(True)
         global_loss = self.objective_fn(
@@ -671,17 +738,32 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             is_temperature=self.importance_sampling_temperature,
         )
         task_loss_val = float(global_loss.detach().item())
+        if _diag_log:
+            print(f"[NAN-DIAG] global_loss={task_loss_val}", flush=True)
         global_loss.backward()
         per_chain_weights = chain_lps_param.grad.detach()
+        if _diag_log:
+            pcw = per_chain_weights
+            print(
+                f"[NAN-DIAG] per_chain_weights finite={torch.isfinite(pcw).sum().item()}/{pcw.numel()} "
+                f"min={pcw[torch.isfinite(pcw)].min().item() if torch.isfinite(pcw).any() else 'all-bad'} "
+                f"max={pcw[torch.isfinite(pcw)].max().item() if torch.isfinite(pcw).any() else 'all-bad'}",
+                flush=True,
+            )
 
+        # Mask is now an installed leaf (see training loop in `discover`),
+        # so each branch's model-side autograd graph is fully self-contained;
+        # retain_graph=False lets backward free saved tensors as it visits
+        # them, capping per-branch peak memory.
         for cont_idx, cont in enumerate(continuations):
             full_input = torch.cat([input_ids, cont], dim=-1)
             with torch.amp.autocast("cuda"):
-                logits = self.model(full_input).logits
-            lp = chain_log_prob(
-                logits.float(), full_input, prefix_len, temperature=self.temperature,
+                hidden = self.model.model(full_input).last_hidden_state
+            lp = chain_log_prob_chunked(
+                hidden, lm_head_weight, full_input, prefix_len,
+                temperature=self.temperature, lm_head_bias=lm_head_bias,
             )
-            # See _step_local: shared m->log_alpha subgraph across branches.
-            (lp * per_chain_weights[cont_idx]).backward(retain_graph=True)
-            del logits, lp
+            (lp * per_chain_weights[cont_idx]).backward()
+            del hidden, lp
+            clear_cuda()
         return task_loss_val

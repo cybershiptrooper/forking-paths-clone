@@ -9,6 +9,7 @@ dependencies = [
     "datasets>=4.2.0",
     "huggingface-hub>=0.35.3",
     "jupyter>=1.1.1",
+    "liger-kernel>=0.7.0",
     "networkx>=3.0",
     "nnsight>=0.1.0",
     "numpy<2",

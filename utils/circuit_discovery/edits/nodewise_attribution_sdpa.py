@@ -45,7 +45,7 @@ from utils.utils import Sentence
 from utils.objectives import is_global_objective
 from utils.importance_sampling import chain_log_prob
 from utils.circuit_discovery.base import CircuitDiscovery
-from utils.circuit_discovery.edits.nodewise_patching_flash import (
+from utils.circuit_discovery.sdpa_forward import (
     make_sdpa_attention_forward,
 )
 

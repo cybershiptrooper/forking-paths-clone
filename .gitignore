@@ -51,3 +51,4 @@ refactor/
 .claudeignore
 todos/*
 claude_scripts/*
+wandb/*
