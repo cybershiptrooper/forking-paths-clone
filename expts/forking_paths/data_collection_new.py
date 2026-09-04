@@ -143,6 +143,8 @@ def generate_all_paths_batched(
     temperature: float = 0.6,
     batch_size: int = 32,
     return_logprobs: bool = True,
+    top_p: Optional[float] = None,
+    top_k: Optional[int] = None,
 ):
     """
     Generate num_paths samples per prompt using temperature sampling (no greedy).
@@ -162,25 +164,64 @@ def generate_all_paths_batched(
         number of prompts to process in parallel
     return_logprobs : bool
         whether to return the log probabilities
+    top_p, top_k : optional
+        nucleus / top-k sampling cutoffs. Left unset (vLLM defaults: no
+        truncation) unless given, so existing Qwen collections are unchanged.
+        Gemma 3 is documented with top_k=64, top_p=0.95 (its
+        generation_config.json), which vLLM does NOT apply when SamplingParams
+        is constructed explicitly, so pass them on the command line.
 
     Returns
     list[dict]
         list of all generated paths with rollout_id, prompt_id, and metadata
     """
     all_results = []
+    extra = {}
+    if top_p is not None:
+        extra["top_p"] = top_p
+    if top_k is not None:
+        extra["top_k"] = top_k
+    # Stop on every EOS id the model's generation_config declares. vLLM 0.11
+    # only honours the tokenizer's single eos_token for n > 1 samples: Gemma 3
+    # ends its turn with <end_of_turn> (id 106, listed only in
+    # generation_config.json), and with n=16 it emitted 106 forever until
+    # max_tokens (verified in logs/gemma_collection/probe3.log). For Qwen the
+    # list is [<|im_end|>, <|endoftext|>], which vLLM already stops on.
+    try:
+        from transformers import GenerationConfig
+        gen_cfg = GenerationConfig.from_pretrained(llm.llm_engine.model_config.model)
+        eos_ids = gen_cfg.eos_token_id
+        if isinstance(eos_ids, int):
+            eos_ids = [eos_ids]
+        if eos_ids:
+            extra["stop_token_ids"] = [int(i) for i in eos_ids]
+    except Exception as e:  # pragma: no cover - best effort
+        print(f"Warning: could not read generation_config eos ids: {e}")
     sampling_params = SamplingParams(
         n=num_paths,  # Generate all paths per prompt in one call
         temperature=temperature,
         max_tokens=max_new_tokens,
         logprobs=0 if return_logprobs else None,
+        **extra,
     )
+    print(f"SamplingParams: {sampling_params}")
+
+    # Pre-tokenize with add_special_tokens=False: the chat template already
+    # renders every special token the model expects (Gemma's `<bos>`, Llama's
+    # `<|begin_of_text|>`); letting vLLM tokenize the string would prepend a
+    # second BOS for those tokenizers. Qwen templates carry no BOS, so this is
+    # a no-op for the existing Qwen collections.
+    tokenizer = llm.get_tokenizer()
 
     # Batch over prompts (not prompt × rollout pairs)
     for batch_start in range(0, len(dataset), batch_size):
         batch_end = min(batch_start + batch_size, len(dataset))
         batch = dataset[batch_start:batch_end]
 
-        prompts = [datapoint["prompt"] for datapoint in batch]
+        prompts = [
+            {"prompt_token_ids": tokenizer.encode(datapoint["prompt"], add_special_tokens=False)}
+            for datapoint in batch
+        ]
         outputs = llm.generate(prompts, sampling_params)
 
         for datapoint, output in zip(batch, outputs):
@@ -391,6 +432,8 @@ def main(
     num_paths: int = 10,
     max_new_tokens: int = 10000,
     temperature: float = 0.6,
+    top_p: Optional[float] = None,
+    top_k: Optional[int] = None,
     batch_size: int = 32,
     return_logprobs: bool = True,
     enable_prefix_caching: bool = True,
@@ -452,6 +495,8 @@ def main(
             temperature=temperature,
             batch_size=batch_size,
             return_logprobs=return_logprobs,
+            top_p=top_p,
+            top_k=top_k,
         )
 
         # Clear generation LLM
@@ -578,6 +623,14 @@ if __name__ == "__main__":
         type=float,
         default=0.6,
         help="Temperature for sampling (default: 0.6)",
+    )
+    parser.add_argument(
+        "--top_p", type=float, default=None,
+        help="Nucleus sampling cutoff (default: unset = vLLM default 1.0). Gemma 3: 0.95",
+    )
+    parser.add_argument(
+        "--top_k", type=int, default=None,
+        help="Top-k sampling cutoff (default: unset = vLLM default, disabled). Gemma 3: 64",
     )
     parser.add_argument(
         "--batch_size", type=int, default=8, help="Batch size for parallel generation"

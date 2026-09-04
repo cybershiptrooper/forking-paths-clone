@@ -23,6 +23,8 @@ from utils.objectives import get_objective
 from utils.importance_sampling import extract_answer_ids, reward_based_answer_ids, merge_no_answer_variants
 from utils.masks import NodeMask
 from utils.circuit_discovery.factory import create_circuit_discovery, get_available_algorithms
+from utils.completion_cache import get_or_generate_sentence_branches
+from utils.base_path_selection import select_base_from_record
 from utils.rewards import (
     extract_boxed,
     compute_correctness_rewards,
@@ -140,6 +142,8 @@ def main(
     log_alpha_init: float = None,
     log_every: int = None,
     plot_every: int = None,
+    analysis_sentence_step: int = None,
+    base_answer_type: str = "stored",
 ):
     # Default model_to_analyse to model_name
     if model_to_analyse is None:
@@ -155,12 +159,13 @@ def main(
     # =====================================================================
     # Step 0: Load data from collection JSON if provided
     # =====================================================================
+    record = None
     if data_path is not None and prompt_index is not None:
         print(f"Loading record {prompt_index} from {data_path}...")
         with open(data_path) as f:
             records = json.load(f)
         record = records[prompt_index]
-        prompt = record["question"]
+        prompt = record.get("question_with_choices") or record["question"]
         if correct_answer is None and "correct_answer" in record:
             correct_answer = extract_boxed(record["correct_answer"]) or record["correct_answer"]
         if "dataset_type" in record:
@@ -190,18 +195,67 @@ def main(
             "formation for each band member. What is the largest number of "
             "members the band could have?"
         )
-    chat = [{"role": "user", "content": prompt}]
-    formatted_text = tokenizer.apply_chat_template(
-        chat, tokenize=False, add_generation_prompt=True
-    )
-    inputs = tokenizer(formatted_text, return_tensors="pt")
-    input_ids = inputs["input_ids"]
+    if record is not None and "prompt_token_ids" in record:
+        input_ids = torch.tensor(record["prompt_token_ids"]).unsqueeze(0)
+    else:
+        chat = [{"role": "user", "content": prompt}]
+        formatted_text = tokenizer.apply_chat_template(
+            chat, tokenize=False, add_generation_prompt=True
+        )
+        inputs = tokenizer(formatted_text, return_tensors="pt")
+        input_ids = inputs["input_ids"]
     prompt_len = input_ids.shape[-1]
 
-    if analysis_timestep is None:
-        analysis_timestep = prompt_len + 200
+    use_sentence_step = analysis_sentence_step is not None
+    if use_sentence_step:
+        # Sentence-step mode currently only works when reusing a base from a
+        # data-collection record. To extend this to fresh sampling we'd need
+        # to first sample a long base via vLLM (max_sampling_tokens generous
+        # enough to contain `analysis_sentence_step + 1` sentences), split
+        # into sentences, then cut at the chosen boundary and re-cache.
+        # TODO: implement sample-and-cut so analysis_sentence_step works
+        # without requiring data_path + prompt_index.
+        if analysis_timestep is not None:
+            print(
+                "WARNING: both analysis_timestep and analysis_sentence_step "
+                "were supplied; preferring sentence-based analysis_sentence_step."
+            )
+        if data_path is None or prompt_index is None:
+            raise ValueError(
+                "analysis_sentence_step requires data_path + prompt_index. "
+                "Sample-and-cut from a fresh base is not yet supported "
+                "(see TODO above)."
+            )
+
+        base_token_ids = select_base_from_record(record, base_answer_type, tokenizer)
+        prompt_token_ids = input_ids[0].tolist()
+        full_input_ids = prompt_token_ids + list(base_token_ids)
+
+        full_tensor = torch.tensor(full_input_ids)
+        raw_sentences = split_tokens_into_sentences(
+            full_tensor, tokenizer, min_sentence_length=min_sentence_length
+        )
+        from utils.cot_analysis import remove_bos_from_sentences as _rbos
+        from utils.cot_analysis import chunk_sentences as _chunk
+        raw_sentences = _rbos(raw_sentences)
+        raw_sentences = _chunk(raw_sentences, sentence_chunk)
+        if analysis_sentence_step >= len(raw_sentences):
+            raise ValueError(
+                f"analysis_sentence_step={analysis_sentence_step} is past the "
+                f"last sentence index ({len(raw_sentences) - 1}) in the chosen "
+                f"base path."
+            )
+        analysis_timestep = raw_sentences[analysis_sentence_step].end + 1
+        print(
+            f"Sentence-step mode: sentence #{analysis_sentence_step} ends at "
+            f"token {analysis_timestep} (prompt_len={prompt_len}, "
+            f"base_answer_type={base_answer_type!r})."
+        )
     else:
-        analysis_timestep = prompt_len + analysis_timestep
+        if analysis_timestep is None:
+            analysis_timestep = prompt_len + 200
+        else:
+            analysis_timestep = prompt_len + analysis_timestep
 
     print(f"Prompt length: {prompt_len} tokens")
     print(f"Analysis timestep: {analysis_timestep}")
@@ -214,17 +268,34 @@ def main(
     print("Step 2: Generating with vLLM (cached)...")
     print("=" * 80)
 
-    cached = get_or_generate(
-        model_name=model_name,
-        formatted_text=formatted_text,
-        prompt_len=prompt_len,
-        analysis_timestep=analysis_timestep,
-        num_branches=num_new_branches,
-        temperature=temperature,
-        max_sampling_tokens=max_sampling_tokens,
-        seed=seed,
-        cache_dir=cache_dir,
-    )
+    if use_sentence_step:
+        base_source = f"dataset:{data_path}:{prompt_index}"
+        cached = get_or_generate_sentence_branches(
+            model_name=model_name,
+            formatted_text=formatted_text,
+            full_input_ids=full_input_ids,
+            analysis_timestep=analysis_timestep,
+            sentence_step=analysis_sentence_step,
+            base_source=base_source,
+            base_answer_type=base_answer_type,
+            num_branches=num_new_branches,
+            temperature=temperature,
+            max_sampling_tokens=max_sampling_tokens,
+            seed=seed,
+            cache_dir=cache_dir,
+        )
+    else:
+        cached = get_or_generate(
+            model_name=model_name,
+            formatted_text=formatted_text,
+            prompt_len=prompt_len,
+            analysis_timestep=analysis_timestep,
+            num_branches=num_new_branches,
+            temperature=temperature,
+            max_sampling_tokens=max_sampling_tokens,
+            seed=seed,
+            cache_dir=cache_dir,
+        )
     input_ids = torch.tensor([cached["input_ids"]])
     branches = cached["branches"]
     cache_key = cached["cache_key"]
@@ -585,6 +656,9 @@ def main(
     node_mask.metadata["renormalize_masked_attention"] = renormalize_masked_attention
     node_mask.metadata["importance_sampling_method"] = importance_sampling_method
     node_mask.metadata["importance_sampling_temperature"] = importance_sampling_temperature
+    if use_sentence_step:
+        node_mask.metadata["analysis_sentence_step"] = analysis_sentence_step
+        node_mask.metadata["base_answer_type"] = base_answer_type
 
     if file_name is not None:
         if not file_name.endswith(".json"):
@@ -686,6 +760,24 @@ if __name__ == "__main__":
         type=int,
         default=None,
         help="Token index for analysis (default: prompt length)",
+    )
+    parser.add_argument(
+        "--analysis_sentence_step",
+        type=int,
+        default=None,
+        help="Sentence index (counted from start of prompt+base) at whose end "
+        "the analysis boundary is placed. Requires --data_path + --prompt_index "
+        "(reuses that record's stored base path). If both this and "
+        "--analysis_timestep are set, the sentence-based one wins (with a "
+        "WARNING). Sample-and-cut from a fresh base is not yet supported.",
+    )
+    parser.add_argument(
+        "--base_answer_type",
+        choices=["stored", "correct", "incorrect", "mode"],
+        default="stored",
+        help="Which path within the data-collection record to use as the base. "
+        "'stored' uses record['output_token_ids'] directly. The others may "
+        "retokenize an alternate text (lossy) — see utils/base_path_selection.py.",
     )
     parser.add_argument(
         "--objective",

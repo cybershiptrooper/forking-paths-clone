@@ -290,11 +290,111 @@ def _make_qwen3_forward_sdpa(mask_converter: Callable = None):
     return _forward
 
 
+def _make_gpt_oss_forward_sdpa(mask_converter: Callable = None):
+    """Build a patched GptOssAttention forward (attention sinks).
+
+    GPT-OSS attention appends a learnable per-head *sink* logit as an extra
+    column before the softmax and drops it afterwards, so part of the
+    probability mass leaks to the sink and the retained scores no longer
+    sum to 1. SDPA cannot express this, so the score matrix is materialised
+    eagerly — Q-chunked to bound memory at ``(1, H, chunk, k_len + 1)``.
+    The circuit mask enters as a pre-softmax additive bias exactly as in
+    the SDPA forwards; the sink logit is unaffected by the mask, so masked
+    attention mass is partly absorbed by the sink rather than fully
+    redistributed (matching how the architecture treats suppressed keys).
+
+    Sliding-window layers need no special handling: with eager attention
+    the model passes each layer an additive mask that already encodes its
+    window.
+    """
+    if mask_converter is None:
+        mask_converter = _expand_mask_to_additive
+
+    from transformers.models.gpt_oss.modeling_gpt_oss import (
+        apply_rotary_pos_emb as gpt_oss_apply_rotary_pos_emb,
+    )
+
+    def _forward(
+        self,
+        hidden_states: torch.Tensor,
+        position_embeddings: Tuple[torch.Tensor, torch.Tensor],
+        attention_mask: Optional[torch.Tensor] = None,
+        past_key_values: Optional[Cache] = None,
+        cache_position: Optional[torch.LongTensor] = None,
+        **kwargs,
+    ):
+        bsz, q_len, _ = hidden_states.size()
+        hidden_shape = (bsz, q_len, -1, self.head_dim)
+
+        query_states = self.q_proj(hidden_states).view(hidden_shape).transpose(1, 2)
+        key_states = self.k_proj(hidden_states).view(hidden_shape).transpose(1, 2)
+        value_states = self.v_proj(hidden_states).view(hidden_shape).transpose(1, 2)
+
+        cos, sin = position_embeddings
+        query_states, key_states = gpt_oss_apply_rotary_pos_emb(
+            query_states, key_states, cos, sin,
+        )
+
+        if past_key_values is not None:
+            cache_kwargs = {"cache_position": cache_position}
+            key_states, value_states = past_key_values.update(
+                key_states, value_states, self.layer_idx, cache_kwargs,
+            )
+
+        key_states = repeat_kv(key_states, self.num_key_value_groups)
+        value_states = repeat_kv(value_states, self.num_key_value_groups)
+        k_len = key_states.shape[-2]
+
+        combined_mask = None
+        if attention_mask is not None:
+            combined_mask = attention_mask
+            if combined_mask.shape[-1] != k_len:
+                combined_mask = combined_mask[:, :, :, :k_len]
+
+        sent_additive = mask_converter(
+            self, q_len, k_len, cache_position, query_states.dtype,
+        )
+        if sent_additive is not None:
+            sent_additive = sent_additive.to(device=query_states.device)
+            if combined_mask is not None:
+                combined_mask = combined_mask + sent_additive
+            else:
+                combined_mask = sent_additive
+
+        out_chunks = []
+        sink = self.sinks.reshape(1, -1, 1, 1)
+        for i in range(0, q_len, _SDPA_Q_CHUNK_SIZE):
+            end = min(i + _SDPA_Q_CHUNK_SIZE, q_len)
+            scores = torch.matmul(
+                query_states[:, :, i:end], key_states.transpose(2, 3),
+            ) * self.scaling
+            if combined_mask is not None:
+                scores = scores + combined_mask[:, :, i:end]
+            sink_col = sink.expand(bsz, -1, end - i, -1).to(scores.dtype)
+            combined = torch.cat([scores, sink_col], dim=-1)
+            combined = combined - combined.max(dim=-1, keepdim=True).values
+            probs = F.softmax(combined, dim=-1, dtype=combined.dtype)
+            out_chunks.append(torch.matmul(probs[..., :-1], value_states))
+        attn_output = torch.cat(out_chunks, dim=2)
+
+        attn_output = (
+            attn_output.transpose(1, 2)
+            .contiguous()
+            .reshape(bsz, q_len, -1)
+        )
+        attn_output = self.o_proj(attn_output)
+
+        return attn_output, past_key_values
+
+    return _forward
+
+
 _SDPA_BUILDERS = {
     "llama": _make_llama_forward_sdpa,
     "qwen2": _make_llama_forward_sdpa,
     "qwen":  _make_llama_forward_sdpa,
     "qwen3": _make_qwen3_forward_sdpa,
+    "gpt_oss": _make_gpt_oss_forward_sdpa,
 }
 
 

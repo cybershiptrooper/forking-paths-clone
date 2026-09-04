@@ -41,6 +41,21 @@ MODEL_METADATA = {
         "nickname": "qwen3_14b",
         "reasoning": True,
     },
+    "Qwen/Qwen3-32B": {
+        "nickname": "qwen3_32b",
+        "reasoning": True,
+    },
+    "openai/gpt-oss-120b": {
+        "nickname": "gpt_oss_120b",
+        "reasoning": True,
+    },
+    # Gemma 3 (instruction-tuned, no thinking mode: gets the
+    # "Let's think step by step." assistant prefill like the other
+    # non-reasoning models)
+    "google/gemma-3-12b-it": {
+        "nickname": "gemma3_12b",
+        "reasoning": False,
+    },
     # Other
     "microsoft/Phi-4-mini-reasoning": {
         "nickname" : "phi_4b",
@@ -85,6 +100,7 @@ ATTENTION_MODULE_PATHS = {
     "qwen2": lambda model, layer: model.model.layers[layer].self_attn,
     "qwen": lambda model, layer: model.model.layers[layer].self_attn,
     "qwen3": lambda model, layer: model.model.layers[layer].self_attn,
+    "gpt_oss": lambda model, layer: model.model.layers[layer].self_attn,
     # Easy to add new architectures:
     # "phi": lambda model, layer: model.model.layers[layer].mixer,
     # "mistral": lambda model, layer: model.model.layers[layer].self_attn,

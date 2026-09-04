@@ -38,17 +38,25 @@ cluster.md
 *old*
 roadmap/
 cache/
-results/*
+*results/*
 
 TASK.md
 analyse_collected_data.ipynb
 expts/circuit_debug/
-notes/
+# notes/
+results
 optimisation_reports/
 plan.md
 refactor/
 .nfs*
-.claudeignore
+# .claudeignore
 todos/*
 claude_scripts/*
 wandb/*
+*.yaml
+legacy/*
+*draft*
+*.json
+notes/
+website
+*.sh

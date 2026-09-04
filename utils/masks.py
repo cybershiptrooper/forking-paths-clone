@@ -56,6 +56,29 @@ def build_mode_filter(
     return frozen
 
 
+def build_prompt_filter(
+    num_prompt_sents: int,
+    num_total_sents: int,
+    device: Optional[torch.device] = None,
+) -> torch.Tensor:
+    """Build boolean filter freezing the first *num_prompt_sents* sentences.
+
+    True = frozen at 1.0. Freezes every entry whose query OR key sentence
+    is one of the first ``num_prompt_sents`` sentences (the question
+    prompt, including the multiple-choice options). With this filter the
+    mask can only ablate attention between reasoning sentences — it cannot
+    learn the degenerate solution of removing attention to the wrong
+    answer options in the prompt.
+    """
+    frozen = torch.zeros(
+        num_total_sents, num_total_sents, dtype=torch.bool, device=device
+    )
+    if num_prompt_sents > 0:
+        frozen[:num_prompt_sents, :] = True
+        frozen[:, :num_prompt_sents] = True
+    return frozen
+
+
 def build_causal_filter(
     num_sents: int, device: Optional[torch.device] = None
 ) -> torch.Tensor:
@@ -75,11 +98,14 @@ def build_combined_filter(
     gap_filter: torch.Tensor,
     mode_filter: torch.Tensor,
     causal_filter: Optional[torch.Tensor] = None,
+    prompt_filter: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
-    """Combine gap, mode, and causal filters into one frozen-mask. True = frozen at 1.0."""
+    """Combine gap, mode, causal, and prompt filters into one frozen-mask. True = frozen at 1.0."""
     combined = gap_filter | mode_filter
     if causal_filter is not None:
         combined = combined | causal_filter.to(combined.device)
+    if prompt_filter is not None:
+        combined = combined | prompt_filter.to(combined.device)
     return combined
 
 
@@ -153,13 +179,16 @@ class NodeMask(MaskResult):
       One score per (layer, src_sent, tgt_sent), shared across heads.
     - ``"pair"``: ``scores = [[float]]``
       One score per (src_sent, tgt_sent), shared across layers and heads.
+    - ``"column"``: ``scores = [float]``
+      One score per target sentence (column), shared across all rows,
+      layers, and heads. Used by column subnetwork probing.
     """
 
     scores: Any = field(default_factory=dict)
 
     @property
     def granularity(self) -> str:
-        """Mask granularity: ``"head"``, ``"layer"``, or ``"pair"``."""
+        """Mask granularity: ``"head"``, ``"layer"``, ``"pair"``, or ``"column"``."""
         return self.metadata.get("mask_granularity", "head")
 
     # ------------------------------------------------------------------
@@ -237,6 +266,7 @@ class NodeMask(MaskResult):
         sentence_gap = self.metadata.get("sentence_gap")
         mask_mode = self.metadata.get("mask_mode")
         num_prefix_sents = self.metadata.get("num_prefix_sentences")
+        num_frozen_prompt_sents = self.metadata.get("num_frozen_prompt_sentences", 0)
 
         gap_filter = build_gap_filter(num_sents, sentence_gap)
         causal_filter = build_causal_filter(num_sents)
@@ -246,7 +276,15 @@ class NodeMask(MaskResult):
         else:
             mode_filter = torch.zeros(num_sents, num_sents, dtype=torch.bool)
 
-        return build_combined_filter(gap_filter, mode_filter, causal_filter)
+        prompt_filter = (
+            build_prompt_filter(num_frozen_prompt_sents, num_sents)
+            if num_frozen_prompt_sents
+            else None
+        )
+
+        return build_combined_filter(
+            gap_filter, mode_filter, causal_filter, prompt_filter
+        )
 
     def to_json(self, path: str, sparse: bool = False):
         """Serialize to JSON file.
@@ -279,8 +317,10 @@ class NodeMask(MaskResult):
                     str(layer): self._matrix_to_sparse(scores, combined_filter)
                     for layer, scores in self.scores.items()
                 }
-            else:  # "pair"
+            elif g == "pair":
                 serialized_scores = self._matrix_to_sparse(self.scores, combined_filter)
+            else:  # "column" — 1D, no sparse encoding needed
+                serialized_scores = self.scores
         else:
             if g == "head":
                 serialized_scores = {
@@ -295,7 +335,9 @@ class NodeMask(MaskResult):
                     str(layer): scores
                     for layer, scores in self.scores.items()
                 }
-            else:  # "pair"
+            elif g == "pair":
+                serialized_scores = self.scores
+            else:  # "column"
                 serialized_scores = self.scores
 
         data = {
@@ -345,8 +387,10 @@ class NodeMask(MaskResult):
                     int(layer): cls._sparse_to_matrix(triples, num_sents)
                     for layer, triples in raw.items()
                 }
-            else:  # "pair"
+            elif g == "pair":
                 scores = cls._sparse_to_matrix(raw, num_sents)
+            else:  # "column" — 1D list, no sparse decoding
+                scores = raw
         else:
             # Legacy dense format
             if g == "head":
@@ -359,8 +403,10 @@ class NodeMask(MaskResult):
                 }
             elif g == "layer":
                 scores = {int(layer): scores for layer, scores in raw.items()}
-            else:  # "pair"
+            elif g == "pair":
                 scores = raw  # already a 2D list
+            else:  # "column"
+                scores = raw  # already a 1D list
 
         return cls(
             model_name=data["model_name"],

@@ -205,10 +205,20 @@ def format_question_mc_evaluation(example):
         "all_answers": [example[l] for l in ['A', 'B', 'C', 'D']]
     }
 
+_MMLU_SUBJECTS = [
+    "abstract_algebra", "formal_logic", "college_chemistry", "college_physics",
+    "college_mathematics", "high_school_physics", "high_school_chemistry",
+    "high_school_mathematics", "elementary_mathematics", "machine_learning",
+    "electrical_engineering", "econometrics", "conceptual_physics",
+    "professional_law", "professional_accounting", "moral_scenarios",
+    "virology", "global_facts", "business_ethics", "public_relations",
+]
+
 DATASET_TO_FORMAT = {
     "MMLU": format_question_mmlu,
     "MMLU-Pro": format_question_mmlu_pro,
     "AQuA": format_question_aqua,
+    "AQuA_train": format_question_aqua,
     "AI2-ARC": format_question_arc,
     "GPQA": format_question_gpqa,
     "WildJailBreak": format_question_wildjailbreak,
@@ -219,5 +229,6 @@ DATASET_TO_FORMAT = {
     "PythonIO": format_question_mc_evaluation,
     "AIME24": format_question_aime,
     "AIME25": format_question_aime,
-    "Game-of-24": format_question_game_of_24
+    "Game-of-24": format_question_game_of_24,
+    **{f"MMLU_{s}": format_question_mmlu for s in _MMLU_SUBJECTS},
 }

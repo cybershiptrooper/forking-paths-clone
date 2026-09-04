@@ -41,9 +41,16 @@ from utils.masks import NodeMask
 from utils.circuit_eval import (
     build_token_to_sent_map,
     install_mask_hooks,
+    install_sdpa_mask_hooks,
+    install_clean_sdpa_forward,
     remove_handles,
 )
-from utils.completion_cache import get_or_generate, DEFAULT_CACHE_DIR
+from utils.completion_cache import (
+    get_or_generate,
+    get_or_generate_sentence_branches,
+    DEFAULT_CACHE_DIR,
+)
+from utils.base_path_selection import select_base_from_record
 from utils.rewards import (
     extract_boxed,
     compute_correctness_rewards,
@@ -72,11 +79,20 @@ def compute_suppression_scores(
     sentences,
     token_to_sent,
     sentence_gap,
+    backend: str = "sdpa",
 ):
     """Suppress attention to each sentence and measure KL at subsequent sentences.
 
     For each sentence i, zeros all attention to i across all layers/heads,
     runs a forward pass on the prefix, and measures per-sentence KL.
+
+    Args:
+        backend: ``"sdpa"`` (new default — pre-softmax additive mask via
+            ``install_sdpa_mask_hooks``) or ``"eager"`` (legacy
+            post-softmax × m + ratio renorm via ``install_mask_hooks``).
+            For binary 0/1 masks with renormalize=True the two paths are
+            mathematically equivalent; the default tracks the backend SNP
+            and the attribution algorithms train under.
 
     Returns:
         scores: list[list[float]] of shape (S, S) where scores[src][tgt] =
@@ -93,6 +109,14 @@ def compute_suppression_scores(
     # No gap filter for suppression — we want to freely zero any column
     gap_filter = torch.zeros(num_sents, num_sents, dtype=torch.bool, device=device)
 
+    # Backend-aware setup: with SDPA we patch every layer's forward to the
+    # SDPA path *before* the clean forward, so clean and masked logits
+    # both go through SDPA. The SDPA forward is a no-op when
+    # ``_circuit_mask`` is unset on the module.
+    sdpa_clean_handles = None
+    if backend == "sdpa":
+        sdpa_clean_handles = install_clean_sdpa_forward(model)
+
     # Clean forward pass
     model.eval()
     with torch.no_grad():
@@ -104,9 +128,14 @@ def compute_suppression_scores(
     # Install hooks once with all-ones mask, then swap per iteration
     ones_mask = torch.ones(num_heads, num_sents, num_sents, device=device)
     binary_masks = {layer: ones_mask for layer in all_layers}
-    handles = install_mask_hooks(
-        model, all_layers, binary_masks, token_to_sent, gap_filter, renormalize=True,
-    )
+    if backend == "sdpa":
+        handles = install_sdpa_mask_hooks(
+            model, all_layers, binary_masks, token_to_sent, gap_filter, renormalize=True,
+        )
+    else:
+        handles = install_mask_hooks(
+            model, all_layers, binary_masks, token_to_sent, gap_filter, renormalize=True,
+        )
 
     # suppression_kl[i][j] = KL at sentence j when attention to i is suppressed
     suppression_kl = [[0.0] * num_sents for _ in range(num_sents)]
@@ -146,6 +175,8 @@ def compute_suppression_scores(
         torch.cuda.empty_cache()
 
     remove_handles(handles)
+    if sdpa_clean_handles is not None:
+        remove_handles(sdpa_clean_handles)
 
     # Transpose: scores[src][tgt] = importance of tgt for src
     scores = [[0.0] * num_sents for _ in range(num_sents)]
@@ -196,6 +227,8 @@ def main(
     sparsities: list[float] = None,
     importance_sampling_method: str = "snis",
     importance_sampling_temperature: float = None,
+    analysis_sentence_step: int = None,
+    base_answer_type: str = "stored",
     **kwargs,
 ):
     if num_tokens_to_analyse is None:
@@ -249,10 +282,51 @@ def main(
     input_ids = inputs["input_ids"]
     prompt_len = input_ids.shape[-1]
 
-    if analysis_timestep is None:
-        analysis_timestep = prompt_len + 200
+    use_sentence_step = analysis_sentence_step is not None
+    full_input_ids = None
+    if use_sentence_step:
+        # See learn_circuit.py: sentence-step mode currently only supports
+        # reusing a base from a data-collection record.
+        # TODO: implement sample-and-cut so analysis_sentence_step works
+        # without requiring data_path + prompt_index.
+        if analysis_timestep is not None:
+            print(
+                "WARNING: both analysis_timestep and analysis_sentence_step "
+                "were supplied; preferring sentence-based analysis_sentence_step."
+            )
+        if data_path is None or prompt_index is None:
+            raise ValueError(
+                "analysis_sentence_step requires data_path + prompt_index. "
+                "Sample-and-cut from a fresh base is not yet supported "
+                "(see TODO above)."
+            )
+
+        base_token_ids = select_base_from_record(record, base_answer_type, tokenizer)
+        prompt_token_ids = input_ids[0].tolist()
+        full_input_ids = prompt_token_ids + list(base_token_ids)
+
+        full_tensor = torch.tensor(full_input_ids)
+        raw_sentences = split_tokens_into_sentences(
+            full_tensor, tokenizer, min_sentence_length=min_sentence_length
+        )
+        raw_sentences = remove_bos_from_sentences(raw_sentences)
+        raw_sentences = chunk_sentences(raw_sentences, sentence_chunk)
+        if analysis_sentence_step >= len(raw_sentences):
+            raise ValueError(
+                f"analysis_sentence_step={analysis_sentence_step} is past the "
+                f"last sentence index ({len(raw_sentences) - 1}) in the chosen "
+                f"base path."
+            )
+        analysis_timestep = raw_sentences[analysis_sentence_step].end + 1
+        print(
+            f"Sentence-step mode: sentence #{analysis_sentence_step} ends at "
+            f"token {analysis_timestep} (base_answer_type={base_answer_type!r})."
+        )
     else:
-        analysis_timestep = prompt_len + analysis_timestep
+        if analysis_timestep is None:
+            analysis_timestep = prompt_len + 200
+        else:
+            analysis_timestep = prompt_len + analysis_timestep
 
     print(f"Prompt length: {prompt_len} tokens")
     print(f"Analysis timestep: {analysis_timestep}")
@@ -264,17 +338,34 @@ def main(
     print("Step 2: Getting branches (cached)...")
     print("=" * 80)
 
-    cached = get_or_generate(
-        model_name=model_name,
-        formatted_text=formatted_text,
-        prompt_len=prompt_len,
-        analysis_timestep=analysis_timestep,
-        num_branches=num_new_branches,
-        temperature=temperature,
-        max_sampling_tokens=max_sampling_tokens,
-        seed=seed,
-        cache_dir=cache_dir,
-    )
+    if use_sentence_step:
+        base_source = f"dataset:{data_path}:{prompt_index}"
+        cached = get_or_generate_sentence_branches(
+            model_name=model_name,
+            formatted_text=formatted_text,
+            full_input_ids=full_input_ids,
+            analysis_timestep=analysis_timestep,
+            sentence_step=analysis_sentence_step,
+            base_source=base_source,
+            base_answer_type=base_answer_type,
+            num_branches=num_new_branches,
+            temperature=temperature,
+            max_sampling_tokens=max_sampling_tokens,
+            seed=seed,
+            cache_dir=cache_dir,
+        )
+    else:
+        cached = get_or_generate(
+            model_name=model_name,
+            formatted_text=formatted_text,
+            prompt_len=prompt_len,
+            analysis_timestep=analysis_timestep,
+            num_branches=num_new_branches,
+            temperature=temperature,
+            max_sampling_tokens=max_sampling_tokens,
+            seed=seed,
+            cache_dir=cache_dir,
+        )
     input_ids = torch.tensor([cached["input_ids"]])
     branches = cached["branches"]
     cache_key = cached["cache_key"]
@@ -519,6 +610,9 @@ def main(
         node_mask.metadata["answer_labels"] = answer_labels
         node_mask.metadata["answer_ids"] = answer_ids_tensor.tolist()
         node_mask.metadata["num_answers"] = num_answers
+    if use_sentence_step:
+        node_mask.metadata["analysis_sentence_step"] = analysis_sentence_step
+        node_mask.metadata["base_answer_type"] = base_answer_type
 
     # Determine output path
     if file_name is not None:
@@ -563,6 +657,22 @@ if __name__ == "__main__":
     parser.add_argument("--prompt", type=str, default=None)
     parser.add_argument("--num_new_branches", type=int, default=8)
     parser.add_argument("--analysis_timestep", type=int, default=None)
+    parser.add_argument(
+        "--analysis_sentence_step",
+        type=int,
+        default=None,
+        help="Sentence index (counted from start of prompt+base) at whose end "
+        "the analysis boundary is placed. Requires --data_path + --prompt_index. "
+        "Sample-and-cut from a fresh base is not yet supported.",
+    )
+    parser.add_argument(
+        "--base_answer_type",
+        choices=["stored", "correct", "incorrect", "mode"],
+        default="stored",
+        help="Which path within the data-collection record to use as the base. "
+        "'stored' uses record['output_token_ids']; others may retokenize an "
+        "alternate text (lossy).",
+    )
     parser.add_argument("--objective",
         choices=["kl_divergence", "log_prob", "answer_kl", "reward_gap"],
         default="kl_divergence")

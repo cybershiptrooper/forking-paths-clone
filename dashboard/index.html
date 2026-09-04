@@ -6,290 +6,7 @@
 <title>Circuit Tracer — Sentence Connections</title>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
-<style>
-  :root {
-    --bg: #f1f5f9;
-    --panel-bg: #ffffff;
-    --border: #e2e8f0;
-    --text: #1e293b;
-    --text-muted: #64748b;
-    --text-dim: #94a3b8;
-    --accent-green: #4caf50;
-    --accent-purple: #9333ea;
-    --highlight: #f0f;
-    --sidebar-w: 260px;
-    --graph-bg: rgba(226,232,240,0.5);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg); color: var(--text);
-    display: flex; height: 100vh; overflow: hidden;
-  }
-
-  /* ── Sidebar ── */
-  #sidebar {
-    width: var(--sidebar-w); min-width: var(--sidebar-w);
-    background: var(--panel-bg); border-right: 1px solid var(--border);
-    padding: 14px; overflow-y: auto;
-    display: flex; flex-direction: column; gap: 14px;
-  }
-  #sidebar h1 { font-size: 15px; font-weight: 700; }
-  #sidebar .subtitle { font-size: 10px; color: var(--text-muted); margin-top: -8px; }
-  #sidebar h2 {
-    font-size: 10px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 2px;
-  }
-  .ctrl { display: flex; flex-direction: column; gap: 5px; }
-  .ctrl label { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-  .ctrl input[type="range"] { width: 100%; accent-color: var(--accent-green); }
-  .ctrl select, .ctrl input[type="file"] {
-    font-size: 12px; padding: 3px 5px; border: 1px solid var(--border);
-    border-radius: 4px; background: var(--bg);
-  }
-  .mono { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; }
-  .pill {
-    font-size: 10px; padding: 1px 6px; border-radius: 8px;
-    background: rgba(76,175,80,0.1); color: var(--accent-green); font-weight: 600;
-  }
-  #meta-info { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
-  #meta-info b { color: var(--text); font-weight: 600; }
-
-  /* ── Main ── */
-  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  #toolbar {
-    height: 36px; background: var(--panel-bg); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; padding: 0 14px; gap: 10px;
-    font-size: 12px; color: var(--text-muted);
-  }
-
-  /* ── Content: graph + detail ── */
-  #content { flex: 1; display: flex; overflow: hidden; }
-  #tab-single.active { display: flex; }
-  #graph-container {
-    flex: 1; position: relative; overflow: hidden;
-    background: var(--graph-bg);
-  }
-  #graph-container canvas, #graph-container svg {
-    position: absolute; top: 0; left: 0;
-  }
-  #graph-container svg { pointer-events: none; }
-  #graph-container svg .node-hit { pointer-events: all; cursor: pointer; }
-
-  /* ── Detail ── */
-  #detail-panel {
-    width: 370px; min-width: 200px; background: var(--panel-bg);
-    border-left: 1px solid var(--border); overflow-y: auto; padding: 14px;
-    resize: horizontal; overflow-x: hidden;
-  }
-  /* Drag handle hint on the left edge */
-  #detail-panel::-webkit-resizer { display: none; }
-  #detail-resize-handle {
-    position: absolute; top: 0; left: -3px; width: 6px; height: 100%;
-    cursor: col-resize; z-index: 10;
-  }
-  #detail-resize-handle:hover { background: rgba(76,175,80,0.15); }
-  #detail-panel h2 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-  .detail-box {
-    background: var(--bg); border-radius: 6px; padding: 10px;
-    font-size: 11px; line-height: 1.6; margin-bottom: 10px;
-  }
-  .conn-list { list-style: none; padding: 0; }
-  .conn-list li {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 3px 0; border-bottom: 1px solid var(--border); font-size: 11px;
-  }
-  .conn-list li:last-child { border-bottom: none; }
-  .bar { height: 5px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-left: 3px; }
-
-  /* ── Classification tags ── */
-  .cls-tags { display: flex; flex-wrap: wrap; gap: 3px; margin: 4px 0 6px; }
-  .cls-tag {
-    font-size: 9px; padding: 1px 5px; border-radius: 3px;
-    background: rgba(99,102,241,0.12); color: #6366f1; font-weight: 600;
-  }
-  .cls-deps { font-size: 10px; color: var(--text-dim); margin: 0 0 6px; }
-  .cat-legend { display: flex; flex-wrap: wrap; gap: 3px 6px; margin-top: 4px; font-size: 9px; }
-  .cat-legend-item { display: flex; align-items: center; gap: 3px; }
-  .cat-legend-swatch { width: 8px; height: 8px; border-radius: 2px; }
-
-  /* ── Tooltip ── */
-  #tooltip {
-    position: fixed; pointer-events: none; z-index: 1000; display: none;
-    background: rgba(15,23,42,0.92); color: #fff;
-    padding: 6px 10px; border-radius: 6px; font-size: 11px; line-height: 1.4;
-    max-width: 280px; box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-  }
-
-  /* ── Tab bar ── */
-  #tab-bar {
-    display: flex; gap: 0; border-bottom: 1px solid var(--border);
-    background: var(--panel-bg); padding: 0 14px;
-  }
-  #tab-bar button {
-    font-size: 11px; font-weight: 600; padding: 7px 16px; border: none;
-    background: transparent; color: var(--text-muted); cursor: pointer;
-    border-bottom: 2px solid transparent; transition: all 0.15s;
-  }
-  #tab-bar button:hover { color: var(--text); background: rgba(76,175,80,0.04); }
-  #tab-bar button.active { color: var(--accent-green); border-bottom-color: var(--accent-green); }
-
-  .tab-pane { display: none; flex: 1; overflow: hidden; }
-  .tab-pane.active { display: flex; }
-
-  /* ── Compare tab ── */
-  #tab-compare { flex-direction: column; overflow-y: auto; }
-  #compare-controls {
-    padding: 14px; background: var(--panel-bg); border-bottom: 1px solid var(--border);
-    display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start;
-  }
-  #compare-mask-list {
-    flex: 1; min-width: 300px; max-height: 180px; overflow-y: auto;
-    border: 1px solid var(--border); border-radius: 6px; background: var(--bg);
-    padding: 6px; font-size: 11px;
-  }
-  #compare-mask-list label {
-    display: flex; align-items: center; gap: 5px; padding: 2px 4px;
-    border-radius: 3px; cursor: pointer;
-  }
-  #compare-mask-list label:hover { background: rgba(76,175,80,0.06); }
-  #compare-mask-list input[type="checkbox"] { accent-color: var(--accent-green); }
-  #compare-actions {
-    display: flex; flex-direction: column; gap: 6px; min-width: 160px;
-  }
-  #compare-actions button {
-    font-size: 11px; padding: 5px 12px; border-radius: 5px; cursor: pointer;
-    border: 1px solid var(--border); background: var(--bg); color: var(--text-muted);
-    font-weight: 600; transition: background 0.15s;
-  }
-  #compare-actions button:hover { background: var(--border); color: var(--text); }
-  #compare-actions button.primary {
-    background: var(--accent-green); color: #fff; border-color: var(--accent-green);
-  }
-  #compare-actions button.primary:hover { background: #43a047; }
-  #compare-status {
-    font-size: 10px; color: var(--text-muted); line-height: 1.5; max-width: 300px;
-  }
-  #compare-status .compat-ok { color: var(--accent-green); font-weight: 600; }
-  #compare-status .compat-err { color: #ef4444; font-weight: 600; }
-
-  #compare-chart-area {
-    flex: 1; padding: 14px; overflow-y: auto;
-  }
-  #compare-metric-bar {
-    display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;
-  }
-  #compare-metric-select {
-    font-size: 11px; padding: 3px 6px; border: 1px solid var(--border);
-    border-radius: 4px; background: var(--bg); min-width: 200px;
-  }
-  #compare-threshold-select {
-    font-size: 11px; padding: 3px 6px; border: 1px solid var(--border);
-    border-radius: 4px; background: var(--bg); min-width: 120px;
-  }
-  #compare-chart-container { min-height: 350px; background: var(--bg); border-radius: 6px; }
-  #compare-heatmap-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 10px;
-  }
-  #compare-heatmap-grid .heatmap-cell {
-    background: var(--bg); border-radius: 6px; min-height: 300px;
-  }
-  #compare-heatmap-grid .heatmap-label {
-    font-size: 10px; font-weight: 600; color: var(--text-muted);
-    padding: 6px 8px 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;
-  }
-  #compare-legend {
-    display: flex; flex-wrap: wrap; gap: 8px; font-size: 10px; color: var(--text-muted);
-  }
-  #compare-legend .cleg {
-    display: flex; align-items: center; gap: 4px;
-  }
-  #compare-legend .cleg-swatch {
-    width: 12px; height: 3px; border-radius: 2px;
-  }
-
-  /* ── Empty ── */
-  #empty-state {
-    flex: 1; display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 10px; color: var(--text-dim); font-size: 13px;
-  }
-
-  /* ── Sentence legend ── */
-  #sentence-legend { font-size: 10px; line-height: 1.5; max-height: 180px; overflow-y: auto; }
-  .sleg { display: flex; gap: 5px; padding: 1px 0; cursor: pointer; border-radius: 3px; }
-  .sleg:hover { background: rgba(76,175,80,0.08); }
-  .sleg.active { background: rgba(240,0,255,0.08); }
-  .sleg-i { font-weight: 700; min-width: 22px; color: var(--accent-green); }
-  .sleg-t { color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-  /* ── View toggle ── */
-  .view-toggle { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
-  .view-toggle button {
-    font-size: 10px; padding: 3px 10px; border: none; background: var(--bg);
-    color: var(--text-muted); cursor: pointer; font-weight: 500;
-  }
-  .view-toggle button.active { background: var(--accent-green); color: #fff; }
-
-  /* ── Threshold chart ── */
-  #threshold-chart-container {
-    width: 100%; min-height: 250px;
-    background: var(--bg); border-radius: 6px;
-    position: relative; overflow: hidden;
-  }
-  #threshold-chart-container .js-plotly-plot { width: 100% !important; }
-
-  /* ── Tour overlay ── */
-  #tour-backdrop {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 9000; pointer-events: all;
-  }
-  #tour-backdrop.active { display: block; }
-  #tour-backdrop svg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
-  #tour-highlight {
-    display: none; position: fixed; z-index: 9001;
-    border: 2px solid var(--accent-green); border-radius: 6px;
-    box-shadow: 0 0 0 4px rgba(76,175,80,0.25);
-    pointer-events: none; transition: all 0.3s ease;
-  }
-  #tour-highlight.active { display: block; }
-  #tour-popover {
-    display: none; position: fixed; z-index: 9002;
-    background: var(--panel-bg); border: 1px solid var(--border);
-    border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.18);
-    padding: 16px 18px 12px; max-width: 370px; min-width: 260px;
-    font-size: 12px; line-height: 1.55; color: var(--text);
-  }
-  #tour-popover.active { display: block; }
-  #tour-popover .tour-title {
-    font-size: 14px; font-weight: 700; margin-bottom: 6px; color: var(--text);
-  }
-  #tour-popover .tour-body { color: var(--text-muted); margin-bottom: 12px; }
-  #tour-popover .tour-body b { color: var(--text); }
-  #tour-popover .tour-footer {
-    display: flex; justify-content: space-between; align-items: center; gap: 8px;
-  }
-  #tour-popover .tour-step-info {
-    font-size: 10px; color: var(--text-dim); font-weight: 600;
-  }
-  #tour-popover .tour-btns { display: flex; gap: 6px; }
-  #tour-popover .tour-btns button {
-    font-size: 11px; padding: 4px 12px; border-radius: 5px; cursor: pointer;
-    border: 1px solid var(--border); background: var(--bg); color: var(--text-muted);
-    font-weight: 500; transition: background 0.15s;
-  }
-  #tour-popover .tour-btns button:hover { background: var(--border); }
-  #tour-popover .tour-btns button.tour-next {
-    background: var(--accent-green); color: #fff; border-color: var(--accent-green);
-  }
-  #tour-popover .tour-btns button.tour-next:hover { background: #43a047; }
-  #tour-btn {
-    font-size: 11px; padding: 4px 12px; border-radius: 5px; cursor: pointer;
-    border: 1px solid var(--border); background: var(--bg); color: var(--text-muted);
-    font-weight: 600; align-self: flex-start; transition: background 0.15s;
-  }
-  #tour-btn:hover { background: var(--border); color: var(--text); }
-</style>
+<link rel="stylesheet" href="shared.css">
 </head>
 <body>
 
@@ -486,86 +203,27 @@
   </div>
 </div>
 
+<script src="shared.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════════
-// State
+// Page-specific state
 // ══════════════════════════════════════════════════════════════
-let maskData = null;
-let resampleData = null;       // sidecar from evaluate_mask_resample.py
-let processed = null;
-let selectedNode = null;       // { layer, sentence }
-let highlightSentence = null;  // sentence index (from legend click)
-let viewMode = 'arcs';         // 'arcs' | 'flow'
-let aggState = null;           // { offsetX, offsetY, gridSize, S, aggMatrix, maxAbs }
-let aggHoverCell = null;       // { i, j } or null
-let aggSelectedCell = null;    // { i, j } or null — clicked cell in agg mode
-let zoomTransform = d3.zoomIdentity;
-let thresholdValues = [];      // sorted discrete list of threshold options
-
-const MARGIN = { top: 36, right: 30, bottom: 70, left: 54 };
-const REGION_COLORS = {
-  prompt:     'rgba(59,130,246,0.07)',  // blue tint
-  assistant:  'rgba(168,85,247,0.07)',  // purple tint
-  generation: 'rgba(245,158,11,0.07)',  // amber tint
-};
-const REGION_BORDER_COLORS = {
-  prompt:     'rgba(59,130,246,0.25)',
-  assistant:  'rgba(168,85,247,0.25)',
-  generation: 'rgba(245,158,11,0.25)',
-};
-
-// PRGn diverging color scale (purple → white → green)
-function edgeColor(norm, isNegative) {
-  if (isNegative) return d3.interpolatePurples(0.3 + Math.abs(norm) * 0.55);
-  return d3.interpolateGreens(0.25 + norm * 0.65);
-}
-
-// Category color palette for function_tags
-const TAG_COLORS = {
-  problem_setup:        '#3b82f6',
-  plan_generation:      '#8b5cf6',
-  fact_retrieval:       '#06b6d4',
-  active_computation:   '#f59e0b',
-  uncertainty_management:'#ef4444',
-  result_consolidation: '#10b981',
-  self_checking:        '#f97316',
-  final_answer_emission:'#ec4899',
-  unknown:              '#94a3b8',
-};
-
-function primaryTag(sentIdx) {
-  const s = (maskData.sentences || [])[sentIdx];
-  if (!s || !s.function_tags || !s.function_tags.length) return 'unknown';
-  return s.function_tags[0];
-}
-
-function categoryEdgeColor(srcIdx, tgtIdx, norm) {
-  const srcTag = primaryTag(srcIdx);
-  const tgtTag = primaryTag(tgtIdx);
-  let base;
-  if (srcTag === tgtTag) {
-    base = TAG_COLORS[srcTag] || TAG_COLORS.unknown;
-  } else {
-    const c1 = d3.color(TAG_COLORS[srcTag] || TAG_COLORS.unknown);
-    const c2 = d3.color(TAG_COLORS[tgtTag] || TAG_COLORS.unknown);
-    base = d3.interpolateRgb(c1, c2)(0.5);
-  }
-  // Fade from white to full color based on norm, mirroring d3.interpolateGreens behavior
-  return d3.interpolateRgb('#ffffff', base)(0.25 + norm * 0.65);
-}
-
-function colorByCategory() {
-  const cb = document.getElementById('color-by-category');
-  return cb && cb.checked;
-}
+let resampleData = null;
+let thresholdEvalData = null;
+let activeTab = 'single';
+let compareMasks = [];
+let serverMaskPaths = [];
 
 // ══════════════════════════════════════════════════════════════
-// DOM
+// Page hooks called by shared.js
 // ══════════════════════════════════════════════════════════════
-const $gc = document.getElementById('graph-container');
-const $empty = document.getElementById('empty-state');
-const $tip = document.getElementById('tooltip');
-let canvas, ctx, svgRoot;
+function pageInitEval() {
+  initThresholdChart();
+  onMetricChange();
+}
+function pageOnReprocess() {
+  onMetricChange();
+}
 
 // ══════════════════════════════════════════════════════════════
 // File / server loading
@@ -582,951 +240,46 @@ document.getElementById('server-masks').addEventListener('change', e => {
   fetch('/api/mask?path=' + encodeURIComponent(maskPath))
     .then(r=>r.json()).then(d => {
       maskData = d;
-      // Try to load resample sidecar
       resampleData = null;
       fetch('/api/resample?path=' + encodeURIComponent(maskPath))
         .then(r=>r.json()).then(sd => {
           resampleData = sd;
-          // Re-init chart dropdown so the resample option appears
           if (resampleData && thresholdEvalData) { initThresholdChart(); onMetricChange(); }
         })
         .catch(() => { resampleData = null; });
       boot();
     }).catch(console.error);
 });
-fetch('/api/masks').then(r=>r.json()).then(ps => {
-  const sel = document.getElementById('server-masks');
-  ps.forEach(p => { const o = document.createElement('option'); o.value=p; const ci=p.indexOf('circuitviz/'); o.textContent=ci>=0 ? p.slice(ci+'circuitviz/'.length) : p; sel.appendChild(o); });
-  // Also populate compare tab checklist
-  if (typeof populateCompareMaskList === 'function') populateCompareMaskList(ps);
-}).catch(()=>{});
 
-// ══════════════════════════════════════════════════════════════
-// Controls
-// ══════════════════════════════════════════════════════════════
-for (const id of ['influence-slider','agg-select','layer-start','layer-end'])
-  document.getElementById(id).addEventListener(id.includes('slider') ? 'input' : 'change', reprocess);
-document.getElementById('show-labels').addEventListener('change', render);
-document.getElementById('color-by-category').addEventListener('change', () => {
-  const legend = document.getElementById('cat-color-legend');
-  if (colorByCategory()) {
-    // Populate legend with tags present in the current mask
-    const tagSet = new Set();
-    for (const s of (maskData ? maskData.sentences || [] : [])) {
-      for (const t of (s.function_tags || [])) tagSet.add(t);
-    }
-    legend.innerHTML = [...tagSet].sort().map(t =>
-      `<span class="cat-legend-item"><span class="cat-legend-swatch" style="background:${TAG_COLORS[t]||TAG_COLORS.unknown}"></span>${t.replace(/_/g,' ')}</span>`
-    ).join('');
-    legend.style.display = '';
-  } else {
-    legend.style.display = 'none';
-  }
-  render();
+// Load mask list and populate compare checklist
+initShared();
+loadServerMaskList(function(ps) {
+  populateCompareMaskList(ps);
 });
 
-// Threshold slider maps integer index → thresholdValues[index]
-document.getElementById('threshold-slider').addEventListener('input', () => {
-  syncThresholdFromSlider();
-  reprocess();
-});
-// Number input: snap to nearest value in thresholdValues
-document.getElementById('threshold-input').addEventListener('change', () => {
-  const v = parseFloat(document.getElementById('threshold-input').value);
-  if (!isNaN(v) && thresholdValues.length > 0) {
-    const idx = nearestThresholdIdx(v);
-    document.getElementById('threshold-slider').value = idx;
-    syncThresholdFromSlider();
-    reprocess();
-  }
-});
-
-function getThreshold() {
-  if (thresholdValues.length === 0) return 0;
-  const idx = parseInt(document.getElementById('threshold-slider').value) || 0;
-  return thresholdValues[Math.min(Math.max(idx, 0), thresholdValues.length - 1)];
-}
-function nearestThresholdIdx(v) {
-  let best = 0, bestD = Infinity;
-  for (let i = 0; i < thresholdValues.length; i++) {
-    const d = Math.abs(thresholdValues[i] - v);
-    if (d < bestD) { bestD = d; best = i; }
-  }
-  return best;
-}
-function syncThresholdFromSlider() {
-  const t = getThreshold();
-  document.getElementById('threshold-input').value = t.toExponential(3);
-  const idx = parseInt(document.getElementById('threshold-slider').value) || 0;
-  document.getElementById('threshold-idx-label').textContent = `${idx + 1}/${thresholdValues.length}`;
-}
-function setThresholdToValue(v) {
-  if (thresholdValues.length === 0) return;
-  const idx = nearestThresholdIdx(v);
-  document.getElementById('threshold-slider').value = idx;
-  syncThresholdFromSlider();
-}
-
-function setView(mode) {
-  viewMode = mode;
-  aggSelectedCell = null;
-  selectedNode = null;
-  document.getElementById('view-arcs').classList.toggle('active', mode==='arcs');
-  document.getElementById('view-flow').classList.toggle('active', mode==='flow');
-  document.getElementById('view-agg').classList.toggle('active', mode==='agg');
-  reprocess();
-}
-
-function reprocess() {
-  if (!maskData) return;
-  syncThresholdFromSlider();
-  document.getElementById('influence-value').textContent =
-    document.getElementById('influence-slider').value;
-  processData(); render(); onMetricChange();
-}
-
 // ══════════════════════════════════════════════════════════════
-// Data processing
+// Tab switching
 // ══════════════════════════════════════════════════════════════
-function boot() {
-  $empty.style.display = 'none';
-  selectedNode = null; highlightSentence = null;
-
-  // Show color-by-category toggle if sentences have function_tags
-  const hasTags = (maskData.sentences || []).some(s => s.function_tags && s.function_tags.length);
-  document.getElementById('color-by-cat-label').style.display = hasTags ? '' : 'none';
-
-  const meta = maskData.metadata || {};
-  const g = meta.mask_granularity || 'head';
-  document.getElementById('meta-info').innerHTML =
-    `<div>Model: <b>${maskData.model_name||'?'}</b></div>` +
-    `<div>Algorithm: <b>${maskData.algorithm||'?'}</b></div>` +
-    `<div>Granularity: <b>${g}</b> &middot; Layers: <b>${(maskData.layers||[]).length}</b> &middot; Sentences: <b>${(maskData.sentences||[]).length}</b></div>`;
-
-  const layers = (maskData.layers||[]).sort((a,b)=>a-b);
-  for (const id of ['layer-start','layer-end']) {
-    const sel = document.getElementById(id); sel.innerHTML = '';
-    layers.forEach(l => { const o=document.createElement('option'); o.value=l; o.textContent='L'+l; sel.appendChild(o); });
-  }
-  document.getElementById('layer-end').value = layers[layers.length-1];
-
-  const leg = document.getElementById('sentence-legend'); leg.innerHTML = '';
-  // Pre-compute regions for legend coloring
-  const sents = maskData.sentences || [];
-  const legRegions = computeSentenceRegions(sents);
-  const regionLabelColors = { prompt: '#3b82f6', assistant: '#a855f7', generation: '#f59e0b' };
-  sents.forEach((s,i) => {
-    const t = (s.text||'').trim() || `Sentence ${i}`;
-    const cat = i < legRegions.assistantIdx ? 'prompt' : i < legRegions.genStart ? 'assistant' : 'generation';
-    const d = document.createElement('div');
-    d.className = 'sleg'; d.dataset.idx = i;
-    d.innerHTML = `<span class="sleg-i" style="color:${regionLabelColors[cat]}">S${i}</span><span class="sleg-t" title="${t.replace(/"/g,'&quot;')}">${t}</span>`;
-    d.addEventListener('click', () => {
-      highlightSentence = (highlightSentence === i) ? null : i;
-      aggSelectedCell = null;
-      leg.querySelectorAll('.sleg').forEach(el => el.classList.toggle('active', parseInt(el.dataset.idx)===highlightSentence));
-      render();
-    });
-    leg.appendChild(d);
+function setTab(tab) {
+  activeTab = tab;
+  const labels = ['single', 'compare', 'resample'];
+  document.querySelectorAll('#tab-bar button').forEach((btn, i) => {
+    btn.classList.toggle('active', labels[i] === tab);
   });
-
-  // Build discrete threshold list
-  const te = meta.threshold_evaluation;
-  if (Array.isArray(te) && te.length > 0) {
-    // Use thresholds from threshold_evaluation
-    const tSet = new Set();
-    for (const entry of te) {
-      if (entry && typeof entry.threshold === 'number') tSet.add(entry.threshold);
-    }
-    thresholdValues = [...tSet].sort((a, b) => a - b);
-  } else {
-    // Fallback: generate ~50 values spanning the score range
-    const all = getAllScores();
-    if (all.length) {
-      all.sort(d3.ascending);
-      const percentiles = d3.range(0, 1.01, 0.02); // 0%, 2%, 4% ... 100%
-      const pSet = new Set([0]);
-      for (const p of percentiles) {
-        const v = d3.quantile(all, p);
-        if (v !== undefined) pSet.add(v);
-      }
-      thresholdValues = [...pSet].sort((a, b) => a - b);
-    } else {
-      thresholdValues = [0];
-    }
-  }
-
-  // Configure slider over the discrete list
-  const sl = document.getElementById('threshold-slider');
-  sl.min = 0;
-  sl.max = thresholdValues.length - 1;
-  sl.step = 1;
-  sl.disabled = thresholdValues.length <= 1;
-  // Default to ~30% of the way through
-  const defaultIdx = Math.round((thresholdValues.length - 1) * 0.3);
-  sl.value = defaultIdx;
-  syncThresholdFromSlider();
-
-  // F5: Pair granularity detection
-  const granularity = (maskData.metadata || {}).mask_granularity || 'head';
-  const isPair = granularity === 'pair';
-  document.getElementById('layer-start').disabled = isPair;
-  document.getElementById('layer-end').disabled = isPair;
-  if (isPair) {
-    document.getElementById('layer-start').title = 'Disabled: pair granularity shares scores across all layers';
-    document.getElementById('layer-end').title = 'Disabled: pair granularity shares scores across all layers';
-  } else {
-    document.getElementById('layer-start').title = '';
-    document.getElementById('layer-end').title = '';
-  }
-  document.getElementById('pair-note').style.display = isPair ? '' : 'none';
-
-  processData(); render();
-  initThresholdChart(); onMetricChange();
-}
-
-function getAllScores() {
-  const meta = maskData.metadata || {};
-  const g = meta.mask_granularity || 'head';
-  const raw = maskData.scores; const vs = [];
-  const isSparse = meta.scores_format === 'sparse';
-  if (isSparse) {
-    // Sparse format: triples of [i, j, score]
-    if (g === 'head') {
-      for (const l in raw) for (const h in raw[l]) {
-        const triples = raw[l][h];
-        for (const t of triples) { if (Math.abs(t[2]) > 0) vs.push(t[2]); }
-      }
-    } else if (g === 'layer') {
-      for (const l in raw) {
-        const triples = raw[l];
-        for (const t of triples) { if (Math.abs(t[2]) > 0) vs.push(t[2]); }
-      }
-    } else {
-      // pair
-      for (const t of raw) { if (Math.abs(t[2]) > 0) vs.push(t[2]); }
-    }
-  } else {
-    // Dense format (original)
-    if (g==='head') { for (const l in raw) for (const h in raw[l]) raw[l][h].forEach(r=>r.forEach(v=>{if(Math.abs(v)>0)vs.push(v);})); }
-    else if (g==='layer') { for (const l in raw) raw[l].forEach(r=>r.forEach(v=>{if(Math.abs(v)>0)vs.push(v);})); }
-    else { raw.forEach(r=>r.forEach(v=>{if(Math.abs(v)>0)vs.push(v);})); }
-  }
-  return vs;
-}
-
-function getLayerAgg(layer, agg) {
-  const meta = maskData.metadata || {};
-  const g = meta.mask_granularity || 'head';
-  const raw = maskData.scores, ls = String(layer);
-  const isSparse = meta.scores_format === 'sparse';
-  const S = (maskData.sentences || []).length;
-
-  if (isSparse) {
-    // Sparse format: convert triples to dense S x S matrix
-    const res = Array.from({length: S}, () => Array(S).fill(0));
-    if (g === 'pair') {
-      for (const t of raw) res[t[0]][t[1]] = t[2];
-    } else if (g === 'layer') {
-      const triples = raw[ls];
-      if (triples) for (const t of triples) res[t[0]][t[1]] = t[2];
-    } else {
-      // head: aggregate across heads
-      const heads = raw[ls]; if (!heads) return res;
-      const hk = Object.keys(heads); if (!hk.length) return res;
-      if (agg === 'max') {
-        for (const h of hk) for (const t of heads[h]) res[t[0]][t[1]] = Math.max(res[t[0]][t[1]], t[2]);
-      } else {
-        for (const h of hk) for (const t of heads[h]) res[t[0]][t[1]] += t[2];
-        if (agg === 'mean') { const n = hk.length; for (let i = 0; i < S; i++) for (let j = 0; j < S; j++) res[i][j] /= n; }
-      }
-    }
-    return res;
-  }
-
-  // Dense format (original)
-  if (g==='pair') return raw.map(r=>[...r]);
-  if (g==='layer') return (raw[ls]||[]).map(r=>[...r]);
-  const heads = raw[ls]; if (!heads) return [];
-  const hk = Object.keys(heads); if (!hk.length) return [];
-  const Sd = heads[hk[0]].length;
-  const res = Array.from({length:Sd}, ()=>Array(Sd).fill(0));
-  for (const h of hk) { const m=heads[h]; for(let i=0;i<Sd;i++) for(let j=0;j<Sd;j++) { if(agg==='max') res[i][j]=Math.max(res[i][j],m[i][j]); else res[i][j]+=m[i][j]; } }
-  if (agg==='mean') { const n=hk.length; for(let i=0;i<Sd;i++) for(let j=0;j<Sd;j++) res[i][j]/=n; }
-  return res;
-}
-
-function processData() {
-  const threshold = getThreshold();
-  const influencePct = parseInt(document.getElementById('influence-slider').value);
-  const agg = document.getElementById('agg-select').value;
-
-  const lStart = parseInt(document.getElementById('layer-start').value);
-  const lEnd = parseInt(document.getElementById('layer-end').value);
-
-  const allLayers = (maskData.layers||[]).sort((a,b)=>a-b);
-  let layers = allLayers.filter(l=>l>=lStart && l<=lEnd);
-  const sents = maskData.sentences || [];
-  const S = sents.length;
-
-  // F5: For pair granularity with arcs/flow view, collapse to single row
-  const granularity = (maskData.metadata || {}).mask_granularity || 'head';
-  const isPair = granularity === 'pair';
-  if (isPair && (viewMode === 'arcs' || viewMode === 'flow') && layers.length > 1) {
-    layers = [layers[0]];
-  }
-
-  // Collect ALL edges (before threshold/influence filtering) for influence calculation
-  let allEdges = [];
-  const nodeImp = {};
-  for (const layer of layers) {
-    const mat = getLayerAgg(layer, agg);
-    nodeImp[layer] = Array(S).fill(0);
-    for (let src=0; src<S; src++) {
-      for (let tgt=0; tgt<S; tgt++) {
-        if (src===tgt) continue;
-        if (tgt>src) continue; // causal: query can only attend to earlier sentences
-        const score = (mat[src]&&mat[src][tgt]!==undefined) ? mat[src][tgt] : 0;
-        if (Math.abs(score) < 1e-12) continue;
-        allEdges.push({layer,src,tgt,score});
-      }
-    }
-  }
-
-  // Sort by descending |score| and pick top influencePct%
-  allEdges.sort((a,b) => Math.abs(b.score)-Math.abs(a.score));
-  const totalInfluence = allEdges.reduce((s,e)=>s+Math.abs(e.score),0);
-  let cumulative = 0;
-  let cutoffIdx = allEdges.length;
-  for (let i=0; i<allEdges.length; i++) {
-    cumulative += Math.abs(allEdges[i].score);
-    if (cumulative >= totalInfluence * influencePct/100) { cutoffIdx = i+1; break; }
-  }
-  allEdges = allEdges.slice(0, cutoffIdx);
-
-  // Apply threshold filter
-  const edges = allEdges.filter(e => e.score >= threshold);
-
-  let globalMax = 0;
-  for (const e of edges) {
-    globalMax = Math.max(globalMax, Math.abs(e.score));
-    nodeImp[e.layer][e.src] += Math.abs(e.score);
-    nodeImp[e.layer][e.tgt] += Math.abs(e.score);
-  }
-  let maxImp = 0;
-  for (const l of layers) maxImp = Math.max(maxImp, ...nodeImp[l]);
-
-  // Compute sentence region boundaries
-  const regions = computeSentenceRegions(sents);
-
-  processed = { layers, sents, edges, nodeImp, globalMax, maxImp, S, regions };
-  document.getElementById('edge-badge').textContent = edges.length + ' edges';
-  document.getElementById('node-badge').textContent = (layers.length*S) + ' nodes';
-}
-
-// Detect prompt / assistant-prefix / generation boundaries
-const ASSISTANT_TOKENS = ['<｜assistant｜>', '<|im_start|>assistant', '<|start_header_id|>assistant', '<|assistant|>', 'assistant\n'];
-function computeSentenceRegions(sents) {
-  // Find first sentence containing an assistant token
-  let assistantIdx = sents.length; // default: everything is prompt
-  for (let i = 0; i < sents.length; i++) {
-    const text = (sents[i].text || '').toLowerCase();
-    if (ASSISTANT_TOKENS.some(tok => text.includes(tok.toLowerCase()))) {
-      assistantIdx = i;
-      break;
-    }
-  }
-
-  // num_prefix_sentences from metadata marks the end of the prefix context
-  // (prompt + assistant prefix). Sentences beyond that are generation.
-  const meta = maskData.metadata || {};
-  const numPrefix = meta.num_prefix_sentences;
-  const genStart = (typeof numPrefix === 'number' && numPrefix < sents.length) ? numPrefix : sents.length;
-
-  // Categories: [0, assistantIdx) = prompt, [assistantIdx, genStart) = assistant prefix, [genStart, S) = generation
-  return { assistantIdx, genStart };
-}
-
-// ══════════════════════════════════════════════════════════════
-// Rendering
-// ══════════════════════════════════════════════════════════════
-function render() {
-  if (!processed) return;
-  const W = $gc.clientWidth, H = $gc.clientHeight;
-
-  // Recreate canvas + SVG
-  $gc.querySelectorAll('canvas,svg').forEach(el=>el.remove());
-  canvas = document.createElement('canvas');
-  canvas.width = W*devicePixelRatio; canvas.height = H*devicePixelRatio;
-  canvas.style.width = W+'px'; canvas.style.height = H+'px';
-  ctx = canvas.getContext('2d'); ctx.scale(devicePixelRatio, devicePixelRatio);
-  $gc.appendChild(canvas);
-
-  svgRoot = d3.select($gc).append('svg').attr('width',W).attr('height',H);
-  const gAll = svgRoot.append('g');
-
-  const { layers, sents, edges, nodeImp, globalMax, maxImp, S } = processed;
-  if (!layers.length || !S) return;
-
-  // Scales
-  const xScale = d3.scalePoint().domain(d3.range(S)).range([MARGIN.left, W-MARGIN.right]).padding(0.5);
-  const yScale = d3.scalePoint().domain(layers).range([H-MARGIN.bottom, MARGIN.top]).padding(0.5);
-
-  const showLabels = document.getElementById('show-labels').checked;
-
-  // Draw
-  const { regions } = processed;
-  if (viewMode === 'agg') {
-    aggHoverCell = null;
-    drawAggregatedMask(ctx, W, H);
-    setupAggMouseEvents(canvas, ctx, W, H);
-    updateAggDetail();
-    return;
-  }
-  drawRegions(xScale, yScale, layers, S, regions, W, H);
-  drawGrid(xScale, yScale, layers, S, W, H);
-  if (viewMode === 'arcs') drawArcs(xScale, yScale, edges, globalMax, W, H);
-  else drawFlow(xScale, yScale, edges, layers, globalMax, S, W, H);
-  drawNodes(gAll, xScale, yScale, layers, S, edges, nodeImp, maxImp, showLabels, sents);
-  drawAxes(gAll, xScale, yScale, layers, S, sents, W, H);
-  drawRegionLabels(gAll, xScale, regions, S);
-
-  // Zoom
-  const zoom = d3.zoom().scaleExtent([0.3,6]).on('zoom', ev => {
-    zoomTransform = ev.transform;
-    gAll.attr('transform', ev.transform);
-    ctx.clearRect(0,0,W,H); ctx.save();
-    ctx.translate(zoomTransform.x, zoomTransform.y);
-    ctx.scale(zoomTransform.k, zoomTransform.k);
-    if (viewMode === 'agg') { drawAggregatedMask(ctx, W, H); }
-    else {
-      drawRegions(xScale, yScale, layers, S, regions, W, H);
-      drawGrid(xScale, yScale, layers, S, W, H);
-      if (viewMode==='arcs') drawArcs(xScale, yScale, edges, globalMax, W, H);
-      else drawFlow(xScale, yScale, edges, layers, globalMax, S, W, H);
-    }
-    ctx.restore();
-  });
-  svgRoot.call(zoom).style('pointer-events','all');
-}
-
-function drawRegions(xScale, yScale, layers, S, regions, W, H) {
-  if (!regions || S === 0) return;
-  ctx.save();
-  const step = xScale.step ? xScale.step() : (W - MARGIN.left - MARGIN.right) / S;
-  const halfStep = step / 2;
-  const top = MARGIN.top - 14;
-  const bot = H - MARGIN.bottom + 14;
-
-  // Build region spans: [{start, end, color, borderColor}]
-  const spans = [];
-  if (regions.assistantIdx > 0) {
-    spans.push({ start: 0, end: regions.assistantIdx, fill: REGION_COLORS.prompt, border: REGION_BORDER_COLORS.prompt });
-  }
-  if (regions.assistantIdx < regions.genStart) {
-    spans.push({ start: regions.assistantIdx, end: regions.genStart, fill: REGION_COLORS.assistant, border: REGION_BORDER_COLORS.assistant });
-  }
-  if (regions.genStart < S) {
-    spans.push({ start: regions.genStart, end: S, fill: REGION_COLORS.generation, border: REGION_BORDER_COLORS.generation });
-  }
-
-  for (const span of spans) {
-    const x0 = xScale(span.start) - halfStep;
-    const x1 = xScale(span.end - 1) + halfStep;
-    ctx.fillStyle = span.fill;
-    ctx.fillRect(x0, top, x1 - x0, bot - top);
-    // Left/right border lines
-    ctx.strokeStyle = span.border;
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 3]);
-    ctx.beginPath(); ctx.moveTo(x0, top); ctx.lineTo(x0, bot); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x1, top); ctx.lineTo(x1, bot); ctx.stroke();
-    ctx.setLineDash([]);
-  }
-  ctx.restore();
-}
-
-function drawRegionLabels(g, xScale, regions, S) {
-  if (!regions || S === 0) return;
-  const step = xScale.step ? xScale.step() : 50;
-  const halfStep = step / 2;
-  const y = MARGIN.top - 18;
-
-  const labels = [];
-  if (regions.assistantIdx > 0) {
-    labels.push({ start: 0, end: regions.assistantIdx, text: 'Prompt', color: 'rgba(59,130,246,0.7)' });
-  }
-  if (regions.assistantIdx < regions.genStart) {
-    labels.push({ start: regions.assistantIdx, end: regions.genStart, text: 'Assistant Prefix', color: 'rgba(168,85,247,0.7)' });
-  }
-  if (regions.genStart < S) {
-    labels.push({ start: regions.genStart, end: S, text: 'Generation', color: 'rgba(245,158,11,0.7)' });
-  }
-
-  for (const lbl of labels) {
-    const x0 = xScale(lbl.start) - halfStep;
-    const x1 = xScale(lbl.end - 1) + halfStep;
-    const cx = (x0 + x1) / 2;
-    g.append('text')
-      .attr('x', cx).attr('y', y)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', 9).attr('font-weight', 600)
-      .attr('fill', lbl.color)
-      .text(lbl.text);
-  }
-}
-
-function drawGrid(xScale, yScale, layers, S, W, H) {
-  ctx.save();
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
-  for (const l of layers) { const y=yScale(l); ctx.beginPath(); ctx.moveTo(MARGIN.left-8,y); ctx.lineTo(W-MARGIN.right+8,y); ctx.stroke(); }
-  for (let s=0;s<S;s++) { const x=xScale(s); ctx.beginPath(); ctx.moveTo(x,MARGIN.top-8); ctx.lineTo(x,H-MARGIN.bottom+8); ctx.stroke(); }
-  ctx.restore();
-}
-
-function isEdgeDimmed(edge) {
-  if (selectedNode) {
-    if (viewMode === 'arcs') {
-      return !(edge.layer===selectedNode.layer && (edge.src===selectedNode.sentence || edge.tgt===selectedNode.sentence));
-    } else {
-      return !(edge.src===selectedNode.sentence || edge.tgt===selectedNode.sentence);
-    }
-  }
-  if (highlightSentence !== null) {
-    return !(edge.src===highlightSentence || edge.tgt===highlightSentence);
-  }
-  return false;
-}
-
-function drawArcs(xScale, yScale, edges, gMax, W, H) {
-  const useCat = colorByCategory();
-  const sorted = [...edges].sort((a,b) => Math.abs(a.score)-Math.abs(b.score));
-  for (const e of sorted) {
-    const x1=xScale(e.tgt), x2=xScale(e.src), y=yScale(e.layer);
-    const norm = gMax>0 ? Math.abs(e.score)/gMax : 0;
-    const sqrtNorm = Math.sqrt(norm);
-    const width = 0.5 + sqrtNorm*4;
-    let opacity = 0.12 + sqrtNorm*0.7;
-    const dimmed = isEdgeDimmed(e);
-    if (dimmed) opacity *= 0.06;
-
-    const dx = x2-x1;
-    const bulge = -(18 + Math.abs(dx)*0.35);
-    ctx.beginPath(); ctx.moveTo(x1,y);
-    ctx.bezierCurveTo(x1+dx*0.3, y+bulge, x1+dx*0.7, y+bulge, x2, y);
-
-    const color = useCat ? categoryEdgeColor(e.src, e.tgt, norm) : edgeColor(norm, e.score<0);
-    ctx.strokeStyle = color; ctx.globalAlpha = opacity;
-    ctx.lineWidth = width; ctx.stroke();
-
-    // Arrow
-    const as = 3+width;
-    const t=0.96;
-    const bx1=x1+dx*0.3, bx2=x1+dx*0.7, by1=y+bulge, by2=y+bulge;
-    const tx = 3*(1-t)*(1-t)*(bx1-x1)+6*(1-t)*t*(bx2-bx1)+3*t*t*(x2-bx2);
-    const ty = 3*(1-t)*(1-t)*(by1-y)+6*(1-t)*t*(by2-by1)+3*t*t*(y-by2);
-    const ang = Math.atan2(ty,tx);
-    ctx.beginPath(); ctx.moveTo(x2,y);
-    ctx.lineTo(x2-as*Math.cos(ang-0.4), y-as*Math.sin(ang-0.4));
-    ctx.lineTo(x2-as*Math.cos(ang+0.4), y-as*Math.sin(ang+0.4));
-    ctx.closePath(); ctx.fillStyle=color; ctx.fill();
-  }
-  ctx.globalAlpha=1;
-}
-
-function drawFlow(xScale, yScale, edges, layers, gMax, S, W, H) {
-  const useCat = colorByCategory();
-  // Group edges by (src,tgt) pair across layers → draw vertical flow lines
-  const pairMap = {};
-  for (const e of edges) {
-    const key = e.src+','+e.tgt;
-    if (!pairMap[key]) pairMap[key] = [];
-    pairMap[key].push(e);
-  }
-
-  // For each pair, draw curved lines between consecutive layers
-  for (const key in pairMap) {
-    const group = pairMap[key].sort((a,b)=>a.layer-b.layer);
-    const [src,tgt] = key.split(',').map(Number);
-
-    for (let i=0; i<group.length-1; i++) {
-      const e1 = group[i], e2 = group[i+1];
-      const x1=xScale(tgt), y1=yScale(e1.layer);
-      const x2=xScale(src), y2=yScale(e2.layer);
-
-      const avgScore = (Math.abs(e1.score)+Math.abs(e2.score))/2;
-      const norm = gMax>0 ? avgScore/gMax : 0;
-      const sqrtNorm = Math.sqrt(norm);
-      const width = 0.4 + sqrtNorm*3.5;
-      let opacity = 0.1 + sqrtNorm*0.6;
-      const dimmed = isEdgeDimmed(e1) && isEdgeDimmed(e2);
-      if (dimmed) opacity *= 0.05;
-
-      const color = useCat ? categoryEdgeColor(src, tgt, norm) : edgeColor(norm, avgScore<0);
-      ctx.strokeStyle = color; ctx.globalAlpha = opacity; ctx.lineWidth = width;
-
-      // S-curve between layers
-      const midY = (y1+y2)/2;
-      ctx.beginPath(); ctx.moveTo(x1,y1);
-      ctx.bezierCurveTo(x1, midY, x2, midY, x2, y2);
-      ctx.stroke();
-    }
-
-    // Draw circles at each layer for this pair
-    for (const e of group) {
-      const norm = gMax>0 ? Math.abs(e.score)/gMax : 0;
-      const dimmed = isEdgeDimmed(e);
-      const r = 2 + Math.sqrt(norm)*3;
-      const opacity = dimmed ? 0.05 : 0.15+norm*0.6;
-      ctx.globalAlpha = opacity;
-
-      const dotColor = useCat ? categoryEdgeColor(e.src, e.tgt, norm) : edgeColor(norm, e.score<0);
-      // Mark at tgt (key) position
-      ctx.beginPath();
-      ctx.arc(xScale(e.tgt), yScale(e.layer), r, 0, Math.PI*2);
-      ctx.fillStyle = dotColor; ctx.fill();
-
-      // Mark at src (query) position
-      ctx.beginPath();
-      ctx.arc(xScale(e.src), yScale(e.layer), r, 0, Math.PI*2);
-      ctx.fill();
-    }
-  }
-  ctx.globalAlpha = 1;
-}
-
-function drawNodes(g, xScale, yScale, layers, S, edges, nodeImp, maxImp, showLabels, sents) {
-  for (const layer of layers) {
-    for (let s=0; s<S; s++) {
-      const x=xScale(s), y=yScale(layer);
-      const imp = nodeImp[layer]?nodeImp[layer][s]:0;
-      const normImp = maxImp>0 ? imp/maxImp : 0;
-
-      const isSel = selectedNode && selectedNode.layer===layer && selectedNode.sentence===s;
-      const isHighlight = highlightSentence===s;
-      const isConn = (selectedNode || highlightSentence!==null) && edges.some(e =>
-        (viewMode==='arcs' ? e.layer===layer : true) &&
-        (e.src===s || e.tgt===s) &&
-        (selectedNode ? (e.src===selectedNode.sentence || e.tgt===selectedNode.sentence) &&
-          (viewMode==='arcs' ? e.layer===selectedNode.layer : true) :
-          (e.src===highlightSentence || e.tgt===highlightSentence))
-      );
-
-      const ng = g.append('g').attr('transform', `translate(${x},${y})`).datum({layer,sentence:s,importance:imp});
-
-      // Outer ring
-      const r = normImp > 0.01 ? 5 + normImp*9 : 5;
-      ng.append('circle').attr('r', r)
-        .attr('fill', isSel ? 'rgba(240,0,255,0.12)' : isConn||isHighlight ? 'rgba(76,175,80,0.15)' : '#fff')
-        .attr('stroke', isSel ? '#f0f' : isConn||isHighlight ? '#4caf50' : normImp>0.02 ? '#94a3b8' : '#cbd5e1')
-        .attr('stroke-width', isSel ? 2 : isConn ? 1.5 : 0.8)
-        .attr('stroke-dasharray', isSel ? '3 2' : 'none');
-
-      // Inner dot (importance)
-      if (normImp > 0.01) {
-        const ir = 2 + normImp*4;
-        ng.append('circle').attr('r', ir)
-          .attr('fill', isSel ? '#f0f' : isConn||isHighlight ? '#4caf50' : '#64748b')
-          .attr('fill-opacity', 0.25+normImp*0.75);
-      }
-
-      // Hit area (invisible, larger)
-      ng.append('circle').attr('class','node-hit').attr('r', Math.max(r+4, 10))
-        .attr('fill','transparent')
-        .on('mouseover', function(ev) {
-          const d=d3.select(this.parentNode).datum();
-          showTip(ev,d);
-          document.getElementById('hover-info').textContent = `L${d.layer} S${d.sentence} imp=${d.importance.toFixed(4)}`;
-        })
-        .on('mousemove', function(ev) { moveTip(ev); })
-        .on('mouseout', function() { hideTip(); document.getElementById('hover-info').textContent=''; })
-        .on('click', function(ev) {
-          const d=d3.select(this.parentNode).datum();
-          if (selectedNode && selectedNode.layer===d.layer && selectedNode.sentence===d.sentence) selectedNode=null;
-          else selectedNode=d;
-          highlightSentence = null;
-          document.querySelectorAll('.sleg').forEach(el=>el.classList.remove('active'));
-          render(); updateDetail();
-        });
-
-      // Label
-      if (showLabels && normImp > 0.01) {
-        ng.append('text').attr('text-anchor','middle').attr('dominant-baseline','middle')
-          .attr('font-size', 8).attr('font-weight',600)
-          .attr('fill', isSel||isConn ? '#1e293b' : '#94a3b8')
-          .attr('dy', r+10).text('S'+s);
-      }
-    }
-  }
-}
-
-function drawAxes(g, xScale, yScale, layers, S, sents, W, H) {
-  // Y-axis: layer labels
-  for (const l of layers) {
-    g.append('text').attr('x', MARGIN.left-12).attr('y', yScale(l))
-      .attr('text-anchor','end').attr('dominant-baseline','middle')
-      .attr('font-size',10).attr('fill','#64748b').attr('font-family','monospace')
-      .text('L'+l);
-  }
-  // X-axis: sentence labels (rotated)
-  for (let s=0; s<S; s++) {
-    const t = (sents[s]&&sents[s].text) ? sents[s].text.trim() : `S${s}`;
-    const tr = t.length>18 ? t.slice(0,16)+'…' : t;
-    g.append('text')
-      .attr('x', xScale(s)).attr('y', H-MARGIN.bottom+18)
-      .attr('text-anchor','end').attr('dominant-baseline','hanging')
-      .attr('font-size',10).attr('fill','#64748b')
-      .attr('transform', `rotate(-40, ${xScale(s)}, ${H-MARGIN.bottom+18})`)
-      .text(tr);
+  document.getElementById('tab-single').classList.toggle('active', tab === 'single');
+  document.getElementById('tab-compare').classList.toggle('active', tab === 'compare');
+  document.getElementById('tab-resample').classList.toggle('active', tab === 'resample');
+  if (tab === 'single' && processed) { render(); onMetricChange(); }
+  if (tab === 'compare' && compareMasks.length > 0) onCompareMetricChange();
+  if (tab === 'resample') {
+    if (!window._resampleData) loadResampleSweep();
+    else renderResampleSweep();
   }
 }
 
 // ══════════════════════════════════════════════════════════════
-// Tooltip
+// Threshold Evaluation Chart
 // ══════════════════════════════════════════════════════════════
-function showTip(ev, d) {
-  const s = processed.sents;
-  const text = (s[d.sentence]&&s[d.sentence].text) ? s[d.sentence].text.trim() : `Sentence ${d.sentence}`;
-  const atTo = processed.edges.filter(e => (viewMode==='arcs' ? e.layer===d.layer : true) && e.src===d.sentence).length;
-  const atBy = processed.edges.filter(e => (viewMode==='arcs' ? e.layer===d.layer : true) && e.tgt===d.sentence).length;
-  $tip.innerHTML =
-    `<div style="font-weight:700">S${d.sentence} @ Layer ${d.layer}</div>`+
-    `<div style="opacity:0.7;margin:2px 0">${text.length>70?text.slice(0,68)+'…':text}</div>`+
-    `<div>Importance: ${d.importance.toFixed(4)}</div>`+
-    `<div>Attends to: ${atTo} &middot; Attended by: ${atBy}</div>`;
-  $tip.style.display='block';
-  moveTip(ev);
-}
-function moveTip(ev) { $tip.style.left=(ev.clientX+14)+'px'; $tip.style.top=(ev.clientY-8)+'px'; }
-function hideTip() { $tip.style.display='none'; }
-
-// ══════════════════════════════════════════════════════════════
-// Aggregated mask mouse interactions
-// ══════════════════════════════════════════════════════════════
-function getAggCell(clientX, clientY, canvasEl) {
-  if (!aggState) return null;
-  const rect = canvasEl.getBoundingClientRect();
-  const x = clientX - rect.left;
-  const y = clientY - rect.top;
-  const { offsetX, offsetY, gridSize, S } = aggState;
-  const j = Math.floor((x - offsetX) / gridSize);
-  const i = Math.floor((y - offsetY) / gridSize);
-  if (i < 0 || i >= S || j < 0 || j >= S) return null;
-  if (j > i) return null; // upper triangle
-  return { i, j };
-}
-
-function showAggTip(ev, cell) {
-  if (!aggState || !processed) return;
-  const { aggMatrix } = aggState;
-  const sents = processed.sents;
-  const qText = (sents[cell.i] && sents[cell.i].text) ? sents[cell.i].text.trim() : `Sentence ${cell.i}`;
-  const kText = (sents[cell.j] && sents[cell.j].text) ? sents[cell.j].text.trim() : `Sentence ${cell.j}`;
-  const score = aggMatrix[cell.i][cell.j];
-  const threshold = getThreshold();
-  const belowT = score < threshold;
-  $tip.innerHTML =
-    `<div style="font-weight:700">S${cell.i} ← S${cell.j}</div>` +
-    `<div style="opacity:0.8;margin:3px 0"><b>Query:</b> ${qText.length > 80 ? qText.slice(0, 78) + '…' : qText}</div>` +
-    `<div style="opacity:0.8;margin:3px 0"><b>Key:</b> ${kText.length > 80 ? kText.slice(0, 78) + '…' : kText}</div>` +
-    `<div style="margin-top:4px">Score: <b>${score.toExponential(3)}</b>${belowT ? ' <span style="opacity:0.6">(below threshold)</span>' : ''}</div>`;
-  $tip.style.display = 'block';
-  moveTip(ev);
-}
-
-function redrawAgg(ctxRef, W, H) {
-  ctxRef.clearRect(0, 0, W, H);
-  drawAggregatedMask(ctxRef, W, H);
-}
-
-function setupAggMouseEvents(canvasEl, ctxRef, W, H) {
-  canvasEl.style.cursor = 'crosshair';
-
-  canvasEl.addEventListener('mousemove', function(ev) {
-    const cell = getAggCell(ev.clientX, ev.clientY, canvasEl);
-    if (!cell) {
-      if (aggHoverCell) {
-        aggHoverCell = null;
-        hideTip();
-        redrawAgg(ctxRef, W, H);
-      }
-      document.getElementById('hover-info').textContent = '';
-      return;
-    }
-    if (aggHoverCell && aggHoverCell.i === cell.i && aggHoverCell.j === cell.j) {
-      moveTip(ev);
-      return;
-    }
-    aggHoverCell = cell;
-    const score = aggState.aggMatrix[cell.i][cell.j];
-    document.getElementById('hover-info').textContent = `S${cell.i}←S${cell.j} score=${score.toExponential(3)}`;
-    showAggTip(ev, cell);
-    redrawAgg(ctxRef, W, H);
-  });
-
-  canvasEl.addEventListener('mouseout', function() {
-    if (aggHoverCell) {
-      aggHoverCell = null;
-      hideTip();
-      document.getElementById('hover-info').textContent = '';
-      redrawAgg(ctxRef, W, H);
-    }
-  });
-
-  canvasEl.addEventListener('click', function(ev) {
-    const cell = getAggCell(ev.clientX, ev.clientY, canvasEl);
-    if (!cell) return;
-    // Toggle: deselect if same cell clicked again
-    if (aggSelectedCell && aggSelectedCell.i === cell.i && aggSelectedCell.j === cell.j) {
-      aggSelectedCell = null;
-    } else {
-      aggSelectedCell = cell;
-    }
-    highlightSentence = null;
-    document.querySelectorAll('.sleg').forEach(function(el) {
-      el.classList.remove('active');
-    });
-    redrawAgg(ctxRef, W, H);
-    updateAggDetail();
-  });
-}
-
-// ══════════════════════════════════════════════════════════════
-// Detail panel
-// ══════════════════════════════════════════════════════════════
-function classificationHtml(sent) {
-  if (!sent || !sent.function_tags) return '';
-  let h = '<div class="cls-tags">';
-  for (const tag of sent.function_tags) {
-    h += `<span class="cls-tag">${tag.replace(/_/g, ' ')}</span>`;
-  }
-  h += '</div>';
-  if (sent.depends_on && sent.depends_on.length) {
-    h += `<div class="cls-deps">Depends on: ${sent.depends_on.map(d => 'S' + d).join(', ')}</div>`;
-  }
-  return h;
-}
-
-function updateDetail() {
-  const panel = document.getElementById('detail-content');
-  if (!selectedNode) { panel.innerHTML='Click a node to inspect connections.'; return; }
-  const {layer,sentence} = selectedNode;
-  const s = processed.sents;
-  const text = (s[sentence]&&s[sentence].text) ? s[sentence].text.trim() : `Sentence ${sentence}`;
-
-  const filterLayer = viewMode==='arcs';
-  const attendsTo = processed.edges
-    .filter(e => (!filterLayer||e.layer===layer) && e.src===sentence)
-    .sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
-  const attendedBy = processed.edges
-    .filter(e => (!filterLayer||e.layer===layer) && e.tgt===sentence)
-    .sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
-
-  let h = `<div style="font-weight:700;font-size:13px">S${sentence} @ Layer ${layer}</div>`;
-  h += `<div style="font-size:10px;color:#64748b;margin:2px 0 4px">${text}</div>`;
-  h += classificationHtml(s[sentence]);
-
-  h += connSection('Attends to', attendsTo, 'tgt', s);
-  h += connSection('Attended by', attendedBy, 'src', s);
-  panel.innerHTML = h;
-}
-
-function connSection(title, list, field, sents) {
-  let h = `<div style="font-weight:600;font-size:11px;margin:6px 0 3px">${title} (${list.length})</div>`;
-  if (!list.length) return h;
-  h += '<ul class="conn-list">';
-  const gm = processed.globalMax||1;
-  for (const e of list.slice(0,20)) {
-    const idx = e[field];
-    const t = (sents[idx]&&sents[idx].text)?sents[idx].text.trim().slice(0,25):`S${idx}`;
-    const norm = Math.abs(e.score)/gm;
-    const barW = Math.round(50*norm);
-    const col = e.score<0 ? '#9333ea' : '#4caf50';
-    h += `<li><span>S${idx} L${e.layer}: ${t}</span>`;
-    h += `<span class="mono">${e.score.toExponential(2)} <span class="bar" style="width:${barW}px;background:${col}"></span></span></li>`;
-  }
-  h += '</ul>';
-  if (list.length>20) h += `<div style="font-size:10px;color:#94a3b8">…and ${list.length-20} more</div>`;
-  return h;
-}
-
-// ══════════════════════════════════════════════════════════════
-// Detail panel for aggregated mask cell click
-// ══════════════════════════════════════════════════════════════
-function updateAggDetail() {
-  const panel = document.getElementById('detail-content');
-  if (!aggSelectedCell || !aggState || !processed) {
-    panel.innerHTML = 'Click a cell to inspect sentence pair.';
-    return;
-  }
-  const { i: qi, j: ki } = aggSelectedCell;
-  const { aggMatrix, S } = aggState;
-  const sents = processed.sents;
-  const score = aggMatrix[qi][ki];
-
-  const qText = (sents[qi] && sents[qi].text) ? sents[qi].text.trim() : `Sentence ${qi}`;
-  const kText = (sents[ki] && sents[ki].text) ? sents[ki].text.trim() : `Sentence ${ki}`;
-
-  let h = `<div style="font-weight:700;font-size:13px">S${qi} ← S${ki}</div>`;
-  h += `<div style="font-size:10px;color:#64748b;margin:2px 0">Score: <b>${score.toExponential(3)}</b></div>`;
-
-  // Query sentence details
-  h += `<div style="font-weight:600;font-size:11px;margin:10px 0 3px;color:#2e7d32">Query: S${qi}</div>`;
-  h += `<div style="font-size:10px;color:#64748b;margin:0 0 4px">${qText.length > 60 ? qText.slice(0, 58) + '…' : qText}</div>`;
-  h += classificationHtml(sents[qi]);
-
-  // Top keys this query attends to (row qi, sorted by score descending)
-  const qEdges = [];
-  for (let j = 0; j <= qi && j < S; j++) {
-    if (j === qi) continue;
-    const s = aggMatrix[qi][j];
-    if (Math.abs(s) > 1e-12) qEdges.push({ idx: j, score: s });
-  }
-  qEdges.sort((a, b) => b.score - a.score);
-  h += aggConnSection('Attends to', qEdges, sents, aggMatrix);
-
-  // Key sentence details
-  h += `<div style="font-weight:600;font-size:11px;margin:10px 0 3px;color:#1565c0">Key: S${ki}</div>`;
-  h += `<div style="font-size:10px;color:#64748b;margin:0 0 4px">${kText.length > 60 ? kText.slice(0, 58) + '…' : kText}</div>`;
-  h += classificationHtml(sents[ki]);
-
-  // Top queries that attend to this key (column ki, sorted by score descending)
-  const kEdges = [];
-  for (let i = ki; i < S; i++) {
-    if (i === ki) continue;
-    const s = aggMatrix[i][ki];
-    if (Math.abs(s) > 1e-12) kEdges.push({ idx: i, score: s });
-  }
-  kEdges.sort((a, b) => b.score - a.score);
-  h += aggConnSection('Attended by', kEdges, sents, aggMatrix);
-
-  panel.innerHTML = h;
-}
-
-function aggConnSection(title, edges, sents, aggMatrix) {
-  let h = `<div style="font-weight:600;font-size:10px;margin:4px 0 2px">${title} (${edges.length})</div>`;
-  if (!edges.length) return h;
-  h += '<ul class="conn-list">';
-  const maxScore = edges.length > 0 ? Math.max(...edges.map(e => Math.abs(e.score))) : 1;
-  for (const e of edges.slice(0, 20)) {
-    const t = (sents[e.idx] && sents[e.idx].text) ? sents[e.idx].text.trim().slice(0, 25) : `S${e.idx}`;
-    const norm = maxScore > 0 ? Math.abs(e.score) / maxScore : 0;
-    const barW = Math.round(50 * norm);
-    const col = e.score < 0 ? '#9333ea' : '#4caf50';
-    h += `<li><span>S${e.idx}: ${t}</span>`;
-    h += `<span class="mono">${e.score.toExponential(2)} <span class="bar" style="width:${barW}px;background:${col}"></span></span></li>`;
-  }
-  h += '</ul>';
-  if (edges.length > 20) h += `<div style="font-size:10px;color:#94a3b8">…and ${edges.length - 20} more</div>`;
-  return h;
-}
-
-// ══════════════════════════════════════════════════════════════
-// Threshold Evaluation Chart (Sparsity vs KL)
-// ══════════════════════════════════════════════════════════════
-let thresholdEvalData = null; // parsed from metadata
-
-// Metric definitions for the dropdown
 const METRIC_DEFS = [
   { key: 'kl_divergence',     label: 'Per-token KL vs Sparsity',          chartType: 'line+random', alwaysAvailable: true },
   { key: 'per_sentence_kl',   label: 'Per-sentence KL (across chains)',   chartType: 'line_per_sentence' },
@@ -1548,13 +301,8 @@ const METRIC_DEFS = [
   { key: 'tag_distribution',  label: 'Tag Distribution',                  chartType: 'tag_bar', alwaysAvailable: false },
 ];
 
-function getRandomKey(field) {
-  // random_{field}s for arrays, random_{field} for single mean
-  return 'random_' + field + 's';
-}
-function getRandomSingleKey(field) {
-  return 'random_' + field;
-}
+function getRandomKey(field) { return 'random_' + field + 's'; }
+function getRandomSingleKey(field) { return 'random_' + field; }
 
 function initThresholdChart() {
   const meta = maskData.metadata || {};
@@ -1565,23 +313,16 @@ function initThresholdChart() {
     thresholdEvalData = null;
     return;
   }
-  // Filter to valid entries
   const entries = te.filter(e => e && typeof e.threshold === 'number' && typeof e.sparsity === 'number');
-  if (entries.length === 0) {
-    thresholdEvalData = null;
-    return;
-  }
+  if (entries.length === 0) { thresholdEvalData = null; return; }
 
-  // Scan first entry for available fields and populate dropdown
   const firstEntry = entries[0];
   const select = document.getElementById('metric-select');
   select.innerHTML = '';
   const availableMetrics = [];
   for (const def of METRIC_DEFS) {
-    // Special availability check for derived metrics
     let available = def.alwaysAvailable || (def.key in firstEntry && firstEntry[def.key] != null);
     if (def.key === 'per_sentence_kl_heatmap') {
-      const meta = maskData.metadata || {};
       available = ('per_sentence_kl' in firstEntry) && Array.isArray(meta.answer_ids);
     }
     if (def.key === 'resample_comparison') {
@@ -1591,19 +332,16 @@ function initThresholdChart() {
       available = (maskData.sentences || []).some(s => s.function_tags && s.function_tags.length);
     }
     if (def.key === 'chain_weights_normalized') {
-      available = ('log_weights' in firstEntry) ||
-                  ('chain_weights_normalized' in firstEntry);
+      available = ('log_weights' in firstEntry) || ('chain_weights_normalized' in firstEntry);
     }
     if (available) {
       availableMetrics.push(def);
       const opt = document.createElement('option');
-      opt.value = def.key;
-      opt.textContent = def.label;
+      opt.value = def.key; opt.textContent = def.label;
       select.appendChild(opt);
     }
   }
 
-  // Default selection: prefer global_metric concept — pick answer_kl or reward_gap or kl_divergence
   const preferredOrder = ['answer_kl', 'reward_gap', 'kl_divergence'];
   let defaultKey = availableMetrics.length > 0 ? availableMetrics[0].key : 'kl_divergence';
   for (const pk of preferredOrder) {
@@ -1612,10 +350,6 @@ function initThresholdChart() {
   select.value = defaultKey;
   select.onchange = onMetricChange;
 
-  const thresholds = entries.map(e => e.threshold);
-  const sparsities = entries.map(e => e.sparsity);
-
-  // N_eff data
   const hasNeff = entries.some(e => 'n_eff_ratio' in e);
   const nEffRatios = hasNeff ? entries.map(e => e.n_eff_ratio ?? NaN) : null;
   const randomNeffs = hasNeff ? entries.map(e => {
@@ -1627,7 +361,6 @@ function initThresholdChart() {
     return NaN;
   }) : null;
 
-  // Answer probabilities data
   const hasAnswerProbs = entries.some(e => Array.isArray(e.answer_probs_masked));
   const hasAnswerProbsWeighted = entries.some(e => Array.isArray(e.answer_probs_masked_weighted));
   const answerLabels = meta.answer_labels || null;
@@ -1635,14 +368,12 @@ function initThresholdChart() {
     ? meta.answer_probs_clean_weighted : null;
 
   thresholdEvalData = {
-    entries, thresholds, sparsities, availableMetrics,
-    nEffRatios, randomNeffs, hasNeff,
-    hasAnswerProbs, hasAnswerProbsWeighted,
-    answerLabels, answerProbsCleanWeighted,
+    entries, thresholds: entries.map(e => e.threshold), sparsities: entries.map(e => e.sparsity),
+    availableMetrics, nEffRatios, randomNeffs, hasNeff,
+    hasAnswerProbs, hasAnswerProbsWeighted, answerLabels, answerProbsCleanWeighted,
   };
   document.getElementById('threshold-chart-section').style.display = '';
   document.getElementById('no-threshold-eval').style.display = 'none';
-
 }
 
 function onMetricChange() {
@@ -1651,75 +382,50 @@ function onMetricChange() {
   const metricKey = select.value;
   const def = METRIC_DEFS.find(d => d.key === metricKey);
   if (!def) return;
-
-  if (def.chartType === 'resample') {
-    renderResampleComparison();
-  } else if (def.chartType === 'tag_bar') {
-    renderTagDistributionChart();
-  } else if (def.chartType === 'line_per_sentence') {
-    renderPerSentenceKLChart();
-  } else if (def.chartType === 'heatmap_per_sentence') {
-    renderPerSentenceKLHeatmap();
-  } else if (def.chartType === 'histogram') {
-    renderLogWeightHistogram();
-  } else if (def.chartType === 'per_chain_weights_bar') {
-    renderPerChainWeightsChart();
-  } else if (def.chartType === 'table') {
-    renderAnswerProbsAsMainChart();
-  } else if (def.chartType === 'table_weighted') {
-    renderWeightedAnswerProbsAsMainChart();
-  } else if (def.chartType === 'line+threshold') {
-    renderNeffAsMainChart();
-  } else {
-    // line or line+random
-    renderThresholdChart();
-  }
+  if (def.chartType === 'resample') renderResampleComparison();
+  else if (def.chartType === 'tag_bar') renderTagDistributionChart();
+  else if (def.chartType === 'line_per_sentence') renderPerSentenceKLChart();
+  else if (def.chartType === 'heatmap_per_sentence') renderPerSentenceKLHeatmap();
+  else if (def.chartType === 'histogram') renderLogWeightHistogram();
+  else if (def.chartType === 'per_chain_weights_bar') renderPerChainWeightsChart();
+  else if (def.chartType === 'table') renderAnswerProbsAsMainChart();
+  else if (def.chartType === 'table_weighted') renderWeightedAnswerProbsAsMainChart();
+  else if (def.chartType === 'line+threshold') renderNeffAsMainChart();
+  else renderThresholdChart();
 }
 
-const PLOTLY_LAYOUT_BASE = {
-  paper_bgcolor: 'rgba(0,0,0,0)',
-  plot_bgcolor: '#f8fafc',
-  font: { family: '-apple-system, BlinkMacSystemFont, sans-serif', size: 11, color: '#64748b' },
-  margin: { l: 56, r: 16, t: 8, b: 52 },
-  legend: { orientation: 'h', y: 1.12, x: 0, font: { size: 10 } },
-  hovermode: 'closest',
-};
-const PLOTLY_CONFIG = {
-  responsive: true,
-  displayModeBar: true,
-  modeBarButtonsToRemove: ['sendDataToCloud', 'lasso2d', 'select2d'],
-  displaylogo: false,
-};
+function _findNearestEntry() {
+  const { entries } = thresholdEvalData;
+  const ct = getThreshold();
+  let idx = 0, best = Infinity;
+  for (let i = 0; i < entries.length; i++) { const d = Math.abs(entries[i].threshold - ct); if (d < best) { best = d; idx = i; } }
+  return entries[idx];
+}
 
+function _getKL(item) {
+  if (item && typeof item === 'object' && 'mean_kl' in item) return item.mean_kl;
+  return typeof item === 'number' ? item : 0;
+}
+function _getSentText(item) {
+  if (item && typeof item === 'object' && 'text' in item) return item.text;
+  return '';
+}
+
+// ── Tag distribution ──
 function renderTagDistributionChart() {
   const container = document.getElementById('threshold-chart-container');
   const sents = maskData.sentences || [];
   const tagCounts = {};
-  for (const s of sents) {
-    for (const tag of (s.function_tags || [])) {
-      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-    }
-  }
+  for (const s of sents) { for (const tag of (s.function_tags || [])) { tagCounts[tag] = (tagCounts[tag] || 0) + 1; } }
   const tags = Object.keys(tagCounts).sort((a, b) => tagCounts[b] - tagCounts[a]);
   const counts = tags.map(t => tagCounts[t]);
   const colors = tags.map(t => TAG_COLORS[t] || TAG_COLORS.unknown);
-
-  const trace = {
-    x: tags.map(t => t.replace(/_/g, ' ')),
-    y: counts,
-    type: 'bar',
-    marker: { color: colors },
-    hovertemplate: '%{x}: %{y}<extra></extra>',
-  };
-  const layout = {
-    ...PLOTLY_LAYOUT_BASE,
-    margin: { ...PLOTLY_LAYOUT_BASE.margin, b: 100 },
-    xaxis: { tickangle: -45, automargin: true },
-    yaxis: { title: 'Count' },
-  };
+  const trace = { x: tags.map(t => t.replace(/_/g, ' ')), y: counts, type: 'bar', marker: { color: colors }, hovertemplate: '%{x}: %{y}<extra></extra>' };
+  const layout = { ...PLOTLY_LAYOUT_BASE, margin: { ...PLOTLY_LAYOUT_BASE.margin, b: 100 }, xaxis: { tickangle: -45, automargin: true }, yaxis: { title: 'Count' } };
   Plotly.react(container, [trace], layout, PLOTLY_CONFIG);
 }
 
+// ── Main line chart ──
 function renderThresholdChart() {
   if (!thresholdEvalData) return;
   const container = document.getElementById('threshold-chart-container');
@@ -1728,13 +434,11 @@ function renderThresholdChart() {
   const def = METRIC_DEFS.find(d => d.key === metricKey);
   const metricLabel = def ? def.label : metricKey;
   const showRandom = def && def.chartType === 'line+random';
-
   const { entries, thresholds, sparsities } = thresholdEvalData;
   const metrics = entries.map(e => e[metricKey] ?? NaN);
   const n = sparsities.length;
   if (n === 0) return;
 
-  // Sort by sparsity
   const idx = d3.range(n).sort((a, b) => sparsities[a] - sparsities[b]);
   const sortedSp = idx.map(i => sparsities[i]);
   const sortedM = idx.map(i => metrics[i]);
@@ -1745,10 +449,8 @@ function renderThresholdChart() {
   const xVals = validIdx.map(i => sortedSp[i]);
   const yVals = validIdx.map(i => sortedM[i]);
   const hoverText = validIdx.map(i => `t=${sortedT[i].toExponential(2)}<br>sparsity=${(sortedSp[i]*100).toFixed(1)}%<br>${metricLabel}=${sortedM[i].toExponential(3)}`);
-
   const traces = [];
 
-  // Random baseline band + line
   if (showRandom) {
     const randomArrayKey = getRandomKey(metricKey);
     const randomSingleKey = getRandomSingleKey(metricKey);
@@ -1773,10 +475,8 @@ function renderThresholdChart() {
     }
   }
 
-  // Main line + points
   traces.push({ x: xVals, y: yVals, mode: 'lines+markers', line: { color: '#4caf50', width: 1.5 }, marker: { size: 5, color: '#4caf50' }, name: 'Learned mask', text: hoverText, hoverinfo: 'text' });
 
-  // Selected threshold marker
   const currentThreshold = getThreshold();
   let nearIdx = 0, nearDist = Infinity;
   for (let i = 0; i < n; i++) { const d = Math.abs(thresholds[i] - currentThreshold); if (d < nearDist) { nearDist = d; nearIdx = i; } }
@@ -1786,14 +486,11 @@ function renderThresholdChart() {
   }
 
   const layout = { ...PLOTLY_LAYOUT_BASE, xaxis: { title: { text: 'Sparsity', standoff: 12 }, tickformat: '.0%', gridcolor: '#e2e8f0' }, yaxis: { title: { text: metricLabel, standoff: 12 }, exponentformat: 'e', gridcolor: '#e2e8f0' } };
-
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
 
-  // Click to set threshold
   container.on('plotly_click', function(data) {
     if (data.points && data.points.length > 0) {
       const sp = data.points[0].x;
-      // Find threshold closest to this sparsity
       let best = 0, bestD = Infinity;
       for (let i = 0; i < n; i++) { const d = Math.abs(sparsities[i] - sp); if (d < bestD) { bestD = d; best = i; } }
       setThresholdToValue(thresholds[best]);
@@ -1802,36 +499,8 @@ function renderThresholdChart() {
   });
 }
 
-// ══════════════════════════════════════════════════════════════
-// N_eff Chart (N_eff/N ratio vs Sparsity)
-// ══════════════════════════════════════════════════════════════
-
-function renderNeffChart() { /* no-op — N_eff is in dropdown */ }
-
-function updateAnswerProbs() { /* no-op — answer probs available via dropdown */ }
-
-// Plotly-based chart renderers for metric dropdown
-// ══════════════════════════════════════════════════════════════
-function _findNearestEntry() {
-  const { entries } = thresholdEvalData;
-  const ct = getThreshold();
-  let idx = 0, best = Infinity;
-  for (let i = 0; i < entries.length; i++) { const d = Math.abs(entries[i].threshold - ct); if (d < best) { best = d; idx = i; } }
-  return entries[idx];
-}
-
-function _getKL(item) {
-  if (item && typeof item === 'object' && 'mean_kl' in item) return item.mean_kl;
-  return typeof item === 'number' ? item : 0;
-}
-function _getSentText(item) {
-  if (item && typeof item === 'object' && 'text' in item) return item.text;
-  return '';
-}
-
+// ── Per-sentence KL ──
 function renderPerSentenceKLChart() {
-  // Line plot matching Streamlit's build_per_sentence_kl_figure:
-  // one trace per branch, x = sentence index, y = mean_kl, lines+markers
   if (!thresholdEvalData) return;
   const container = document.getElementById('threshold-chart-container');
   const entry = _findNearestEntry();
@@ -1840,43 +509,27 @@ function renderPerSentenceKLChart() {
     container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No per-sentence KL data at this threshold.</div>';
     return;
   }
-
   const branches = perSentKL;
-  const numBranches = branches.length;
   const numSents = Math.max(...branches.map(b => Array.isArray(b) ? b.length : 0), 0);
   if (numSents === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Empty sentence data.</div>'; return; }
-
   const colors = d3.schemeTableau10;
   const traces = [];
-  for (let b = 0; b < numBranches; b++) {
+  for (let b = 0; b < branches.length; b++) {
     const xVals = [], yVals = [], hoverTexts = [];
     const bData = branches[b] || [];
     for (let s = 0; s < bData.length; s++) {
-      xVals.push(s);
-      yVals.push(_getKL(bData[s]));
+      xVals.push(s); yVals.push(_getKL(bData[s]));
       const txt = _getSentText(bData[s]);
-      const truncated = txt.length > 60 ? txt.slice(0, 58) + '…' : txt;
-      hoverTexts.push(`Branch ${b}, S${s}<br>${truncated}<br>KL=${_getKL(bData[s]).toExponential(3)}`);
+      hoverTexts.push(`Branch ${b}, S${s}<br>${txt.length > 60 ? txt.slice(0, 58) + '…' : txt}<br>KL=${_getKL(bData[s]).toExponential(3)}`);
     }
-    traces.push({
-      x: xVals, y: yVals, mode: 'lines+markers', name: 'Branch ' + b,
-      line: { color: colors[b % colors.length], width: 1.5 },
-      marker: { symbol: 'x', size: 6, color: colors[b % colors.length] },
-      text: hoverTexts, hoverinfo: 'text',
-    });
+    traces.push({ x: xVals, y: yVals, mode: 'lines+markers', name: 'Branch ' + b, line: { color: colors[b % colors.length], width: 1.5 }, marker: { symbol: 'x', size: 6, color: colors[b % colors.length] }, text: hoverTexts, hoverinfo: 'text' });
   }
-
-  const layout = { ...PLOTLY_LAYOUT_BASE,
-    title: { text: `Threshold=${entry.threshold.toExponential(2)}, Sparsity=${(entry.sparsity*100).toFixed(1)}%`, font: { size: 10, color: '#94a3b8' }, x: 0 },
-    xaxis: { title: { text: 'Continuation sentence index', standoff: 12 }, gridcolor: '#e2e8f0', dtick: 1 },
-    yaxis: { title: { text: 'Mean KL Divergence', standoff: 12 }, exponentformat: 'e', gridcolor: '#e2e8f0' },
-  };
+  const layout = { ...PLOTLY_LAYOUT_BASE, title: { text: `Threshold=${entry.threshold.toExponential(2)}, Sparsity=${(entry.sparsity*100).toFixed(1)}%`, font: { size: 10, color: '#94a3b8' }, x: 0 }, xaxis: { title: { text: 'Continuation sentence index', standoff: 12 }, gridcolor: '#e2e8f0', dtick: 1 }, yaxis: { title: { text: 'Mean KL Divergence', standoff: 12 }, exponentformat: 'e', gridcolor: '#e2e8f0' } };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
 }
 
+// ── Per-sentence KL heatmap ──
 function renderPerSentenceKLHeatmap() {
-  // Heatmap: rows = branches grouped by answer, columns = sentence index
-  // Color = mean_kl. Shows A-chains vs B-chains pattern.
   if (!thresholdEvalData) return;
   const container = document.getElementById('threshold-chart-container');
   const entry = _findNearestEntry();
@@ -1884,182 +537,90 @@ function renderPerSentenceKLHeatmap() {
   const meta = maskData.metadata || {};
   const answerIds = meta.answer_ids || [];
   const answerLabels = meta.answer_labels || [];
-
   if (!perSentKL || !Array.isArray(perSentKL) || perSentKL.length === 0 || answerIds.length === 0) {
     container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No per-sentence KL or answer_ids data.</div>';
     return;
   }
-
   const branches = perSentKL;
   const numSents = Math.max(...branches.map(b => Array.isArray(b) ? b.length : 0), 0);
-
-  // Sort branches by answer group
   const branchOrder = d3.range(branches.length).sort((a, b) => (answerIds[a] || 0) - (answerIds[b] || 0));
-
   const zData = [], yLabels = [];
   for (const bi of branchOrder) {
-    const bData = branches[bi] || [];
-    const row = d3.range(numSents).map(s => bData[s] ? _getKL(bData[s]) : 0);
-    zData.push(row);
-    const ansLabel = answerLabels[answerIds[bi]] || ('Ans ' + answerIds[bi]);
-    yLabels.push(`B${bi} (${ansLabel})`);
+    zData.push(d3.range(numSents).map(s => (branches[bi] || [])[s] ? _getKL((branches[bi] || [])[s]) : 0));
+    yLabels.push(`B${bi} (${answerLabels[answerIds[bi]] || ('Ans ' + answerIds[bi])})`);
   }
-
-  const xLabels = d3.range(numSents).map(i => String(i));
-
-  const traces = [{
-    z: zData, x: xLabels, y: yLabels, type: 'heatmap',
-    colorscale: 'YlOrRd', hovertemplate: '%{y}<br>Sentence %{x}<br>KL=%{z:.2e}<extra></extra>',
-    colorbar: { title: { text: 'KL', side: 'right' }, thickness: 12 },
-  }];
-
-  const layout = { ...PLOTLY_LAYOUT_BASE,
-    title: { text: `Per-sentence KL heatmap (by answer) — t=${entry.threshold.toExponential(2)}`, font: { size: 10, color: '#94a3b8' }, x: 0 },
-    xaxis: { title: { text: 'Sentence index', standoff: 12 }, type: 'category' },
-    yaxis: { type: 'category', autorange: 'reversed' },
-    margin: { ...PLOTLY_LAYOUT_BASE.margin, l: 100 },
-  };
+  const traces = [{ z: zData, x: d3.range(numSents).map(String), y: yLabels, type: 'heatmap', colorscale: 'YlOrRd', hovertemplate: '%{y}<br>Sentence %{x}<br>KL=%{z:.2e}<extra></extra>', colorbar: { title: { text: 'KL', side: 'right' }, thickness: 12 } }];
+  const layout = { ...PLOTLY_LAYOUT_BASE, title: { text: `Per-sentence KL heatmap (by answer) — t=${entry.threshold.toExponential(2)}`, font: { size: 10, color: '#94a3b8' }, x: 0 }, xaxis: { title: { text: 'Sentence index', standoff: 12 }, type: 'category' }, yaxis: { type: 'category', autorange: 'reversed' }, margin: { ...PLOTLY_LAYOUT_BASE.margin, l: 100 } };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
 }
 
+// ── Log-weight histogram ──
 function renderLogWeightHistogram() {
   if (!thresholdEvalData) return;
   const container = document.getElementById('threshold-chart-container');
   const entry = _findNearestEntry();
   const logWeights = entry.log_weights;
-  if (!Array.isArray(logWeights) || logWeights.length === 0) {
-    container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No log_weights data at this threshold.</div>';
-    return;
-  }
-
-  const traces = [{
-    x: logWeights, type: 'histogram',
-    marker: { color: 'rgba(76,175,80,0.6)', line: { color: '#4caf50', width: 1 } },
-    hovertemplate: 'log(w): %{x:.2f}<br>count: %{y}<extra></extra>',
-    nbinsx: Math.min(30, Math.max(10, Math.ceil(Math.sqrt(logWeights.length)))),
-  }];
-
-  const layout = { ...PLOTLY_LAYOUT_BASE, showlegend: false,
-    xaxis: { title: { text: 'log(weight)', standoff: 12 }, gridcolor: '#e2e8f0' },
-    yaxis: { title: { text: 'Count', standoff: 12 }, gridcolor: '#e2e8f0' },
-  };
+  if (!Array.isArray(logWeights) || logWeights.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No log_weights data.</div>'; return; }
+  const traces = [{ x: logWeights, type: 'histogram', marker: { color: 'rgba(76,175,80,0.6)', line: { color: '#4caf50', width: 1 } }, hovertemplate: 'log(w): %{x:.2f}<br>count: %{y}<extra></extra>', nbinsx: Math.min(30, Math.max(10, Math.ceil(Math.sqrt(logWeights.length)))) }];
+  const layout = { ...PLOTLY_LAYOUT_BASE, showlegend: false, xaxis: { title: { text: 'log(weight)', standoff: 12 }, gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Count', standoff: 12 }, gridcolor: '#e2e8f0' } };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
 }
 
+// ── Per-chain weights ──
 function renderPerChainWeightsChart() {
   if (!thresholdEvalData) return;
   const container = document.getElementById('threshold-chart-container');
   const entry = _findNearestEntry();
-
-  // Prefer the new field; fall back to recomputing from log_weights (SNIS).
   let weights = entry.chain_weights_normalized;
   if (!Array.isArray(weights)) {
     const lw = entry.log_weights;
-    if (!Array.isArray(lw) || lw.length === 0) {
-      container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No per-chain weight data at this threshold.</div>';
-      return;
-    }
-    const mx = Math.max(...lw);
-    const es = lw.map(v => Math.exp(v - mx));
-    const S = es.reduce((a, b) => a + b, 0);
-    weights = es.map(v => v / S);
+    if (!Array.isArray(lw) || lw.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No per-chain weight data.</div>'; return; }
+    const mx = Math.max(...lw); const es = lw.map(v => Math.exp(v - mx)); const S = es.reduce((a, b) => a + b, 0); weights = es.map(v => v / S);
   }
-
   const meta = maskData.metadata || {};
   const answerIds = meta.answer_ids || [];
   const answerLabels = meta.answer_labels || [];
   const correctAnswer = meta.correct_answer;
   const N = weights.length;
-
   const incorrectPalette = ['#dc2626', '#f97316', '#ca8a04', '#be123c', '#7c2d12'];
-  const bucketColors = answerLabels.map((lab, i) => {
-    if (lab === correctAnswer) return '#16a34a';
-    return incorrectPalette[i % incorrectPalette.length];
-  });
-
+  const bucketColors = answerLabels.map((lab, i) => lab === correctAnswer ? '#16a34a' : incorrectPalette[i % incorrectPalette.length]);
   const bucketIndices = {};
-  for (let i = 0; i < N; i++) {
-    const aid = answerIds[i] ?? 0;
-    if (!bucketIndices[aid]) bucketIndices[aid] = [];
-    bucketIndices[aid].push(i);
-  }
-  const traces = Object.entries(bucketIndices).map(([aid, idxs]) => ({
-    x: idxs,
-    y: idxs.map(i => weights[i]),
-    type: 'bar',
-    name: (answerLabels[aid] || 'Ans ' + aid) +
-          (answerLabels[aid] === correctAnswer ? ' (correct)' : ''),
-    marker: { color: bucketColors[aid] || '#94a3b8' },
-    hovertemplate: 'chain %{x}<br>weight=%{y:.3f}<extra></extra>',
-  }));
-
+  for (let i = 0; i < N; i++) { const aid = answerIds[i] ?? 0; if (!bucketIndices[aid]) bucketIndices[aid] = []; bucketIndices[aid].push(i); }
+  const traces = Object.entries(bucketIndices).map(([aid, idxs]) => ({ x: idxs, y: idxs.map(i => weights[i]), type: 'bar', name: (answerLabels[aid] || 'Ans ' + aid) + (answerLabels[aid] === correctAnswer ? ' (correct)' : ''), marker: { color: bucketColors[aid] || '#94a3b8' }, hovertemplate: 'chain %{x}<br>weight=%{y:.3f}<extra></extra>' }));
   const baseline = 1.0 / N;
-  const baselineTrace = {
-    x: [0, N - 1],
-    y: [baseline, baseline],
-    type: 'scatter', mode: 'lines',
-    line: { color: '#64748b', dash: 'dash', width: 1 },
-    name: '1/N uniform',
-    hoverinfo: 'skip',
-  };
-
-  const method = entry.importance_sampling_method
-    || meta.importance_sampling_method || 'snis';
-  const titleText =
-    `IS weights under ${method} | sparsity=${(entry.sparsity * 100).toFixed(1)}%` +
-    (entry.n_eff != null ? ` | N_eff=${entry.n_eff.toFixed(1)}/${N}` : '');
-
-  const layout = { ...PLOTLY_LAYOUT_BASE,
-    barmode: 'stack',
-    title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 },
-    xaxis: { title: { text: 'chain index', standoff: 12 }, gridcolor: '#e2e8f0' },
-    yaxis: { title: { text: 'SNIS weight', standoff: 12 }, gridcolor: '#e2e8f0',
-             range: [0, 1.02] },
-  };
-
-  Plotly.newPlot(container, [...traces, baselineTrace], layout, PLOTLY_CONFIG);
+  traces.push({ x: [0, N - 1], y: [baseline, baseline], type: 'scatter', mode: 'lines', line: { color: '#64748b', dash: 'dash', width: 1 }, name: '1/N uniform', hoverinfo: 'skip' });
+  const method = entry.importance_sampling_method || meta.importance_sampling_method || 'snis';
+  const titleText = `IS weights under ${method} | sparsity=${(entry.sparsity * 100).toFixed(1)}%` + (entry.n_eff != null ? ` | N_eff=${entry.n_eff.toFixed(1)}/${N}` : '');
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'stack', title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 }, xaxis: { title: { text: 'chain index', standoff: 12 }, gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'SNIS weight', standoff: 12 }, gridcolor: '#e2e8f0', range: [0, 1.02] } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
 }
 
+// ── Answer probs ──
 function renderAnswerProbsAsMainChart() {
   if (!thresholdEvalData || !thresholdEvalData.hasAnswerProbs) return;
   const container = document.getElementById('threshold-chart-container');
-  const { entries, answerLabels } = thresholdEvalData;
   const entry = _findNearestEntry();
-  // Prefer the fine-grained probs so they line up with meta.answer_labels
-  // (answer_probs_masked is the 2-bucket binary correct/incorrect vector and
-  // doesn't match the fine-grained P_clean histogram).
-  const probs = Array.isArray(entry.answer_probs_masked_fine)
-    ? entry.answer_probs_masked_fine
-    : entry.answer_probs_masked;
+  const probs = Array.isArray(entry.answer_probs_masked_fine) ? entry.answer_probs_masked_fine : entry.answer_probs_masked;
   if (!Array.isArray(probs)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No answer probs.</div>'; return; }
-
   const meta = maskData.metadata || {};
-  const answerIds = meta.answer_ids || [];
-  const N = answerIds.length || 1;
+  const answerIds = meta.answer_ids || []; const N = answerIds.length || 1;
   const numAnswers = Math.max(meta.num_answers || 0, probs.length);
   const pClean = new Array(numAnswers).fill(0);
   for (const aid of answerIds) { if (aid < numAnswers) pClean[aid]++; }
   for (let i = 0; i < numAnswers; i++) pClean[i] /= N;
-
-  const labels = d3.range(numAnswers).map(i => (answerLabels && answerLabels[i]) ? answerLabels[i] : 'Answer ' + i);
-
+  const labels = d3.range(numAnswers).map(i => (thresholdEvalData.answerLabels && thresholdEvalData.answerLabels[i]) || 'Answer ' + i);
   const traces = [
     { x: labels, y: pClean.map(v => v * 100), type: 'bar', name: 'P_clean', marker: { color: '#60a5fa', opacity: 0.7 }, hovertemplate: '%{x}<br>P_clean=%{y:.1f}%<extra></extra>' },
     { x: labels, y: probs.map(v => v * 100), type: 'bar', name: 'P_masked', marker: { color: '#4caf50' }, hovertemplate: '%{x}<br>P_masked=%{y:.1f}%<extra></extra>' },
   ];
-
   const nEff = entry.n_eff, nEffRatio = entry.n_eff_ratio;
   let titleText = `Sparsity: ${(entry.sparsity * 100).toFixed(1)}%`;
   if (nEff != null) titleText += ` | N_eff: ${nEff.toFixed(1)}/${N} (${(nEffRatio * 100).toFixed(1)}%)`;
-
-  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group',
-    title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 },
-    xaxis: { type: 'category', gridcolor: '#e2e8f0' },
-    yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
-  };
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group', title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 }, xaxis: { type: 'category', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' } };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
 }
 
+// ── Weighted answer probs ──
 function renderWeightedAnswerProbsAsMainChart() {
   if (!thresholdEvalData) return;
   const container = document.getElementById('threshold-chart-container');
@@ -2067,170 +628,89 @@ function renderWeightedAnswerProbsAsMainChart() {
   const entry = _findNearestEntry();
   const probsM = entry ? entry.answer_probs_masked_weighted : null;
   if (!Array.isArray(probsM) || !Array.isArray(answerProbsCleanWeighted)) {
-    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Paper-style (Eq. 1) weighted answer probs not available — re-run evaluate_mask.py to populate <code>answer_probs_clean_weighted</code> and <code>answer_probs_masked_weighted</code>.</div>';
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Paper-style (Eq. 1) weighted answer probs not available.</div>';
     return;
   }
-
   const numAnswers = probsM.length;
-  const labels = d3.range(numAnswers).map(i => (answerLabels && answerLabels[i]) ? answerLabels[i] : 'Answer ' + i);
-
+  const labels = d3.range(numAnswers).map(i => (answerLabels && answerLabels[i]) || 'Answer ' + i);
   const traces = [
-    { x: labels, y: answerProbsCleanWeighted.map(v => v * 100), type: 'bar', name: 'P_clean (weighted)', marker: { color: '#60a5fa', opacity: 0.7 }, hovertemplate: '%{x}<br>P_clean weighted=%{y:.1f}%<extra></extra>' },
-    { x: labels, y: probsM.map(v => v * 100), type: 'bar', name: 'P_masked (weighted)', marker: { color: '#f97316' }, hovertemplate: '%{x}<br>P_masked weighted=%{y:.1f}%<extra></extra>' },
+    { x: labels, y: answerProbsCleanWeighted.map(v => v * 100), type: 'bar', name: 'P_clean (weighted)', marker: { color: '#60a5fa', opacity: 0.7 } },
+    { x: labels, y: probsM.map(v => v * 100), type: 'bar', name: 'P_masked (weighted)', marker: { color: '#f97316' } },
   ];
-
-  const titleText = `Sparsity: ${(entry.sparsity * 100).toFixed(1)}% | Eq. 1 outcome distributions (paper-style, within-sample reweighting)`;
-
-  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group',
-    title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 },
-    xaxis: { type: 'category', gridcolor: '#e2e8f0' },
-    yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
-  };
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group', title: { text: `Sparsity: ${(entry.sparsity * 100).toFixed(1)}% | Eq. 1 outcome distributions`, font: { size: 10, color: '#64748b' }, x: 0 }, xaxis: { type: 'category', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' } };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
 }
 
+// ── Resample comparison ──
 function renderResampleComparison() {
   const container = document.getElementById('threshold-chart-container');
   if (!resampleData || !Array.isArray(resampleData.thresholds) || resampleData.thresholds.length === 0) {
-    container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No resample data available. Run evaluate_mask_resample.py.</div>';
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No resample data available.</div>';
     return;
   }
-
-  // Find the resample entry closest to the current threshold
   const ct = getThreshold();
   let bestIdx = 0, bestDist = Infinity;
-  for (let i = 0; i < resampleData.thresholds.length; i++) {
-    const d = Math.abs(resampleData.thresholds[i].threshold - ct);
-    if (d < bestDist) { bestDist = d; bestIdx = i; }
-  }
+  for (let i = 0; i < resampleData.thresholds.length; i++) { const d = Math.abs(resampleData.thresholds[i].threshold - ct); if (d < bestDist) { bestDist = d; bestIdx = i; } }
   const rEntry = resampleData.thresholds[bestIdx];
   const allLabels = resampleData.answer_labels || [];
-  if (allLabels.length === 0) {
-    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No answer labels.</div>';
-    return;
-  }
-
-  // 1) Unmasked (original) — frequency distribution
+  if (allLabels.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No answer labels.</div>'; return; }
   const origDist = resampleData.original.answer_distribution || {};
-  const origVals = allLabels.map(l => (origDist[l] || 0) * 100);
-
-  // 2) Masked without resampling (IS-based) — from existing evaluation
   const isDist = rEntry.masked_is_answer_distribution || {};
-  const isVals = allLabels.map(l => (isDist[l] || 0) * 100);
-  const hasIS = Object.keys(isDist).length > 0;
-
-  // 3) Masked with resampling — frequency distribution
   const resDist = rEntry.resample_answer_distribution || {};
-  const resVals = allLabels.map(l => (resDist[l] || 0) * 100);
-
-  // Truncate labels for display
+  const hasIS = Object.keys(isDist).length > 0;
   const displayLabels = allLabels.map(l => l.length > 30 ? l.slice(0, 27) + '...' : l);
-
-  const traces = [
-    {
-      x: displayLabels, y: origVals, type: 'bar', name: 'Unmasked',
-      marker: { color: '#60a5fa', opacity: 0.8 },
-      hovertemplate: '%{x}<br>Unmasked: %{y:.1f}%<extra></extra>',
-    },
-  ];
-  if (hasIS) {
-    traces.push({
-      x: displayLabels, y: isVals, type: 'bar', name: 'Masked (IS)',
-      marker: { color: '#4caf50', opacity: 0.8 },
-      hovertemplate: '%{x}<br>Masked (IS): %{y:.1f}%<extra></extra>',
-    });
-  }
-  traces.push({
-    x: displayLabels, y: resVals, type: 'bar', name: 'Masked (resample)',
-    marker: { color: '#f59e0b', opacity: 0.8 },
-    hovertemplate: '%{x}<br>Masked (resample): %{y:.1f}%<extra></extra>',
-  });
-
-  const sparsity = rEntry.sparsity;
-  const nResample = resampleData.num_resample_branches || '?';
-  const nOrig = (resampleData.original.branches || []).length || '?';
-  let titleText = `Sparsity: ${(sparsity * 100).toFixed(1)}%`;
-  titleText += ` | Original: ${nOrig} branches | Resample: ${nResample} branches`;
-
-  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group',
-    title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 },
-    xaxis: { type: 'category', gridcolor: '#e2e8f0', tickangle: allLabels.length > 5 ? -45 : 0 },
-    yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
-    margin: { ...PLOTLY_LAYOUT_BASE.margin, b: allLabels.length > 5 ? 100 : 52 },
-  };
+  const traces = [{ x: displayLabels, y: allLabels.map(l => (origDist[l] || 0) * 100), type: 'bar', name: 'Unmasked', marker: { color: '#60a5fa', opacity: 0.8 } }];
+  if (hasIS) traces.push({ x: displayLabels, y: allLabels.map(l => (isDist[l] || 0) * 100), type: 'bar', name: 'Masked (IS)', marker: { color: '#4caf50', opacity: 0.8 } });
+  traces.push({ x: displayLabels, y: allLabels.map(l => (resDist[l] || 0) * 100), type: 'bar', name: 'Masked (resample)', marker: { color: '#f59e0b', opacity: 0.8 } });
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group', title: { text: `Sparsity: ${(rEntry.sparsity * 100).toFixed(1)}%`, font: { size: 10, color: '#64748b' }, x: 0 }, xaxis: { type: 'category', gridcolor: '#e2e8f0', tickangle: allLabels.length > 5 ? -45 : 0 }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' }, margin: { ...PLOTLY_LAYOUT_BASE.margin, b: allLabels.length > 5 ? 100 : 52 } };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
-
-  // Click on chart → jump to threshold
-  container.on('plotly_click', function() { /* no-op — stays at current threshold */ });
 }
 
+// ── N_eff chart ──
 function renderNeffAsMainChart() {
   if (!thresholdEvalData || !thresholdEvalData.hasNeff) return;
   const container = document.getElementById('threshold-chart-container');
   const { sparsities, nEffRatios, randomNeffs, thresholds: thrArr } = thresholdEvalData;
   const n = sparsities.length;
   if (n === 0) return;
-
   const idx = d3.range(n).sort((a, b) => sparsities[a] - sparsities[b]);
   const sortedSp = idx.map(i => sparsities[i]);
   const sortedNeff = idx.map(i => nEffRatios[i]);
   const validIdx = d3.range(n).filter(i => !isNaN(sortedNeff[i]));
   if (validIdx.length === 0) return;
-
   const xVals = validIdx.map(i => sortedSp[i]);
   const yVals = validIdx.map(i => Math.min(sortedNeff[i], 1));
   const ptColors = validIdx.map(i => sortedNeff[i] >= 0.1 ? '#4caf50' : '#ef4444');
-
   const traces = [];
-
-  // Random baseline with error bars from random_n_effs
   if (randomNeffs) {
     const { entries } = thresholdEvalData;
     const N = entries[0] ? (maskData.metadata.num_branches || entries.length) : 1;
     const sortedRN = idx.map(i => randomNeffs[i]);
     const rVals = validIdx.filter(i => !isNaN(sortedRN[i]));
     if (rVals.length > 0) {
-      // Compute std from random_n_effs arrays in each entry
       const rMeans = rVals.map(i => Math.min(sortedRN[i], 1));
       const rStds = rVals.map(i => {
-        const origIdx = idx[i];
-        const arr = entries[origIdx].random_n_effs;
+        const origIdx = idx[i]; const arr = entries[origIdx].random_n_effs;
         if (!Array.isArray(arr) || arr.length === 0) return 0;
         const numConts = entries[origIdx].n_eff ? (entries[origIdx].n_eff / (entries[origIdx].n_eff_ratio || 1)) : arr.length;
         const ratios = arr.map(v => Math.min(v / (numConts || 1), 1));
         const mean = ratios.reduce((a, b) => a + b, 0) / ratios.length;
         return Math.sqrt(ratios.reduce((a, b) => a + (b - mean) ** 2, 0) / ratios.length);
       });
-      traces.push({
-        x: rVals.map(i => sortedSp[i]), y: rMeans, mode: 'lines',
-        line: { color: 'orange', dash: 'dash', width: 1.5 }, name: 'Random baseline',
-        error_y: { type: 'data', array: rStds, visible: true, color: 'rgba(255,165,0,0.4)', thickness: 1 },
-      });
+      traces.push({ x: rVals.map(i => sortedSp[i]), y: rMeans, mode: 'lines', line: { color: 'orange', dash: 'dash', width: 1.5 }, name: 'Random baseline', error_y: { type: 'data', array: rStds, visible: true, color: 'rgba(255,165,0,0.4)', thickness: 1 } });
     }
   }
-
-  // N_eff line + markers
   traces.push({ x: xVals, y: yVals, mode: 'lines+markers', line: { color: '#64748b', width: 1 }, marker: { size: 6, color: ptColors }, name: 'N_eff/N', hovertemplate: 'sparsity=%{x:.1%}<br>N_eff/N=%{y:.3f}<extra></extra>' });
-
-  // 0.1 threshold line
   const spMin = d3.min(xVals), spMax = d3.max(xVals);
   traces.push({ x: [spMin, spMax], y: [0.1, 0.1], mode: 'lines', line: { color: 'rgba(239,68,68,0.5)', dash: 'dash', width: 1 }, name: 'N_eff/N = 0.1', showlegend: true });
-
-  // Selected threshold marker
   const currentThreshold = getThreshold();
-  const sortedT = idx.map(i => thrArr[i]);
   let nearIdx = 0, nearDist = Infinity;
   for (let i = 0; i < n; i++) { const d = Math.abs(thrArr[i] - currentThreshold); if (d < nearDist) { nearDist = d; nearIdx = i; } }
   if (!isNaN(nEffRatios[nearIdx])) {
     traces.push({ x: [sparsities[nearIdx]], y: [Math.min(nEffRatios[nearIdx], 1)], mode: 'markers', marker: { size: 12, symbol: 'star', color: '#1e293b', line: { color: '#fff', width: 1.5 } }, showlegend: false, hoverinfo: 'skip' });
   }
-
-  const layout = { ...PLOTLY_LAYOUT_BASE,
-    xaxis: { title: { text: 'Sparsity', standoff: 12 }, tickformat: '.0%', gridcolor: '#e2e8f0' },
-    yaxis: { title: { text: 'N_eff / N', standoff: 12 }, range: [0, 1.05], gridcolor: '#e2e8f0' },
-  };
+  const layout = { ...PLOTLY_LAYOUT_BASE, xaxis: { title: { text: 'Sparsity', standoff: 12 }, tickformat: '.0%', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'N_eff / N', standoff: 12 }, range: [0, 1.05], gridcolor: '#e2e8f0' } };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
-
   container.on('plotly_click', function(data) {
     if (data.points && data.points.length > 0) {
       const sp = data.points[0].x;
@@ -2242,545 +722,100 @@ function renderNeffAsMainChart() {
   });
 }
 
-// ==============================================================
-// Aggregated Mask Heatmap (F4)
-// ══════════════════════════════════════════════════════════════
-function drawAggregatedMask(c, W, H) {
-  if (!processed) return;
-  const { sents, S } = processed;
-  const agg = document.getElementById('agg-select').value;
-  const threshold = getThreshold();
-
-  const lStart = parseInt(document.getElementById('layer-start').value);
-  const lEnd = parseInt(document.getElementById('layer-end').value);
-  const allLayers = (maskData.layers || []).sort((a, b) => a - b);
-  const layers = allLayers.filter(l => l >= lStart && l <= lEnd);
-
-  // Aggregate scores across active layers
-  const aggMatrix = Array.from({ length: S }, () => Array(S).fill(0));
-  const layerCount = layers.length;
-  for (const layer of layers) {
-    const mat = getLayerAgg(layer, agg);
-    for (let i = 0; i < S; i++) {
-      for (let j = 0; j < S; j++) {
-        if (mat[i] && mat[i][j] !== undefined) {
-          if (agg === 'max') aggMatrix[i][j] = Math.max(aggMatrix[i][j], mat[i][j]);
-          else aggMatrix[i][j] += mat[i][j];
-        }
-      }
-    }
-  }
-  if (agg === 'mean' && layerCount > 0) {
-    for (let i = 0; i < S; i++) for (let j = 0; j < S; j++) aggMatrix[i][j] /= layerCount;
-  }
-
-  // Find max absolute value for color scale
-  let maxAbs = 0;
-  for (let i = 0; i < S; i++) {
-    for (let j = 0; j <= i; j++) { // lower triangle only
-      maxAbs = Math.max(maxAbs, Math.abs(aggMatrix[i][j]));
-    }
-  }
-  if (maxAbs === 0) maxAbs = 1;
-
-  const pad = { top: 36, right: 50, bottom: 36, left: 50 };
-  const gridSize = Math.min((W - pad.left - pad.right) / S, (H - pad.top - pad.bottom) / S);
-  const gridW = gridSize * S;
-  const gridH = gridSize * S;
-  const offsetX = pad.left + (W - pad.left - pad.right - gridW) / 2;
-  const offsetY = pad.top + (H - pad.top - pad.bottom - gridH) / 2;
-
-  // Save state for mouse interaction
-  aggState = { offsetX, offsetY, gridSize, S, aggMatrix, maxAbs };
-
-  // Color scale: purple for negative, green for positive
-  function cellColor(val) {
-    const norm = Math.abs(val) / maxAbs;
-    if (val < 0) return d3.interpolatePurples(0.15 + norm * 0.7);
-    return d3.interpolateGreens(0.15 + norm * 0.7);
-  }
-
-  // Determine which rows and columns to highlight
-  // aggSelectedCell: row=i (query), col=j (key) — distinct indices
-  // highlightSentence: same index for both row and column (from legend click)
-  const hlRows = new Set();
-  const hlCols = new Set();
-  if (aggSelectedCell) {
-    hlRows.add(aggSelectedCell.i);
-    hlCols.add(aggSelectedCell.j);
-  } else if (highlightSentence !== null) {
-    hlRows.add(highlightSentence);
-    hlCols.add(highlightSentence);
-  }
-  const hasHighlight = hlRows.size > 0 || hlCols.size > 0;
-
-  // Draw cells (lower triangle only, upper = grey)
-  for (let i = 0; i < S; i++) {
-    for (let j = 0; j < S; j++) {
-      const x = offsetX + j * gridSize;
-      const y = offsetY + i * gridSize;
-
-      const isHl = hlRows.has(i) || hlCols.has(j);
-
-      if (j > i) {
-        // Upper triangle: blank/grey (tinted if highlighted)
-        c.fillStyle = isHl ? '#e8f5e9' : '#f1f5f9';
-        c.fillRect(x, y, gridSize, gridSize);
-      } else {
-        const val = aggMatrix[i][j];
-        const belowThreshold = val < threshold;
-        const useCat = colorByCategory();
-        if (useCat && !belowThreshold) {
-          const norm = maxAbs > 0 ? Math.abs(val) / maxAbs : 0;
-          // Lower-left triangle: key (column j)
-          const keyColor = TAG_COLORS[primaryTag(j)] || TAG_COLORS.unknown;
-          c.fillStyle = d3.interpolateRgb('#ffffff', keyColor)(0.15 + norm * 0.7);
-          c.beginPath();
-          c.moveTo(x, y);
-          c.lineTo(x, y + gridSize);
-          c.lineTo(x + gridSize, y + gridSize);
-          c.closePath();
-          c.fill();
-          // Upper-right triangle: query (row i)
-          const queryColor = TAG_COLORS[primaryTag(i)] || TAG_COLORS.unknown;
-          c.fillStyle = d3.interpolateRgb('#ffffff', queryColor)(0.15 + norm * 0.7);
-          c.beginPath();
-          c.moveTo(x, y);
-          c.lineTo(x + gridSize, y);
-          c.lineTo(x + gridSize, y + gridSize);
-          c.closePath();
-          c.fill();
-          if (isHl) {
-            c.fillStyle = 'rgba(76, 175, 80, 0.10)';
-            c.fillRect(x, y, gridSize, gridSize);
-          }
-        } else {
-          if (belowThreshold) {
-            c.fillStyle = isHl ? '#cdd5dc' : '#e2e8f0'; // dimmed
-          } else {
-            c.fillStyle = cellColor(val);
-            if (isHl) {
-              c.fillRect(x, y, gridSize, gridSize);
-              c.fillStyle = 'rgba(76, 175, 80, 0.10)';
-            }
-          }
-          c.fillRect(x, y, gridSize, gridSize);
-        }
-      }
-
-      // Fade non-highlighted cells when a selection is active
-      if (hasHighlight && !isHl && j <= i) {
-        c.fillStyle = 'rgba(255,255,255,0.45)';
-        c.fillRect(x, y, gridSize, gridSize);
-      }
-
-      // Cell border
-      c.strokeStyle = '#fff';
-      c.lineWidth = 0.5;
-      c.strokeRect(x, y, gridSize, gridSize);
-    }
-  }
-
-  // Highlight row/column outlines
-  c.strokeStyle = '#4caf50';
-  c.lineWidth = 2;
-  if (aggSelectedCell) {
-    // Row outline for query sentence
-    c.strokeRect(offsetX, offsetY + aggSelectedCell.i * gridSize, gridW, gridSize);
-    // Column outline for key sentence (only if different from query)
-    if (aggSelectedCell.j !== aggSelectedCell.i) {
-      c.strokeRect(offsetX + aggSelectedCell.j * gridSize, offsetY, gridSize, gridH);
-    }
-  } else if (highlightSentence !== null && highlightSentence < S) {
-    c.strokeRect(offsetX, offsetY + highlightSentence * gridSize, gridW, gridSize);
-    c.strokeRect(offsetX + highlightSentence * gridSize, offsetY, gridSize, gridH);
-  }
-
-  // Hover cell outline
-  if (aggHoverCell && aggHoverCell.i < S && aggHoverCell.j < S) {
-    const hx = offsetX + aggHoverCell.j * gridSize;
-    const hy = offsetY + aggHoverCell.i * gridSize;
-    c.strokeStyle = '#1e293b';
-    c.lineWidth = 2.5;
-    c.strokeRect(hx, hy, gridSize, gridSize);
-  }
-
-  // Axis labels
-  const fontSize = Math.min(10, gridSize * 0.6);
-  for (let s = 0; s < S; s++) {
-    const isHlLabel = hlRows.has(s) || hlCols.has(s);
-    const isHv = aggHoverCell && (aggHoverCell.i === s || aggHoverCell.j === s);
-    c.fillStyle = isHlLabel ? '#2e7d32' : isHv ? '#1e293b' : '#64748b';
-    c.font = (isHlLabel || isHv ? 'bold ' : '') + fontSize + 'px monospace';
-    // Bottom labels (key axis)
-    c.textAlign = 'center';
-    c.fillText('S' + s, offsetX + s * gridSize + gridSize / 2, offsetY + gridH + 14);
-    // Left labels (query axis)
-    c.textAlign = 'right';
-    c.fillText('S' + s, offsetX - 4, offsetY + s * gridSize + gridSize / 2 + 3);
-  }
-
-  // Color legend
-  const legendX = offsetX + gridW + 10;
-  const legendY = offsetY;
-  const legendH = Math.min(gridH, 120);
-  const legendW = 12;
-  const steps = 20;
-  // Green (positive) on top, purple (negative) on bottom
-  for (let i = 0; i < steps; i++) {
-    const frac = i / steps;
-    const val = maxAbs * (1 - 2 * frac); // goes from +max to -max
-    const y = legendY + frac * legendH;
-    c.fillStyle = val >= 0 ? d3.interpolateGreens(0.15 + (val / maxAbs) * 0.7)
-                           : d3.interpolatePurples(0.15 + (Math.abs(val) / maxAbs) * 0.7);
-    c.fillRect(legendX, y, legendW, legendH / steps + 1);
-  }
-  c.strokeStyle = '#94a3b8'; c.lineWidth = 0.5;
-  c.strokeRect(legendX, legendY, legendW, legendH);
-
-  c.fillStyle = '#64748b'; c.font = '8px monospace'; c.textAlign = 'left';
-  c.fillText('+' + maxAbs.toExponential(1), legendX + legendW + 3, legendY + 6);
-  c.fillText('0', legendX + legendW + 3, legendY + legendH / 2 + 3);
-  c.fillText('-' + maxAbs.toExponential(1), legendX + legendW + 3, legendY + legendH);
-}
-
-// ══════════════════════════════════════════════════════════════
-// Resize
-// ══════════════════════════════════════════════════════════════
-window.addEventListener('resize', () => { if (processed) { render(); onMetricChange(); } });
-
-// ══════════════════════════════════════════════════════════════
-// Detail panel drag-resize
-// ══════════════════════════════════════════════════════════════
-(function() {
-  const handle = document.getElementById('detail-resize-handle');
-  const panel = document.getElementById('detail-panel');
-  if (!handle || !panel) return;
-  let dragging = false, startX = 0, startW = 0;
-  handle.addEventListener('mousedown', e => {
-    dragging = true; startX = e.clientX; startW = panel.offsetWidth;
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-    e.preventDefault();
-  });
-  document.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const delta = startX - e.clientX; // dragging left = wider
-    const newW = Math.max(200, Math.min(800, startW + delta));
-    panel.style.width = newW + 'px';
-  });
-  document.addEventListener('mouseup', () => {
-    if (!dragging) return;
-    dragging = false;
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
-    if (processed) { render(); onMetricChange(); }
-  });
-})();
-
 // ══════════════════════════════════════════════════════════════
 // Guided Tour
 // ══════════════════════════════════════════════════════════════
-let tourStep = 0;
-let tourActive = false;
-
+let tourStep = 0, tourActive = false;
 const tourSteps = [
-  {
-    target: null,
-    title: 'Welcome to Circuit Tracer',
-    body: 'This dashboard visualizes attention attribution circuits discovered by the circuit discovery pipeline. Nodes are (Layer, Sentence) pairs. Edges show how much one sentence attends to another at each layer. All three objectives (faithfulness, reward, contrastive) are evaluated and viewable from a single mask.',
-  },
-  {
-    target: () => document.querySelector('#sidebar .ctrl:nth-of-type(1)'),
-    title: 'Load Mask',
-    body: 'Load a NodeMask JSON file from your local machine or from the server\'s results directory. Both dense and sparse score formats are supported.',
-    arrow: 'left',
-  },
-  {
-    target: () => document.querySelector('.view-toggle'),
-    title: 'View Toggle',
-    body: '<b>Within-layer arcs</b>: Bezier arcs connecting sentence pairs within each layer row.<br><br><b>Cross-layer flow</b>: Vertical S-curves showing how a connection persists across layers.<br><br><b>Aggregated mask</b>: An S&times;S heatmap of sentence-to-sentence scores aggregated across all active layers. Useful for seeing the overall attention pattern at a glance.',
-    arrow: 'left',
-  },
-  {
-    target: () => document.querySelector('#threshold-slider').closest('.ctrl'),
-    title: 'Threshold',
-    body: 'Filter edges by minimum score. Steps through discrete values from the threshold evaluation. Edges with score &lt; threshold are hidden (matching the evaluation in circuit_eval.py). Also controls which threshold is shown in the metric charts.',
-    arrow: 'left',
-  },
-  {
-    target: () => document.querySelector('#influence-slider').closest('.ctrl'),
-    title: 'Influence %',
-    body: 'Pre-filters edges by cumulative |score|. 80% keeps only the strongest edges accounting for 80% of total influence, preventing low thresholds from flooding the graph.',
-    arrow: 'left',
-  },
-  {
-    target: () => document.querySelector('#agg-select').closest('.ctrl'),
-    title: 'Aggregation',
-    body: 'For per-head masks: combine heads via <b>Mean</b>, <b>Max</b>, or <b>Sum</b>. Affects both the graph and the aggregated mask heatmap.',
-    arrow: 'left',
-  },
-  {
-    target: () => document.querySelector('#layer-start').closest('.ctrl'),
-    title: 'Layer Range',
-    body: 'Restrict which layers appear in the graph. For <b>pair granularity</b> masks, this is disabled since scores are shared across all layers.',
-    arrow: 'left',
-  },
-  {
-    target: () => document.getElementById('sentence-legend').closest('.ctrl'),
-    title: 'Sentences',
-    body: 'Click a sentence to highlight all edges involving it. Click again to deselect. Sentences are color-coded by region: <span style="color:#3b82f6">prompt</span>, <span style="color:#a855f7">assistant prefix</span>, <span style="color:#f59e0b">generation</span>.',
-    arrow: 'left',
-  },
-  {
-    target: () => document.getElementById('graph-container'),
-    title: 'Graph Area',
-    body: 'The main visualization. X = sentences, Y = layers (bottom = early, top = late). Node size reflects importance. <b>Click a node</b> to inspect it. <b>Scroll</b> to zoom, <b>drag</b> to pan. Background shading shows prompt/assistant/generation regions.',
-    arrow: 'top',
-  },
-  {
-    target: () => document.getElementById('metric-select'),
-    title: 'Metric Dropdown',
-    body: 'Select from all available evaluation metrics. Charts are interactive (Plotly): zoom, pan, hover for values, click legend entries to toggle traces, download as PNG.<br><br><b>Local metrics</b> (always available): Per-token KL, Per-sentence KL.<br><b>IS-based</b> (Obj 1 &amp; 2): Answer KL, Reward Gap, P(target), P(best other), N_eff, Log-weight histogram, Per-answer probabilities.<br><b>Contrastive</b> (Obj 3): KL_A, KL_B, Contrastive Loss, Per-sentence KL heatmap by answer.',
-    arrow: 'right',
-  },
-  {
-    target: () => document.getElementById('threshold-chart-container'),
-    title: 'Metric Chart',
-    body: 'The chart for the selected metric. Most "vs Sparsity" plots show the learned mask (green) against a random baseline (orange dashed, with &plusmn;1&sigma; band). The star marks the current threshold. <b>Click a point</b> to jump to that threshold. N_eff chart includes error bars from random samples. Per-sentence charts show data at the current threshold.',
-    arrow: 'right',
-  },
-  {
-    target: () => document.getElementById('detail-panel'),
-    title: 'Detail Panel',
-    body: 'The right panel is resizable (drag the left edge). Below the metric chart, <b>Node Details</b> shows connections for the selected node: "Attends to" (outgoing) and "Attended by" (incoming) with score bars.',
-    arrow: 'right',
-  },
+  { target: null, title: 'Welcome to Circuit Tracer', body: 'This dashboard visualizes attention attribution circuits discovered by the circuit discovery pipeline. Nodes are (Layer, Sentence) pairs. Edges show how much one sentence attends to another at each layer.' },
+  { target: () => document.querySelector('#sidebar .ctrl:nth-of-type(1)'), title: 'Load Mask', body: 'Load a NodeMask JSON file from your local machine or from the server\'s results directory.', arrow: 'left' },
+  { target: () => document.querySelector('.view-toggle'), title: 'View Toggle', body: '<b>Within-layer arcs</b>: Bezier arcs within each layer row.<br><b>Cross-layer flow</b>: Vertical S-curves across layers.<br><b>Aggregated mask</b>: S&times;S heatmap aggregated across layers.', arrow: 'left' },
+  { target: () => document.querySelector('#threshold-slider').closest('.ctrl'), title: 'Threshold', body: 'Filter edges by minimum score. Steps through discrete values from the threshold evaluation.', arrow: 'left' },
+  { target: () => document.querySelector('#influence-slider').closest('.ctrl'), title: 'Influence %', body: 'Pre-filters edges by cumulative |score|. 80% keeps only the strongest edges.', arrow: 'left' },
+  { target: () => document.getElementById('graph-container'), title: 'Graph Area', body: 'X = sentences, Y = layers. Node size reflects importance. <b>Click a node</b> to inspect, <b>scroll</b> to zoom, <b>drag</b> to pan.', arrow: 'top' },
+  { target: () => document.getElementById('metric-select'), title: 'Metric Dropdown', body: 'Select from available evaluation metrics. Charts are interactive Plotly.', arrow: 'right' },
+  { target: () => document.getElementById('detail-panel'), title: 'Detail Panel', body: 'Resizable panel. Below the metric chart, <b>Node Details</b> shows connections for the selected node.', arrow: 'right' },
 ];
-
-function startTour() {
-  tourStep = 0;
-  tourActive = true;
-  showTourStep();
-}
-
-function endTour() {
-  tourActive = false;
-  document.getElementById('tour-backdrop').classList.remove('active');
-  document.getElementById('tour-highlight').classList.remove('active');
-  document.getElementById('tour-popover').classList.remove('active');
-}
-
-function tourNext() {
-  if (tourStep < tourSteps.length - 1) { tourStep++; showTourStep(); }
-  else endTour();
-}
-
-function tourPrev() {
-  if (tourStep > 0) { tourStep--; showTourStep(); }
-}
-
+function startTour() { tourStep = 0; tourActive = true; showTourStep(); }
+function endTour() { tourActive = false; document.getElementById('tour-backdrop').classList.remove('active'); document.getElementById('tour-highlight').classList.remove('active'); document.getElementById('tour-popover').classList.remove('active'); }
+function tourNext() { if (tourStep < tourSteps.length - 1) { tourStep++; showTourStep(); } else endTour(); }
+function tourPrev() { if (tourStep > 0) { tourStep--; showTourStep(); } }
 function showTourStep() {
   if (!tourActive) return;
   const step = tourSteps[tourStep];
-  const backdrop = document.getElementById('tour-backdrop');
-  const highlight = document.getElementById('tour-highlight');
-  const popover = document.getElementById('tour-popover');
-
-  backdrop.classList.add('active');
-  popover.classList.add('active');
-
-  // Update popover content
+  const backdrop = document.getElementById('tour-backdrop'), highlight = document.getElementById('tour-highlight'), popover = document.getElementById('tour-popover');
+  backdrop.classList.add('active'); popover.classList.add('active');
   popover.querySelector('.tour-title').textContent = step.title;
   popover.querySelector('.tour-body').innerHTML = step.body;
   popover.querySelector('.tour-step-info').textContent = (tourStep + 1) + ' / ' + tourSteps.length;
   popover.querySelector('.tour-prev').style.display = tourStep === 0 ? 'none' : '';
   popover.querySelector('.tour-next').textContent = tourStep === tourSteps.length - 1 ? 'Finish' : 'Next';
-
-  // Get target element
   const targetEl = step.target ? step.target() : null;
-
   if (targetEl) {
-    const rect = targetEl.getBoundingClientRect();
-    const pad = 6;
-
-    // Update SVG cutout mask
-    backdrop.innerHTML = `<svg width="100%" height="100%">
-      <defs><mask id="tour-mask">
-        <rect width="100%" height="100%" fill="white"/>
-        <rect x="${rect.left - pad}" y="${rect.top - pad}" width="${rect.width + pad*2}" height="${rect.height + pad*2}" rx="6" fill="black"/>
-      </mask></defs>
-      <rect width="100%" height="100%" fill="rgba(15,23,42,0.55)" mask="url(#tour-mask)"/>
-    </svg>`;
-
-    // Position highlight
+    const rect = targetEl.getBoundingClientRect(); const pad = 6;
+    backdrop.innerHTML = `<svg width="100%" height="100%"><defs><mask id="tour-mask"><rect width="100%" height="100%" fill="white"/><rect x="${rect.left - pad}" y="${rect.top - pad}" width="${rect.width + pad*2}" height="${rect.height + pad*2}" rx="6" fill="black"/></mask></defs><rect width="100%" height="100%" fill="rgba(15,23,42,0.55)" mask="url(#tour-mask)"/></svg>`;
     highlight.classList.add('active');
-    highlight.style.left = (rect.left - pad) + 'px';
-    highlight.style.top = (rect.top - pad) + 'px';
-    highlight.style.width = (rect.width + pad * 2) + 'px';
-    highlight.style.height = (rect.height + pad * 2) + 'px';
-
-    // Position popover relative to target
-    positionPopover(popover, rect, step.arrow || 'right');
+    highlight.style.left = (rect.left - pad) + 'px'; highlight.style.top = (rect.top - pad) + 'px';
+    highlight.style.width = (rect.width + pad * 2) + 'px'; highlight.style.height = (rect.height + pad * 2) + 'px';
+    const gap = 14, popW = 370, popH = popover.offsetHeight || 200, vw = window.innerWidth, vh = window.innerHeight;
+    const arrow = step.arrow || 'right';
+    let left, top;
+    if (arrow === 'left') { left = rect.right + gap; top = rect.top + rect.height / 2 - popH / 2; if (left + popW > vw - 10) left = rect.left - gap - popW; }
+    else if (arrow === 'right') { left = rect.left - gap - popW; top = rect.top + rect.height / 2 - popH / 2; if (left < 10) left = rect.right + gap; }
+    else { left = rect.left + rect.width / 2 - popW / 2; top = rect.bottom + gap; if (top + popH > vh - 10) top = rect.top - gap - popH; }
+    left = Math.max(10, Math.min(left, vw - popW - 10)); top = Math.max(10, Math.min(top, vh - popH - 10));
+    popover.style.left = left + 'px'; popover.style.top = top + 'px'; popover.style.transform = '';
   } else {
-    // No target: center the popover, full backdrop
     backdrop.innerHTML = '<svg width="100%" height="100%"><rect width="100%" height="100%" fill="rgba(15,23,42,0.55)"/></svg>';
     highlight.classList.remove('active');
-    popover.style.left = '50%';
-    popover.style.top = '50%';
-    popover.style.transform = 'translate(-50%, -50%)';
+    popover.style.left = '50%'; popover.style.top = '50%'; popover.style.transform = 'translate(-50%, -50%)';
   }
 }
-
-function positionPopover(popover, rect, arrow) {
-  popover.style.transform = '';
-  const gap = 14;
-  const popW = 370;
-  const popH = popover.offsetHeight || 200;
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-
-  let left, top;
-
-  if (arrow === 'left') {
-    left = rect.right + gap;
-    top = rect.top + rect.height / 2 - popH / 2;
-    // If goes off right edge, flip to left
-    if (left + popW > vw - 10) {
-      left = rect.left - gap - popW;
-    }
-  } else if (arrow === 'right') {
-    left = rect.left - gap - popW;
-    top = rect.top + rect.height / 2 - popH / 2;
-    if (left < 10) {
-      left = rect.right + gap;
-    }
-  } else if (arrow === 'top') {
-    left = rect.left + rect.width / 2 - popW / 2;
-    top = rect.bottom + gap;
-    if (top + popH > vh - 10) {
-      top = rect.top - gap - popH;
-    }
-  } else {
-    left = rect.left + rect.width / 2 - popW / 2;
-    top = rect.top - gap - popH;
-    if (top < 10) {
-      top = rect.bottom + gap;
-    }
-  }
-
-  // Clamp to viewport
-  left = Math.max(10, Math.min(left, vw - popW - 10));
-  top = Math.max(10, Math.min(top, vh - popH - 10));
-
-  popover.style.left = left + 'px';
-  popover.style.top = top + 'px';
-}
-
-// Close tour on Escape
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && tourActive) endTour(); });
-// Close tour when clicking backdrop (not on the highlighted element)
-document.getElementById('tour-backdrop').addEventListener('click', e => {
-  if (e.target === e.currentTarget || e.target.tagName === 'rect' || e.target.tagName === 'svg') endTour();
-});
+document.getElementById('tour-backdrop').addEventListener('click', e => { if (e.target === e.currentTarget || e.target.tagName === 'rect' || e.target.tagName === 'svg') endTour(); });
 
 // ══════════════════════════════════════════════════════════════
 // Compare Masks Tab
 // ══════════════════════════════════════════════════════════════
-let activeTab = 'single';
-let compareMasks = [];       // [{name, data, color}, ...]
-let serverMaskPaths = [];    // cached from /api/masks
+const COMPARE_COLORS = ['#4caf50', '#2196f3', '#e91e63', '#ff9800', '#9c27b0', '#00bcd4', '#795548', '#607d8b', '#f44336', '#3f51b5'];
+const COMPARE_METRIC_DEFS = METRIC_DEFS.filter(d => d.key !== 'per_sentence_kl');
 
-const COMPARE_COLORS = [
-  '#4caf50', '#2196f3', '#e91e63', '#ff9800', '#9c27b0',
-  '#00bcd4', '#795548', '#607d8b', '#f44336', '#3f51b5',
-];
-
-// Metrics available for comparison (exclude per_sentence_kl line chart)
-const COMPARE_METRIC_DEFS = METRIC_DEFS.filter(d =>
-  d.key !== 'per_sentence_kl'
-);
-
-function setTab(tab) {
-  activeTab = tab;
-  const labels = ['single', 'compare', 'resample'];
-  document.querySelectorAll('#tab-bar button').forEach((btn, i) => {
-    btn.classList.toggle('active', labels[i] === tab);
-  });
-  document.getElementById('tab-single').classList.toggle('active', tab === 'single');
-  document.getElementById('tab-compare').classList.toggle('active', tab === 'compare');
-  document.getElementById('tab-resample').classList.toggle('active', tab === 'resample');
-  if (tab === 'single' && processed) { render(); onMetricChange(); }
-  if (tab === 'compare' && compareMasks.length > 0) onCompareMetricChange();
-  if (tab === 'resample') {
-    if (!window._resampleData) loadResampleSweep();
-    else renderResampleSweep();
-  }
-}
-
-// Populate compare mask checklist from server
 function populateCompareMaskList(paths) {
   serverMaskPaths = paths;
   const container = document.getElementById('compare-mask-list');
-  if (paths.length === 0) {
-    container.innerHTML = '<em style="color:var(--text-dim)">No masks found on server.</em>';
-    return;
-  }
+  if (paths.length === 0) { container.innerHTML = '<em style="color:var(--text-dim)">No masks found on server.</em>'; return; }
   container.innerHTML = '';
   for (const p of paths) {
     const label = document.createElement('label');
-    const cb = document.createElement('input');
-    cb.type = 'checkbox'; cb.value = p;
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = p;
     const span = document.createElement('span');
-    // Shorten display name
     const ci = p.indexOf('circuit_discovery/');
     span.textContent = ci >= 0 ? p.slice(ci + 'circuit_discovery/'.length) : p;
     span.title = p;
-    label.appendChild(cb);
-    label.appendChild(span);
-    container.appendChild(label);
+    label.appendChild(cb); label.appendChild(span); container.appendChild(label);
   }
 }
 
-// Compare mask list is populated by the existing fetch('/api/masks') call above.
-
-// Load selected masks
 async function loadCompareMasks() {
   const checks = document.querySelectorAll('#compare-mask-list input[type="checkbox"]:checked');
   const paths = Array.from(checks).map(c => c.value);
-  if (paths.length < 2) {
-    document.getElementById('compare-status').innerHTML = '<span class="compat-err">Select at least 2 masks to compare.</span>';
-    return;
-  }
+  if (paths.length < 2) { document.getElementById('compare-status').innerHTML = '<span class="compat-err">Select at least 2 masks.</span>'; return; }
   document.getElementById('compare-status').innerHTML = 'Loading ' + paths.length + ' masks...';
-
   try {
-    const results = await Promise.all(
-      paths.map(p => fetch('/api/mask?path=' + encodeURIComponent(p)).then(r => r.json()))
-    );
+    const results = await Promise.all(paths.map(p => fetch('/api/mask?path=' + encodeURIComponent(p)).then(r => r.json())));
     compareMasks = results.map((data, i) => {
       const ci = paths[i].indexOf('circuit_discovery/');
       const shortName = ci >= 0 ? paths[i].slice(ci + 'circuit_discovery/'.length) : paths[i];
-      // Further shorten: take last path component without .json
       const parts = shortName.split('/');
-      const fileName = parts[parts.length - 1].replace(/\.json$/, '');
-      return { name: fileName, fullPath: paths[i], data, color: COMPARE_COLORS[i % COMPARE_COLORS.length] };
+      return { name: parts[parts.length - 1].replace(/\.json$/, ''), fullPath: paths[i], data, color: COMPARE_COLORS[i % COMPARE_COLORS.length] };
     });
-
     const compat = checkMaskCompatibility(compareMasks.map(m => m.data));
-    if (compat.compatible) {
-      document.getElementById('compare-status').innerHTML =
-        '<span class="compat-ok">&#10003; Compatible</span> — ' + compareMasks.length + ' masks loaded. Random baselines will be combined.';
-    } else {
-      document.getElementById('compare-status').innerHTML =
-        '<span class="compat-err">&#10007; Incompatible</span>: ' + compat.reason + '<br>Random baselines shown separately per mask.';
-    }
-
+    document.getElementById('compare-status').innerHTML = compat.compatible
+      ? '<span class="compat-ok">&#10003; Compatible</span> — ' + compareMasks.length + ' masks loaded.'
+      : '<span class="compat-err">&#10007; Incompatible</span>: ' + compat.reason;
     initCompareMetricDropdown();
     onCompareMetricChange();
-  } catch (err) {
-    document.getElementById('compare-status').innerHTML = '<span class="compat-err">Error loading masks: ' + err.message + '</span>';
-  }
+  } catch (err) { document.getElementById('compare-status').innerHTML = '<span class="compat-err">Error: ' + err.message + '</span>'; }
 }
 
 function clearCompareMasks() {
@@ -2795,975 +830,260 @@ function clearCompareMasks() {
   document.getElementById('compare-threshold-select').style.display = 'none';
 }
 
-// ── Compatibility check ──
 function checkMaskCompatibility(masks) {
   if (masks.length < 2) return { compatible: true, reason: '' };
-  const ref = masks[0];
-  const refMeta = ref.metadata || {};
+  const ref = masks[0], refMeta = ref.metadata || {};
   const refSentLen = (ref.sentences || []).length;
   const refLayers = JSON.stringify((ref.layers || []).sort((a, b) => a - b));
-  const refBranches = refMeta.num_branches;
-  const refPrefix = refMeta.num_prefix_sentences;
-  const refTokens = refMeta.num_tokens_to_analyse;
-
   for (let i = 1; i < masks.length; i++) {
-    const m = masks[i];
-    const meta = m.metadata || {};
-    if ((m.sentences || []).length !== refSentLen)
-      return { compatible: false, reason: `Mask ${i + 1} has ${(m.sentences || []).length} sentences vs ${refSentLen}` };
-    if (JSON.stringify((m.layers || []).sort((a, b) => a - b)) !== refLayers)
-      return { compatible: false, reason: `Mask ${i + 1} has different layers` };
-    if (meta.num_branches !== refBranches)
-      return { compatible: false, reason: `Mask ${i + 1} has ${meta.num_branches} branches vs ${refBranches}` };
-    if (meta.num_prefix_sentences !== refPrefix)
-      return { compatible: false, reason: `Mask ${i + 1} has ${meta.num_prefix_sentences} prefix sentences vs ${refPrefix}` };
-    if (meta.num_tokens_to_analyse !== refTokens)
-      return { compatible: false, reason: `Mask ${i + 1} has ${meta.num_tokens_to_analyse} analysis tokens vs ${refTokens}` };
+    const m = masks[i], meta = m.metadata || {};
+    if ((m.sentences || []).length !== refSentLen) return { compatible: false, reason: `Mask ${i + 1} has ${(m.sentences || []).length} sentences vs ${refSentLen}` };
+    if (JSON.stringify((m.layers || []).sort((a, b) => a - b)) !== refLayers) return { compatible: false, reason: `Mask ${i + 1} has different layers` };
   }
   return { compatible: true, reason: '' };
 }
 
-function areMasksCompatible() {
-  return checkMaskCompatibility(compareMasks.map(m => m.data)).compatible;
-}
+function areMasksCompatible() { return checkMaskCompatibility(compareMasks.map(m => m.data)).compatible; }
 
-// ── Metric dropdown ──
+function _getThresholdEntries(md) { return ((md.metadata || {}).threshold_evaluation || []).filter(e => e && typeof e.threshold === 'number' && typeof e.sparsity === 'number'); }
+function _findEntryAtSparsity(entries, sparsity) { let idx = 0, best = Infinity; for (let i = 0; i < entries.length; i++) { const d = Math.abs(entries[i].sparsity - sparsity); if (d < best) { best = d; idx = i; } } return entries[idx]; }
+function _getSelectedCompareSparsity() { const v = parseFloat(document.getElementById('compare-threshold-select').value); if (isNaN(v) && compareMasks.length > 0) { const te = _getThresholdEntries(compareMasks[0].data); if (te.length > 0) return te[Math.round((te.length - 1) * 0.3)].sparsity; } return v; }
+
 function initCompareMetricDropdown() {
-  const select = document.getElementById('compare-metric-select');
-  select.innerHTML = '';
+  const select = document.getElementById('compare-metric-select'); select.innerHTML = '';
   if (compareMasks.length === 0) return;
-
-  // Determine which metrics are available in ANY mask
-  const firstEntries = compareMasks.map(m => {
-    const te = (m.data.metadata || {}).threshold_evaluation;
-    return (Array.isArray(te) && te.length > 0) ? te[0] : null;
-  });
-
+  const firstEntries = compareMasks.map(m => { const te = (m.data.metadata || {}).threshold_evaluation; return (Array.isArray(te) && te.length > 0) ? te[0] : null; });
   for (const def of COMPARE_METRIC_DEFS) {
     let available = false;
-    if (def.alwaysAvailable) {
-      available = firstEntries.some(e => e != null);
-    } else if (def.key === 'per_sentence_kl_heatmap') {
-      available = firstEntries.some(e => e && 'per_sentence_kl' in e);
-    } else if (def.key === 'resample_comparison') {
-      // Resample data lives in sidecar files, not inside the mask JSON, so
-      // we can't gate availability on threshold_evaluation. Always offer
-      // it; the renderer shows an explicit empty state if no series match.
-      available = true;
-    } else {
-      available = firstEntries.some(e => e && def.key in e && e[def.key] != null);
-    }
-    if (available) {
-      const opt = document.createElement('option');
-      opt.value = def.key; opt.textContent = def.label;
-      select.appendChild(opt);
-    }
+    if (def.alwaysAvailable) available = firstEntries.some(e => e != null);
+    else if (def.key === 'resample_comparison') available = true;
+    else available = firstEntries.some(e => e && def.key in e && e[def.key] != null);
+    if (available) { const opt = document.createElement('option'); opt.value = def.key; opt.textContent = def.label; select.appendChild(opt); }
   }
-
-  // Default
   const preferredOrder = ['answer_kl', 'reward_gap', 'kl_divergence'];
-  for (const pk of preferredOrder) {
-    if (select.querySelector(`option[value="${pk}"]`)) { select.value = pk; break; }
-  }
-
-  // Build legend
-  const legend = document.getElementById('compare-legend');
-  legend.innerHTML = '';
-  for (const m of compareMasks) {
-    const el = document.createElement('div'); el.className = 'cleg';
-    el.innerHTML = `<span class="cleg-swatch" style="background:${m.color}"></span><span title="${m.fullPath}">${m.name}</span>`;
-    legend.appendChild(el);
-  }
+  for (const pk of preferredOrder) { if (select.querySelector(`option[value="${pk}"]`)) { select.value = pk; break; } }
+  const legend = document.getElementById('compare-legend'); legend.innerHTML = '';
+  for (const m of compareMasks) { const el = document.createElement('div'); el.className = 'cleg'; el.innerHTML = `<span class="cleg-swatch" style="background:${m.color}"></span><span title="${m.fullPath}">${m.name}</span>`; legend.appendChild(el); }
 }
 
-// ── Sparsity dropdown for compare tab ──
-// Populated with sparsities from the first mask. Per-mask lookups use
-// _findEntryAtSparsity so comparisons are meaningful across masks whose
-// raw mask-score scales differ.
 function initCompareThresholdDropdown() {
-  const select = document.getElementById('compare-threshold-select');
-  select.innerHTML = '<option value="">— select sparsity —</option>';
+  const select = document.getElementById('compare-threshold-select'); select.innerHTML = '<option value="">— select sparsity —</option>';
   if (compareMasks.length === 0) return;
-
-  // Use sparsities from first mask as the reference grid
   const te = (compareMasks[0].data.metadata || {}).threshold_evaluation || [];
-  for (const entry of te) {
-    if (entry && typeof entry.sparsity === 'number') {
-      const opt = document.createElement('option');
-      opt.value = entry.sparsity;
-      opt.textContent = `sparsity ${(entry.sparsity * 100).toFixed(1)}% (t=${entry.threshold.toExponential(2)})`;
-      select.appendChild(opt);
-    }
-  }
-  // Default to ~30% through the sparsity list
-  if (te.length > 0) {
-    const defaultIdx = Math.round((te.length - 1) * 0.3);
-    select.value = te[defaultIdx].sparsity;
-  }
+  for (const entry of te) { if (entry && typeof entry.sparsity === 'number') { const opt = document.createElement('option'); opt.value = entry.sparsity; opt.textContent = `sparsity ${(entry.sparsity * 100).toFixed(1)}%`; select.appendChild(opt); } }
+  if (te.length > 0) select.value = te[Math.round((te.length - 1) * 0.3)].sparsity;
 }
 
-// Sparsity-dropdown change: re-render the current chart WITHOUT re-initialising
-// the dropdown (which would reset the user's selection to the default).
-function onCompareSparsityChange() {
-  if (compareMasks.length === 0) return;
-  const metricKey = document.getElementById('compare-metric-select').value;
-  const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey);
-  if (!def) return;
-  if (def.chartType === 'heatmap_per_sentence') renderCompareHeatmaps();
-  else if (def.chartType === 'histogram') renderCompareHistogram();
-  else if (def.chartType === 'table') renderCompareAnswerProbs();
-  else if (def.chartType === 'table_weighted') renderCompareWeightedAnswerProbs();
-}
+function onCompareSparsityChange() { if (compareMasks.length === 0) return; const metricKey = document.getElementById('compare-metric-select').value; const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey); if (!def) return; if (def.chartType === 'heatmap_per_sentence') renderCompareHeatmaps(); else if (def.chartType === 'histogram') renderCompareHistogram(); else if (def.chartType === 'table') renderCompareAnswerProbs(); else if (def.chartType === 'table_weighted') renderCompareWeightedAnswerProbs(); }
 
-// ── Main compare render dispatcher ──
 function onCompareMetricChange() {
   if (compareMasks.length === 0) return;
   const metricKey = document.getElementById('compare-metric-select').value;
-  const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey);
-  if (!def) return;
-
+  const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey); if (!def) return;
   const chartContainer = document.getElementById('compare-chart-container');
   const heatmapGrid = document.getElementById('compare-heatmap-grid');
   const thresholdSelect = document.getElementById('compare-threshold-select');
-
-  if (def.chartType === 'resample') {
-    chartContainer.style.display = '';
-    heatmapGrid.style.display = 'none';
-    thresholdSelect.style.display = 'none';
-    renderCompareResampleSweep();
-  } else if (def.chartType === 'heatmap_per_sentence') {
-    chartContainer.style.display = 'none';
-    heatmapGrid.style.display = '';
-    thresholdSelect.style.display = '';
-    initCompareThresholdDropdown();
-    renderCompareHeatmaps();
-  } else if (def.chartType === 'histogram') {
-    chartContainer.style.display = '';
-    heatmapGrid.style.display = 'none';
-    thresholdSelect.style.display = '';
-    initCompareThresholdDropdown();
-    renderCompareHistogram();
-  } else if (def.chartType === 'table') {
-    chartContainer.style.display = '';
-    heatmapGrid.style.display = 'none';
-    thresholdSelect.style.display = '';
-    initCompareThresholdDropdown();
-    renderCompareAnswerProbs();
-  } else if (def.chartType === 'table_weighted') {
-    chartContainer.style.display = '';
-    heatmapGrid.style.display = 'none';
-    thresholdSelect.style.display = '';
-    initCompareThresholdDropdown();
-    renderCompareWeightedAnswerProbs();
-  } else {
-    // line+random or line+threshold
-    chartContainer.style.display = '';
-    heatmapGrid.style.display = 'none';
-    thresholdSelect.style.display = 'none';
-    renderCompareLineChart();
-  }
+  if (def.chartType === 'resample') { chartContainer.style.display = ''; heatmapGrid.style.display = 'none'; thresholdSelect.style.display = 'none'; renderCompareResampleSweep(); }
+  else if (def.chartType === 'heatmap_per_sentence') { chartContainer.style.display = 'none'; heatmapGrid.style.display = ''; thresholdSelect.style.display = ''; initCompareThresholdDropdown(); renderCompareHeatmaps(); }
+  else if (['histogram','table','table_weighted'].includes(def.chartType)) { chartContainer.style.display = ''; heatmapGrid.style.display = 'none'; thresholdSelect.style.display = ''; initCompareThresholdDropdown(); if (def.chartType === 'histogram') renderCompareHistogram(); else if (def.chartType === 'table') renderCompareAnswerProbs(); else renderCompareWeightedAnswerProbs(); }
+  else { chartContainer.style.display = ''; heatmapGrid.style.display = 'none'; thresholdSelect.style.display = 'none'; renderCompareLineChart(); }
 }
 
-// ── Helpers ──
-function _getThresholdEntries(maskData) {
-  const te = (maskData.metadata || {}).threshold_evaluation || [];
-  return te.filter(e => e && typeof e.threshold === 'number' && typeof e.sparsity === 'number');
-}
-
-function _findEntryAtSparsity(entries, sparsity) {
-  let idx = 0, best = Infinity;
-  for (let i = 0; i < entries.length; i++) {
-    const d = Math.abs(entries[i].sparsity - sparsity);
-    if (d < best) { best = d; idx = i; }
-  }
-  return entries[idx];
-}
-
-function _getSelectedCompareSparsity() {
-  const v = parseFloat(document.getElementById('compare-threshold-select').value);
-  if (isNaN(v) && compareMasks.length > 0) {
-    const te = _getThresholdEntries(compareMasks[0].data);
-    if (te.length > 0) return te[Math.round((te.length - 1) * 0.3)].sparsity;
-  }
-  return v;
-}
-
-// ── Combined random baseline ──
 function computeCombinedRandomBaseline(metricKey) {
-  // Only combine if masks are compatible
-  const compatible = areMasksCompatible();
-  if (!compatible) return null;
-
+  if (!areMasksCompatible()) return null;
   const randomArrayKey = 'random_' + metricKey + 's';
-  // Use sparsity points from first mask as reference
   const refEntries = _getThresholdEntries(compareMasks[0].data);
-  const n = refEntries.length;
-  if (n === 0) return null;
-
+  const n = refEntries.length; if (n === 0) return null;
   const sparsities = refEntries.map(e => e.sparsity);
   const means = [], stdLows = [], stdHighs = [];
-
   for (let si = 0; si < n; si++) {
-    // Collect all random samples at this sparsity across masks
     const allSamples = [];
-    for (const m of compareMasks) {
-      const entries = _getThresholdEntries(m.data);
-      // Find closest entry by sparsity
-      const entry = _findEntryAtSparsity(entries, refEntries[si].sparsity);
-      if (entry && Array.isArray(entry[randomArrayKey])) {
-        allSamples.push(...entry[randomArrayKey]);
-      }
-    }
+    for (const m of compareMasks) { const entries = _getThresholdEntries(m.data); const entry = _findEntryAtSparsity(entries, refEntries[si].sparsity); if (entry && Array.isArray(entry[randomArrayKey])) allSamples.push(...entry[randomArrayKey]); }
     if (allSamples.length === 0) return null;
     const mean = allSamples.reduce((a, b) => a + b, 0) / allSamples.length;
     const std = Math.sqrt(allSamples.reduce((a, b) => a + (b - mean) ** 2, 0) / allSamples.length);
-    means.push(mean);
-    stdLows.push(mean - std);
-    stdHighs.push(mean + std);
+    means.push(mean); stdLows.push(mean - std); stdHighs.push(mean + std);
   }
-
   return { sparsities, means, stdLows, stdHighs };
 }
 
-// ══════════════════════════════════════════════════════════════
-// Compare: Line chart (sparsity vs metric)
-// ══════════════════════════════════════════════════════════════
 function renderCompareLineChart() {
   const container = document.getElementById('compare-chart-container');
   const metricKey = document.getElementById('compare-metric-select').value;
-  const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey);
-  if (!def) return;
+  const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey); if (!def) return;
   const metricLabel = def.label;
   const showRandom = def.chartType === 'line+random';
-
   const traces = [];
-
-  // Random baseline (combined if compatible, else per-mask)
   if (showRandom) {
     const combined = computeCombinedRandomBaseline(metricKey);
     if (combined) {
-      // Combined random band + line
-      const xFwd = combined.sparsities;
-      const xRev = [...combined.sparsities].reverse();
-      traces.push({
-        x: [...xFwd, ...xRev],
-        y: [...combined.stdHighs, ...combined.stdLows.slice().reverse()],
-        fill: 'toself', fillcolor: 'rgba(255,165,0,0.10)',
-        line: { color: 'transparent' }, name: 'Random ±1σ (combined)',
-        hoverinfo: 'skip', showlegend: true,
-      });
-      traces.push({
-        x: xFwd, y: combined.means, mode: 'lines',
-        line: { color: 'orange', dash: 'dash', width: 1.5 },
-        name: 'Random baseline (combined)',
-      });
-    } else {
-      // Per-mask random baselines
-      for (let mi = 0; mi < compareMasks.length; mi++) {
-        const m = compareMasks[mi];
-        const entries = _getThresholdEntries(m.data);
-        const randomArrayKey = 'random_' + metricKey + 's';
-        const randomSingleKey = 'random_' + metricKey;
-        const hasMulti = entries.every(e => Array.isArray(e[randomArrayKey]) && e[randomArrayKey].length > 0);
-
-        const idx = d3.range(entries.length).sort((a, b) => entries[a].sparsity - entries[b].sparsity);
-        const xVals = idx.map(i => entries[i].sparsity);
-
-        if (hasMulti) {
-          const rMean = entries.map(e => {
-            const a = e[randomArrayKey];
-            return a.reduce((x, y) => x + y, 0) / a.length;
-          });
-          const sortedRM = idx.map(i => rMean[i]);
-          traces.push({
-            x: xVals, y: sortedRM, mode: 'lines',
-            line: { color: m.color, dash: 'dot', width: 1 },
-            name: m.name + ' (random)', opacity: 0.5,
-          });
-        } else if (entries.every(e => randomSingleKey in e && e[randomSingleKey] != null)) {
-          const sortedRM = idx.map(i => entries[i][randomSingleKey]);
-          traces.push({
-            x: xVals, y: sortedRM, mode: 'lines',
-            line: { color: m.color, dash: 'dot', width: 1 },
-            name: m.name + ' (random)', opacity: 0.5,
-          });
-        }
-      }
+      traces.push({ x: [...combined.sparsities, ...combined.sparsities.slice().reverse()], y: [...combined.stdHighs, ...combined.stdLows.slice().reverse()], fill: 'toself', fillcolor: 'rgba(255,165,0,0.10)', line: { color: 'transparent' }, name: 'Random ±1σ', hoverinfo: 'skip', showlegend: true });
+      traces.push({ x: combined.sparsities, y: combined.means, mode: 'lines', line: { color: 'orange', dash: 'dash', width: 1.5 }, name: 'Random baseline (combined)' });
     }
   }
-
-  // N_eff: per-mask random baselines
-  if (def.chartType === 'line+threshold') {
-    for (let mi = 0; mi < compareMasks.length; mi++) {
-      const m = compareMasks[mi];
-      const meta = m.data.metadata || {};
-      const entries = _getThresholdEntries(m.data);
-      const idx = d3.range(entries.length).sort((a, b) => entries[a].sparsity - entries[b].sparsity);
-      const xVals = idx.map(i => entries[i].sparsity);
-      const N = meta.num_branches || 1;
-      const randomNeffs = entries.map(e => {
-        const rn = e.random_n_effs;
-        if (Array.isArray(rn) && rn.length > 0) return rn.reduce((a, b) => a + b, 0) / rn.length / N;
-        return NaN;
-      });
-      const sortedRN = idx.map(i => randomNeffs[i]);
-      const validIdxs = d3.range(idx.length).filter(i => !isNaN(sortedRN[i]));
-      if (validIdxs.length > 0) {
-        traces.push({
-          x: validIdxs.map(i => xVals[i]),
-          y: validIdxs.map(i => Math.min(sortedRN[i], 1)),
-          mode: 'lines', line: { color: m.color, dash: 'dot', width: 1 },
-          name: m.name + ' (random)', opacity: 0.5,
-        });
-      }
-    }
-  }
-
-  // One learned-mask line per mask
   const missingMasks = [];
   for (let mi = 0; mi < compareMasks.length; mi++) {
     const m = compareMasks[mi];
     const entries = _getThresholdEntries(m.data);
-    const n = entries.length;
-    if (n === 0) { missingMasks.push(m.name); continue; }
-
+    const n = entries.length; if (n === 0) { missingMasks.push(m.name); continue; }
     const idx = d3.range(n).sort((a, b) => entries[a].sparsity - entries[b].sparsity);
     const sortedSp = idx.map(i => entries[i].sparsity);
     const sortedM = idx.map(i => entries[i][metricKey] ?? NaN);
     const validIdx = d3.range(n).filter(i => !isNaN(sortedM[i]));
     if (validIdx.length === 0) { missingMasks.push(m.name); continue; }
-
     const xVals = validIdx.map(i => sortedSp[i]);
-    const yVals = validIdx.map(i => sortedM[i]);
-
-    // Cap N_eff at 1
-    const yPlot = def.chartType === 'line+threshold' ? yVals.map(v => Math.min(v, 1)) : yVals;
-
-    traces.push({
-      x: xVals, y: yPlot, mode: 'lines+markers',
-      line: { color: m.color, width: 2 },
-      marker: { size: 4, color: m.color },
-      name: m.name,
-      hovertemplate: `${m.name}<br>sparsity=%{x:.1%}<br>${metricKey}=%{y:.3e}<extra></extra>`,
-    });
+    const yPlot = def.chartType === 'line+threshold' ? validIdx.map(i => Math.min(sortedM[i], 1)) : validIdx.map(i => sortedM[i]);
+    traces.push({ x: xVals, y: yPlot, mode: 'lines+markers', line: { color: m.color, width: 2 }, marker: { size: 4, color: m.color }, name: m.name, hovertemplate: `${m.name}<br>sparsity=%{x:.1%}<br>${metricKey}=%{y:.3e}<extra></extra>` });
   }
-
-  // N_eff threshold line
-  if (def.chartType === 'line+threshold') {
-    const allSp = compareMasks.flatMap(m => _getThresholdEntries(m.data).map(e => e.sparsity));
-    if (allSp.length > 0) {
-      traces.push({
-        x: [d3.min(allSp), d3.max(allSp)], y: [0.1, 0.1],
-        mode: 'lines', line: { color: 'rgba(239,68,68,0.5)', dash: 'dash', width: 1 },
-        name: 'N_eff/N = 0.1', showlegend: true,
-      });
-    }
-  }
-
-  const layout = {
-    ...PLOTLY_LAYOUT_BASE,
-    xaxis: { title: { text: 'Sparsity', standoff: 12 }, tickformat: '.0%', gridcolor: '#e2e8f0' },
-    yaxis: {
-      title: { text: metricLabel, standoff: 12 },
-      exponentformat: 'e', gridcolor: '#e2e8f0',
-      ...(def.chartType === 'line+threshold' ? { range: [0, 1.05] } : {}),
-    },
-    height: 420,
-    ...(missingMasks.length > 0 ? { annotations: [{
-      text: 'No ' + metricKey + ' for: ' + missingMasks.join(', '),
-      xref: 'paper', yref: 'paper', x: 0.5, y: 1.0,
-      xanchor: 'center', yanchor: 'bottom',
-      showarrow: false, font: { size: 10, color: '#94a3b8' },
-    }] } : {}),
-  };
-
+  const layout = { ...PLOTLY_LAYOUT_BASE, xaxis: { title: { text: 'Sparsity', standoff: 12 }, tickformat: '.0%', gridcolor: '#e2e8f0' }, yaxis: { title: { text: metricLabel, standoff: 12 }, exponentformat: 'e', gridcolor: '#e2e8f0' }, height: 420 };
   Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
 }
 
-// ══════════════════════════════════════════════════════════════
-// Compare: Heatmaps (per-sentence KL, side by side)
-// ══════════════════════════════════════════════════════════════
 function renderCompareHeatmaps() {
-  const grid = document.getElementById('compare-heatmap-grid');
-  grid.innerHTML = '';
+  const grid = document.getElementById('compare-heatmap-grid'); grid.innerHTML = '';
   const sparsity = _getSelectedCompareSparsity();
   if (isNaN(sparsity)) { grid.innerHTML = '<em style="color:var(--text-dim);padding:10px;">Select a sparsity.</em>'; return; }
-
   for (const m of compareMasks) {
     const entries = _getThresholdEntries(m.data);
     const entry = _findEntryAtSparsity(entries, sparsity);
     const meta = m.data.metadata || {};
-    const answerIds = meta.answer_ids || [];
-    const answerLabels = meta.answer_labels || [];
     const perSentKL = entry ? entry.per_sentence_kl : null;
-
     const cell = document.createElement('div'); cell.className = 'heatmap-cell';
-    const label = document.createElement('div'); label.className = 'heatmap-label';
-    label.textContent = m.name; label.title = m.fullPath;
+    const label = document.createElement('div'); label.className = 'heatmap-label'; label.textContent = m.name;
     cell.appendChild(label);
-    const chartDiv = document.createElement('div');
-    chartDiv.style.minHeight = '280px';
-    cell.appendChild(chartDiv);
-    grid.appendChild(cell);
-
-    if (!perSentKL || !Array.isArray(perSentKL) || perSentKL.length === 0 || answerIds.length === 0) {
-      chartDiv.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No heatmap data.</div>';
-      continue;
-    }
-
-    const branches = perSentKL;
-    const numSents = Math.max(...branches.map(b => Array.isArray(b) ? b.length : 0), 0);
-    const branchOrder = d3.range(branches.length).sort((a, b) => (answerIds[a] || 0) - (answerIds[b] || 0));
-
+    const chartDiv = document.createElement('div'); chartDiv.style.minHeight = '280px'; cell.appendChild(chartDiv); grid.appendChild(cell);
+    if (!perSentKL || !Array.isArray(perSentKL) || perSentKL.length === 0) { chartDiv.innerHTML = '<div style="padding:20px;color:#94a3b8;">No heatmap data.</div>'; continue; }
+    const answerIds = meta.answer_ids || [], answerLabels = meta.answer_labels || [];
+    const numSents = Math.max(...perSentKL.map(b => Array.isArray(b) ? b.length : 0), 0);
+    const branchOrder = d3.range(perSentKL.length).sort((a, b) => (answerIds[a] || 0) - (answerIds[b] || 0));
     const zData = [], yLabels = [];
-    for (const bi of branchOrder) {
-      const bData = branches[bi] || [];
-      zData.push(d3.range(numSents).map(s => bData[s] ? _getKL(bData[s]) : 0));
-      const ansLabel = answerLabels[answerIds[bi]] || ('Ans ' + answerIds[bi]);
-      yLabels.push(`B${bi} (${ansLabel})`);
-    }
-
-    const traces = [{
-      z: zData, x: d3.range(numSents).map(String), y: yLabels, type: 'heatmap',
-      colorscale: 'YlOrRd', hovertemplate: '%{y}<br>Sentence %{x}<br>KL=%{z:.2e}<extra></extra>',
-      colorbar: { title: { text: 'KL', side: 'right' }, thickness: 10 },
-    }];
-
-    const layout = {
-      ...PLOTLY_LAYOUT_BASE,
-      title: { text: `t=${entry.threshold.toExponential(2)} (${(entry.sparsity * 100).toFixed(1)}%)`, font: { size: 9, color: '#94a3b8' }, x: 0 },
-      xaxis: { title: { text: 'Sentence', standoff: 8 }, type: 'category' },
-      yaxis: { type: 'category', autorange: 'reversed' },
-      margin: { l: 80, r: 16, t: 24, b: 40 },
-      height: 280,
-    };
-    Plotly.newPlot(chartDiv, traces, layout, PLOTLY_CONFIG);
+    for (const bi of branchOrder) { zData.push(d3.range(numSents).map(s => (perSentKL[bi] || [])[s] ? _getKL((perSentKL[bi] || [])[s]) : 0)); yLabels.push(`B${bi} (${answerLabels[answerIds[bi]] || ('Ans ' + answerIds[bi])})`); }
+    Plotly.newPlot(chartDiv, [{ z: zData, x: d3.range(numSents).map(String), y: yLabels, type: 'heatmap', colorscale: 'YlOrRd', hovertemplate: '%{y}<br>Sentence %{x}<br>KL=%{z:.2e}<extra></extra>' }], { ...PLOTLY_LAYOUT_BASE, xaxis: { type: 'category' }, yaxis: { type: 'category', autorange: 'reversed' }, margin: { l: 80, r: 16, t: 24, b: 40 }, height: 280 }, PLOTLY_CONFIG);
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// Compare: Log-weight histogram (overlaid)
-// ══════════════════════════════════════════════════════════════
 function renderCompareHistogram() {
   const container = document.getElementById('compare-chart-container');
   const sparsity = _getSelectedCompareSparsity();
   if (isNaN(sparsity)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a sparsity.</div>'; return; }
-
   const traces = [];
-  for (const m of compareMasks) {
-    const entries = _getThresholdEntries(m.data);
-    const entry = _findEntryAtSparsity(entries, sparsity);
-    const logWeights = entry ? entry.log_weights : null;
-    if (!Array.isArray(logWeights) || logWeights.length === 0) continue;
-
-    traces.push({
-      x: logWeights, type: 'histogram', name: m.name,
-      marker: { color: m.color, opacity: 0.5, line: { color: m.color, width: 1 } },
-      nbinsx: Math.min(30, Math.max(10, Math.ceil(Math.sqrt(logWeights.length)))),
-    });
-  }
-
-  const layout = {
-    ...PLOTLY_LAYOUT_BASE, barmode: 'overlay', height: 400,
-    xaxis: { title: { text: 'log(weight)', standoff: 12 }, gridcolor: '#e2e8f0' },
-    yaxis: { title: { text: 'Count', standoff: 12 }, gridcolor: '#e2e8f0' },
-  };
-  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+  for (const m of compareMasks) { const entries = _getThresholdEntries(m.data); const entry = _findEntryAtSparsity(entries, sparsity); const lw = entry ? entry.log_weights : null; if (Array.isArray(lw) && lw.length > 0) traces.push({ x: lw, type: 'histogram', name: m.name, marker: { color: m.color, opacity: 0.5, line: { color: m.color, width: 1 } }, nbinsx: Math.min(30, Math.max(10, Math.ceil(Math.sqrt(lw.length)))) }); }
+  Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, barmode: 'overlay', height: 400, xaxis: { title: { text: 'log(weight)', standoff: 12 }, gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Count', standoff: 12 }, gridcolor: '#e2e8f0' } }, PLOTLY_CONFIG);
 }
 
-// ══════════════════════════════════════════════════════════════
-// Compare: Answer probabilities (grouped bars)
-// ══════════════════════════════════════════════════════════════
 function renderCompareAnswerProbs() {
   const container = document.getElementById('compare-chart-container');
   const sparsity = _getSelectedCompareSparsity();
   if (isNaN(sparsity)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a sparsity.</div>'; return; }
-
-  const traces = [];
-
-  // P_clean from first mask (should be same for compatible masks)
   const meta0 = compareMasks[0].data.metadata || {};
-  const answerIds0 = meta0.answer_ids || [];
-  const answerLabels0 = meta0.answer_labels || [];
+  const answerIds0 = meta0.answer_ids || [], answerLabels0 = meta0.answer_labels || [];
   const numAnswers0 = meta0.num_answers || 2;
   const pClean = new Array(numAnswers0).fill(0);
   for (const aid of answerIds0) { if (aid < numAnswers0) pClean[aid]++; }
   for (let i = 0; i < numAnswers0; i++) pClean[i] /= (answerIds0.length || 1);
   const labels = d3.range(numAnswers0).map(i => answerLabels0[i] || 'Answer ' + i);
-
-  traces.push({
-    x: labels, y: pClean.map(v => v * 100), type: 'bar', name: 'P_clean',
-    marker: { color: '#94a3b8', opacity: 0.5 },
-  });
-
-  for (const m of compareMasks) {
-    const entries = _getThresholdEntries(m.data);
-    const entry = _findEntryAtSparsity(entries, sparsity);
-    // Prefer the fine-grained probs so they line up with meta.answer_labels;
-    // answer_probs_masked is binary (correct/incorrect) and would collapse the
-    // incorrect mass onto a single fine-grained label.
-    const probs = entry
-      ? (Array.isArray(entry.answer_probs_masked_fine)
-          ? entry.answer_probs_masked_fine
-          : entry.answer_probs_masked)
-      : null;
-    if (!Array.isArray(probs)) continue;
-    traces.push({
-      x: labels, y: probs.map(v => v * 100), type: 'bar', name: m.name,
-      marker: { color: m.color },
-    });
-  }
-
-  const layout = {
-    ...PLOTLY_LAYOUT_BASE, barmode: 'group', height: 400,
-    xaxis: { type: 'category', gridcolor: '#e2e8f0' },
-    yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
-  };
-  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+  const traces = [{ x: labels, y: pClean.map(v => v * 100), type: 'bar', name: 'P_clean', marker: { color: '#94a3b8', opacity: 0.5 } }];
+  for (const m of compareMasks) { const entries = _getThresholdEntries(m.data); const entry = _findEntryAtSparsity(entries, sparsity); const probs = entry ? (Array.isArray(entry.answer_probs_masked_fine) ? entry.answer_probs_masked_fine : entry.answer_probs_masked) : null; if (Array.isArray(probs)) traces.push({ x: labels, y: probs.map(v => v * 100), type: 'bar', name: m.name, marker: { color: m.color } }); }
+  Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, barmode: 'group', height: 400, xaxis: { type: 'category', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' } }, PLOTLY_CONFIG);
 }
 
-// ══════════════════════════════════════════════════════════════
-// Compare: Paper-style (Eq. 1) weighted answer probabilities
-// ══════════════════════════════════════════════════════════════
 function renderCompareWeightedAnswerProbs() {
   const container = document.getElementById('compare-chart-container');
   const sparsity = _getSelectedCompareSparsity();
   if (isNaN(sparsity)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a sparsity.</div>'; return; }
-
-  const traces = [];
-
-  // P_clean (weighted) from first mask's top-level metadata.
-  // Same for every threshold; same across compatible masks.
   const meta0 = compareMasks[0].data.metadata || {};
-  const pCleanW = Array.isArray(meta0.answer_probs_clean_weighted)
-    ? meta0.answer_probs_clean_weighted : null;
-  const answerLabels0 = meta0.answer_labels || [];
-  if (!pCleanW) {
-    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Paper-style (Eq. 1) weighted answer probs not available — re-run evaluate_mask.py to populate <code>answer_probs_clean_weighted</code> and <code>answer_probs_masked_weighted</code>.</div>';
-    return;
-  }
-  const numAnswers = pCleanW.length;
-  const labels = d3.range(numAnswers).map(i => answerLabels0[i] || 'Answer ' + i);
-
-  traces.push({
-    x: labels, y: pCleanW.map(v => v * 100), type: 'bar', name: 'P_clean (weighted)',
-    marker: { color: '#94a3b8', opacity: 0.5 },
-  });
-
-  for (const m of compareMasks) {
-    const entries = _getThresholdEntries(m.data);
-    const entry = _findEntryAtSparsity(entries, sparsity);
-    const probs = entry ? entry.answer_probs_masked_weighted : null;
-    if (!Array.isArray(probs)) continue;
-    traces.push({
-      x: labels, y: probs.map(v => v * 100), type: 'bar', name: m.name,
-      marker: { color: m.color },
-    });
-  }
-
-  const layout = {
-    ...PLOTLY_LAYOUT_BASE, barmode: 'group', height: 400,
-    title: { text: 'Eq. 1 outcome distributions (paper-style, within-sample reweighting)', font: { size: 10, color: '#64748b' }, x: 0 },
-    xaxis: { type: 'category', gridcolor: '#e2e8f0' },
-    yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' },
-  };
-  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+  const pCleanW = meta0.answer_probs_clean_weighted, answerLabels0 = meta0.answer_labels || [];
+  if (!Array.isArray(pCleanW)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No weighted probs available.</div>'; return; }
+  const labels = d3.range(pCleanW.length).map(i => answerLabels0[i] || 'Answer ' + i);
+  const traces = [{ x: labels, y: pCleanW.map(v => v * 100), type: 'bar', name: 'P_clean (weighted)', marker: { color: '#94a3b8', opacity: 0.5 } }];
+  for (const m of compareMasks) { const entries = _getThresholdEntries(m.data); const entry = _findEntryAtSparsity(entries, sparsity); const probs = entry ? entry.answer_probs_masked_weighted : null; if (Array.isArray(probs)) traces.push({ x: labels, y: probs.map(v => v * 100), type: 'bar', name: m.name, marker: { color: m.color } }); }
+  Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, barmode: 'group', height: 400, xaxis: { type: 'category', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' } }, PLOTLY_CONFIG);
 }
-
-// ───────────────────────────────────────────────────────────────────
-// Compare-tab: Resample fraction-correct vs sparsity for selected masks
-// ───────────────────────────────────────────────────────────────────
 
 async function renderCompareResampleSweep() {
   const container = document.getElementById('compare-chart-container');
-  if (compareMasks.length === 0) {
-    container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">Load masks first.</div>';
-    return;
-  }
-  // Ensure global resample data is loaded once.
-  if (!window._resampleData) {
-    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Loading resample data…</div>';
-    try {
-      const r = await fetch('/api/resample_sweep');
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      window._resampleData = await r.json();
-    } catch (e) {
-      container.innerHTML = `<div style="padding:20px;color:#ef4444;">Error loading /api/resample_sweep: ${e.message}</div>`;
-      return;
-    }
-  }
-  const data = window._resampleData;
-  const allSeries = data.series || [];
-
-  // Match each loaded compare mask to any series whose mask_path equals it.
-  // (m.name is the shortened display name; m.fullPath is the project-relative
-  // path that the resample sidecar/result file stores in `mask_path`.)
-  const matched = [];
-  const missingMasks = [];
-  for (const m of compareMasks) {
-    const seriesForThisMask = allSeries.filter(s => s.mask_path === m.fullPath);
-    if (seriesForThisMask.length === 0) {
-      missingMasks.push(m.name);
-    } else {
-      seriesForThisMask.forEach(s => matched.push({ series: s, mask: m }));
-    }
-  }
-
-  if (matched.length === 0) {
-    container.innerHTML = `<div style="padding:20px;color:#94a3b8;text-align:center;">
-      No resample data found for the selected masks.<br>
-      <span style="font-size:10px;color:#cbd5e1;">Run <code>evaluate_mask_resample.py</code> on these masks first.</span>
-      ${missingMasks.length ? `<br><br><span style="font-size:10px;">Checked: ${missingMasks.length} mask(s).</span>` : ''}
-    </div>`;
-    return;
-  }
-
-  // Build Plotly traces, coloring each entry by its mask's compare color.
+  if (compareMasks.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Load masks first.</div>'; return; }
+  if (!window._resampleData) { try { const r = await fetch('/api/resample_sweep'); window._resampleData = await r.json(); } catch (e) { container.innerHTML = `<div style="padding:20px;color:#ef4444;">Error: ${e.message}</div>`; return; } }
+  const allSeries = (window._resampleData.series || []);
+  const matched = [], missingMasks = [];
+  for (const m of compareMasks) { const s = allSeries.filter(s => s.mask_path === m.fullPath); if (s.length === 0) missingMasks.push(m.name); else s.forEach(sr => matched.push({ series: sr, mask: m })); }
+  if (matched.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No resample data for selected masks.</div>'; return; }
   const traces = [];
-  const baselineShapes = [];
-  // For deterministic per-mask "standalone" symbol assignment.
-  const standaloneCountByMask = new Map();
-
   for (const { series: s, mask } of matched) {
-    const color = mask.color;
-    const xs = s.points.map(p => p.sparsity);
-    const ys = s.points.map(p => p.fraction_correct);
-    const arrayMinus = s.points.map(p => p.fraction_correct - p.ci_lo);
-    const arrayPlus = s.points.map(p => p.ci_hi - p.fraction_correct);
-    const customdata = s.points.map(p => [
-      p.n_resample_branches ?? '',
-      p.ci_lo != null ? p.ci_lo.toFixed(3) : '—',
-      p.ci_hi != null ? p.ci_hi.toFixed(3) : '—',
-    ]);
-    const hovertemplate =
-      '<b>%{fullData.name}</b><br>' +
-      'sparsity = %{x:.4f}<br>' +
-      'fraction_correct = %{y:.3f}<br>' +
-      '95% CI = [%{customdata[1]} , %{customdata[2]}]<br>' +
-      'n = %{customdata[0]}<extra></extra>';
-
-    const baseLabel = s.baseline_fraction_correct != null
-      ? ` (baseline=${s.baseline_fraction_correct.toFixed(3)})`
-      : '';
-    const traceName = `${mask.name} · ${s.task_name}${baseLabel}`;
-
-    if (s.kind === 'line') {
-      traces.push({
-        type: 'scatter',
-        mode: 'lines+markers',
-        x: xs, y: ys,
-        name: traceName,
-        marker: { color, size: 7 },
-        line: { color, width: 2 },
-        error_y: {
-          type: 'data', symmetric: false,
-          array: arrayPlus, arrayminus: arrayMinus,
-          color, thickness: 1, width: 4,
-        },
-        customdata, hovertemplate,
-        legendgroup: mask.fullPath,
-      });
-    } else {
-      const idx = (standaloneCountByMask.get(mask.fullPath) || 0);
-      standaloneCountByMask.set(mask.fullPath, idx + 1);
-      const symbols = ['square', 'diamond', 'triangle-up', 'triangle-down', 'cross', 'x', 'star'];
-      traces.push({
-        type: 'scatter',
-        mode: 'markers',
-        x: xs, y: ys,
-        name: traceName,
-        marker: {
-          color, size: 14,
-          symbol: symbols[idx % symbols.length],
-          line: { width: 1.2, color: '#1e293b' },
-        },
-        error_y: {
-          type: 'data', symmetric: false,
-          array: arrayPlus, arrayminus: arrayMinus,
-          color, thickness: 1.5, width: 6,
-        },
-        customdata, hovertemplate,
-        legendgroup: mask.fullPath,
-      });
-    }
-
-    if (s.baseline_fraction_correct != null) {
-      baselineShapes.push({
-        type: 'line',
-        xref: 'paper', x0: 0, x1: 1,
-        yref: 'y',
-        y0: s.baseline_fraction_correct,
-        y1: s.baseline_fraction_correct,
-        line: { color, width: 1, dash: 'dot' },
-        opacity: 0.35,
-      });
-    }
+    traces.push({ type: 'scatter', mode: s.kind === 'line' ? 'lines+markers' : 'markers', x: s.points.map(p => p.sparsity), y: s.points.map(p => p.fraction_correct), name: `${mask.name} · ${s.task_name}`, marker: { color: mask.color, size: s.kind === 'line' ? 7 : 14 }, line: { color: mask.color, width: 2 }, error_y: { type: 'data', symmetric: false, array: s.points.map(p => p.ci_hi - p.fraction_correct), arrayminus: s.points.map(p => p.fraction_correct - p.ci_lo), color: mask.color, thickness: 1, width: 4 } });
   }
-
-  // Deduplicate baseline shapes if all masks share the same prompt.
-  const uniqBaselines = [];
-  const seenBaselineY = new Set();
-  for (const sh of baselineShapes) {
-    const k = `${sh.line.color}_${sh.y0.toFixed(6)}`;
-    if (!seenBaselineY.has(k)) {
-      seenBaselineY.add(k);
-      uniqBaselines.push(sh);
-    }
-  }
-
-  let titleText = `Resample fraction correct vs sparsity (${matched.length} series across ${compareMasks.length} mask${compareMasks.length === 1 ? '' : 's'}`;
-  if (data.bootstrap_B) titleText += `; ${data.ci_low}–${data.ci_high}% bootstrap CI, B=${data.bootstrap_B}`;
-  titleText += ')';
-  if (missingMasks.length) {
-    titleText += ` — ${missingMasks.length} selected mask(s) had no resample data`;
-  }
-
-  const layout = {
-    ...PLOTLY_LAYOUT_BASE,
-    title: { text: titleText, font: { size: 11, color: '#64748b' }, x: 0 },
-    xaxis: {
-      title: { text: 'Sparsity', standoff: 8 },
-      range: [-0.02, 1.02], gridcolor: '#e2e8f0', zeroline: false,
-    },
-    yaxis: {
-      title: { text: 'Fraction correct (resampled)', standoff: 12 },
-      range: [-0.02, 1.02], gridcolor: '#e2e8f0', zeroline: false,
-    },
-    legend: { font: { size: 10 } },
-    shapes: uniqBaselines,
-    hovermode: 'closest',
-    height: 460,
-  };
-  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+  Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, xaxis: { title: 'Sparsity', range: [-0.02, 1.02], gridcolor: '#e2e8f0' }, yaxis: { title: 'Fraction correct', range: [-0.02, 1.02], gridcolor: '#e2e8f0' }, height: 460 }, PLOTLY_CONFIG);
 }
 
-// ───────────────────────────────────────────────────────────────────
-// Resample Sweep tab
-// ───────────────────────────────────────────────────────────────────
-
-const RESAMPLE_LINE_COLORS = [
-  '#2196f3', '#ff9800', '#4caf50', '#e91e63', '#9c27b0',
-  '#00bcd4', '#795548', '#607d8b', '#f44336', '#3f51b5',
-];
-const RESAMPLE_STANDALONE_COLORS = [
-  '#9333ea', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444',
-  '#ec4899', '#14b8a6', '#8b5cf6',
-];
-const RESAMPLE_STANDALONE_SYMBOLS = [
-  'square', 'diamond', 'triangle-up', 'triangle-down', 'cross', 'x', 'star', 'hexagon',
-];
+// ══════════════════════════════════════════════════════════════
+// Resample Sweep Tab
+// ══════════════════════════════════════════════════════════════
+const RESAMPLE_LINE_COLORS = ['#2196f3', '#ff9800', '#4caf50', '#e91e63', '#9c27b0', '#00bcd4', '#795548', '#607d8b', '#f44336', '#3f51b5'];
+const RESAMPLE_STANDALONE_COLORS = ['#9333ea', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6', '#8b5cf6'];
+const RESAMPLE_STANDALONE_SYMBOLS = ['square', 'diamond', 'triangle-up', 'triangle-down', 'cross', 'x', 'star', 'hexagon'];
 
 async function loadResampleSweep() {
   const empty = document.getElementById('resample-empty');
-  empty.style.display = 'flex';
-  empty.textContent = 'Loading resample data…';
+  empty.style.display = 'flex'; empty.textContent = 'Loading resample data…';
   try {
-    const r = await fetch('/api/resample_sweep');
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const data = await r.json();
-    if (data.error) throw new Error(data.error);
+    const r = await fetch('/api/resample_sweep'); if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json(); if (data.error) throw new Error(data.error);
     window._resampleData = data;
     populateResampleSeriesList(data);
     renderResampleSweep();
     empty.style.display = 'none';
-  } catch (e) {
-    empty.textContent = `Error loading /api/resample_sweep: ${e.message}`;
-    console.error(e);
-  }
+  } catch (e) { empty.textContent = `Error: ${e.message}`; }
 }
 
 function populateResampleSeriesList(data) {
   const list = document.getElementById('resample-series-list');
   const series = data.series || [];
-  document.getElementById('resample-count-badge').textContent =
-    `${series.length} series`;
-  if (series.length === 0) {
-    list.innerHTML = '<em style="color:var(--text-dim)">No resample data found.</em>';
-    return;
-  }
-  // Default: every series visible.
-  if (!window._resampleVisible) {
-    window._resampleVisible = new Set(series.map((s, i) => i));
-  }
+  document.getElementById('resample-count-badge').textContent = `${series.length} series`;
+  if (series.length === 0) { list.innerHTML = '<em style="color:var(--text-dim)">No resample data.</em>'; return; }
+  if (!window._resampleVisible) window._resampleVisible = new Set(series.map((s, i) => i));
   list.innerHTML = '';
   series.forEach((s, i) => {
     const color = colorForResampleSeries(s, i, series);
-    const id = `resample-series-${i}`;
     const wrapper = document.createElement('label');
     wrapper.style.cssText = 'display:flex;gap:6px;align-items:center;padding:3px 4px;border-radius:4px;cursor:pointer;';
-    wrapper.onmouseover = () => wrapper.style.background = 'rgba(76,175,80,0.06)';
-    wrapper.onmouseout = () => wrapper.style.background = '';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.id = id;
-    cb.checked = window._resampleVisible.has(i);
-    cb.onchange = () => {
-      if (cb.checked) window._resampleVisible.add(i);
-      else window._resampleVisible.delete(i);
-      renderResampleSweep();
-    };
-    const swatch = document.createElement('span');
-    swatch.style.cssText = `display:inline-block;width:16px;height:8px;border-radius:2px;background:${color};flex:none;`;
-    const text = document.createElement('span');
-    text.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
-    const kindTag = s.kind === 'standalone'
-      ? '<span style="font-size:9px;color:var(--text-dim);font-weight:600;margin-right:3px;">●</span>'
-      : '<span style="font-size:9px;color:var(--text-dim);font-weight:600;margin-right:3px;">━</span>';
-    text.innerHTML = `${kindTag}<span title="${s.task_name}">${s.task_name}</span>`;
-    wrapper.appendChild(cb);
-    wrapper.appendChild(swatch);
-    wrapper.appendChild(text);
-    list.appendChild(wrapper);
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = window._resampleVisible.has(i);
+    cb.onchange = () => { if (cb.checked) window._resampleVisible.add(i); else window._resampleVisible.delete(i); renderResampleSweep(); };
+    const swatch = document.createElement('span'); swatch.style.cssText = `display:inline-block;width:16px;height:8px;border-radius:2px;background:${color};flex:none;`;
+    const text = document.createElement('span'); text.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    text.innerHTML = `<span title="${s.task_name}">${s.task_name}</span>`;
+    wrapper.appendChild(cb); wrapper.appendChild(swatch); wrapper.appendChild(text); list.appendChild(wrapper);
   });
-
-  // Update CSV download link to the API endpoint that streams the CSV.
-  const a = document.getElementById('resample-download-csv');
-  a.href = '/api/resample_csv';
-
-  // Bootstrap meta line.
-  const meta = document.getElementById('resample-meta');
-  meta.innerHTML = `<b>Bootstrap:</b> B=${data.bootstrap_B}, ${data.ci_low}–${data.ci_high}%<br>
-    <b>Series:</b> ${series.filter(s => s.kind === 'line').length} multi-threshold curves,
-    ${series.filter(s => s.kind === 'standalone').length} single-sparsity points.`;
+  document.getElementById('resample-download-csv').href = '/api/resample_csv';
+  document.getElementById('resample-meta').innerHTML = `<b>Bootstrap:</b> B=${data.bootstrap_B}, ${data.ci_low}–${data.ci_high}%<br><b>Series:</b> ${series.filter(s => s.kind === 'line').length} curves, ${series.filter(s => s.kind === 'standalone').length} points.`;
 }
 
 function colorForResampleSeries(s, i, all) {
-  if (s.kind === 'line') {
-    const lineIdx = all.slice(0, i).filter(x => x.kind === 'line').length;
-    return RESAMPLE_LINE_COLORS[lineIdx % RESAMPLE_LINE_COLORS.length];
-  }
-  const standaloneIdx = all.slice(0, i).filter(x => x.kind === 'standalone').length;
-  return RESAMPLE_STANDALONE_COLORS[standaloneIdx % RESAMPLE_STANDALONE_COLORS.length];
-}
-function symbolForStandalone(s, i, all) {
-  const standaloneIdx = all.slice(0, i).filter(x => x.kind === 'standalone').length;
-  return RESAMPLE_STANDALONE_SYMBOLS[standaloneIdx % RESAMPLE_STANDALONE_SYMBOLS.length];
+  if (s.kind === 'line') return RESAMPLE_LINE_COLORS[all.slice(0, i).filter(x => x.kind === 'line').length % RESAMPLE_LINE_COLORS.length];
+  return RESAMPLE_STANDALONE_COLORS[all.slice(0, i).filter(x => x.kind === 'standalone').length % RESAMPLE_STANDALONE_COLORS.length];
 }
 
 function renderResampleSweep() {
-  const data = window._resampleData;
-  if (!data) return;
+  const data = window._resampleData; if (!data) return;
   const series = data.series || [];
   const visible = window._resampleVisible || new Set();
   const showCI = document.getElementById('resample-show-ci').checked;
   const showBaseline = document.getElementById('resample-show-baseline').checked;
-
-  const traces = [];
-  const baselines = [];
-
+  const traces = [], baselines = [];
   series.forEach((s, i) => {
     if (!visible.has(i)) return;
     const color = colorForResampleSeries(s, i, series);
-    const xs = s.points.map(p => p.sparsity);
-    const ys = s.points.map(p => p.fraction_correct);
-    const arrayMinus = s.points.map(p => p.fraction_correct - p.ci_lo);
-    const arrayPlus = s.points.map(p => p.ci_hi - p.fraction_correct);
-    const baseLabel = s.baseline_fraction_correct != null
-      ? ` (baseline=${s.baseline_fraction_correct.toFixed(3)})`
-      : '';
-
-    const customdata = s.points.map(p => [
-      p.n_resample_branches ?? '',
-      p.ci_lo != null ? p.ci_lo.toFixed(3) : '—',
-      p.ci_hi != null ? p.ci_hi.toFixed(3) : '—',
-    ]);
-    const hovertemplate =
-      '<b>%{fullData.name}</b><br>' +
-      'sparsity = %{x:.4f}<br>' +
-      'fraction_correct = %{y:.3f}<br>' +
-      '95% CI = [%{customdata[1]} , %{customdata[2]}]<br>' +
-      'n = %{customdata[0]}<extra></extra>';
-
-    if (s.kind === 'line') {
-      traces.push({
-        type: 'scatter',
-        mode: 'lines+markers',
-        x: xs,
-        y: ys,
-        name: s.task_name + baseLabel,
-        marker: { color: color, size: 7 },
-        line: { color: color, width: 2 },
-        error_y: showCI ? {
-          type: 'data', symmetric: false,
-          array: arrayPlus, arrayminus: arrayMinus,
-          color: color, thickness: 1, width: 4,
-        } : { visible: false },
-        customdata: customdata,
-        hovertemplate: hovertemplate,
-        legendgroup: s.task_name,
-      });
-    } else {
-      traces.push({
-        type: 'scatter',
-        mode: 'markers',
-        x: xs,
-        y: ys,
-        name: s.task_name + baseLabel,
-        marker: {
-          color: color, size: 14,
-          symbol: symbolForStandalone(s, i, series),
-          line: { width: 1.2, color: '#1e293b' },
-        },
-        error_y: showCI ? {
-          type: 'data', symmetric: false,
-          array: arrayPlus, arrayminus: arrayMinus,
-          color: color, thickness: 1.5, width: 6,
-        } : { visible: false },
-        customdata: customdata,
-        hovertemplate: hovertemplate,
-        legendgroup: s.task_name,
-      });
-    }
-
-    if (showBaseline && s.baseline_fraction_correct != null) {
-      baselines.push({
-        type: 'line',
-        xref: 'paper', x0: 0, x1: 1,
-        yref: 'y',
-        y0: s.baseline_fraction_correct,
-        y1: s.baseline_fraction_correct,
-        line: { color: color, width: 1, dash: 'dot' },
-        opacity: 0.4,
-      });
-    }
+    const xs = s.points.map(p => p.sparsity), ys = s.points.map(p => p.fraction_correct);
+    const baseLabel = s.baseline_fraction_correct != null ? ` (baseline=${s.baseline_fraction_correct.toFixed(3)})` : '';
+    const sym = s.kind === 'standalone' ? RESAMPLE_STANDALONE_SYMBOLS[series.slice(0, i).filter(x => x.kind === 'standalone').length % RESAMPLE_STANDALONE_SYMBOLS.length] : undefined;
+    traces.push({ type: 'scatter', mode: s.kind === 'line' ? 'lines+markers' : 'markers', x: xs, y: ys, name: s.task_name + baseLabel, marker: { color, size: s.kind === 'line' ? 7 : 14, symbol: sym }, line: { color, width: 2 }, error_y: showCI ? { type: 'data', symmetric: false, array: s.points.map(p => p.ci_hi - p.fraction_correct), arrayminus: s.points.map(p => p.fraction_correct - p.ci_lo), color, thickness: 1, width: 4 } : { visible: false }, legendgroup: s.task_name });
+    if (showBaseline && s.baseline_fraction_correct != null) baselines.push({ type: 'line', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: s.baseline_fraction_correct, y1: s.baseline_fraction_correct, line: { color, width: 1, dash: 'dot' }, opacity: 0.4 });
   });
-
-  const layout = {
-    title: {
-      text: 'Resample fraction correct vs sparsity',
-      font: { size: 13 }, x: 0.02,
-    },
-    margin: { l: 50, r: 240, t: 40, b: 45 },
-    xaxis: {
-      title: { text: 'Sparsity', standoff: 8 },
-      range: [-0.02, 1.02],
-      gridcolor: '#e2e8f0', zeroline: false,
-    },
-    yaxis: {
-      title: { text: 'Fraction correct (resampled)', standoff: 12 },
-      range: [-0.02, 1.02],
-      gridcolor: '#e2e8f0', zeroline: false,
-    },
-    legend: {
-      x: 1.02, y: 1, xanchor: 'left', yanchor: 'top',
-      bgcolor: 'rgba(255,255,255,0.9)',
-      bordercolor: '#e2e8f0', borderwidth: 1,
-      font: { size: 10 },
-    },
-    shapes: baselines,
-    hovermode: 'closest',
-    plot_bgcolor: '#fff',
-    paper_bgcolor: '#fff',
-  };
-
-  const cfg = { displaylogo: false, responsive: true };
-  Plotly.react('resample-chart', traces, layout, cfg);
+  Plotly.react('resample-chart', traces, { title: { text: 'Resample fraction correct vs sparsity', font: { size: 13 }, x: 0.02 }, margin: { l: 50, r: 240, t: 40, b: 45 }, xaxis: { title: 'Sparsity', range: [-0.02, 1.02], gridcolor: '#e2e8f0', zeroline: false }, yaxis: { title: 'Fraction correct', range: [-0.02, 1.02], gridcolor: '#e2e8f0', zeroline: false }, legend: { x: 1.02, y: 1, xanchor: 'left', bgcolor: 'rgba(255,255,255,0.9)', bordercolor: '#e2e8f0', borderwidth: 1, font: { size: 10 } }, shapes: baselines, hovermode: 'closest', plot_bgcolor: '#fff', paper_bgcolor: '#fff' }, { displaylogo: false, responsive: true });
 }
 
+// Resample tab resize
 window.addEventListener('resize', () => {
-  if (activeTab === 'resample' && window._resampleData) {
-    Plotly.Plots.resize('resample-chart');
-  }
+  if (activeTab === 'resample' && window._resampleData) Plotly.Plots.resize('resample-chart');
 });
 </script>
 </body>

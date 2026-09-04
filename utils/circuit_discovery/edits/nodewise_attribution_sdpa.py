@@ -40,6 +40,7 @@ from utils.masks import (
     build_mode_filter,
     build_causal_filter,
     build_combined_filter,
+    build_prompt_filter,
 )
 from utils.utils import Sentence
 from utils.objectives import is_global_objective
@@ -246,6 +247,7 @@ class NodewiseAttributionSDPA(CircuitDiscovery):
         num_prefix_sentences: Optional[int] = None,
         branch_rewards: Optional[List[float]] = None,
         position_mask_overrides: Optional[List[Optional[torch.Tensor]]] = None,
+        num_frozen_prompt_sentences: int = 0,
         **kwargs,
     ) -> NodeMask:
         device = next(self.model.parameters()).device
@@ -268,7 +270,14 @@ class NodewiseAttributionSDPA(CircuitDiscovery):
             num_prefix_sents, num_sents, mask_mode, device=device,
         )
         causal_filter = build_causal_filter(num_sents, device=device)
-        combined_filter = build_combined_filter(gap_filter, mode_filter, causal_filter)
+        prompt_filter = (
+            build_prompt_filter(num_frozen_prompt_sentences, num_sents, device=device)
+            if num_frozen_prompt_sentences
+            else None
+        )
+        combined_filter = build_combined_filter(
+            gap_filter, mode_filter, causal_filter, prompt_filter
+        )
 
         forward_fn = self._sdpa_forward()
 
@@ -430,6 +439,7 @@ class NodewiseAttributionSDPA(CircuitDiscovery):
                 "negate_scores": self.negate_scores,
                 "mask_mode": mask_mode,
                 "num_prefix_sentences": num_prefix_sents,
+                "num_frozen_prompt_sentences": num_frozen_prompt_sentences,
                 "pair_aggregation": self.pair_aggregation,
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,

@@ -53,9 +53,9 @@ class CircuitDiscovery(ABC):
         torch_compile: bool = False,
         **kwargs,
     ):
-        if mask_granularity not in ("head", "layer", "pair"):
+        if mask_granularity not in ("head", "layer", "pair", "column"):
             raise ValueError(
-                f"mask_granularity must be 'head', 'layer', or 'pair', got {mask_granularity!r}"
+                f"mask_granularity must be 'head', 'layer', 'pair', or 'column', got {mask_granularity!r}"
             )
         self.importance_sampling_method = kwargs.pop(
             "importance_sampling_method", "snis",

@@ -14,6 +14,7 @@ dependencies = [
     "nnsight>=0.1.0",
     "numpy<2",
     "plotly>=6.3.1",
+    "pyngrok>=8.1.2",
     "python-dotenv>=1.1.1",
     "rbeast>=0.1.23",
     "scikit-learn>=1.7.2",

@@ -1,0 +1,41 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# vscode
+.vscode
+
+data/collection
+data/forking_paths
+playground.ipynb
+
+# custom
+plots
+thought_anchors
+*rollouts*
+*log
+*logs
+.cursor
+*rough*
+
+.DS_Store
+cluster.md
+.env
+*.patch
+.superset
+.claude
+*old*
+cache/
+
+TASK.md
+analyse_collected_data.ipynb
+plan.md
+refactor/
+.nfs*

@@ -32,6 +32,7 @@ from utils.masks import (
     build_mode_filter,
     build_causal_filter,
     build_combined_filter,
+    build_prompt_filter,
 )
 from utils.utils import Sentence, get_attention_module
 from utils.objectives import is_global_objective
@@ -507,6 +508,7 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
         num_prefix_sentences: Optional[int] = None,
         branch_rewards: Optional[List[float]] = None,
         position_mask_overrides: Optional[List[Optional[torch.Tensor]]] = None,
+        num_frozen_prompt_sentences: int = 0,
         **kwargs,
     ) -> NodeMask:
         device = next(self.model.parameters()).device
@@ -541,7 +543,14 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
             num_prefix_sents, num_sents, mask_mode, device=device,
         )
         causal_filter = build_causal_filter(num_sents, device=device)
-        combined_filter = build_combined_filter(gap_filter, mode_filter, causal_filter)
+        prompt_filter = (
+            build_prompt_filter(num_frozen_prompt_sentences, num_sents, device=device)
+            if num_frozen_prompt_sentences
+            else None
+        )
+        combined_filter = build_combined_filter(
+            gap_filter, mode_filter, causal_filter, prompt_filter
+        )
         combined_filter_cpu = combined_filter.cpu()
 
         active_pairs = torch.nonzero(~combined_filter, as_tuple=False)
@@ -747,10 +756,12 @@ class NodewiseActivationPatchingFlash(CircuitDiscovery):
                 "ablate_non_target_layers": self.ablate_non_target_layers,
                 "mask_mode": mask_mode,
                 "num_prefix_sentences": num_prefix_sents,
+                "num_frozen_prompt_sentences": num_frozen_prompt_sentences,
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,
                 "importance_sampling_method": self.importance_sampling_method,
                 "importance_sampling_temperature": self.importance_sampling_temperature,
+                "score_readout": "raw_score",
             },
             scores=scores,
         )

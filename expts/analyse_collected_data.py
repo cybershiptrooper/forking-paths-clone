@@ -404,22 +404,25 @@ def analyse_closeness_mc(
     finish_reasons = ([record["finish_reason"]] +
                       record.get("alternate_finish_reasons", []))
 
+    # Distractor letter -> text mapping (from the original record). The
+    # valid letter set comes from the record so 5-choice datasets (AQuA:
+    # A-E) don't have legitimate picks mislabeled as token_error.
+    letters = record.get("all_letters") or ["A", "B", "C", "D"]
+    answers_text = record.get("all_answers") or [""] * len(letters)
+    letter_to_text = dict(zip(letters, answers_text))
+    valid_letters = set(letters)
+
     # Per-path local category. Aligns with the order in all_answers.
     def local_category(ans: str, finish_reason: str) -> str:
         if finish_reason == "length":
             return "incomplete"
         if ans == "Z":
             return "unparseable"
-        if ans not in {"A", "B", "C", "D"}:
+        if ans not in valid_letters:
             return "token_error"
         if ans != correct_letter:
             return "wrong_choice"
         return "correct"
-
-    # Distractor letter -> text mapping (from the original record)
-    letters = record.get("all_letters") or ["A", "B", "C", "D"]
-    answers_text = record.get("all_answers") or [""] * len(letters)
-    letter_to_text = dict(zip(letters, answers_text))
 
     wrong_indices = [i for i, v in enumerate(verdicts) if not v]
     unique_wrong: dict[str, int] = {}  # answer letter -> first index

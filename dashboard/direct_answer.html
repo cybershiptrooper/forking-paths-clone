@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circuit Tracer — Direct-Answer Probes</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+
+<div id="sidebar">
+  <h1>Circuit Tracer</h1>
+  <div class="subtitle">Direct-answer probe masks (SNP / TA / Suppress)</div>
+
+  <div class="ctrl">
+    <h2>Load Mask</h2>
+    <input type="file" id="file-input" accept=".json">
+    <select id="sweep-select" style="width:100%;font-size:10px;margin-bottom:3px;"><option value="">— select sweep / dataset —</option></select>
+    <select id="server-mask-groups" style="width:100%;font-size:10px;"><option value="">— select prompt —</option></select>
+    <select id="server-masks" style="display:none;"><option value="">— server masks —</option></select>
+  </div>
+
+  <div id="meta-info"></div>
+  <div id="da-meta-info" style="font-size:10px;color:var(--text-muted);line-height:1.5;"></div>
+
+  <div class="ctrl">
+    <h2>View</h2>
+    <div class="view-toggle">
+      <button id="view-arcs" class="active" onclick="setView('arcs')">Within-layer arcs</button>
+      <button id="view-flow" onclick="setView('flow')">Cross-layer flow</button>
+      <button id="view-agg" onclick="setView('agg')">Aggregated mask</button>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <h2>Mask Threshold Mode</h2>
+    <select id="threshold-mode-select">
+      <option value="m_gt_0" selected>m &gt; 0 (P(keep) &gt; 0.5)</option>
+      <option value="m_gt_0.5">m &gt; 0.5</option>
+      <option value="all">All edges (probability-weighted)</option>
+    </select>
+    <div id="sparsity-selector" style="display:none;margin-top:4px;">
+      <label style="font-size:10px;color:var(--text-dim);">Target sparsity:</label>
+      <select id="sparsity-select" style="width:100%;font-size:10px;"></select>
+    </div>
+    <div id="threshold-mode-info" style="font-size:9px;color:var(--text-dim);margin-top:2px;"></div>
+  </div>
+
+  <!-- Hidden threshold controls (needed by shared.js internals) -->
+  <div style="display:none;">
+    <input type="range" id="threshold-slider" min="0" max="0" step="1" value="0">
+    <input type="number" id="threshold-input" step="any" value="0">
+    <span id="threshold-idx-label">0/0</span>
+  </div>
+
+  <div class="ctrl">
+    <h2>Influence %</h2>
+    <input type="range" id="influence-slider" min="10" max="100" step="1" value="30">
+    <label>Show top <span class="mono" id="influence-value">30</span>% of influence</label>
+  </div>
+
+  <div class="ctrl">
+    <h2>Aggregation</h2>
+    <select id="agg-select">
+      <option value="mean" selected>Mean</option>
+      <option value="max">Max</option>
+      <option value="sum">Sum</option>
+    </select>
+  </div>
+
+  <div class="ctrl">
+    <h2>Layer Range</h2>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <select id="layer-start" style="flex:1;"></select>
+      <span style="font-size:11px;color:var(--text-dim);">to</span>
+      <select id="layer-end" style="flex:1;"></select>
+    </div>
+    <div id="pair-note" style="display:none;font-size:10px;color:var(--text-dim);margin-top:2px;">Pair granularity: scores shared across layers.</div>
+  </div>
+
+  <div class="ctrl">
+    <h2>Display</h2>
+    <label><input type="checkbox" id="show-labels" checked> Node labels</label>
+    <label id="color-by-cat-label" style="display:none;"><input type="checkbox" id="color-by-category"> Color edges by category</label>
+    <div id="cat-color-legend" class="cat-legend" style="display:none;"></div>
+  </div>
+
+  <div class="ctrl">
+    <h2>Sentences</h2>
+    <div id="sentence-legend"></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="tab-bar">
+    <button class="active" onclick="setTab('single')">Mask Visualization</button>
+    <button onclick="setTab('eval')">Eval Results</button>
+    <button onclick="setTab('compare')">Mask Comparison</button>
+  </div>
+
+  <div id="tab-single" class="tab-pane active" style="flex-direction:column;">
+    <div id="toolbar">
+      <b>Sentence Connection Graph</b>
+      <span class="pill" id="edge-badge"></span>
+      <span class="pill" id="node-badge"></span>
+      <span style="flex:1;"></span>
+      <span class="mono" id="hover-info"></span>
+    </div>
+    <div id="content">
+      <div id="graph-container">
+        <div id="empty-state">
+          <div style="font-size:40px;opacity:0.25;">&#x1F50C;</div>
+          <div>Load a mask JSON to begin</div>
+        </div>
+      </div>
+      <div id="detail-panel" style="position:relative;">
+        <div id="detail-resize-handle"></div>
+        <h2>Node Details</h2>
+        <div class="detail-box" id="detail-content">Click a node to inspect connections.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-eval" class="tab-pane" style="flex-direction:column;overflow-y:auto;">
+    <div style="padding:14px;">
+      <div id="eval-empty" style="color:var(--text-dim);font-size:13px;text-align:center;padding:40px 0;">
+        Load a mask to see eval results.<br>
+        <span style="font-size:10px;">Evals are loaded from sidecar <code>.eval.json</code> files.</span>
+      </div>
+      <div id="eval-content" style="display:none;">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
+          <h2 style="font-size:14px;font-weight:700;margin:0;">Evaluation Results</h2>
+          <span class="pill" id="eval-source-badge"></span>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <select id="eval-metric-select" style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);min-width:250px;">
+            <option value="kl_vs_sparsity">KL vs Sparsity (by threshold mode)</option>
+            <option value="kl_norm_vs_sparsity">KL / KL_max vs Sparsity</option>
+            <option value="answer_probs">Answer Probabilities (P(A/B/C/D))</option>
+            <option value="p_target_vs_sparsity">P(target) vs Sparsity</option>
+            <option value="rollout_p_target">Rollout P(correct) vs Sparsity</option>
+            <option value="rollout_kl">Rollout KL vs Sparsity</option>
+            <option value="eval_table">Full Eval Table</option>
+          </select>
+        </div>
+
+        <div id="eval-chart-container" style="min-height:350px;background:var(--bg);border-radius:6px;"></div>
+        <div id="eval-table-container" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-compare" class="tab-pane">
+    <div id="cmp-controls">
+      <div class="cmp-mask-row">
+        <label style="color:#2196f3;">Mask A:</label>
+        <select id="cmp-group-a"><option value="">-- select mask group --</option></select>
+        <select id="cmp-sparsity-a" style="display:none;max-width:140px;"></select>
+      </div>
+      <div class="cmp-mask-row">
+        <label style="color:#ff9800;">Mask B:</label>
+        <select id="cmp-group-b"><option value="">-- select mask group --</option></select>
+        <select id="cmp-sparsity-b" style="display:none;max-width:140px;"></select>
+      </div>
+      <div class="cmp-mask-row">
+        <button id="cmp-load-btn">Load &amp; Compare</button>
+        <span id="cmp-status"></span>
+      </div>
+    </div>
+
+    <div id="cmp-body">
+      <div id="cmp-chart-area">
+        <div id="cmp-metric-bar">
+          <select id="cmp-metric-select">
+            <option value="pair_table">Ranked pair table</option>
+            <option value="diff_heatmap">Difference heatmap (S x S)</option>
+            <option value="scatter_raw">Score scatter (raw)</option>
+            <option value="scatter_rank">Rank-based scatter</option>
+            <option value="marginals_col">Column marginals (key sentences)</option>
+            <option value="marginals_row">Row marginals (query sentences)</option>
+            <option value="overlap">Overlap at matched sparsity</option>
+          </select>
+          <span id="cmp-topk-row" style="display:none;">
+            Top <span id="cmp-topk-label" class="mono" style="min-width:30px;">50</span>
+            <input type="range" id="cmp-topk-slider" min="5" max="500" step="1" value="50">
+          </span>
+          <span id="cmp-sort-row" style="display:none;">
+            Sort:
+            <select id="cmp-sort-select">
+              <option value="disagreement">|A - B| (disagreement)</option>
+              <option value="score_a">Score in A (descending)</option>
+              <option value="score_b">Score in B (descending)</option>
+              <option value="diff_a_minus_b">A - B (A higher first)</option>
+              <option value="diff_b_minus_a">B - A (B higher first)</option>
+              <option value="joint">A + B (joint importance)</option>
+            </select>
+          </span>
+        </div>
+
+        <div id="cmp-empty">
+          Select two masks above and click <b>Load &amp; Compare</b> to begin.<br>
+          <span style="font-size:10px;">Both masks must share the same prompt (same number of sentences).</span>
+        </div>
+        <div id="cmp-content" style="display:none;">
+          <div id="cmp-chart-container"></div>
+        </div>
+      </div>
+
+      <div id="cmp-detail-panel"></div>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="shared.js"></script>
+<script src="mask_compare.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+// Page-specific state
+// ══════════════════════════════════════════════════════════════
+let evalData = null;
+let currentMaskPath = null;
+let activeTab = 'single';
+let maskGroups = [];       // from /api/mask_groups
+let currentGroup = null;   // currently selected group object
+
+const MODE_COLORS = {
+  'm_gt_0':   '#2196f3',
+  'm_gt_0.5': '#9c27b0',
+  'top_k':    '#4caf50',
+};
+const MODE_LABELS = {
+  'm_gt_0':   'm > 0',
+  'm_gt_0.5': 'm > 0.5',
+  'top_k':    'top-k',
+};
+
+// ══════════════════════════════════════════════════════════════
+// Threshold mode: replaces the raw threshold slider for SNP masks
+// ══════════════════════════════════════════════════════════════
+function applyThresholdMode() {
+  if (!maskData) return;
+  const mode = document.getElementById('threshold-mode-select').value;
+  const allScores = getAllScores();
+  if (allScores.length === 0) return;
+
+  allScores.sort(d3.ascending);
+  const N = allScores.length;
+  let thresholdVal;
+  const infoEl = document.getElementById('threshold-mode-info');
+
+  if (mode === 'all') {
+    thresholdVal = allScores[0] - 1;
+    infoEl.textContent = `${N} total edges. Use influence % to reduce density.`;
+  } else if (mode === 'm_gt_0') {
+    thresholdVal = 0;
+    const nAbove = allScores.filter(v => v > 0).length;
+    infoEl.textContent = `Scores > 0: ${nAbove} of ${N} edges (${(nAbove/N*100).toFixed(0)}%).`;
+  } else if (mode === 'm_gt_0.5') {
+    thresholdVal = 0.5;
+    const nAbove = allScores.filter(v => v > 0.5).length;
+    infoEl.textContent = `Scores > 0.5: ${nAbove} of ${N} edges (${(nAbove/N*100).toFixed(0)}%).`;
+  } else if (mode.startsWith('top_k_')) {
+    const targetSparsity = parseInt(mode.split('_')[2]) / 100;
+    const keepFrac = 1 - targetSparsity;
+    const cutoffIdx = Math.min(N - 1, Math.floor(N * (1 - keepFrac)));
+    thresholdVal = allScores[cutoffIdx];
+    const nAbove = allScores.filter(v => v >= thresholdVal).length;
+    infoEl.textContent = `Top ${(keepFrac*100).toFixed(0)}%: ${nAbove} edges (threshold=${thresholdVal.toFixed(2)}).`;
+  } else {
+    thresholdVal = 0;
+    infoEl.textContent = '';
+  }
+
+  setThresholdToValue(thresholdVal);
+  reprocess();
+}
+
+document.getElementById('threshold-mode-select').addEventListener('change', function() {
+  const mode = this.value;
+  // For top-k modes within a group, load the matching mask file
+  if (mode.startsWith('top_k_') && currentGroup) {
+    const tsp = parseInt(mode.split('_')[2]);
+    const entry = currentGroup.sparsities.find(e => e.tsp === tsp);
+    if (entry && entry.path !== currentMaskPath) {
+      loadMaskFromPath(entry.path);
+      return; // applyThresholdMode will be called after load via pageInitEval
+    }
+  }
+  applyThresholdMode();
+});
+
+// ══════════════════════════════════════════════════════════════
+// Sparsity selector (within a group)
+// ══════════════════════════════════════════════════════════════
+document.getElementById('sparsity-select').addEventListener('change', function() {
+  if (!currentGroup || !this.value) return;
+  const tsp = parseInt(this.value);
+  const entry = currentGroup.sparsities.find(e => e.tsp === tsp);
+  if (entry) {
+    // Update the threshold mode to match
+    const modeSelect = document.getElementById('threshold-mode-select');
+    const topKOpt = modeSelect.querySelector(`option[value="top_k_${tsp}"]`);
+    if (topKOpt) modeSelect.value = `top_k_${tsp}`;
+    loadMaskFromPath(entry.path);
+  }
+});
+
+function loadMaskFromPath(path) {
+  currentMaskPath = path;
+  fetch('/api/mask?path=' + encodeURIComponent(path))
+    .then(r => r.json()).then(d => {
+      maskData = d;
+      evalData = null;
+      boot();
+    }).catch(console.error);
+}
+
+// ══════════════════════════════════════════════════════════════
+// Page hooks called by shared.js
+// ══════════════════════════════════════════════════════════════
+function pageInitEval() {
+  const meta = maskData.metadata || {};
+  const info = document.getElementById('da-meta-info');
+  const parts = [];
+  if (meta.target_letter) parts.push(`Target: <b>${meta.target_letter}</b>`);
+  if (meta.correct_answer) parts.push(`Correct: <b>${meta.correct_answer}</b>`);
+  if (meta.objective) parts.push(`Objective: <b>${meta.objective}</b>`);
+  if (meta.target_sparsity != null) parts.push(`Target sparsity: <b>${meta.target_sparsity}</b>`);
+  if (meta.answer_letters) parts.push(`Answers: <b>${(meta.answer_letters || []).join(', ')}</b>`);
+  if (meta.answer_probs_clean) {
+    const letters = meta.answer_letters || ['A','B','C','D'];
+    const probs = meta.answer_probs_clean;
+    const probStr = probs.map((p,i) => `${letters[i] || i}=${(p*100).toFixed(1)}%`).join(', ');
+    parts.push(`P<sub>clean</sub>: ${probStr}`);
+  }
+  info.innerHTML = parts.join('<br>');
+
+  // Build threshold mode options based on current group
+  const modeSelect = document.getElementById('threshold-mode-select');
+  const sparsitySelector = document.getElementById('sparsity-selector');
+  const sparsitySelect = document.getElementById('sparsity-select');
+
+  // Rebuild the mode dropdown with group-specific top-k options
+  const baseOptions = [
+    {value: 'm_gt_0', label: 'm > 0 (P(keep) > 0.5)'},
+    {value: 'm_gt_0.5', label: 'm > 0.5'},
+  ];
+  // Add top-k options for each sparsity in the current group
+  const topKOptions = [];
+  if (currentGroup && currentGroup.sparsities.length > 1) {
+    for (const entry of currentGroup.sparsities) {
+      topKOptions.push({
+        value: `top_k_${entry.tsp}`,
+        label: `top-k @ ${entry.tsp}% sparsity`,
+        tsp: entry.tsp,
+      });
+    }
+  } else if (meta.target_sparsity != null) {
+    const tsp = Math.round(meta.target_sparsity * 100);
+    topKOptions.push({
+      value: `top_k_${tsp}`,
+      label: `top-k @ ${tsp}% sparsity (matched)`,
+      tsp: tsp,
+    });
+  }
+  const allOption = {value: 'all', label: 'All edges (probability-weighted)'};
+
+  modeSelect.innerHTML = '';
+  for (const opt of [...baseOptions, ...topKOptions, allOption]) {
+    const o = document.createElement('option');
+    o.value = opt.value;
+    o.textContent = opt.label;
+    modeSelect.appendChild(o);
+  }
+
+  // Also populate the sparsity sub-selector for grouped masks
+  if (currentGroup && currentGroup.sparsities.length > 1) {
+    sparsitySelector.style.display = '';
+    sparsitySelect.innerHTML = '';
+    for (const entry of currentGroup.sparsities) {
+      const o = document.createElement('option');
+      o.value = entry.tsp;
+      o.textContent = `${entry.tsp}%`;
+      sparsitySelect.appendChild(o);
+    }
+    if (meta.target_sparsity != null) {
+      sparsitySelect.value = Math.round(meta.target_sparsity * 100);
+    }
+  } else {
+    sparsitySelector.style.display = 'none';
+  }
+
+  // Default: matched target sparsity top-k if available
+  if (meta.target_sparsity != null) {
+    const tsp = Math.round(meta.target_sparsity * 100);
+    const matchOpt = modeSelect.querySelector(`option[value="top_k_${tsp}"]`);
+    if (matchOpt) modeSelect.value = `top_k_${tsp}`;
+    else modeSelect.value = 'm_gt_0';
+  } else {
+    modeSelect.value = 'm_gt_0';
+  }
+  applyThresholdMode();
+
+  if (currentMaskPath) {
+    loadEvalSidecar(currentMaskPath);
+  }
+}
+
+function pageOnReprocess() {
+  if (evalData && activeTab === 'eval') renderEvalChart();
+}
+
+// ══════════════════════════════════════════════════════════════
+// File / server loading
+// ══════════════════════════════════════════════════════════════
+document.getElementById('file-input').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      maskData = JSON.parse(ev.target.result);
+      currentMaskPath = null;
+      currentGroup = null;
+      evalData = null;
+      boot();
+    } catch(err) { alert(err); }
+  };
+  r.readAsText(f);
+});
+
+// Hidden fallback — still used by loadServerMaskList for non-grouped masks
+document.getElementById('server-masks').addEventListener('change', e => {
+  if (!e.target.value) return;
+  currentGroup = null;
+  loadMaskFromPath(e.target.value);
+});
+
+// Grouped mask selector
+document.getElementById('server-mask-groups').addEventListener('change', e => {
+  if (!e.target.value) return;
+  const idx = parseInt(e.target.value);
+  if (isNaN(idx)) {
+    // It's an ungrouped path
+    currentGroup = null;
+    loadMaskFromPath(e.target.value);
+    return;
+  }
+  const group = maskGroups[idx];
+  if (!group) return;
+  currentGroup = group;
+  // Load the middle sparsity by default (or the first available)
+  const midIdx = Math.floor(group.sparsities.length / 2);
+  const entry = group.sparsities[midIdx];
+  loadMaskFromPath(entry.path);
+});
+
+// ══════════════════════════════════════════════════════════════
+// Load grouped mask list from server
+// ══════════════════════════════════════════════════════════════
+// Two-level selection: first the sweep / dataset (parent directory),
+// then the prompt (mask group) within it. Keeps both dropdowns short.
+let sweepDirs = {};   // dir -> {groups: [{group, idx}], ungrouped: [paths]}
+
+function shortDirLabel(dir) {
+  return dir
+    .replace(/^results\//, '')
+    .replace(/\/masks$/, '')
+    || 'masks';
+}
+
+function populatePromptSelect(dir) {
+  const sel = document.getElementById('server-mask-groups');
+  sel.innerHTML = '<option value="">— select prompt —</option>';
+  const entry = sweepDirs[dir];
+  if (!entry) return;
+  for (const {group: g, idx} of entry.groups) {
+    const o = document.createElement('option');
+    o.value = idx;
+    const tspRange = g.sparsities.length > 1
+      ? `${g.sparsities[0].tsp}–${g.sparsities[g.sparsities.length-1].tsp}%`
+      : `${g.sparsities[0].tsp}%`;
+    // Strip the shared sweep-name prefix so options read "p03 [...]",
+    // falling back to the full label when there is no common prefix.
+    let label = g.label;
+    const m = g.label.match(/_((?:s55_|late_)?p\d+.*)$/);
+    if (m) label = m[1];
+    o.textContent = `${label} [${tspRange}, ${g.sparsities.length} levels]`;
+    sel.appendChild(o);
+  }
+  for (const p of entry.ungrouped) {
+    const o = document.createElement('option');
+    o.value = p;
+    o.textContent = p.split('/').pop();
+    sel.appendChild(o);
+  }
+}
+
+function loadMaskGroupList() {
+  fetch('/api/mask_groups').then(r => r.json()).then(data => {
+    maskGroups = data.groups || [];
+    sweepDirs = {};
+    maskGroups.forEach((g, idx) => {
+      const dir = g.dir ? g.dir.split('/').slice(0, -1).join('/') : 'other';
+      if (!sweepDirs[dir]) sweepDirs[dir] = {groups: [], ungrouped: []};
+      sweepDirs[dir].groups.push({group: g, idx});
+    });
+    for (const p of (data.ungrouped || [])) {
+      const dir = p.split('/').slice(0, -1).join('/') || 'other';
+      if (!sweepDirs[dir]) sweepDirs[dir] = {groups: [], ungrouped: []};
+      sweepDirs[dir].ungrouped.push(p);
+    }
+
+    const sweepSel = document.getElementById('sweep-select');
+    sweepSel.innerHTML = '<option value="">— select sweep / dataset —</option>';
+    for (const dir of Object.keys(sweepDirs).sort()) {
+      const n = sweepDirs[dir].groups.length + sweepDirs[dir].ungrouped.length;
+      const o = document.createElement('option');
+      o.value = dir;
+      o.textContent = `${shortDirLabel(dir)} (${n})`;
+      sweepSel.appendChild(o);
+    }
+    sweepSel.addEventListener('change', e => populatePromptSelect(e.target.value));
+  }).catch(err => {
+    console.error('Failed to load mask groups, falling back to flat list:', err);
+    // Fallback: show the flat dropdown
+    document.getElementById('sweep-select').style.display = 'none';
+    document.getElementById('server-mask-groups').style.display = 'none';
+    document.getElementById('server-masks').style.display = '';
+    loadServerMaskList();
+  });
+}
+
+initShared();
+loadMaskGroupList();
+initCompare();
+
+document.getElementById('eval-metric-select').addEventListener('change', renderEvalChart);
+
+// ══════════════════════════════════════════════════════════════
+// Tab switching
+// ══════════════════════════════════════════════════════════════
+function setTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('#tab-bar button').forEach((btn, i) => {
+    btn.classList.toggle('active', ['single','eval','compare'][i] === tab);
+  });
+  document.getElementById('tab-single').classList.toggle('active', tab === 'single');
+  document.getElementById('tab-eval').classList.toggle('active', tab === 'eval');
+  document.getElementById('tab-compare').classList.toggle('active', tab === 'compare');
+  if (tab === 'single' && processed) render();
+  if (tab === 'eval' && evalData) renderEvalChart();
+}
+
+// ══════════════════════════════════════════════════════════════
+// Eval loading — group-aggregated or single-mask fallback
+// ══════════════════════════════════════════════════════════════
+function loadEvalSidecar(maskPath) {
+  // If we have a group, load all evals in the group at once
+  if (currentGroup && currentGroup.sparsities.length > 1) {
+    loadGroupEvals(currentGroup);
+    return;
+  }
+  // Single-mask fallback
+  if (!maskPath) return;
+  fetch('/api/eval_sidecar?path=' + encodeURIComponent(maskPath))
+    .then(r => r.json())
+    .then(data => {
+      if (!data) {
+        evalData = null;
+        showEvalEmpty('No eval sidecar found for this mask.');
+        return;
+      }
+      evalData = { mode: 'single', single: data };
+      showEvalReady(maskPath.split('/').pop().replace('.json', ''));
+    })
+    .catch(err => {
+      console.error('Failed to load eval sidecar:', err);
+      evalData = null;
+    });
+}
+
+function loadGroupEvals(group) {
+  const paths = group.sparsities.map(e => e.path);
+  const qs = paths.map(p => 'paths=' + encodeURIComponent(p)).join('&');
+  fetch('/api/group_evals?' + qs)
+    .then(r => r.json())
+    .then(data => {
+      if (!data || !data.evals) {
+        evalData = null;
+        showEvalEmpty('No eval data found for this group.');
+        return;
+      }
+      evalData = {
+        mode: 'group',
+        group: data,
+        kl_max: data.kl_max,
+        target_letter: data.target_letter,
+        answer_letters: data.answer_letters || ['A','B','C','D'],
+        clean_answer_probs: data.clean_answer_probs,
+      };
+      showEvalReady(group.label);
+    })
+    .catch(err => {
+      console.error('Failed to load group evals:', err);
+      evalData = null;
+    });
+}
+
+function showEvalEmpty(msg) {
+  document.getElementById('eval-empty').style.display = '';
+  document.getElementById('eval-content').style.display = 'none';
+  document.getElementById('eval-empty').innerHTML = msg;
+}
+function showEvalReady(label) {
+  document.getElementById('eval-empty').style.display = 'none';
+  document.getElementById('eval-content').style.display = '';
+  document.getElementById('eval-source-badge').textContent = label;
+  renderEvalChart();
+}
+
+// ══════════════════════════════════════════════════════════════
+// Extract aggregated rows from group evals
+// ══════════════════════════════════════════════════════════════
+function getGroupSNPCurve() {
+  // One point per target sparsity: the matched top_k row
+  if (!evalData || evalData.mode !== 'group') return [];
+  const points = [];
+  for (const entry of evalData.group.evals) {
+    const ev = entry.eval;
+    if (!ev || !ev.rows) continue;
+    // Find the matched top_k row (target_sparsity matches training target)
+    const topK = ev.rows.find(r => r.row === 'mask_eval' && r.mode === 'top_k');
+    if (topK) points.push(topK);
+  }
+  points.sort((a, b) => a.sparsity - b.sparsity);
+  return points;
+}
+
+function getGroupModeCurve(mode) {
+  if (!evalData || evalData.mode !== 'group') return [];
+  const points = [];
+  for (const entry of evalData.group.evals) {
+    const ev = entry.eval;
+    if (!ev || !ev.rows) continue;
+    const row = ev.rows.find(r => r.row === 'mask_eval' && r.mode === mode);
+    if (row) points.push(row);
+  }
+  points.sort((a, b) => a.sparsity - b.sparsity);
+  return points;
+}
+
+function getTACurve() {
+  if (!evalData || evalData.mode !== 'group' || !evalData.group.ta_eval) return [];
+  const rows = evalData.group.ta_eval.rows || [];
+  return rows.filter(r => r.row === 'mask_eval' && r.mode === 'top_k')
+    .sort((a, b) => a.sparsity - b.sparsity);
+}
+
+function getSNPRolloutCurve() {
+  if (!evalData || evalData.mode !== 'group' || !evalData.group.snp_rollouts) return [];
+  return evalData.group.snp_rollouts.slice().sort((a, b) => a.sparsity - b.sparsity);
+}
+
+function getTARolloutCurve() {
+  if (!evalData || evalData.mode !== 'group' || !evalData.group.ta_rollouts) return [];
+  return evalData.group.ta_rollouts.slice().sort((a, b) => a.sparsity - b.sparsity);
+}
+
+// ══════════════════════════════════════════════════════════════
+// Eval chart rendering
+// ══════════════════════════════════════════════════════════════
+function renderEvalChart() {
+  if (!evalData) return;
+  const metric = document.getElementById('eval-metric-select').value;
+  const chartContainer = document.getElementById('eval-chart-container');
+  const tableContainer = document.getElementById('eval-table-container');
+
+  if (metric === 'eval_table') {
+    chartContainer.style.display = 'none';
+    tableContainer.style.display = '';
+    renderEvalTable();
+  } else {
+    chartContainer.style.display = '';
+    tableContainer.style.display = 'none';
+    if (evalData.mode === 'group') {
+      if (metric === 'kl_vs_sparsity') renderGroupKL(chartContainer, false);
+      else if (metric === 'kl_norm_vs_sparsity') renderGroupKL(chartContainer, true);
+      else if (metric === 'answer_probs') renderGroupAnswerProbs(chartContainer);
+      else if (metric === 'p_target_vs_sparsity') renderGroupPTarget(chartContainer);
+      else if (metric === 'rollout_p_target') renderRolloutPTarget(chartContainer);
+      else if (metric === 'rollout_kl') renderRolloutKL(chartContainer);
+    } else {
+      // Single-mask fallback: legacy rendering from single eval
+      renderSingleMaskChart(metric, chartContainer);
+    }
+  }
+}
+
+// ── Group plots (cross-sparsity, one point per trained mask) ──
+
+function renderGroupKL(container, normalized) {
+  const klMax = evalData.kl_max;
+  if (normalized && (!klMax || klMax === 0)) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">KL_max is 0 or missing.</div>';
+    return;
+  }
+
+  const snpTopK = getGroupSNPCurve();
+  const snpMgt0 = getGroupModeCurve('m_gt_0');
+  const snpMgt05 = getGroupModeCurve('m_gt_0.5');
+  const ta = getTACurve();
+
+  if (snpTopK.length === 0 && ta.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No eval data.</div>';
+    return;
+  }
+
+  const yFn = normalized
+    ? (r => (r.kl_normalized != null) ? r.kl_normalized : r.kl / klMax)
+    : (r => r.kl);
+  const yLabel = normalized ? 'KL / KL_max' : 'KL Divergence';
+
+  const traces = [];
+
+  if (snpTopK.length > 0) {
+    traces.push({
+      x: snpTopK.map(r => r.sparsity), y: snpTopK.map(yFn),
+      mode: 'lines+markers', marker: { size: 7, color: '#4caf50' },
+      line: { color: '#4caf50', width: 2.5 },
+      name: 'SNP (matched top-k)',
+      hovertemplate: 'SNP top-k<br>sparsity=%{x:.1%}<br>' + yLabel + '=%{y:.4f}<extra></extra>',
+    });
+  }
+  if (snpMgt0.length > 0) {
+    traces.push({
+      x: snpMgt0.map(r => r.sparsity), y: snpMgt0.map(yFn),
+      mode: 'lines+markers', marker: { size: 5, color: '#2196f3', symbol: 'diamond' },
+      line: { color: '#2196f3', width: 1.5, dash: 'dot' },
+      name: 'SNP (m > 0)',
+      hovertemplate: 'SNP m>0<br>sparsity=%{x:.1%}<br>' + yLabel + '=%{y:.4f}<extra></extra>',
+    });
+  }
+  if (snpMgt05.length > 0) {
+    traces.push({
+      x: snpMgt05.map(r => r.sparsity), y: snpMgt05.map(yFn),
+      mode: 'lines+markers', marker: { size: 5, color: '#9c27b0', symbol: 'square' },
+      line: { color: '#9c27b0', width: 1.5, dash: 'dot' },
+      name: 'SNP (m > 0.5)',
+      hovertemplate: 'SNP m>0.5<br>sparsity=%{x:.1%}<br>' + yLabel + '=%{y:.4f}<extra></extra>',
+    });
+  }
+  if (ta.length > 0) {
+    traces.push({
+      x: ta.map(r => r.sparsity), y: ta.map(yFn),
+      mode: 'lines+markers', marker: { size: 7, color: '#ff9800' },
+      line: { color: '#ff9800', width: 2.5 },
+      name: 'Thought Anchors',
+      hovertemplate: 'TA<br>sparsity=%{x:.1%}<br>' + yLabel + '=%{y:.4f}<extra></extra>',
+    });
+  }
+
+  if (normalized) {
+    traces.push({ x: [0, 1], y: [1, 1], mode: 'lines', line: { color: '#ef4444', dash: 'dash', width: 1 }, name: 'KL_max = 1.0', showlegend: true });
+  } else if (klMax) {
+    traces.push({ x: [0, 1], y: [klMax, klMax], mode: 'lines', line: { color: '#ef4444', dash: 'dash', width: 1 }, name: 'KL_max', showlegend: true });
+  }
+
+  const layout = {
+    ...PLOTLY_LAYOUT_BASE, height: 400,
+    xaxis: { title: 'Sparsity (fraction of edges ablated)', tickformat: '.0%', gridcolor: '#e2e8f0' },
+    yaxis: { title: yLabel, gridcolor: '#e2e8f0' },
+  };
+  if (normalized) {
+    const allY = [...snpTopK, ...snpMgt0, ...snpMgt05, ...ta].map(yFn);
+    layout.yaxis.range = [0, Math.min(1.5, (d3.max(allY) || 1) * 1.2)];
+  } else {
+    layout.yaxis.exponentformat = 'e';
+  }
+
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+function renderGroupPTarget(container) {
+  const snpTopK = getGroupSNPCurve();
+  const ta = getTACurve();
+  const letters = evalData.answer_letters || ['A','B','C','D'];
+  const targetLetter = evalData.target_letter;
+  const targetIdx = targetLetter ? letters.indexOf(targetLetter.trim()) : -1;
+
+  function pt(r) {
+    if (r.p_target != null) return r.p_target;
+    if (targetIdx >= 0 && r.answer_probs) return r.answer_probs[targetIdx];
+    return null;
+  }
+
+  const snpPts = snpTopK.filter(r => pt(r) != null);
+  const taPts = ta.filter(r => pt(r) != null);
+
+  if (snpPts.length === 0 && taPts.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No P(target) data.</div>';
+    return;
+  }
+
+  const traces = [];
+  const cleanPt = evalData.clean_answer_probs && targetIdx >= 0 ? evalData.clean_answer_probs[targetIdx] : null;
+  const tgtLabel = targetLetter ? targetLetter.trim() : 'target';
+  if (cleanPt != null) {
+    traces.push({ x: [0, 1], y: [cleanPt, cleanPt], mode: 'lines', line: { color: '#94a3b8', dash: 'dot', width: 1 }, name: `Clean P(${tgtLabel})` });
+  }
+
+  if (snpPts.length > 0) {
+    traces.push({
+      x: snpPts.map(r => r.sparsity), y: snpPts.map(r => pt(r)),
+      mode: 'lines+markers', marker: { size: 7, color: '#4caf50' },
+      line: { color: '#4caf50', width: 2.5 },
+      name: 'SNP (matched top-k)',
+      hovertemplate: `SNP<br>sparsity=%{x:.1%}<br>P(${tgtLabel})=%{y:.3f}<extra></extra>`,
+    });
+  }
+  if (taPts.length > 0) {
+    traces.push({
+      x: taPts.map(r => r.sparsity), y: taPts.map(r => pt(r)),
+      mode: 'lines+markers', marker: { size: 7, color: '#ff9800' },
+      line: { color: '#ff9800', width: 2.5 },
+      name: 'Thought Anchors',
+      hovertemplate: `TA<br>sparsity=%{x:.1%}<br>P(${tgtLabel})=%{y:.3f}<extra></extra>`,
+    });
+  }
+
+  Plotly.newPlot(container, traces, {
+    ...PLOTLY_LAYOUT_BASE, height: 400,
+    xaxis: { title: 'Sparsity', tickformat: '.0%', gridcolor: '#e2e8f0' },
+    yaxis: { title: `P(${tgtLabel})`, gridcolor: '#e2e8f0', range: [0, 1.05] },
+  }, PLOTLY_CONFIG);
+}
+
+function renderRolloutPTarget(container) {
+  const snpRoll = getSNPRolloutCurve().filter(r => r.p_target != null);
+  const taRoll = getTARolloutCurve().filter(r => r.p_target != null);
+  const snpFix = getGroupSNPCurve().filter(r => r.p_target != null);
+  const taFix = getTACurve().filter(r => r.p_target != null);
+  const letters = evalData.answer_letters || ['A','B','C','D'];
+  const targetLetter = evalData.target_letter;
+  const targetIdx = targetLetter ? letters.indexOf(targetLetter.trim()) : -1;
+  const tgtLabel = targetLetter ? targetLetter.trim() : 'target';
+
+  if (snpRoll.length === 0 && taRoll.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No rollout data available for this group.</div>';
+    return;
+  }
+
+  const traces = [];
+  const cleanPt = evalData.clean_answer_probs && targetIdx >= 0 ? evalData.clean_answer_probs[targetIdx] : null;
+  if (cleanPt != null) {
+    traces.push({ x: [0, 1], y: [cleanPt, cleanPt], mode: 'lines', line: { color: '#94a3b8', dash: 'dot', width: 1 }, name: `Clean P(${tgtLabel})` });
+  }
+
+  if (snpFix.length > 0) {
+    traces.push({
+      x: snpFix.map(r => r.sparsity), y: snpFix.map(r => r.p_target),
+      mode: 'lines', marker: { size: 0 },
+      line: { color: '#4caf50', width: 1, dash: 'dot' },
+      name: 'SNP fixed eval',
+      hovertemplate: `SNP fixed<br>sparsity=%{x:.1%}<br>P(${tgtLabel})=%{y:.3f}<extra></extra>`,
+      legendgroup: 'snp', showlegend: true,
+    });
+  }
+  if (snpRoll.length > 0) {
+    traces.push({
+      x: snpRoll.map(r => r.sparsity), y: snpRoll.map(r => r.p_target),
+      mode: 'lines+markers', marker: { size: 7, color: '#4caf50' },
+      line: { color: '#4caf50', width: 2.5 },
+      name: 'SNP rollout (n=' + (snpRoll[0].n_rollouts || '?') + ')',
+      hovertemplate: `SNP rollout<br>sparsity=%{x:.1%}<br>P(${tgtLabel})=%{y:.3f}<extra></extra>`,
+      legendgroup: 'snp',
+    });
+  }
+  if (taFix.length > 0) {
+    traces.push({
+      x: taFix.map(r => r.sparsity), y: taFix.map(r => r.p_target),
+      mode: 'lines', marker: { size: 0 },
+      line: { color: '#ff9800', width: 1, dash: 'dot' },
+      name: 'TA fixed eval',
+      hovertemplate: `TA fixed<br>sparsity=%{x:.1%}<br>P(${tgtLabel})=%{y:.3f}<extra></extra>`,
+      legendgroup: 'ta', showlegend: true,
+    });
+  }
+  if (taRoll.length > 0) {
+    traces.push({
+      x: taRoll.map(r => r.sparsity), y: taRoll.map(r => r.p_target),
+      mode: 'lines+markers', marker: { size: 7, color: '#ff9800' },
+      line: { color: '#ff9800', width: 2.5 },
+      name: 'TA rollout (n=' + (taRoll[0].n_rollouts || '?') + ')',
+      hovertemplate: `TA rollout<br>sparsity=%{x:.1%}<br>P(${tgtLabel})=%{y:.3f}<extra></extra>`,
+      legendgroup: 'ta',
+    });
+  }
+
+  Plotly.newPlot(container, traces, {
+    ...PLOTLY_LAYOUT_BASE, height: 400,
+    title: { text: 'Rollout P(correct) vs Sparsity', font: { size: 14 } },
+    xaxis: { title: 'Sparsity', tickformat: '.0%', gridcolor: '#e2e8f0' },
+    yaxis: { title: `P(${tgtLabel})`, gridcolor: '#e2e8f0', range: [0, 1.05] },
+  }, PLOTLY_CONFIG);
+}
+
+function renderRolloutKL(container) {
+  const snpRoll = getSNPRolloutCurve().filter(r => r.kl != null);
+  const taRoll = getTARolloutCurve().filter(r => r.kl != null);
+  const snpFix = getGroupSNPCurve().filter(r => r.kl != null);
+  const taFix = getTACurve().filter(r => r.kl != null);
+
+  if (snpRoll.length === 0 && taRoll.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No rollout KL data available for this group.</div>';
+    return;
+  }
+
+  const traces = [];
+
+  if (snpFix.length > 0) {
+    traces.push({
+      x: snpFix.map(r => r.sparsity), y: snpFix.map(r => r.kl),
+      mode: 'lines', marker: { size: 0 },
+      line: { color: '#4caf50', width: 1, dash: 'dot' },
+      name: 'SNP fixed eval',
+      hovertemplate: 'SNP fixed<br>sparsity=%{x:.1%}<br>KL=%{y:.4f}<extra></extra>',
+      legendgroup: 'snp', showlegend: true,
+    });
+  }
+  if (snpRoll.length > 0) {
+    traces.push({
+      x: snpRoll.map(r => r.sparsity), y: snpRoll.map(r => r.kl),
+      mode: 'lines+markers', marker: { size: 7, color: '#4caf50' },
+      line: { color: '#4caf50', width: 2.5 },
+      name: 'SNP rollout (n=' + (snpRoll[0].n_rollouts || '?') + ')',
+      hovertemplate: 'SNP rollout<br>sparsity=%{x:.1%}<br>KL=%{y:.4f}<extra></extra>',
+      legendgroup: 'snp',
+    });
+  }
+  if (taFix.length > 0) {
+    traces.push({
+      x: taFix.map(r => r.sparsity), y: taFix.map(r => r.kl),
+      mode: 'lines', marker: { size: 0 },
+      line: { color: '#ff9800', width: 1, dash: 'dot' },
+      name: 'TA fixed eval',
+      hovertemplate: 'TA fixed<br>sparsity=%{x:.1%}<br>KL=%{y:.4f}<extra></extra>',
+      legendgroup: 'ta', showlegend: true,
+    });
+  }
+  if (taRoll.length > 0) {
+    traces.push({
+      x: taRoll.map(r => r.sparsity), y: taRoll.map(r => r.kl),
+      mode: 'lines+markers', marker: { size: 7, color: '#ff9800' },
+      line: { color: '#ff9800', width: 2.5 },
+      name: 'TA rollout (n=' + (taRoll[0].n_rollouts || '?') + ')',
+      hovertemplate: 'TA rollout<br>sparsity=%{x:.1%}<br>KL=%{y:.4f}<extra></extra>',
+      legendgroup: 'ta',
+    });
+  }
+
+  const klMax = evalData.kl_max;
+  if (klMax) {
+    traces.push({ x: [0, 1], y: [klMax, klMax], mode: 'lines', line: { color: '#ef4444', dash: 'dash', width: 1 }, name: 'KL_max (fixed)', showlegend: true });
+  }
+
+  Plotly.newPlot(container, traces, {
+    ...PLOTLY_LAYOUT_BASE, height: 400,
+    title: { text: 'Rollout KL vs Sparsity', font: { size: 14 } },
+    xaxis: { title: 'Sparsity', tickformat: '.0%', gridcolor: '#e2e8f0' },
+    yaxis: { title: 'KL Divergence (avg over rollouts)', gridcolor: '#e2e8f0', exponentformat: 'e' },
+  }, PLOTLY_CONFIG);
+}
+
+function renderGroupAnswerProbs(container) {
+  const snpTopK = getGroupSNPCurve();
+  const letters = evalData.answer_letters || ['A','B','C','D'];
+  const targetLetter = evalData.target_letter;
+  const cleanProbs = evalData.clean_answer_probs;
+
+  // One line per letter, x = sparsity, y = P(letter)
+  const traces = [];
+  const letterColors = ['#2196f3', '#4caf50', '#ff9800', '#e91e63'];
+
+  for (let li = 0; li < letters.length; li++) {
+    const letter = letters[li].trim();
+    const isTarget = letter === (targetLetter || '').trim();
+    const pts = snpTopK.filter(r => r.answer_probs && r.answer_probs[li] != null);
+    if (pts.length === 0) continue;
+    traces.push({
+      x: pts.map(r => r.sparsity),
+      y: pts.map(r => r.answer_probs[li] * 100),
+      mode: 'lines+markers',
+      marker: { size: isTarget ? 7 : 5, color: letterColors[li % 4] },
+      line: { color: letterColors[li % 4], width: isTarget ? 2.5 : 1.5, dash: isTarget ? 'solid' : 'dot' },
+      name: `P(${letter})` + (isTarget ? ' (target)' : ''),
+      hovertemplate: `P(${letter})<br>sparsity=%{x:.1%}<br>prob=%{y:.1f}%<extra></extra>`,
+    });
+    if (cleanProbs && cleanProbs[li] != null) {
+      traces.push({
+        x: [0, 1], y: [cleanProbs[li] * 100, cleanProbs[li] * 100],
+        mode: 'lines', line: { color: letterColors[li % 4], dash: 'dash', width: 0.8 },
+        name: `Clean P(${letter})`, showlegend: false,
+      });
+    }
+  }
+
+  Plotly.newPlot(container, traces, {
+    ...PLOTLY_LAYOUT_BASE, height: 400,
+    xaxis: { title: 'Sparsity', tickformat: '.0%', gridcolor: '#e2e8f0' },
+    yaxis: { title: 'Probability (%)', gridcolor: '#e2e8f0', range: [0, 105] },
+  }, PLOTLY_CONFIG);
+}
+
+// ── Single-mask fallback (legacy: threshold-mode comparison within one mask) ──
+
+function renderSingleMaskChart(metric, container) {
+  const data = evalData.single;
+  if (!data || !data.rows) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No data.</div>'; return; }
+  const maskRows = data.rows.filter(r => r.row === 'mask_eval');
+  const klMax = data.kl_max || (data.rows.find(r => r.row === 'kl_max') || {}).kl || 1;
+
+  if (metric === 'kl_vs_sparsity' || metric === 'kl_norm_vs_sparsity') {
+    const normalized = metric === 'kl_norm_vs_sparsity';
+    const yFn = normalized ? (r => (r.kl_normalized != null ? r.kl_normalized : r.kl / klMax)) : (r => r.kl);
+    const traces = [];
+    for (const r of maskRows) {
+      const color = MODE_COLORS[r.mode] || '#64748b';
+      const label = MODE_LABELS[r.mode] || r.mode;
+      traces.push({
+        x: [r.sparsity], y: [yFn(r)],
+        mode: 'markers', marker: { size: 10, color },
+        name: `${label} (sp=${(r.sparsity*100).toFixed(0)}%)`,
+      });
+    }
+    Plotly.newPlot(container, traces, {
+      ...PLOTLY_LAYOUT_BASE, height: 380,
+      xaxis: { title: 'Sparsity', tickformat: '.0%', gridcolor: '#e2e8f0' },
+      yaxis: { title: normalized ? 'KL / KL_max' : 'KL', gridcolor: '#e2e8f0' },
+    }, PLOTLY_CONFIG);
+  } else if (metric === 'answer_probs') {
+    const letters = data.answer_letters || ['A','B','C','D'];
+    const cleanProbs = data.clean_answer_probs;
+    const traces = [];
+    if (cleanProbs) {
+      traces.push({ x: letters, y: cleanProbs.map(p => p*100), type: 'bar', name: 'Clean', marker: { color: '#94a3b8', opacity: 0.5 } });
+    }
+    for (const r of maskRows) {
+      if (!r.answer_probs) continue;
+      traces.push({ x: letters, y: r.answer_probs.map(p => p*100), type: 'bar', name: `${MODE_LABELS[r.mode]||r.mode} (sp=${(r.sparsity*100).toFixed(0)}%)`, marker: { color: MODE_COLORS[r.mode] || '#64748b' } });
+    }
+    Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, barmode: 'group', height: 380, xaxis: { type: 'category' }, yaxis: { title: 'Probability (%)' } }, PLOTLY_CONFIG);
+  } else if (metric === 'p_target_vs_sparsity') {
+    const letters = data.answer_letters || ['A','B','C','D'];
+    const tIdx = letters.indexOf(data.target_letter);
+    const traces = [];
+    for (const r of maskRows) {
+      const pt = r.p_target != null ? r.p_target : (tIdx >= 0 && r.answer_probs ? r.answer_probs[tIdx] : null);
+      if (pt == null) continue;
+      traces.push({ x: [r.sparsity], y: [pt], mode: 'markers', marker: { size: 10, color: MODE_COLORS[r.mode] || '#64748b' }, name: MODE_LABELS[r.mode] || r.mode });
+    }
+    Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, height: 380, xaxis: { title: 'Sparsity', tickformat: '.0%' }, yaxis: { title: 'P(target)', range: [0, 1.05] } }, PLOTLY_CONFIG);
+  }
+}
+
+// ── Eval table (works for both group and single) ──
+
+function renderEvalTable() {
+  const container = document.getElementById('eval-table-container');
+  if (!evalData) { container.innerHTML = ''; return; }
+
+  const letters = evalData.mode === 'group'
+    ? (evalData.answer_letters || ['A','B','C','D'])
+    : (evalData.single.answer_letters || ['A','B','C','D']);
+  const targetLetter = evalData.mode === 'group' ? evalData.target_letter : evalData.single.target_letter;
+  const targetIdx = targetLetter ? letters.indexOf(targetLetter) : -1;
+  const klMax = evalData.mode === 'group' ? evalData.kl_max : evalData.single.kl_max;
+
+  let allRows = [];
+  if (evalData.mode === 'group') {
+    // Collect matched top_k rows across all masks
+    for (const entry of evalData.group.evals) {
+      const ev = entry.eval;
+      if (!ev || !ev.rows) continue;
+      for (const r of ev.rows) {
+        if (r.row === 'mask_eval') allRows.push(r);
+      }
+    }
+    // Add TA rows
+    if (evalData.group.ta_eval) {
+      for (const r of evalData.group.ta_eval.rows) {
+        if (r.row === 'mask_eval') allRows.push({ ...r, _source: 'TA' });
+      }
+    }
+    allRows.sort((a, b) => a.sparsity - b.sparsity);
+  } else {
+    allRows = evalData.single.rows || [];
+  }
+
+  let h = '<table class="eval-table">';
+  h += '<thead><tr><th>Source</th><th>Mode</th><th>Sparsity</th><th>KL</th><th>KL/KL<sub>max</sub></th>';
+  for (let i = 0; i < letters.length; i++) {
+    const cls = i === targetIdx ? ' class="target-col"' : '';
+    h += `<th${cls}>P(${letters[i]})</th>`;
+  }
+  h += '<th>P(target)</th></tr></thead><tbody>';
+
+  for (const r of allRows) {
+    const isRef = r.row === 'clean' || r.row === 'kl_max';
+    const cls = isRef ? ' class="ref-row"' : '';
+    const source = r._source || (r.row === 'clean' ? '' : r.row === 'kl_max' ? '' : 'SNP');
+    const modeLabel = r.row === 'clean' ? 'Clean' : r.row === 'kl_max' ? 'All-zero' : (MODE_LABELS[r.mode] || r.mode);
+    const spLabel = r.target_sparsity != null
+      ? `${(r.sparsity*100).toFixed(1)}% (target=${(r.target_sparsity*100).toFixed(0)}%)`
+      : `${((r.sparsity||0)*100).toFixed(1)}%`;
+    const klNorm = r.kl_normalized != null ? r.kl_normalized : (klMax > 0 ? r.kl / klMax : 0);
+
+    h += `<tr${cls}>`;
+    h += `<td>${source}</td>`;
+    h += `<td class="mode-label">${modeLabel}</td>`;
+    h += `<td>${spLabel}</td>`;
+    h += `<td>${r.kl != null ? r.kl.toExponential(2) : '—'}</td>`;
+    h += `<td>${isRef ? '—' : klNorm.toFixed(4)}</td>`;
+
+    if (r.answer_probs) {
+      for (let i = 0; i < letters.length; i++) {
+        const val = r.answer_probs[i] != null ? r.answer_probs[i] : 0;
+        const cls2 = i === targetIdx ? ' class="target-col"' : '';
+        h += `<td${cls2}>${(val*100).toFixed(1)}%</td>`;
+      }
+    } else {
+      for (let i = 0; i < letters.length; i++) h += '<td>—</td>';
+    }
+
+    const pt = r.p_target != null ? r.p_target : (r.answer_probs && targetIdx >= 0 ? r.answer_probs[targetIdx] : null);
+    h += `<td>${pt != null ? (pt*100).toFixed(1) + '%' : '—'}</td>`;
+    h += '</tr>';
+  }
+
+  h += '</tbody></table>';
+  container.innerHTML = h;
+}
+</script>
+</body>
+</html>

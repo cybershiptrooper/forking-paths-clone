@@ -38,6 +38,42 @@ def compute_cache_key(
     return hashlib.sha256(key_data.encode()).hexdigest()[:16]
 
 
+def compute_sentence_cache_key(
+    model_name: str,
+    formatted_text: str,
+    sentence_step: int,
+    base_source: str,
+    base_answer_type: str,
+    temperature: float,
+    seed: int,
+    max_sampling_tokens: int,
+    num_branches: int,
+) -> str:
+    """Cache key for sentence-step branch generation.
+
+    Adds a `kind: "sentence"` namespace marker so it cannot collide with
+    legacy token-based keys produced by `compute_cache_key`.
+    `base_source` identifies the record (e.g. "dataset:<path>:<idx>") and
+    `base_answer_type` distinguishes which path within the record was picked.
+    """
+    key_data = json.dumps(
+        {
+            "kind": "sentence",
+            "model_name": model_name,
+            "formatted_text": formatted_text,
+            "sentence_step": sentence_step,
+            "base_source": base_source,
+            "base_answer_type": base_answer_type,
+            "temperature": temperature,
+            "seed": seed,
+            "max_sampling_tokens": max_sampling_tokens,
+            "num_branches": num_branches,
+        },
+        sort_keys=True,
+    )
+    return hashlib.sha256(key_data.encode()).hexdigest()[:16]
+
+
 def load_from_cache(cache_key: str, cache_dir: str = DEFAULT_CACHE_DIR):
     """Load cached completions by key. Returns None on miss."""
     path = os.path.join(cache_dir, f"{cache_key}.json")
@@ -160,6 +196,103 @@ def get_or_generate(
         "analysis_timestep": analysis_timestep,
         "prompt_len": prompt_len,
         "input_ids": input_ids[0].tolist(),
+        "branches": branches,
+    }
+    _save_to_cache(cache_key, data, cache_dir)
+
+    data["cache_key"] = cache_key
+    return data
+
+
+def get_or_generate_sentence_branches(
+    model_name: str,
+    formatted_text: str,
+    full_input_ids: list,
+    analysis_timestep: int,
+    sentence_step: int,
+    base_source: str,
+    base_answer_type: str,
+    num_branches: int,
+    temperature: float,
+    max_sampling_tokens: int,
+    seed: int,
+    cache_dir: str = DEFAULT_CACHE_DIR,
+) -> dict:
+    """Sentence-step variant: generate branches from a caller-supplied prefix.
+
+    Unlike `get_or_generate`, this never samples a base completion. The full
+    prefix (prompt + chosen base path) is supplied by the caller, the analysis
+    boundary has already been computed from sentence boundaries, and we only
+    generate `num_branches` continuations from that boundary.
+
+    Cache namespace is "sentence" so legacy token-based caches stay valid.
+    """
+    cache_key = compute_sentence_cache_key(
+        model_name=model_name,
+        formatted_text=formatted_text,
+        sentence_step=sentence_step,
+        base_source=base_source,
+        base_answer_type=base_answer_type,
+        temperature=temperature,
+        seed=seed,
+        max_sampling_tokens=max_sampling_tokens,
+        num_branches=num_branches,
+    )
+
+    cached = load_from_cache(cache_key, cache_dir)
+    if cached is not None:
+        print(f"  Cache hit ({cache_key}): loaded {len(cached['branches'])} branches")
+        cached["cache_key"] = cache_key
+        return cached
+
+    print(f"  Cache miss ({cache_key}): generating with vLLM...")
+
+    from vllm import LLM, SamplingParams
+    from transformers import AutoTokenizer
+    from utils.utils import clear_cuda
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    if analysis_timestep > len(full_input_ids):
+        raise ValueError(
+            f"analysis_timestep={analysis_timestep} exceeds full_input_ids "
+            f"length ({len(full_input_ids)})."
+        )
+    prefix_text = tokenizer.decode(full_input_ids[:analysis_timestep])
+
+    llm = LLM(model=model_name, dtype="auto")
+    print(f"  Generating {num_branches} branches from sentence-{sentence_step} boundary...")
+    branch_params = SamplingParams(
+        n=num_branches,
+        temperature=temperature,
+        max_tokens=max_sampling_tokens,
+        seed=seed,
+    )
+    branch_outputs = llm.generate([prefix_text], branch_params)
+
+    branches = []
+    for output in branch_outputs[0].outputs:
+        branches.append(
+            {
+                "text": output.text,
+                "token_ids": list(output.token_ids),
+            }
+        )
+
+    del llm
+    clear_cuda()
+    print(f"  Generated {len(branches)} branches, vLLM cleaned up.")
+
+    data = {
+        "model_name": model_name,
+        "seed": seed,
+        "temperature": temperature,
+        "max_sampling_tokens": max_sampling_tokens,
+        "num_branches": num_branches,
+        "sentence_step": sentence_step,
+        "analysis_timestep": analysis_timestep,
+        "base_source": base_source,
+        "base_answer_type": base_answer_type,
+        "input_ids": list(full_input_ids),
         "branches": branches,
     }
     _save_to_cache(cache_key, data, cache_dir)

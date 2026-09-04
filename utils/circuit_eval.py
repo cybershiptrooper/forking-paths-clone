@@ -21,6 +21,9 @@ from utils.circuit_discovery.common import (
     make_attention_forward,
     apply_sentence_mask,
 )
+from utils.circuit_discovery.sdpa_forward import (
+    make_sdpa_attention_forward,
+)
 from utils.circuit_discovery.base import AblationHandle
 
 
@@ -313,10 +316,178 @@ def install_non_target_ablation(
     return handles
 
 
+def install_sdpa_mask_hooks(
+    model: torch.nn.Module,
+    layers: list[int],
+    binary_masks: dict[int, torch.Tensor],
+    token_to_sent: torch.Tensor,
+    gap_filter: torch.Tensor,
+    renormalize: bool,
+) -> list[AblationHandle]:
+    """SDPA equivalent of ``install_mask_hooks`` for *binary* masks.
+
+    Installs the SDPA-based attention forward (pre-softmax additive mask
+    via ``_expand_mask_to_additive`` from
+    :mod:`utils.circuit_discovery.sdpa_forward`). For binary 0/1 masks
+    with renormalization on, this is mathematically equivalent to the
+    eager post-softmax × m + ratio renorm path used by
+    ``install_mask_hooks``: 0 → -inf gets softmaxed to 0; 1 → 0 leaves
+    the logit unchanged; softmax over surviving entries renormalizes
+    automatically. ``renormalize`` is accepted for interface
+    compatibility but has no separate effect under SDPA (softmax *is*
+    the renormalization).
+    """
+    forward_fn = make_sdpa_attention_forward(model.config.model_type)
+    handles: list[AblationHandle] = []
+    for layer_idx in layers:
+        attn_module = get_attention_module(model, layer_idx)
+        original_forward = attn_module.forward
+        attn_module._circuit_mask = binary_masks[layer_idx]
+        attn_module._token_to_sent = token_to_sent
+        attn_module._gap_filter = gap_filter
+        attn_module._renormalize_masked_attn = renormalize
+        attn_module.forward = types.MethodType(forward_fn, attn_module)
+        handles.append(AblationHandle(attn_module, original_forward))
+    return handles
+
+
+def install_non_target_ablation_sdpa(
+    model: torch.nn.Module,
+    target_layers: list[int],
+    num_heads: int,
+    num_sents: int,
+    token_to_sent: torch.Tensor,
+    gap_filter: torch.Tensor,
+    renormalize: bool,
+    device: torch.device,
+) -> list[AblationHandle]:
+    """SDPA equivalent of ``install_non_target_ablation``."""
+    num_total_layers = model.config.num_hidden_layers
+    target_set = set(target_layers)
+    non_target = [l for l in range(num_total_layers) if l not in target_set]
+    print(f"Ablating {len(non_target)} non-target layers (SDPA backend)...")
+
+    zero_mask = torch.zeros(num_heads, num_sents, num_sents, device=device)
+    filled_mask = apply_gap_filter(zero_mask, gap_filter, fill_value=1.0)
+
+    forward_fn = make_sdpa_attention_forward(model.config.model_type)
+    handles: list[AblationHandle] = []
+    for layer_idx in non_target:
+        attn_module = get_attention_module(model, layer_idx)
+        original_forward = attn_module.forward
+        attn_module._circuit_mask = filled_mask
+        attn_module._token_to_sent = token_to_sent
+        attn_module._gap_filter = gap_filter
+        attn_module._renormalize_masked_attn = renormalize
+        attn_module.forward = types.MethodType(forward_fn, attn_module)
+        handles.append(AblationHandle(attn_module, original_forward))
+    return handles
+
+
+def install_clean_sdpa_forward(
+    model: torch.nn.Module,
+) -> list[AblationHandle]:
+    """Patch every attention layer to use the SDPA forward with no mask installed.
+
+    Used by ``--backend sdpa`` callers that want the *clean* reference
+    forward to also run through the SDPA-patched path (so the masked
+    eval and the clean baseline differ only in the mask, not the
+    backend). Without ``_circuit_mask`` set on the module, the SDPA
+    forward's mask converter returns ``None`` and SDPA runs unmodified.
+    """
+    forward_fn = make_sdpa_attention_forward(model.config.model_type)
+    handles: list[AblationHandle] = []
+    num_total_layers = model.config.num_hidden_layers
+    for layer_idx in range(num_total_layers):
+        attn_module = get_attention_module(model, layer_idx)
+        original_forward = attn_module.forward
+        # Explicitly clear any leftover state from prior runs.
+        for attr in ("_circuit_mask", "_token_to_sent", "_gap_filter"):
+            if hasattr(attn_module, attr):
+                delattr(attn_module, attr)
+        attn_module.forward = types.MethodType(forward_fn, attn_module)
+        handles.append(AblationHandle(attn_module, original_forward))
+    return handles
+
+
 def remove_handles(handles: list[AblationHandle]):
     """Remove all ablation handles (restore original forwards)."""
     for h in handles:
         h.remove()
+
+
+# ------------------------------------------------------------------
+# Direct-answer probe metric (deterministic suffix evaluation)
+# ------------------------------------------------------------------
+
+
+def compute_probe_metric(
+    model: torch.nn.Module,
+    input_ids: torch.Tensor,
+    suffix_token_ids: list[int] | torch.Tensor,
+    answer_token_ids: list[int] | torch.Tensor,
+    clean_answer_logprobs: torch.Tensor,
+    target_answer_id: Optional[int] = None,
+) -> dict:
+    """One-forward-pass answer-distribution metric for the deterministic probe.
+
+    Assumes the caller has already installed the ablation hooks for the
+    threshold under test.  Runs the model on ``prefix + suffix +
+    placeholder``, reads the logits at the position whose next token is
+    the answer, restricts to ``answer_token_ids``, softmax-renormalises,
+    and computes:
+
+    - ``answer_probs_masked``: list of P(letter) under the masked model.
+    - ``probe_kl``: KL(P_clean || P_masked) over the answer simplex.
+    - ``probe_reward_gap``: ``P_masked(target) - max_{other} P_masked(other)``
+      (only when *target_answer_id* is provided).
+
+    Args:
+        clean_answer_logprobs: ``(num_answers,)`` log-probs over the answer
+            simplex under the clean (unablated) model.  Computed once
+            outside this helper and reused across thresholds.
+    """
+    device = next(model.parameters()).device
+    if isinstance(suffix_token_ids, list):
+        suffix_token_ids = torch.tensor(suffix_token_ids, dtype=torch.long)
+    if isinstance(answer_token_ids, list):
+        answer_token_ids = torch.tensor(answer_token_ids, dtype=torch.long)
+    suffix_token_ids = suffix_token_ids.to(device)
+    answer_token_ids = answer_token_ids.to(device)
+    clean_lp = clean_answer_logprobs.to(device)
+
+    placeholder = answer_token_ids[0:1]
+    cont = torch.cat([suffix_token_ids, placeholder]).unsqueeze(0)
+    full_input = torch.cat([input_ids.to(device), cont], dim=-1)
+    prefix_len = input_ids.shape[-1]
+    answer_pos = prefix_len + suffix_token_ids.shape[-1] - 1
+
+    model.eval()
+    with torch.no_grad():
+        logits = model(full_input).logits
+    row = logits[0, answer_pos].float()
+    masked_lp = torch.log_softmax(row[answer_token_ids], dim=-1)
+    masked_p = masked_lp.exp()
+
+    p_clean = clean_lp.exp()
+    kl = (p_clean * (clean_lp - masked_lp)).sum().item()
+
+    out = {
+        "probe_kl": kl,
+        "answer_probs_masked": masked_p.cpu().tolist(),
+    }
+    if target_answer_id is not None:
+        target = int(target_answer_id)
+        other = torch.ones(
+            masked_p.shape[0], dtype=torch.bool, device=masked_p.device,
+        )
+        other[target] = False
+        out["probe_reward_gap"] = float(
+            (masked_p[target] - masked_p[other].max()).item()
+        )
+        out["probe_p_target"] = float(masked_p[target].item())
+        out["probe_p_best_other"] = float(masked_p[other].max().item())
+    return out
 
 
 # ------------------------------------------------------------------
@@ -413,6 +584,7 @@ def eval_all_metrics(
     is_method: str = "snis",
     is_temperature: Optional[float] = None,
     chain_lengths: Optional[torch.Tensor] = None,
+    probe_metric_fn: Optional[Callable] = None,
 ) -> dict:
     """Run model with *binary_masks* and compute all metrics in a single pass.
 
@@ -485,6 +657,11 @@ def eval_all_metrics(
     total_branches = 0
 
     with torch.no_grad():
+        # Optional direct-answer probe metric (one extra forward on
+        # `prefix + suffix + placeholder` while hooks are alive).
+        if probe_metric_fn is not None:
+            probe_out = probe_metric_fn(model)
+
         for cont_idx, cont in enumerate(continuations):
             full_input = torch.cat([input_ids, cont], dim=-1)
             full_len = full_input.shape[-1]
@@ -692,6 +869,10 @@ def eval_all_metrics(
         result["kl_b"] = kl_b
         result["contrastive_loss"] = kl_a - kl_b
 
+    if probe_metric_fn is not None:
+        result.update({f"probe_{k}" if not k.startswith("probe_") else k: v
+                       for k, v in probe_out.items()})
+
     return result
 
 
@@ -725,6 +906,9 @@ def evaluate_at_thresholds(
     temperature: float = 1.0,
     importance_sampling_method: str = "snis",
     importance_sampling_temperature: Optional[float] = None,
+    probe_suffix_token_ids: Optional[list[int]] = None,
+    probe_answer_token_ids: Optional[list[int]] = None,
+    probe_target_answer_id: Optional[int] = None,
 ) -> list[dict]:
     """Evaluate all metrics at different mask thresholds.
 
@@ -818,6 +1002,40 @@ def evaluate_at_thresholds(
         [c.shape[-1] for c in continuations], dtype=torch.long, device=device,
     )
 
+    # Optional direct-answer probe metric: pre-compute clean answer
+    # log-probs once and build a closure that the threshold-loop can
+    # invoke while masked-hooks are alive.
+    probe_metric_fn = None
+    if probe_suffix_token_ids is not None and probe_answer_token_ids is not None:
+        suffix_ids_t = torch.tensor(probe_suffix_token_ids, dtype=torch.long, device=device)
+        ans_ids_t = torch.tensor(probe_answer_token_ids, dtype=torch.long, device=device)
+        placeholder = ans_ids_t[0:1]
+        probe_full = torch.cat(
+            [input_ids.to(device), suffix_ids_t.unsqueeze(0), placeholder.unsqueeze(0)],
+            dim=-1,
+        )
+        probe_answer_pos = prefix_len + suffix_ids_t.shape[-1] - 1
+        with torch.no_grad():
+            clean_probe_logits = model(probe_full).logits
+        clean_probe_lp = torch.log_softmax(
+            clean_probe_logits[0, probe_answer_pos, ans_ids_t].float(), dim=-1,
+        ).detach()
+        node_mask.metadata["probe_answer_probs_clean"] = (
+            clean_probe_lp.exp().cpu().tolist()
+        )
+        del clean_probe_logits
+
+        def _probe_fn(_model):
+            return compute_probe_metric(
+                _model,
+                input_ids=input_ids,
+                suffix_token_ids=suffix_ids_t,
+                answer_token_ids=ans_ids_t,
+                clean_answer_logprobs=clean_probe_lp,
+                target_answer_id=probe_target_answer_id,
+            )
+        probe_metric_fn = _probe_fn
+
     # Shared kwargs for eval_all_metrics
     shared_kwargs = dict(
         layers=layers,
@@ -842,6 +1060,7 @@ def evaluate_at_thresholds(
         is_method=importance_sampling_method,
         is_temperature=importance_sampling_temperature,
         chain_lengths=chain_lengths,
+        probe_metric_fn=probe_metric_fn,
     )
 
     # Pre-generate K random score masks by permuting learned scores
@@ -965,6 +1184,19 @@ def evaluate_at_thresholds(
                 r.get("contrastive_loss", 0.0) for r in random_results
             ]
 
+        # Direct-answer probe metrics (forced-suffix evaluation)
+        if "probe_kl" in learned:
+            entry["probe_kl"] = learned["probe_kl"]
+            entry["probe_answer_probs_masked"] = learned["probe_answer_probs_masked"]
+            entry["random_probe_kl"] = _mean_field(random_results, "probe_kl")
+            entry["random_probe_kls"] = [r.get("probe_kl", 0.0) for r in random_results]
+            if "probe_reward_gap" in learned:
+                entry["probe_reward_gap"] = learned["probe_reward_gap"]
+                entry["probe_p_target"] = learned["probe_p_target"]
+                entry["probe_p_best_other"] = learned["probe_p_best_other"]
+                entry["random_probe_reward_gap"] = _mean_field(random_results, "probe_reward_gap")
+                entry["random_probe_reward_gaps"] = [r.get("probe_reward_gap", 0.0) for r in random_results]
+
         results.append(entry)
 
         # --- Logging ---
@@ -981,6 +1213,10 @@ def evaluate_at_thresholds(
             extra_parts.append(
                 f"kl_a={learned['kl_a']:.6f} kl_b={learned['kl_b']:.6f}"
             )
+        if "probe_kl" in learned:
+            extra_parts.append(f"probe_kl={learned['probe_kl']:.6f}")
+            if "probe_reward_gap" in learned:
+                extra_parts.append(f"probe_gap={learned['probe_reward_gap']:+.4f}")
         extra = (" | " + " | ".join(extra_parts)) if extra_parts else ""
         print(
             f"  threshold={threshold:.1e} | sparsity={sparsity:.2%} "

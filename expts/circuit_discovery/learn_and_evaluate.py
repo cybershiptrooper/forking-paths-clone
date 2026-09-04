@@ -85,6 +85,24 @@ if __name__ == "__main__":
         help="Token index for analysis (default: prompt length)",
     )
     parser.add_argument(
+        "--analysis_sentence_step",
+        type=int,
+        default=None,
+        help="Sentence index (counted from start of prompt+base) at whose end "
+        "the analysis boundary is placed. Requires --data_path + --prompt_index. "
+        "If both this and --analysis_timestep are set, the sentence-based one "
+        "wins (with a WARNING). Sample-and-cut from a fresh base is not yet "
+        "supported.",
+    )
+    parser.add_argument(
+        "--base_answer_type",
+        choices=["stored", "correct", "incorrect", "mode"],
+        default="stored",
+        help="Which path within the data-collection record to use as the base. "
+        "'stored' uses record['output_token_ids'] directly. Others may "
+        "retokenize an alternate text (lossy).",
+    )
+    parser.add_argument(
         "--objective",
         choices=["kl_divergence", "log_prob", "answer_kl", "reward_gap"],
         default="kl_divergence",

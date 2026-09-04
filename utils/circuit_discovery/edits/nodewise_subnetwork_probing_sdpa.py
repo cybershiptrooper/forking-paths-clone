@@ -23,6 +23,7 @@ which is in [0, 1] and directly interpretable as "keep probability".
 Higher = more important. ``negate_scores`` is not applied.
 """
 
+import json
 import os
 from typing import List, Optional
 
@@ -37,6 +38,7 @@ from utils.masks import (
     build_mode_filter,
     build_causal_filter,
     build_combined_filter,
+    build_prompt_filter,
 )
 from utils.utils import Sentence, clear_cuda
 from utils.objectives import is_global_objective
@@ -63,7 +65,13 @@ def _hard_concrete_sample(
     gamma: float = _HC_GAMMA,
     zeta: float = _HC_ZETA,
 ) -> torch.Tensor:
-    """Reparameterised Hard-Concrete sample in [0, 1], differentiable in log_alpha."""
+    """Reparameterised Hard-Concrete sample in [0, 1], differentiable in log_alpha.
+
+    ``beta`` controls the temperature: smaller β → harder (closer to {0,1})
+    samples; larger β → softer. Default 2/3 is the Louizos et al. value.
+    Anneal β from a high value to a low value over training to widen
+    exploration early and sharpen the mask late.
+    """
     u = torch.empty_like(log_alpha).uniform_(_HC_EPS, 1.0 - _HC_EPS)
     s = torch.sigmoid((torch.log(u) - torch.log(1.0 - u) + log_alpha) / beta)
     s_bar = s * (zeta - gamma) + gamma
@@ -97,14 +105,18 @@ def _hard_concrete_l0_probs(
     )
 
 
-def _hard_concrete_l0_mean(log_alpha: torch.Tensor) -> torch.Tensor:
+def _hard_concrete_l0_mean(
+    log_alpha: torch.Tensor, beta: float = _HC_BETA,
+) -> torch.Tensor:
     """Average per-entry active probability — Cao et al. 2021's R(θ) = (1/d) Σ_i ..."""
-    return _hard_concrete_l0_probs(log_alpha).mean()
+    return _hard_concrete_l0_probs(log_alpha, beta=beta).mean()
 
 
-def _hard_concrete_l0_count(log_alpha: torch.Tensor) -> torch.Tensor:
+def _hard_concrete_l0_count(
+    log_alpha: torch.Tensor, beta: float = _HC_BETA,
+) -> torch.Tensor:
     """Expected number of active entries (sum of per-entry probs); for diagnostics."""
-    return _hard_concrete_l0_probs(log_alpha).sum()
+    return _hard_concrete_l0_probs(log_alpha, beta=beta).sum()
 
 
 class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
@@ -130,11 +142,37 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         l0_warmup_frac: float = 0.25,
         l0_ramp_frac: float = 0.50,
         log_alpha_init: float = 2.0,
+        log_alpha_init_mask_path: Optional[str] = None,
+        log_alpha_init_mask_alpha: float = 1.0,
         log_dir: Optional[str] = None,
         log_every: int = 5,
         plot_every: int = 20,
         wandb_project: Optional[str] = "cot_interp",
         wandb_run_name: Optional[str] = None,
+        # New flags (defaults preserve current behaviour) ----------------
+        sparsity_loss_mode: str = "l0_mean",
+        l0_normalize_hinge: bool = False,
+        target_sparsity: Optional[float] = None,
+        optimizer: str = "adam",
+        momentum: float = 0.9,
+        l0_lr_multiplier: float = 1.0,
+        dropout_p: float = 0.0,
+        save_log_alpha: bool = False,
+        checkpoint_path: Optional[str] = None,
+        checkpoint_every: int = 50,
+        resume_from_checkpoint: bool = False,
+        # D2 — HC variance reduction ------------------------------------
+        num_hc_samples_per_step: int = 1,
+        polyak_ema_log_alpha: float = 0.0,
+        hc_beta_anneal: bool = False,
+        hc_beta_start: float = _HC_BETA,
+        hc_beta_end: float = _HC_BETA / 2.0,
+        hc_beta_anneal_end_frac: float = 1.0,
+        # D3 — LR scheduler --------------------------------------------
+        lr_schedule: str = "constant",
+        lr_min_ratio: float = 0.1,
+        lr_plateau_patience: int = 50,
+        lr_plateau_factor: float = 0.5,
         **kwargs,
     ):
         """
@@ -157,6 +195,24 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
                 so the first step is close to the unmasked model, which works
                 well with our short training budget and the reward_gap
                 objective but is a deliberate deviation from the paper.
+            log_alpha_init: also accepts the string ``"random"``, matching
+                ``ColumnSubnetworkProbing``: every gate drawn independently
+                from Uniform(-2, 2), which spans hard-closed (log_alpha
+                <= -1.6, gate mean 0) to fully open (>= +1.6, gate mean 1).
+                The named initializations used by the sentence-grading
+                hyperparameter search are plain floats on this scale —
+                closed = -3, half = 0 (gate mean 0.5), open = +2 — so no
+                extra mode parameter is needed for them.
+            log_alpha_init_mask_path: Optional mask JSON. When set, the
+                initialization instead mixes that mask with the all-open
+                mask: it is binarized by top-k at this run's
+                ``target_sparsity`` over the learnable pool (the
+                evaluator's rule), and edge ``(i, j)`` starts at gate mean
+                ``m = alpha + (1 - alpha) * kept(i, j)``, converted to
+                log_alpha by ``_mean_to_log_alpha``. alpha = 1 is all-open
+                (identical to ``log_alpha_init = 2.0``); alpha = 0 starts
+                exactly at the supplied mask.
+            log_alpha_init_mask_alpha: The mixing weight ``alpha`` above.
         """
         self.pair_aggregation = kwargs.pop("pair_aggregation", "mean")
         kwargs.pop("batch_chunk_size", None)
@@ -174,6 +230,8 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         self.l0_warmup_frac = l0_warmup_frac
         self.l0_ramp_frac = l0_ramp_frac
         self.log_alpha_init = log_alpha_init
+        self.log_alpha_init_mask_path = log_alpha_init_mask_path
+        self.log_alpha_init_mask_alpha = log_alpha_init_mask_alpha
         # log_dir / plot_every kept for backward-compat; training curves now
         # go to wandb. log_every controls wandb scalar cadence.
         self.log_dir = log_dir
@@ -181,6 +239,64 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         self.plot_every = plot_every
         self.wandb_project = wandb_project
         self.wandb_run_name = wandb_run_name
+
+        if sparsity_loss_mode not in ("l0_mean", "target_size_relu", "target_size_l2"):
+            raise ValueError(
+                f"sparsity_loss_mode must be 'l0_mean', 'target_size_relu' or "
+                f"'target_size_l2', got {sparsity_loss_mode!r}"
+            )
+        if sparsity_loss_mode in ("target_size_relu", "target_size_l2") and target_sparsity is None:
+            raise ValueError(
+                f"{sparsity_loss_mode} sparsity loss requires target_sparsity in [0, 1)."
+            )
+        if optimizer not in ("adam", "sgd", "sgd_momentum", "hybrid"):
+            raise ValueError(
+                f"optimizer must be one of {{adam, sgd, sgd_momentum, hybrid}}, "
+                f"got {optimizer!r}"
+            )
+        if not (0.0 <= dropout_p < 1.0):
+            raise ValueError(f"dropout_p must be in [0, 1), got {dropout_p}")
+        self.sparsity_loss_mode = sparsity_loss_mode
+        self.l0_normalize_hinge = l0_normalize_hinge
+        self.target_sparsity = target_sparsity
+        self.optimizer = optimizer
+        self.momentum = momentum
+        self.l0_lr_multiplier = l0_lr_multiplier
+        self.dropout_p = dropout_p
+        self.save_log_alpha = save_log_alpha
+        self.checkpoint_path = checkpoint_path
+        self.checkpoint_every = checkpoint_every
+        self.resume_from_checkpoint = resume_from_checkpoint
+        # D2 — HC variance reduction
+        if num_hc_samples_per_step < 1:
+            raise ValueError(
+                f"num_hc_samples_per_step must be >= 1, got {num_hc_samples_per_step}"
+            )
+        if not (0.0 <= polyak_ema_log_alpha < 1.0):
+            raise ValueError(
+                f"polyak_ema_log_alpha must be in [0, 1), got {polyak_ema_log_alpha}"
+            )
+        self.num_hc_samples_per_step = num_hc_samples_per_step
+        self.polyak_ema_log_alpha = polyak_ema_log_alpha
+        self.hc_beta_anneal = hc_beta_anneal
+        self.hc_beta_start = hc_beta_start
+        self.hc_beta_end = hc_beta_end
+        if not (0.0 < hc_beta_anneal_end_frac <= 1.0):
+            raise ValueError(
+                f"hc_beta_anneal_end_frac must be in (0, 1], got "
+                f"{hc_beta_anneal_end_frac}"
+            )
+        self.hc_beta_anneal_end_frac = hc_beta_anneal_end_frac
+        # D3 — LR scheduler
+        if lr_schedule not in ("constant", "cosine", "linear", "on_plateau"):
+            raise ValueError(
+                f"lr_schedule must be one of {{constant, cosine, linear, "
+                f"on_plateau}}, got {lr_schedule!r}"
+            )
+        self.lr_schedule = lr_schedule
+        self.lr_min_ratio = lr_min_ratio
+        self.lr_plateau_patience = lr_plateau_patience
+        self.lr_plateau_factor = lr_plateau_factor
 
     # ------------------------------------------------------------------
     # Patching helpers
@@ -235,40 +351,171 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
     # log_alpha bookkeeping (granularity-aware)
     # ------------------------------------------------------------------
 
-    def _init_log_alpha(self, granularity, num_heads, num_sents, device):
-        init = self.log_alpha_init
+    def _mean_to_log_alpha(self, m, device):
+        """Invert the deterministic Hard-Concrete readout: gate mean -> log_alpha.
+
+        The readout is ``m = clamp(sigmoid(la / beta) * (zeta - gamma) + gamma, 0, 1)``,
+        so for an interior mean the inverse is
+        ``la = beta * logit((m - gamma) / (zeta - gamma))``. The readout
+        saturates outside ``[gamma, zeta]``: every ``la`` above
+        ``beta * logit((1 - gamma) / (zeta - gamma))`` gives m = 1 exactly.
+        We therefore map the endpoints to +/- ``log_alpha_init`` so that
+        m = 1 reproduces the canonical fully-open initialization rather
+        than sitting at the smallest log_alpha that happens to saturate.
+        """
+        m = torch.as_tensor(m, dtype=torch.float32, device=device)
+        mag = abs(self.log_alpha_init)
+        beta = (self.hc_beta_start if getattr(self, "hc_beta_anneal", False)
+                else _HC_BETA)
+        s = (m - _HC_GAMMA) / (_HC_ZETA - _HC_GAMMA)
+        s = s.clamp(1e-6, 1 - 1e-6)
+        la = beta * (torch.log(s) - torch.log1p(-s))
+        la = la.clamp(-mag, mag)
+        la = torch.where(m >= 1.0, torch.full_like(la, mag), la)
+        la = torch.where(m <= 0.0, torch.full_like(la, -mag), la)
+        return la
+
+    def _init_means(self, num_sents, device, combined_filter=None):
+        """Per-edge initial gate means when initializing from a mask.
+
+        Returns an (S, S) tensor of means in [0, 1], or None when no mask
+        was supplied (the float / "random" paths handle those).
+        """
+        if not self.log_alpha_init_mask_path:
+            return None
+        if self.target_sparsity is None:
+            raise ValueError(
+                "log_alpha_init_mask_path requires target_sparsity (the mask "
+                "is binarized by top-k at that sparsity)"
+            )
+        kept = self._load_mask_topk(
+            self.log_alpha_init_mask_path, num_sents, device, combined_filter,
+        )
+        a = float(self.log_alpha_init_mask_alpha)
+        return a + (1.0 - a) * kept.to(torch.float32)
+
+    def _load_mask_topk(self, path, num_sents, device, combined_filter):
+        """Binary (S, S) top-k selection of a saved mask at target_sparsity.
+
+        Same rule as the matched-target evaluator
+        (``expts/direct_answer_circuit_discovery/eval_log_alpha.py``):
+        keep the ``round((1 - s) * n_valid)`` highest-scoring learnable
+        edges.
+        """
+        with open(path) as f:
+            d = json.load(f)
+        scores = torch.tensor(d["scores"], dtype=torch.float32, device=device)
+        if scores.shape != (num_sents, num_sents):
+            raise ValueError(
+                f"init mask {path} has shape {tuple(scores.shape)}, expected "
+                f"{(num_sents, num_sents)}"
+            )
+        readout = d.get("metadata", {}).get("score_readout")
+        if readout not in ("log_alpha", "raw_score") and (
+            float(scores.min()) >= 0.0 and float(scores.max()) <= 1.0
+        ):
+            # Hard-Concrete means: invert so the ranking matches the evaluator.
+            ss = ((scores - _HC_GAMMA) / (_HC_ZETA - _HC_GAMMA)).clamp(1e-6, 1 - 1e-6)
+            scores = _HC_BETA * (torch.log(ss) - torch.log1p(-ss))
+        valid = (
+            torch.ones(num_sents, num_sents, dtype=torch.bool, device=device)
+            if combined_filter is None
+            else ~combined_filter.bool()
+        )
+        n_valid = int(valid.sum())
+        n_keep = max(0, int(round((1.0 - float(self.target_sparsity)) * n_valid)))
+        flat = torch.where(
+            valid.flatten(), scores.flatten(),
+            torch.full_like(scores.flatten(), float("-inf")),
+        )
+        keep = torch.zeros_like(flat, dtype=torch.bool)
+        if n_keep > 0:
+            keep[torch.topk(flat, n_keep).indices] = True
+        print(
+            f"  init mask: kept {int(keep.sum())} of {n_valid} learnable edges "
+            f"from {os.path.basename(path)} at target sparsity "
+            f"{float(self.target_sparsity):g}"
+        )
+        return keep.view(num_sents, num_sents)
+
+    def _init_log_alpha(self, granularity, num_heads, num_sents, device,
+                        combined_filter=None):
+        means = self._init_means(num_sents, device, combined_filter)
+        if means is not None:
+            base = self._mean_to_log_alpha(means, device)
+        elif isinstance(self.log_alpha_init, str):
+            # Same convention as ColumnSubnetworkProbing.
+            if self.log_alpha_init != "random":
+                raise ValueError(
+                    f"log_alpha_init must be a float or 'random', "
+                    f"got {self.log_alpha_init!r}"
+                )
+            base = torch.empty(
+                (num_sents, num_sents), device=device, dtype=torch.float32,
+            ).uniform_(-2.0, 2.0)
+        else:
+            base = torch.full(
+                (num_sents, num_sents), float(self.log_alpha_init),
+                device=device, dtype=torch.float32,
+            )
         if granularity == "head":
             return {
-                l: torch.full(
-                    (num_heads, num_sents, num_sents),
-                    init, device=device, dtype=torch.float32, requires_grad=True,
-                )
+                l: base.unsqueeze(0).expand(num_heads, -1, -1)
+                    .clone().requires_grad_(True)
                 for l in self.layers
             }
         if granularity == "layer":
             return {
-                l: torch.full(
-                    (1, num_sents, num_sents),
-                    init, device=device, dtype=torch.float32, requires_grad=True,
-                )
+                l: base.unsqueeze(0).clone().requires_grad_(True)
                 for l in self.layers
             }
-        # "pair": one shared tensor
-        return torch.full(
-            (1, num_sents, num_sents),
-            init, device=device, dtype=torch.float32, requires_grad=True,
-        )
+        return base.unsqueeze(0).clone().requires_grad_(True)
 
     def _params_as_list(self, log_alpha, granularity):
-        if granularity == "pair":
+        if isinstance(log_alpha, torch.Tensor):
             return [log_alpha]
         return list(log_alpha.values())
 
-    def _sample_masks(self, log_alpha, granularity):
-        if granularity == "pair":
-            sampled = _hard_concrete_sample(log_alpha)
+    def _current_beta(self, step: int) -> float:
+        """Annealed Hard-Concrete temperature for this training step.
+
+        Linear interpolation from ``hc_beta_start`` at step 0 to
+        ``hc_beta_end``, reached after ``hc_beta_anneal_end_frac`` of
+        training (default 1.0 = the final step) and held there. Ending the
+        anneal early leaves a hardened-gate phase in which the mask is
+        optimized at its final temperature. Returns the constant
+        ``_HC_BETA`` when annealing is disabled.
+        """
+        if not self.hc_beta_anneal:
+            return _HC_BETA
+        total = max(1, self.num_training_steps - 1)
+        anneal_steps = max(1.0, self.hc_beta_anneal_end_frac * total)
+        frac = min(1.0, max(0.0, step / anneal_steps))
+        return self.hc_beta_start + (self.hc_beta_end - self.hc_beta_start) * frac
+
+    def _sample_masks(self, log_alpha, granularity, beta: float = _HC_BETA):
+        if isinstance(log_alpha, torch.Tensor):
+            sampled = _hard_concrete_sample(log_alpha, beta=beta)
+            sampled = self._apply_dropout(sampled)
             return {l: sampled for l in self.layers}
-        return {l: _hard_concrete_sample(log_alpha[l]) for l in self.layers}
+        return {
+            l: self._apply_dropout(_hard_concrete_sample(log_alpha[l], beta=beta))
+            for l in self.layers
+        }
+
+    def _apply_dropout(self, sampled: torch.Tensor) -> torch.Tensor:
+        """Bernoulli dropout on the sampled mask during training.
+
+        With probability ``dropout_p`` per entry, force the sampled mask to 0
+        for this training step (extra regulariser; AutoCircuit-style).
+        Active only when ``dropout_p > 0``. Surviving entries are *not*
+        rescaled — we want the L0 budget to reflect "active in expectation",
+        not an inflated value.
+        """
+        if self.dropout_p <= 0.0:
+            return sampled
+        keep = (torch.rand_like(sampled) >= self.dropout_p).float()
+        return sampled * keep
 
     def _ones_masks(self, granularity, num_heads, num_sents, device):
         """Deterministic all-ones mask per target layer.
@@ -283,22 +530,71 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         ones = torch.ones(shape, device=device)
         return {l: ones for l in self.layers}
 
-    def _l0(self, log_alpha, granularity):
-        """Mean per-entry active probability, matching Cao et al.'s (1/d) Σ ...
+    def _l0(self, log_alpha, granularity, combined_filter=None, beta: float = _HC_BETA):
+        """Sparsity loss in one of three modes (see also ``target_size_l2``
+        in the body: two-sided quadratic toward the target size).
 
-        Using a mean (rather than a sum that scales with #edges × #layers) makes
-        ``l0_lambda`` roughly invariant to granularity and to the number of
-        target layers, so the same λ has comparable pressure across configs.
+        - ``"l0_mean"`` (default, matches Cao et al.): mean per-entry active
+          probability across the parameter tensor(s). Filter-agnostic for
+          backward compatibility with prior runs.
+        - ``"target_size_relu"``: ``ReLU(n_active − target_n)``, where the
+          counts are taken **only over filter-valid entries** so that
+          ``target_sparsity`` is interpretable as "fraction of *valid* edges
+          to prune" (gap/causal/mode-filtered cells are not counted).
+          ``λ`` then scales how hard we push *down* once the budget is
+          exceeded; below budget, gradient is zero.
+
+        ``beta`` must be the same Hard-Concrete temperature used for
+        sampling this step, so the budget measures the distribution
+        actually being sampled (matters when ``hc_beta_anneal`` is on).
+
+        With ``l0_normalize_hinge=True`` the hinge is divided by the
+        detached excess (in cells, floored at 1), so the *total* per-step
+        crush force is bounded at ~λ regardless of how far over budget the
+        mask is: per-cell force ≈ λ·p′/excess instead of λ·p′ for every
+        over-budget cell simultaneously.
         """
-        if granularity == "pair":
-            # One shared parameter tensor — it is applied across ``self.layers``
-            # at forward time, but the *parameter count* is one tensor, so the
-            # regularizer is computed once (matches paper's parameter-wise R(θ)).
-            return _hard_concrete_l0_mean(log_alpha)
-        # head / layer: average the per-tensor means (all layer tensors same shape).
-        return sum(
-            _hard_concrete_l0_mean(log_alpha[l]) for l in self.layers
-        ) / len(self.layers)
+        if self.sparsity_loss_mode == "l0_mean":
+            if isinstance(log_alpha, torch.Tensor):
+                return _hard_concrete_l0_mean(log_alpha, beta=beta)
+            return sum(
+                _hard_concrete_l0_mean(log_alpha[l], beta=beta) for l in self.layers
+            ) / len(self.layers)
+
+        # target_size_relu — filter-aware count, ReLU hinge against budget.
+        # NOTE: ``combined_filter == True`` means *frozen* at 1.0 (gap/mode/
+        # causal-excluded). Learnable / valid entries are the *complement*.
+        assert combined_filter is not None, (
+            "target_size_relu requires combined_filter for valid-edge counting"
+        )
+        learnable_2d = (~combined_filter.bool()).to(torch.float32)
+        if isinstance(log_alpha, torch.Tensor):
+            probs = _hard_concrete_l0_probs(log_alpha, beta=beta)
+            valid = learnable_2d.unsqueeze(0).to(probs.dtype)
+            n_active = (probs * valid).sum()
+            n_valid = valid.sum()
+        else:
+            n_active = log_alpha[self.layers[0]].new_zeros(())
+            n_valid = log_alpha[self.layers[0]].new_zeros(())
+            for l in self.layers:
+                probs = _hard_concrete_l0_probs(log_alpha[l], beta=beta)
+                valid = learnable_2d.unsqueeze(0).to(probs.dtype)
+                n_active = n_active + (probs * valid).sum()
+                n_valid = n_valid + valid.sum() * probs.shape[0]
+        target_n = (1.0 - self.target_sparsity) * n_valid
+        if self.sparsity_loss_mode == "target_size_l2":
+            # Two-sided quadratic: penalises being sparser than the target
+            # as well as denser, so the mask has a restoring force toward
+            # landing AT the target (the one-sided hinge lets it drift
+            # past). Normalised by n_valid so the per-cell push is
+            # λ·2·(excess fraction)·p′ — the same scale as the hinge's
+            # λ·p′ at 50% excess, vanishing smoothly at the target.
+            return (n_active - target_n) ** 2 / n_valid
+        hinge = torch.relu(n_active - target_n)
+        if self.l0_normalize_hinge:
+            excess = (n_active - target_n).detach().clamp(min=1.0)
+            hinge = hinge / excess
+        return hinge
 
     def _lambda_at_step(self, step: int) -> float:
         """Cao et al.'s L0 schedule: 0 → λ_max ramp, then held.
@@ -317,10 +613,136 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             return self.l0_lambda * (frac - self.l0_warmup_frac) / self.l0_ramp_frac
         return self.l0_lambda
 
+    def _update_lr(self, optim, step: int, total_steps: int) -> float:
+        """Apply LR schedule for this step; return the resulting lr.
+
+        ``constant``: returns ``self.learning_rate`` unchanged.
+        ``cosine``: half-cosine decay from ``learning_rate`` down to
+        ``learning_rate * lr_min_ratio`` over ``total_steps``.
+        ``linear``: linear decay over the same range.
+        ``on_plateau``: handled separately via ReduceLROnPlateau; this
+        function returns the optimiser's current lr without modifying it.
+        """
+        if self.lr_schedule == "constant":
+            return self.learning_rate
+        if self.lr_schedule == "on_plateau":
+            return float(optim.param_groups[0]["lr"])
+        progress = min(1.0, max(0.0, step / max(1, total_steps - 1)))
+        lr_max = self.learning_rate
+        lr_min = self.learning_rate * self.lr_min_ratio
+        if self.lr_schedule == "cosine":
+            import math
+            new_lr = lr_min + 0.5 * (lr_max - lr_min) * (1.0 + math.cos(math.pi * progress))
+        elif self.lr_schedule == "linear":
+            new_lr = lr_max + (lr_min - lr_max) * progress
+        else:
+            new_lr = lr_max
+        for pg in optim.param_groups:
+            pg["lr"] = new_lr
+        return float(new_lr)
+
+    def _build_optimizer(self, params):
+        """Build optimiser per ``self.optimizer``.
+
+        ``hybrid``: returns the Adam used for the *task* gradient. The L0
+        update is applied manually outside this optimiser so its magnitude
+        is not adaptively normalised away (the entire reason this mode
+        exists).
+        """
+        if self.optimizer == "adam" or self.optimizer == "hybrid":
+            return torch.optim.Adam(params, lr=self.learning_rate)
+        if self.optimizer == "sgd":
+            return torch.optim.SGD(params, lr=self.learning_rate)
+        if self.optimizer == "sgd_momentum":
+            return torch.optim.SGD(
+                params, lr=self.learning_rate, momentum=self.momentum,
+            )
+        raise ValueError(f"Unknown optimizer {self.optimizer!r}")
+
+    def _save_checkpoint(self, path, step, log_alpha, granularity, optim,
+                         ema_log_alpha=None):
+        """Save full training state for resume-and-extend."""
+        if isinstance(log_alpha, torch.Tensor):
+            la_state = {"_tensor": log_alpha.detach().cpu()}
+        else:
+            la_state = {str(l): log_alpha[l].detach().cpu() for l in self.layers}
+        ema_state = None
+        if ema_log_alpha is not None:
+            if isinstance(ema_log_alpha, torch.Tensor):
+                ema_state = {"_tensor": ema_log_alpha.detach().cpu()}
+            else:
+                ema_state = {
+                    str(l): ema_log_alpha[l].detach().cpu() for l in self.layers
+                }
+        state = {
+            "step": step,
+            "granularity": granularity,
+            "log_alpha": la_state,
+            "ema_log_alpha": ema_state,
+            "optimizer": optim.state_dict(),
+            "torch_rng_state": torch.get_rng_state(),
+            "torch_cuda_rng_state_all": torch.cuda.get_rng_state_all(),
+        }
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        # Atomic-ish write to avoid corrupted files on preemption.
+        tmp = path + ".tmp"
+        torch.save(state, tmp)
+        os.replace(tmp, path)
+
+    def _load_checkpoint(self, path, log_alpha, granularity, optim, device,
+                         ema_log_alpha=None):
+        """Load checkpoint into existing log_alpha + optimizer; return start_step.
+
+        Loaded with ``map_location='cpu'`` so that RNG-state byte tensors stay
+        on CPU (``set_rng_state`` requires CPU ByteTensors); we then move
+        only the parameter tensors to the target device.
+
+        If ``ema_log_alpha`` is passed and the checkpoint holds an EMA state,
+        the EMA tensors are restored in place too (older checkpoints without
+        the key leave the EMA at its re-initialized value).
+        """
+        state = torch.load(path, map_location="cpu", weights_only=False)
+        if state["granularity"] != granularity:
+            raise ValueError(
+                f"checkpoint granularity={state['granularity']} != "
+                f"current granularity={granularity}"
+            )
+        if isinstance(log_alpha, torch.Tensor):
+            la_key = "_tensor" if "_tensor" in state["log_alpha"] else "pair"
+            with torch.no_grad():
+                log_alpha.copy_(state["log_alpha"][la_key].to(device))
+        else:
+            for l in self.layers:
+                with torch.no_grad():
+                    log_alpha[l].copy_(state["log_alpha"][str(l)].to(device))
+        ema_state = state.get("ema_log_alpha")
+        if ema_log_alpha is not None and ema_state is not None:
+            if isinstance(ema_log_alpha, torch.Tensor):
+                ema_key = "_tensor" if "_tensor" in ema_state else "pair"
+                with torch.no_grad():
+                    ema_log_alpha.copy_(ema_state[ema_key].to(device))
+            else:
+                for l in self.layers:
+                    with torch.no_grad():
+                        ema_log_alpha[l].copy_(ema_state[str(l)].to(device))
+        optim.load_state_dict(state["optimizer"])
+        # Optim state tensors may need a device move (Adam's exp_avg etc).
+        for st in optim.state.values():
+            for k, v in st.items():
+                if isinstance(v, torch.Tensor):
+                    st[k] = v.to(device)
+        torch.set_rng_state(state["torch_rng_state"])
+        if torch.cuda.is_available() and "torch_cuda_rng_state_all" in state:
+            try:
+                torch.cuda.set_rng_state_all(state["torch_cuda_rng_state_all"])
+            except Exception as e:
+                print(f"  (could not restore CUDA RNG state: {e})")
+        return int(state["step"])
+
     def _expected_active_count(self, log_alpha, granularity) -> float:
         """Interpretable diagnostic: expected number of active edges."""
         with torch.no_grad():
-            if granularity == "pair":
+            if isinstance(log_alpha, torch.Tensor):
                 return float(
                     (_hard_concrete_l0_count(log_alpha)).item()
                 )
@@ -341,6 +763,7 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         num_prefix_sentences: Optional[int] = None,
         branch_rewards: Optional[List[float]] = None,
         position_mask_overrides: Optional[List[Optional[torch.Tensor]]] = None,
+        num_frozen_prompt_sentences: int = 0,
         **kwargs,
     ) -> NodeMask:
         device = next(self.model.parameters()).device
@@ -362,15 +785,51 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             num_prefix_sents, num_sents, mask_mode, device=device,
         )
         causal_filter = build_causal_filter(num_sents, device=device)
-        combined_filter = build_combined_filter(gap_filter, mode_filter, causal_filter)
+        prompt_filter = (
+            build_prompt_filter(num_frozen_prompt_sentences, num_sents, device=device)
+            if num_frozen_prompt_sentences
+            else None
+        )
+        combined_filter = build_combined_filter(
+            gap_filter, mode_filter, causal_filter, prompt_filter
+        )
 
         forward_fn = self._sdpa_forward()
         granularity = self.mask_granularity
 
         # ----- Init learnable parameters -----
-        log_alpha = self._init_log_alpha(granularity, num_heads, num_sents, device)
+        log_alpha = self._init_log_alpha(
+            granularity, num_heads, num_sents, device,
+            combined_filter=combined_filter,
+        )
         params = self._params_as_list(log_alpha, granularity)
-        optim = torch.optim.Adam(params, lr=self.learning_rate)
+        optim = self._build_optimizer(params)
+
+        # ----- Optional Polyak EMA on log_alpha (D2) -----
+        # Maintain a smoothed copy of log_alpha that's updated each step.
+        # When polyak_ema_log_alpha > 0, the readout uses the EMA copy
+        # rather than the noisy live log_alpha — empirically reduces
+        # variance from late-training HC sampling jitter. Created before
+        # the resume path so checkpoints can restore it.
+        ema_log_alpha = None
+        if self.polyak_ema_log_alpha > 0.0:
+            with torch.no_grad():
+                if isinstance(log_alpha, torch.Tensor):
+                    ema_log_alpha = log_alpha.detach().clone()
+                else:
+                    ema_log_alpha = {
+                        l: log_alpha[l].detach().clone() for l in self.layers
+                    }
+
+        start_step = 0
+        if self.resume_from_checkpoint and self.checkpoint_path is not None \
+                and os.path.exists(self.checkpoint_path):
+            print(f"  Resuming from checkpoint: {self.checkpoint_path}")
+            start_step = self._load_checkpoint(
+                self.checkpoint_path, log_alpha, granularity, optim, device,
+                ema_log_alpha=ema_log_alpha,
+            )
+            print(f"    -> resumed at step {start_step}")
 
         # ----- Patch target layers; use deterministic all-ones for clean logits -----
         # Clean-logits reference must be fully kept on target layers (not a
@@ -430,8 +889,27 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             chain_logprobs_clean = None
 
         # Swap in the initial stochastic HC sample for training.
-        init_masks = self._sample_masks(log_alpha, granularity)
+        # Uses the step-0 annealed temperature so sampling and the L0
+        # budget agree from the first step (hc_beta_anneal fix).
+        init_masks = self._sample_masks(
+            log_alpha, granularity, beta=self._current_beta(start_step),
+        )
         self._install_masks(init_masks)
+
+        # ----- Optional LR scheduler (D3) -----
+        # constant: no-op; cosine / linear: per-step lr update on Adam's
+        # param_group; on_plateau: ReduceLROnPlateau driven by smoothed
+        # task_loss. Hybrid mode also reads ``current_lr`` for its manual
+        # SGD step (so the L0 push tracks Adam's lr decay too).
+        plateau_sched = None
+        plateau_loss_buf = []
+        if self.lr_schedule == "on_plateau":
+            plateau_sched = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optim,
+                mode="min",
+                factor=self.lr_plateau_factor,
+                patience=self.lr_plateau_patience,
+            )
 
         chain_lengths = torch.tensor(
             [c.shape[-1] for c in continuations], dtype=torch.long, device=device,
@@ -467,6 +945,8 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
                 "l0_warmup_frac": self.l0_warmup_frac,
                 "l0_ramp_frac": self.l0_ramp_frac,
                 "log_alpha_init": self.log_alpha_init,
+                "log_alpha_init_mask_path": self.log_alpha_init_mask_path,
+                "log_alpha_init_mask_alpha": self.log_alpha_init_mask_alpha,
                 "mask_granularity": granularity,
                 "num_continuations": len(continuations),
                 "num_layers": len(self.layers),
@@ -479,93 +959,289 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             },
         )
 
-        for step in tqdm(range(self.num_training_steps), desc="SNP steps"):
-            sampled = self._sample_masks(log_alpha, granularity)
-            # Decouple model graph from log_alpha graph: install *detached*
-            # mask leaves so per-branch backwards inside _step_global /
-            # _step_local can use retain_graph=False (frees model saved
-            # tensors as backward visits them, both within and across
-            # branches). After the task step, push accumulated leaf grads
-            # back through the m_sample → log_alpha subgraph in one walk.
-            #
-            # Identity-aware: pair granularity has the same `sampled`
-            # tensor at every layer key. Share one leaf across those keys
-            # so per-layer .grad accumulates into a single tensor.
-            unique_leaves = {}  # id(orig_tensor) -> leaf
-            sampled_leaf = {}
-            for k, v in sampled.items():
-                leaf = unique_leaves.get(id(v))
-                if leaf is None:
-                    leaf = v.detach().requires_grad_(True)
-                    unique_leaves[id(v)] = leaf
-                sampled_leaf[k] = leaf
-            self._install_masks(sampled_leaf)
+        if start_step >= self.num_training_steps:
+            print(
+                f"  Checkpoint already at step {start_step} >= "
+                f"num_training_steps={self.num_training_steps}; skipping training."
+            )
+        # HF gradient checkpointing only engages in train mode
+        # (GradientCheckpointingLayer gates on `self.training`); without this
+        # the flag is a silent no-op and long-context 32B training OOMs. The
+        # model has no dropout, so train() is numerically identical here.
+        if getattr(self.model, "is_gradient_checkpointing", False):
+            self.model.train()
+        # Gross node-flip tracking: per training step, count learnable cells
+        # whose deterministic clamped-to-zero status changed (on→off and
+        # off→on separately), accumulated between logged steps. The scalar
+        # `sparsity` series only recovers the NET change per interval; these
+        # two counters give the gross flux.
+        _learnable_flat = (~combined_filter.bool()).flatten()
+        _prev_clamped = None
+        _flips_off_accum = 0
+        _flips_on_accum = 0
+        for step in tqdm(
+            range(start_step, self.num_training_steps),
+            desc="SNP steps", initial=start_step, total=self.num_training_steps,
+        ):
             optim.zero_grad(set_to_none=True)
+            beta = self._current_beta(step)
+            K = self.num_hc_samples_per_step
+            # K-sample variance reduction: average gradient over K fresh HC
+            # samples before stepping. Each inner iteration scales its
+            # backward grad by 1/K so the accumulated log_alpha.grad equals
+            # the mean over samples (matches a single-sample step in
+            # magnitude; just lower variance).
+            task_loss_val_accum = 0.0
+            for k_idx in range(K):
+                sampled = self._sample_masks(log_alpha, granularity, beta=beta)
+                # Decouple model graph from log_alpha graph (see comment
+                # in single-sample version below).
+                unique_leaves = {}
+                sampled_leaf = {}
+                for k_key, v in sampled.items():
+                    leaf = unique_leaves.get(id(v))
+                    if leaf is None:
+                        leaf = v.detach().requires_grad_(True)
+                        unique_leaves[id(v)] = leaf
+                    sampled_leaf[k_key] = leaf
+                self._install_masks(sampled_leaf)
 
-            if use_global:
-                task_loss_val = self._step_global(
-                    input_ids, continuations, prefix_len, device,
-                    chain_logprobs_clean, answer_ids, num_answers, chain_lengths,
-                )
-            else:
-                task_loss_val = self._step_local(
-                    input_ids, continuations, clean_logits_list,
-                    prefix_len, device, branch_rewards, position_mask_overrides,
-                )
+                if use_global:
+                    task_loss_val_k = self._step_global(
+                        input_ids, continuations, prefix_len, device,
+                        chain_logprobs_clean, answer_ids, num_answers, chain_lengths,
+                    )
+                else:
+                    task_loss_val_k = self._step_local(
+                        input_ids, continuations, clean_logits_list,
+                        prefix_len, device, branch_rewards, position_mask_overrides,
+                    )
+                task_loss_val_accum += task_loss_val_k / K
 
-            # Push accumulated leaf grads through m_sample → log_alpha.
-            for orig_id, leaf in unique_leaves.items():
-                if leaf.grad is None:
-                    continue
-                orig = next(t for t in sampled.values() if id(t) == orig_id)
-                orig.backward(gradient=leaf.grad)
+                # Push accumulated leaf grads through m_sample → log_alpha,
+                # scaled by 1/K so the K-sample average lands on log_alpha.grad.
+                scale = 1.0 / K
+                for orig_id, leaf in unique_leaves.items():
+                    if leaf.grad is None:
+                        continue
+                    orig = next(t for t in sampled.values() if id(t) == orig_id)
+                    orig.backward(gradient=leaf.grad * scale)
+                # Discard model graph + leaf state for this sample before the
+                # next one. Python will GC; we just drop the references.
+                del sampled, sampled_leaf, unique_leaves
+            task_loss_val = task_loss_val_accum
+
+            # ----- Task-gradient diagnostics -----
+            # At this point .grad on the params holds ONLY the task-term
+            # gradient (the L0 penalty is applied below: manually for the
+            # hybrid optimizer, via backward for the others), so its norm
+            # and step-to-step direction stability measure whether the task
+            # objective is still supplying signal — the saturation check.
+            with torch.no_grad():
+                grad_parts = [
+                    p.grad.flatten() for p in params if p.grad is not None
+                ]
+                if grad_parts:
+                    task_grad_flat = torch.cat(grad_parts)
+                    task_grad_norm = float(task_grad_flat.norm().item())
+                    prev = getattr(self, "_prev_task_grad_flat", None)
+                    if prev is not None and prev.numel() == task_grad_flat.numel():
+                        denom = float(prev.norm().item()) * task_grad_norm
+                        task_grad_cosine = (
+                            float((prev @ task_grad_flat).item() / denom)
+                            if denom > 0.0 else None
+                        )
+                    else:
+                        task_grad_cosine = None
+                    self._prev_task_grad_flat = task_grad_flat.detach().clone()
+                else:
+                    task_grad_norm = 0.0
+                    task_grad_cosine = None
+
+            # ----- LR schedule update (D3) -----
+            # Refreshes Adam's lr in-place; the manual L0 SGD below reads
+            # the same `current_lr` value so both stay in sync.
+            current_lr = self._update_lr(
+                optim, step, self.num_training_steps,
+            )
 
             # Sparsity penalty (independent of the task forward), scheduled λ.
             lam = self._lambda_at_step(step)
+            l0_val = 0.0
             if lam > 0.0:
-                l0 = lam * self._l0(log_alpha, granularity)
+                l0 = lam * self._l0(log_alpha, granularity, combined_filter, beta=beta)
                 l0_val = float(l0.detach().item())
-                l0.backward()
+                if self.optimizer == "hybrid":
+                    # Hybrid: Adam handles task gradient only. Apply the L0
+                    # gradient *manually* outside Adam so |λ| is not
+                    # adaptively normalised away. The Adam .step() below
+                    # only sees the task gradient already accumulated on
+                    # the leaves; we then take a vanilla SGD step on
+                    # log_alpha using the L0 gradient computed here.
+                    l0_grads = torch.autograd.grad(
+                        l0,
+                        params,
+                        retain_graph=False,
+                        allow_unused=True,
+                    )
+                else:
+                    l0.backward()
+                    l0_grads = None
             else:
-                # During warmup, skip the L0 forward + backward entirely rather
-                # than propagate zeros through the graph.
-                l0_val = 0.0
+                l0_grads = None
 
             optim.step()
 
-            if wandb_run is not None and (step % self.log_every == 0):
-                sparsity_val = self._current_sparsity(log_alpha, granularity)
-                log_step(
-                    wandb_run,
-                    step=step,
-                    metrics={
-                        "task_loss": task_loss_val,
-                        "l0_loss": l0_val,
-                        "sparsity": sparsity_val,
-                        "l0_lambda": lam,
-                    },
+            if l0_grads is not None:
+                # Manual SGD on L0 grad; lr scaled by l0_lr_multiplier so we
+                # can independently tune the L0 push without disturbing Adam.
+                # ``current_lr`` already reflects the LR schedule.
+                with torch.no_grad():
+                    l0_lr = current_lr * self.l0_lr_multiplier
+                    for p, g in zip(params, l0_grads):
+                        if g is None:
+                            continue
+                        p.add_(g, alpha=-l0_lr)
+
+            # ----- Polyak EMA on log_alpha (D2) -----
+            if ema_log_alpha is not None:
+                ema_decay = self.polyak_ema_log_alpha
+                with torch.no_grad():
+                    if isinstance(ema_log_alpha, torch.Tensor):
+                        ema_log_alpha.mul_(ema_decay).add_(
+                            log_alpha.detach(), alpha=1.0 - ema_decay,
+                        )
+                    else:
+                        for l in self.layers:
+                            ema_log_alpha[l].mul_(ema_decay).add_(
+                                log_alpha[l].detach(), alpha=1.0 - ema_decay,
+                            )
+
+            # ----- Gross flip counters (see init above the loop) -----
+            with torch.no_grad():
+                if isinstance(log_alpha, torch.Tensor):
+                    m_now = _hard_concrete_mean(log_alpha, beta=beta).flatten()
+                    lrn = _learnable_flat.to(m_now.device)
+                    n_rep = m_now.numel() // lrn.numel() if lrn.numel() else 1
+                    lrn = lrn.repeat(max(1, n_rep))[:m_now.numel()]
+                else:
+                    m_parts = [
+                        _hard_concrete_mean(log_alpha[l], beta=beta)
+                        for l in self.layers
+                    ]
+                    m_now = torch.cat([m.flatten() for m in m_parts])
+                    lrn_2d = _learnable_flat.to(m_now.device)
+                    lrn = torch.cat([
+                        lrn_2d.view(*m_parts[0].shape[-2:]).unsqueeze(0)
+                        .expand_as(m).flatten()
+                        for m in m_parts
+                    ])
+                clamped_now = (m_now == 0.0) & lrn
+                if _prev_clamped is not None:
+                    _flips_off_accum += int((clamped_now & ~_prev_clamped).sum().item())
+                    _flips_on_accum += int((~clamped_now & _prev_clamped).sum().item())
+                _prev_clamped = clamped_now
+
+            # ReduceLROnPlateau is metric-driven; step it on smoothed task_loss.
+            if plateau_sched is not None:
+                plateau_loss_buf.append(task_loss_val)
+                if len(plateau_loss_buf) > 10:
+                    plateau_loss_buf.pop(0)
+                plateau_sched.step(sum(plateau_loss_buf) / len(plateau_loss_buf))
+
+            if (
+                self.checkpoint_path is not None
+                and self.checkpoint_every > 0
+                and ((step + 1) % self.checkpoint_every == 0
+                     or (step + 1) == self.num_training_steps)
+            ):
+                self._save_checkpoint(
+                    self.checkpoint_path, step + 1, log_alpha, granularity, optim,
+                    ema_log_alpha=ema_log_alpha,
                 )
+
+            if (step % self.log_every == 0) or (step + 1 == self.num_training_steps):
+                sparsity_val = self._current_sparsity(
+                    log_alpha, granularity, combined_filter, beta=beta,
+                )
+                # Budget-side view of the same quantity: expected active
+                # count under the closed-form P(z > 0) at the current β,
+                # restricted to learnable cells — the value the
+                # target_size_relu hinge actually constrains. Logged so
+                # per-step node add/remove analyses can compare the two.
+                sparsity_expected = self._expected_sparsity(
+                    log_alpha, granularity, combined_filter, beta=beta,
+                )
+                metrics = {
+                    "step": step,
+                    "task_loss": task_loss_val,
+                    "l0_loss": l0_val,
+                    "sparsity": sparsity_val,
+                    "sparsity_expected": sparsity_expected,
+                    "flips_off_interval": _flips_off_accum,
+                    "flips_on_interval": _flips_on_accum,
+                    "l0_lambda": lam,
+                    "lr": current_lr,
+                    "hc_beta": beta,
+                    "num_hc_samples_per_step": K,
+                    "task_grad_norm": task_grad_norm,
+                    "task_grad_cosine": task_grad_cosine,
+                }
+                _flips_off_accum = 0
+                _flips_on_accum = 0
+                # Objective-specific saturation stats (ESS, softmax entropy,
+                # pair-saturation fraction, hazard levels, ...) written by
+                # the loss function on its last call this step.
+                from utils import objectives as _objectives_mod
+                metrics.update({
+                    f"diag_{k}": v
+                    for k, v in _objectives_mod.LAST_DIAGNOSTICS.items()
+                })
+                # Per-chain-weight stats from the global two-pass step.
+                metrics.update(getattr(self, "_last_global_diag", {}))
+                if wandb_run is not None:
+                    log_step(wandb_run, step=step, metrics={k: v for k, v in metrics.items() if k != "step"})
+                # Local JSONL fallback so training curves survive wandb outages
+                # and can be replotted offline. Writes one line per logged step.
+                if self.log_dir is not None:
+                    os.makedirs(self.log_dir, exist_ok=True)
+                    jl_path = os.path.join(self.log_dir, "training_metrics.jsonl")
+                    with open(jl_path, "a") as _jlf:
+                        _jlf.write(json.dumps(metrics) + "\n")
 
         finish_wandb_run(wandb_run)
         self._unpatch_model(handles)
         if non_target_handles:
             self._unpatch_model(non_target_handles)
 
-        # ----- Readout: deterministic mask mean in [0, 1] -----
-        with torch.no_grad():
-            if granularity == "pair":
-                readout = _hard_concrete_mean(log_alpha).detach().cpu()
-                scores = readout[0].tolist()
-            elif granularity == "layer":
-                scores = {}
-                for l in self.layers:
-                    r = _hard_concrete_mean(log_alpha[l]).detach().cpu()
-                    scores[l] = r[0].tolist()
-            else:  # head
-                scores = {}
-                for l in self.layers:
-                    r = _hard_concrete_mean(log_alpha[l]).detach().cpu()
-                    scores[l] = {h: r[h].tolist() for h in range(num_heads)}
+        # ----- Readout -----
+        # Default: deterministic HC mean ``m`` in [0, 1] (back-compat).
+        # If ``save_log_alpha`` is True, save raw log_alpha values instead;
+        # eval-time recovers any of {m, m>0, m>0.5, top-K} from log_alpha.
+        # When Polyak EMA is enabled (D2), the readout source is the EMA
+        # tensor instead of the noisy live ``log_alpha``.
+        if ema_log_alpha is not None:
+            readout_source = ema_log_alpha
+        else:
+            readout_source = log_alpha
+
+        # The readout (and the saved hard_concrete_beta below) use the β in
+        # effect at the *final* step, so eval-side threshold constants and
+        # HC-mean inversion match the trained distribution when
+        # hc_beta_anneal is on.
+        final_beta = self._current_beta(self.num_training_steps - 1)
+        if self.save_log_alpha:
+            readout_fn = lambda t: t.detach().float().cpu()
+            score_readout_kind = "log_alpha"
+        else:
+            readout_fn = (
+                lambda t: _hard_concrete_mean(t, beta=final_beta).detach().cpu()
+            )
+            score_readout_kind = "hard_concrete_mean"
+
+        scores = self._score_readout(
+            readout_source, readout_fn, granularity, num_heads,
+        )
 
         return NodeMask(
             model_name=self.model.config._name_or_path,
@@ -581,8 +1257,18 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
                 "l0_warmup_frac": self.l0_warmup_frac,
                 "l0_ramp_frac": self.l0_ramp_frac,
                 "l0_normalization": "mean",
+                "sparsity_loss_mode": self.sparsity_loss_mode,
+                "l0_normalize_hinge": self.l0_normalize_hinge,
+                "target_sparsity": self.target_sparsity,
+                "optimizer": self.optimizer,
+                "momentum": self.momentum,
+                "l0_lr_multiplier": self.l0_lr_multiplier,
+                "dropout_p": self.dropout_p,
+                "save_log_alpha": self.save_log_alpha,
                 "log_alpha_init": self.log_alpha_init,
-                "hard_concrete_beta": _HC_BETA,
+                "log_alpha_init_mask_path": self.log_alpha_init_mask_path,
+                "log_alpha_init_mask_alpha": self.log_alpha_init_mask_alpha,
+                "hard_concrete_beta": final_beta,
                 "hard_concrete_gamma": _HC_GAMMA,
                 "hard_concrete_zeta": _HC_ZETA,
                 "num_continuations": len(continuations),
@@ -591,23 +1277,96 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
                 "ablate_non_target_layers": self.ablate_non_target_layers,
                 "mask_mode": mask_mode,
                 "num_prefix_sentences": num_prefix_sents,
+                "num_frozen_prompt_sentences": num_frozen_prompt_sentences,
                 "pair_aggregation": self.pair_aggregation,
                 "mask_granularity": granularity,
                 "branch_rewards": branch_rewards,
                 "importance_sampling_method": self.importance_sampling_method,
                 "importance_sampling_temperature": self.importance_sampling_temperature,
                 "attention_backend": "sdpa",
-                "score_readout": "hard_concrete_mean",
+                "score_readout": score_readout_kind,
+                "num_hc_samples_per_step": self.num_hc_samples_per_step,
+                "polyak_ema_log_alpha": self.polyak_ema_log_alpha,
+                "hc_beta_anneal": self.hc_beta_anneal,
+                "hc_beta_start": self.hc_beta_start,
+                "hc_beta_end": self.hc_beta_end,
+                "hc_beta_anneal_end_frac": self.hc_beta_anneal_end_frac,
+                "lr_schedule": self.lr_schedule,
+                "lr_min_ratio": self.lr_min_ratio,
             },
             scores=scores,
         )
 
     # ------------------------------------------------------------------
+    # Score readout
+    # ------------------------------------------------------------------
+
+    def _score_readout(self, readout_source, readout_fn, granularity, num_heads):
+        """Convert trained log_alpha (or EMA) into serializable scores.
+
+        Override in subclasses to change the readout shape (e.g. column
+        granularity saves a 1D list instead of 2D).
+        """
+        with torch.no_grad():
+            if granularity == "pair":
+                r = readout_fn(readout_source)
+                return r[0].tolist()
+            elif granularity == "layer":
+                scores = {}
+                for l in self.layers:
+                    r = readout_fn(readout_source[l])
+                    scores[l] = r[0].tolist()
+                return scores
+            else:  # head
+                scores = {}
+                for l in self.layers:
+                    r = readout_fn(readout_source[l])
+                    scores[l] = {h: r[h].tolist() for h in range(num_heads)}
+                return scores
+
+    # ------------------------------------------------------------------
     # Logging / plotting
     # ------------------------------------------------------------------
 
-    def _current_sparsity(self, log_alpha, granularity) -> float:
-        """Fraction of entries whose Hard-Concrete mean has hit the clamp at 0.
+    def _expected_sparsity(
+        self, log_alpha, granularity, combined_filter=None, beta: float = _HC_BETA,
+    ) -> float:
+        """1 − (Σ P(z > 0) over learnable cells) / n_learnable at temperature β.
+
+        The budget-side sparsity: the quantity ``target_size_relu``
+        constrains, as opposed to ``_current_sparsity``'s clamped-to-zero
+        count. Falls back to the whole tensor when no filter is given.
+        """
+        with torch.no_grad():
+            if isinstance(log_alpha, torch.Tensor):
+                probs_parts = [_hard_concrete_l0_probs(log_alpha, beta=beta)]
+            else:
+                probs_parts = [
+                    _hard_concrete_l0_probs(log_alpha[l], beta=beta)
+                    for l in self.layers
+                ]
+            n_active = 0.0
+            n_valid = 0.0
+            for probs in probs_parts:
+                if combined_filter is not None:
+                    valid = (~combined_filter.bool()).to(probs.dtype).unsqueeze(0)
+                    n_active += float((probs * valid).sum().item())
+                    n_valid += float(valid.sum().item()) * probs.shape[0]
+                else:
+                    n_active += float(probs.sum().item())
+                    n_valid += float(probs.numel())
+            if n_valid == 0:
+                return 0.0
+            return 1.0 - n_active / n_valid
+
+    def _current_sparsity(self, log_alpha, granularity, combined_filter=None,
+                          beta: float = _HC_BETA) -> float:
+        """Fraction of *valid* (gap/mode/causal-passing) entries whose
+        Hard-Concrete mean has hit the clamp at 0.
+
+        When ``combined_filter`` is supplied, the fraction is taken only over
+        learnable cells (``~combined_filter``). Otherwise it falls back to
+        the fraction over the full parameter tensor (legacy behaviour).
 
         Matches Cao et al. 2021's "fraction of non-zero weights" metric: an
         entry counts as pruned when the deterministic HC readout
@@ -621,13 +1380,35 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         edges as "off" and diverged from the paper's notion of sparsity.
         """
         with torch.no_grad():
-            if granularity == "pair":
-                m = _hard_concrete_mean(log_alpha)
+            if isinstance(log_alpha, torch.Tensor):
+                m_flat = _hard_concrete_mean(log_alpha, beta=beta).flatten()
+                if combined_filter is not None:
+                    valid_flat = (~combined_filter.bool()).flatten().to(m_flat.device)
+                    n_repeat = m_flat.numel() // valid_flat.numel() if valid_flat.numel() > 0 else 1
+                    valid_flat = valid_flat.repeat(max(1, n_repeat))[:m_flat.numel()]
+                else:
+                    valid_flat = torch.ones_like(m_flat, dtype=torch.bool)
             else:
-                m = torch.cat([_hard_concrete_mean(log_alpha[l]).flatten() for l in self.layers])
-            # Exact equality: ``torch.clamp(x, 0, 1)`` produces *bit-exact*
-            # 0.0 for any input ≤ 0, so no tolerance is needed or correct.
-            return float((m == 0.0).float().mean().item())
+                m_parts = [
+                    _hard_concrete_mean(log_alpha[l], beta=beta) for l in self.layers
+                ]
+                m_flat = torch.cat([m.flatten() for m in m_parts])
+                if combined_filter is not None:
+                    valid_2d = (~combined_filter.bool()).to(m_flat.device)
+                    # Each layer tensor is (H, S, S) for "head" or (1, S, S) for "layer";
+                    # broadcast valid_2d across the leading dim.
+                    valid_parts = []
+                    for m in m_parts:
+                        v = valid_2d.unsqueeze(0).expand_as(m).flatten()
+                        valid_parts.append(v)
+                    valid_flat = torch.cat(valid_parts)
+                else:
+                    valid_flat = torch.ones_like(m_flat, dtype=torch.bool)
+            n_valid = int(valid_flat.sum().item())
+            if n_valid == 0:
+                return 0.0
+            pruned_in_valid = int(((m_flat == 0.0) & valid_flat).sum().item())
+            return pruned_in_valid / n_valid
 
     # ------------------------------------------------------------------
     # Per-step loss routines (each builds a scalar and calls backward)
@@ -742,6 +1523,24 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             print(f"[NAN-DIAG] global_loss={task_loss_val}", flush=True)
         global_loss.backward()
         per_chain_weights = chain_lps_param.grad.detach()
+        # ∂loss/∂(chain log-prob) is the entire signal the model-side
+        # backward will see; a near-one-hot |weight| distribution means the
+        # objective has degenerated to pushing a single candidate.
+        with torch.no_grad():
+            absw = per_chain_weights.abs()
+            absw_sum = float(absw.sum().item())
+            if absw_sum > 0:
+                p_absw = absw / absw_sum
+                w_entropy = float(-(p_absw * (p_absw + 1e-12).log()).sum().item())
+                w_max_share = float(p_absw.max().item())
+            else:
+                w_entropy = 0.0
+                w_max_share = 0.0
+            self._last_global_diag = {
+                "per_chain_weight_abs_sum": absw_sum,
+                "per_chain_weight_entropy": w_entropy,
+                "per_chain_weight_max_share": w_max_share,
+            }
         if _diag_log:
             pcw = per_chain_weights
             print(

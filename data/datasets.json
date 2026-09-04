@@ -7,6 +7,14 @@
         "hf_split": "test",
         "type": "multiple choice"
     },
+    "AQuA_train": {
+        "name": "AQuA_train",
+        "source": "deepmind/aqua_rat",
+        "hf": true,
+        "hf_name": null,
+        "hf_split": "train",
+        "type": "multiple choice"
+    },
     "GPQA": {
         "name": "GPQA",
         "source": "Idavidrein/gpqa",
@@ -86,5 +94,173 @@
         "hf_name": null,
         "hf_split": null,
         "type": "open ended"
+    },
+    "MMLU": {
+        "name": "MMLU",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "all",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_abstract_algebra": {
+        "name": "MMLU_abstract_algebra",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "abstract_algebra",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_formal_logic": {
+        "name": "MMLU_formal_logic",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "formal_logic",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_college_chemistry": {
+        "name": "MMLU_college_chemistry",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "college_chemistry",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_college_physics": {
+        "name": "MMLU_college_physics",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "college_physics",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_college_mathematics": {
+        "name": "MMLU_college_mathematics",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "college_mathematics",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_high_school_physics": {
+        "name": "MMLU_high_school_physics",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "high_school_physics",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_high_school_chemistry": {
+        "name": "MMLU_high_school_chemistry",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "high_school_chemistry",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_high_school_mathematics": {
+        "name": "MMLU_high_school_mathematics",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "high_school_mathematics",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_elementary_mathematics": {
+        "name": "MMLU_elementary_mathematics",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "elementary_mathematics",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_machine_learning": {
+        "name": "MMLU_machine_learning",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "machine_learning",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_electrical_engineering": {
+        "name": "MMLU_electrical_engineering",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "electrical_engineering",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_econometrics": {
+        "name": "MMLU_econometrics",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "econometrics",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_conceptual_physics": {
+        "name": "MMLU_conceptual_physics",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "conceptual_physics",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_professional_law": {
+        "name": "MMLU_professional_law",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "professional_law",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_professional_accounting": {
+        "name": "MMLU_professional_accounting",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "professional_accounting",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_moral_scenarios": {
+        "name": "MMLU_moral_scenarios",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "moral_scenarios",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_virology": {
+        "name": "MMLU_virology",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "virology",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_global_facts": {
+        "name": "MMLU_global_facts",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "global_facts",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_business_ethics": {
+        "name": "MMLU_business_ethics",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "business_ethics",
+        "hf_split": "test",
+        "type": "multiple choice"
+    },
+    "MMLU_public_relations": {
+        "name": "MMLU_public_relations",
+        "source": "cais/mmlu",
+        "hf": true,
+        "hf_name": "public_relations",
+        "hf_split": "test",
+        "type": "multiple choice"
     }
 }
