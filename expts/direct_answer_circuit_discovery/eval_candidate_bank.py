@@ -202,7 +202,7 @@ def evaluate_candidate_mask(args, nm: NodeMask):
     target_cluster = int(bank["target_cluster"])
     training_objective = nm.metadata.get("objective")
 
-    score_readout = nm.metadata.get("score_readout", "hard_concrete_mean")
+    score_readout = nm.score_readout
     granularity = nm.metadata.get("mask_granularity") or nm.granularity or "pair"
 
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)

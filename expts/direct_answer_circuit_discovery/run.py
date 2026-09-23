@@ -15,6 +15,7 @@ file; CLI flags override config values.
 from __future__ import annotations
 
 import argparse
+import json
 from typing import List
 
 from utils.expt_config import load_config
@@ -113,6 +114,19 @@ def build_parser() -> argparse.ArgumentParser:
         "ablating attention to the wrong answer options.",
     )
     parser.add_argument(
+        "--learnable_region", choices=["prompt_to_trace", "trace_to_trace"], default=None,
+        help="Restrict the learnable pool to a named region. "
+        "'prompt_to_trace': only cells where a reasoning sentence reads a "
+        "prompt sentence are learnable; reasoning-to-reasoning and "
+        "prompt-to-prompt cells stay at 1.0. Mutually exclusive with "
+        "--freeze_prompt_sentences.",
+    )
+    parser.add_argument(
+        "--frozen_key_sentences", type=int, nargs="*", default=None,
+        help="Sentence indices whose reads are frozen at 1.0 inside the "
+        "learnable region (e.g. the answer-option chunks). Needs --learnable_region.",
+    )
+    parser.add_argument(
         "--no_renormalize_masked_attention",
         dest="renormalize_masked_attention",
         action="store_false",
@@ -161,6 +175,20 @@ def build_parser() -> argparse.ArgumentParser:
         "answer bank JSON built by build_answer_bank.py.",
     )
     parser.add_argument(
+        "--rollout_bank_path", type=str, default=None,
+        help="Train the probe objective on the sampled clean rollouts of a "
+        "clean_rollouts_k32 file (eval_onpolicy_kl.py) instead of the stored suffix.",
+    )
+    parser.add_argument("--rollout_bank_set", type=str, default="B")
+    parser.add_argument(
+        "--continuations_per_step", type=int, default=None,
+        help="Random subset of the bank used at each training step (default: all).",
+    )
+    parser.add_argument(
+        "--clean_logits_dtype", type=str, default=None,
+        help="Storage dtype of the cached clean logits (e.g. bfloat16 for a large bank).",
+    )
+    parser.add_argument(
         "--target_letter", type=str, default=None,
         help="For answer_probe_reward_gap / answer_probe_logit_margin: "
         "which letter to promote. Defaults to dataset's correct_answer.",
@@ -178,9 +206,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--mask_granularity", choices=["head", "layer", "pair"],
         default="head",
     )
+    # Attribution patching only. "sum" is the integrated-gradients score of
+    # the sentence-pair cell (autograd sums over its token pairs), which is
+    # the quantity whose top-k ranking approximates the effect of zeroing the
+    # cell; "mean" divides by |sent_i|*|sent_j| and down-weights long
+    # sentence pairs. Default was "mean" until 2026-09-19.
     parser.add_argument(
         "--pair_aggregation", choices=["sum", "mean", "median", "max"],
-        default="mean",
+        default="sum",
     )
     parser.add_argument("--ablate_non_target_layers", action="store_true")
     parser.add_argument("--num_ig_steps", type=int, default=10)
@@ -277,6 +310,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--pid_snapshot_hold_steps", type=int, default=None)
     parser.add_argument("--dcm_lr_init", type=float, default=None)
     parser.add_argument("--dcm_lr_warmup_frac", type=float, default=None)
+    parser.add_argument(
+        "--algorithm_kwargs", type=json.loads, default=None,
+        help="Extra keyword arguments for the masking algorithm's constructor "
+             "(JSON object on the command line, a mapping in a YAML config). "
+             "Used for algorithm-specific keys that have no dedicated flag.",
+    )
     return parser
 
 
@@ -365,9 +404,15 @@ def main():
             **shared,
             freeze_prompt_sentences=args.freeze_prompt_sentences,
             freeze_sentences_before=args.freeze_sentences_before,
+            learnable_region=args.learnable_region,
+            frozen_key_sentences=args.frozen_key_sentences,
             masking_algorithm=args.masking_algorithm,
             objective=args.objective,
             answer_bank_path=args.answer_bank_path,
+            rollout_bank_path=args.rollout_bank_path,
+            rollout_bank_set=args.rollout_bank_set,
+            continuations_per_step=args.continuations_per_step,
+            clean_logits_dtype=args.clean_logits_dtype,
             target_letter=args.target_letter,
             target_probs=(
                 [float(x) for x in args.target_probs.split(",")]
@@ -434,6 +479,7 @@ def main():
             pid_snapshot_hold_steps=args.pid_snapshot_hold_steps,
             dcm_lr_init=args.dcm_lr_init,
             dcm_lr_warmup_frac=args.dcm_lr_warmup_frac,
+            algorithm_kwargs=args.algorithm_kwargs,
         )
     else:
         from expts.direct_answer_circuit_discovery.suppress import main as supp_main

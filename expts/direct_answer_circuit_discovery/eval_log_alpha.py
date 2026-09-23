@@ -32,6 +32,7 @@ from utils.masks import (
     build_causal_filter,
     build_combined_filter,
     build_prompt_filter,
+    build_region_filter,
 )
 from utils.circuit_eval import (
     install_mask_hooks,
@@ -282,6 +283,12 @@ def main():
         "even if the mask was not trained with freeze_prompt_sentences. "
         "Uses the prompt boundary derived from the data.",
     )
+    parser.add_argument(
+        "--learnable_region", choices=["prompt_to_trace"], default=None,
+        help="Evaluate over a named learnable region (see run.py). Read "
+        "from the mask metadata when omitted; pass explicitly for masks "
+        "without that metadata (thought anchors, random baselines).",
+    )
     args = parser.parse_args()
     set_seed(args.seed)
 
@@ -298,7 +305,7 @@ def main():
         evaluate_candidate_mask(args, nm)
         return
 
-    score_readout = nm.metadata.get("score_readout", "hard_concrete_mean")
+    score_readout = nm.score_readout
     granularity = nm.metadata.get("mask_granularity") or nm.granularity or "pair"
     # Training-time Hard-Concrete temperature (differs from 2/3 for
     # hc_beta_anneal runs); drives both the HC-mean inversion and the
@@ -397,6 +404,23 @@ def main():
         if num_frozen_prompt
         else None
     )
+    learnable_region = args.learnable_region or nm.metadata.get("learnable_region")
+    region_filter = build_region_filter(
+        learnable_region, num_prompt_sentences, num_sents, device=target_device,
+    )
+    if region_filter is not None:
+        meta_np = nm.metadata.get("num_prompt_sentences")
+        if meta_np is not None and int(meta_np) != num_prompt_sentences:
+            raise ValueError(
+                f"Mask metadata says {meta_np} prompt sentences but "
+                f"_build_prefix found {num_prompt_sentences}."
+            )
+        prompt_filter = (
+            region_filter if prompt_filter is None
+            else (prompt_filter | region_filter)
+        )
+        print(f"  Learnable region: {learnable_region} "
+              f"({num_prompt_sentences} prompt sentences)")
     combined_filter = build_combined_filter(
         gap_filter, mode_filter, causal_filter, prompt_filter
     )
@@ -552,6 +576,8 @@ def main():
         "sentence_gap": args.sentence_gap,
         "mask_mode": args.mask_mode,
         "num_frozen_prompt_sentences": num_frozen_prompt,
+        "learnable_region": learnable_region,
+        "num_prompt_sentences": num_prompt_sentences,
         "mask_granularity": granularity,
         "score_readout_input": score_readout,
         "target_letter": target_letter,

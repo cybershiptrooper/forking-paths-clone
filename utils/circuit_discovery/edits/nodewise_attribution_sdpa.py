@@ -356,6 +356,16 @@ class NodewiseAttributionSDPA(CircuitDiscovery):
             f"aggregation={self.pair_aggregation}, granularity={granularity})..."
         )
 
+        # HF gradient checkpointing only engages in train mode
+        # (GradientCheckpointingLayer gates on ``self.training``); without
+        # this the ``gradient_checkpointing`` flag is a silent no-op during
+        # the IG backward passes. The models used here have no dropout, so
+        # train() is numerically identical (same guard as the SNP trainer).
+        toggled_train = False
+        if getattr(self.model, "is_gradient_checkpointing", False):
+            self.model.train()
+            toggled_train = True
+
         # ----- IG loop -----
         for step in tqdm(
             range(start_step, self.num_ig_steps + 1), desc="IG steps",
@@ -387,6 +397,8 @@ class NodewiseAttributionSDPA(CircuitDiscovery):
 
             self._unpatch_model(handles)
 
+        if toggled_train:
+            self.model.eval()
         if non_target_handles:
             self._unpatch_model(non_target_handles)
 
@@ -430,6 +442,9 @@ class NodewiseAttributionSDPA(CircuitDiscovery):
             objective_name=objective_name,
             metadata={
                 "num_ig_steps": self.num_ig_steps,
+                # Signed IG scores; evaluators must rank them as-is
+                # (never as Hard-Concrete means).
+                "score_readout": "raw_score",
                 "include_zero_ablation": self.include_zero_ablation,
                 "zero_ablation_epsilon": self.zero_ablation_epsilon,
                 "num_continuations": len(continuations),

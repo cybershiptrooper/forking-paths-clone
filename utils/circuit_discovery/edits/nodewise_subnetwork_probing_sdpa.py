@@ -25,6 +25,7 @@ Higher = more important. ``negate_scores`` is not applied.
 
 import json
 import os
+import random
 from typing import List, Optional
 
 import torch
@@ -216,6 +217,12 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         """
         self.pair_aggregation = kwargs.pop("pair_aggregation", "mean")
         kwargs.pop("batch_chunk_size", None)
+        # Training on several continuations (for example a bank of sampled
+        # rollouts): draw this many of them at random at every step instead
+        # of running all of them (None = all). Clean reference logits can be
+        # cached in bfloat16 to hold a large bank in CPU memory.
+        self.continuations_per_step = kwargs.pop("continuations_per_step", None)
+        self.clean_logits_dtype = kwargs.pop("clean_logits_dtype", None) or "float32"
         # IG-specific kwargs passed by the shared learn_circuit.py CLI;
         # accepted and ignored so this method is a drop-in in the factory.
         kwargs.pop("num_ig_steps", None)
@@ -1012,9 +1019,13 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
                         chain_logprobs_clean, answer_ids, num_answers, chain_lengths,
                     )
                 else:
+                    step_conts, step_clean, step_rewards, step_pm = self._continuations_for_step(
+                        step, continuations, clean_logits_list, branch_rewards,
+                        position_mask_overrides,
+                    )
                     task_loss_val_k = self._step_local(
-                        input_ids, continuations, clean_logits_list,
-                        prefix_len, device, branch_rewards, position_mask_overrides,
+                        input_ids, step_conts, step_clean,
+                        prefix_len, device, step_rewards, step_pm,
                     )
                 task_loss_val_accum += task_loss_val_k / K
 
@@ -1413,6 +1424,34 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
     # ------------------------------------------------------------------
     # Per-step loss routines (each builds a scalar and calls backward)
     # ------------------------------------------------------------------
+
+    def _continuations_for_step(
+        self, step, continuations, clean_logits_list, branch_rewards,
+        position_mask_overrides,
+    ):
+        """Random subset of ``continuations_per_step`` continuations for one
+        step (a fixed function of the step index, so runs are reproducible);
+        everything when the option is unset or not smaller than the bank."""
+        n = self.continuations_per_step
+        if not n or n >= len(continuations):
+            return continuations, clean_logits_list, branch_rewards, position_mask_overrides
+        idx = sorted(random.Random(100_003 * (step + 1) + 7).sample(range(len(continuations)), n))
+        pick = lambda lst: None if lst is None else [lst[i] for i in idx]
+        return pick(continuations), pick(clean_logits_list), pick(branch_rewards), pick(position_mask_overrides)
+
+    def _get_clean_logits(self, input_ids, continuations):
+        """Base-class clean logits, optionally stored in a narrower dtype
+        (the probe objectives read one row and upcast it themselves)."""
+        if self.clean_logits_dtype == "float32":
+            return super()._get_clean_logits(input_ids, continuations)
+        dtype = getattr(torch, self.clean_logits_dtype)
+        out = []
+        self.model.eval()
+        with torch.no_grad(), torch.amp.autocast("cuda"):
+            for cont in continuations:
+                full_input = torch.cat([input_ids, cont], dim=-1)
+                out.append(self.model(full_input).logits.to(dtype).detach().cpu())
+        return out
 
     def _step_local(
         self,

@@ -385,6 +385,8 @@ def main(
     lr_plateau_factor: Optional[float] = None,
     # Column subnetwork probing
     training_gap_mode: Optional[str] = None,
+    # boundary_answer_dist_kl_length: weight of the answer-distribution KL
+    answer_dist_kl_weight: Optional[float] = None,
 ):
     if model_to_analyse is None:
         model_to_analyse = model_name
@@ -416,6 +418,7 @@ def main(
         "nodewise_dcm_pid_boundary_hazard_probe_weighted_batched",
             "nodewise_subnetwork_probing_boundary_hazard_batched",
             "nodewise_subnetwork_probing_boundary_hazard_probe_weighted_batched",
+            "nodewise_subnetwork_probing_boundary_hazard_answer_dist_batched",
             "nodewise_dcm_pid_boundary_hazard_batched",
             "nodewise_dcm_pid_boundary_hazard_probe_weighted_batched",
         )
@@ -500,6 +503,7 @@ def main(
         "nodewise_dcm_pid_boundary_hazard_probe_weighted_batched",
         "nodewise_subnetwork_probing_boundary_hazard_batched",
         "nodewise_subnetwork_probing_boundary_hazard_probe_weighted_batched",
+        "nodewise_subnetwork_probing_boundary_hazard_answer_dist_batched",
         "column_subnetwork_probing",
         "nodewise_activation_patching_flash",
     }
@@ -721,6 +725,8 @@ def main(
         discovery_kwargs["batch_chunk_size"] = batch_chunk_size
     if use_hazard_objective:
         discovery_kwargs["boundary_data"] = boundary_data
+    if answer_dist_kl_weight is not None:
+        discovery_kwargs["answer_dist_kl_weight"] = answer_dist_kl_weight
     # Subnetwork-probing kwargs (only consumed by the SNP algorithm; harmless
     # when passed to algorithms that ignore them via **kwargs).
     for _k, _v in {
@@ -809,6 +815,8 @@ def main(
     })
     if use_hazard_objective:
         node_mask.metadata["boundary_data_path"] = boundary_data_path
+    if answer_dist_kl_weight is not None:
+        node_mask.metadata["answer_dist_kl_weight"] = answer_dist_kl_weight
     if use_candidate_objective:
         node_mask.metadata.update({
             "answer_bank_path": answer_bank_path,

@@ -54,9 +54,11 @@ todos/*
 claude_scripts/*
 wandb/*
 *.yaml
-legacy/*
+*legacy*
 *draft*
 *.json
-notes/
+# notes/
 website
 *.sh
+*scripts*
+*_review.ipynb

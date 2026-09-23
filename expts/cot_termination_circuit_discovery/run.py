@@ -144,6 +144,7 @@ def build_parser() -> argparse.ArgumentParser:
             "boundary_hazard_lift",
             "boundary_expected_length",
             "boundary_expected_length_eligible",
+            "boundary_answer_dist_kl_length",
         ],
         default="answer_probe_kl",
     )
@@ -151,6 +152,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--boundary_data_path", type=str, default=None,
         help="For boundary_* objectives: path to the boundary-hazard "
         "metadata JSON built by build_boundary_data.py.",
+    )
+    parser.add_argument(
+        "--answer_dist_kl_weight", type=float, default=None,
+        help="For boundary_answer_dist_kl_length: weight of "
+        "KL(bank final-answer distribution || predicted stop distribution).",
     )
     parser.add_argument(
         "--pairwise_beta", type=float, default=10.0,
@@ -232,7 +238,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--plot_every", type=int, default=None)
     parser.add_argument(
         "--sparsity_loss_mode",
-        choices=["l0_mean", "target_size_relu"], default=None,
+        choices=["l0_mean", "target_size_relu", "target_size_l2"], default=None,
     )
     parser.add_argument("--target_sparsity", type=float, default=None)
     parser.add_argument(
@@ -380,6 +386,7 @@ def main():
             lr_min_ratio=args.lr_min_ratio,
             lr_plateau_patience=args.lr_plateau_patience,
             lr_plateau_factor=args.lr_plateau_factor,
+            answer_dist_kl_weight=args.answer_dist_kl_weight,
         )
     else:
         raise ValueError(

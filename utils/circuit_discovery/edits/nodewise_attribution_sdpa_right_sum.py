@@ -376,6 +376,9 @@ class NodewiseAttributionSDPA(CircuitDiscovery):
             objective_name=objective_name,
             metadata={
                 "num_ig_steps": self.num_ig_steps,
+                # Signed IG scores; evaluators must rank them as-is
+                # (never as Hard-Concrete means).
+                "score_readout": "raw_score",
                 "num_continuations": len(continuations),
                 "sentence_gap": self.sentence_gap,
                 "num_heads": num_heads,

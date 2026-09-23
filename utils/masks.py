@@ -79,6 +79,107 @@ def build_prompt_filter(
     return frozen
 
 
+def build_prompt_to_trace_filter(
+    num_prompt_sents: int,
+    num_total_sents: int,
+    device: Optional[torch.device] = None,
+) -> torch.Tensor:
+    """Build boolean filter that leaves ONLY prompt-to-trace cells learnable.
+
+    True = frozen at 1.0. A cell (i, j) stays learnable only when the query
+    sentence i is a reasoning sentence (``i >= num_prompt_sents``) and the
+    key sentence j is a prompt sentence (``j < num_prompt_sents``): the
+    attention a reasoning sentence pays to the question text. Every
+    reasoning-to-reasoning cell and every prompt-to-prompt cell is frozen.
+    This is the complement of :func:`build_prompt_filter` in the sense
+    that the two learnable pools are disjoint.
+    """
+    frozen = torch.ones(
+        num_total_sents, num_total_sents, dtype=torch.bool, device=device
+    )
+    if 0 < num_prompt_sents < num_total_sents:
+        frozen[num_prompt_sents:, :num_prompt_sents] = False
+    return frozen
+
+
+LEARNABLE_REGIONS = ("prompt_to_trace", "trace_to_trace")
+
+
+def build_trace_to_trace_filter(
+    num_prompt_sents: int,
+    num_total_sents: int,
+    device: Optional[torch.device] = None,
+) -> torch.Tensor:
+    """Build boolean filter that leaves ONLY reasoning-to-reasoning cells learnable.
+
+    True = frozen at 1.0. A cell (i, j) stays learnable only when both the
+    query sentence i and the key sentence j are reasoning sentences
+    (``>= num_prompt_sents``). Every read of a prompt sentence, by the
+    reasoning or by the prompt itself, stays at 1.0.
+    """
+    frozen = torch.ones(
+        num_total_sents, num_total_sents, dtype=torch.bool, device=device
+    )
+    if 0 <= num_prompt_sents < num_total_sents:
+        frozen[num_prompt_sents:, num_prompt_sents:] = False
+    return frozen
+
+
+def build_frozen_keys_filter(
+    frozen_key_sentences,
+    num_total_sents: int,
+    device: Optional[torch.device] = None,
+) -> torch.Tensor:
+    """Build boolean filter freezing every read of the given key sentences.
+
+    True = frozen at 1.0. Used to keep reads of the answer options (and of
+    any other chunk that must stay readable) out of a learnable region.
+    """
+    frozen = torch.zeros(
+        num_total_sents, num_total_sents, dtype=torch.bool, device=device
+    )
+    for j in frozen_key_sentences or []:
+        if 0 <= int(j) < num_total_sents:
+            frozen[:, int(j)] = True
+    return frozen
+
+
+def build_region_filter(
+    learnable_region: Optional[str],
+    num_prompt_sents: int,
+    num_total_sents: int,
+    device: Optional[torch.device] = None,
+    frozen_key_sentences=None,
+) -> Optional[torch.Tensor]:
+    """Return the extra frozen-filter for a named learnable region, or None.
+
+    ``learnable_region=None`` means the default pool (whatever the gap /
+    mode / causal / prompt filters leave learnable). ``"prompt_to_trace"``
+    restricts the pool to reasoning-query, prompt-key cells;
+    ``"trace_to_trace"`` to reasoning-query, reasoning-key cells.
+    ``frozen_key_sentences`` additionally freezes every read of the listed
+    sentences (for instance the answer-option chunks) in either region.
+    """
+    region = None
+    if learnable_region == "prompt_to_trace":
+        region = build_prompt_to_trace_filter(
+            num_prompt_sents, num_total_sents, device=device
+        )
+    elif learnable_region == "trace_to_trace":
+        region = build_trace_to_trace_filter(
+            num_prompt_sents, num_total_sents, device=device
+        )
+    elif learnable_region not in (None, ""):
+        raise ValueError(
+            f"Unknown learnable_region {learnable_region!r}; "
+            f"expected one of {LEARNABLE_REGIONS}"
+        )
+    if frozen_key_sentences:
+        keys = build_frozen_keys_filter(frozen_key_sentences, num_total_sents, device=device)
+        region = keys if region is None else (region | keys)
+    return region
+
+
 def build_causal_filter(
     num_sents: int, device: Optional[torch.device] = None
 ) -> torch.Tensor:
@@ -107,6 +208,35 @@ def build_combined_filter(
     if prompt_filter is not None:
         combined = combined | prompt_filter.to(combined.device)
     return combined
+
+
+# Saved ``scores`` come in two families. Subnetwork-probing trainers save
+# Hard-Concrete means (legacy) or log-alphas and tag the mask with
+# ``metadata["score_readout"]``. Every score-based method (thought anchors /
+# attention suppression, attribution patching, activation patching, random
+# baselines) saves a raw importance score per cell. Older masks of the
+# second family were written before the ``score_readout`` field existed;
+# the evaluators used to default a missing field to ``"hard_concrete_mean"``,
+# which clamps raw scores to [0, 1] and collapses every negative or >1 score
+# to one tied rank (see notes/reports_comparisons/kl_frozen_attribution_comparison.md
+# section 6.1). Resolve the readout from the algorithm name instead.
+_HARD_CONCRETE_ALGORITHM_MARKER = "subnetwork_probing"
+
+
+def resolve_score_readout(algorithm: Optional[str], metadata: Optional[dict]) -> str:
+    """Return the score readout kind for a saved mask.
+
+    Uses ``metadata["score_readout"]`` when present and not null; otherwise
+    infers it from the algorithm name: subnetwork-probing masks saved
+    Hard-Concrete means (``"hard_concrete_mean"``), everything else saved
+    raw scores (``"raw_score"``).
+    """
+    readout = (metadata or {}).get("score_readout")
+    if readout not in (None, "None", ""):
+        return readout
+    if algorithm and _HARD_CONCRETE_ALGORITHM_MARKER in algorithm:
+        return "hard_concrete_mean"
+    return "raw_score"
 
 
 @dataclass
@@ -190,6 +320,17 @@ class NodeMask(MaskResult):
     def granularity(self) -> str:
         """Mask granularity: ``"head"``, ``"layer"``, ``"pair"``, or ``"column"``."""
         return self.metadata.get("mask_granularity", "head")
+
+    @property
+    def score_readout(self) -> str:
+        """How ``scores`` should be read for ranking / thresholding.
+
+        ``"log_alpha"`` / ``"hard_concrete_mean"`` for subnetwork-probing
+        masks, ``"raw_score"`` for every score-based method. See
+        :func:`resolve_score_readout` for the fallback rule applied to masks
+        saved without the ``score_readout`` metadata field.
+        """
+        return resolve_score_readout(self.algorithm, self.metadata)
 
     # ------------------------------------------------------------------
     # Sparsity
@@ -281,6 +422,19 @@ class NodeMask(MaskResult):
             if num_frozen_prompt_sents
             else None
         )
+        # Masks trained on a named learnable region (e.g. only the
+        # prompt-to-trace cells) record it with the prompt-sentence count.
+        region_filter = build_region_filter(
+            self.metadata.get("learnable_region"),
+            int(self.metadata.get("num_prompt_sentences", 0) or 0),
+            num_sents,
+            frozen_key_sentences=self.metadata.get("frozen_key_sentences"),
+        )
+        if region_filter is not None:
+            prompt_filter = (
+                region_filter if prompt_filter is None
+                else (prompt_filter | region_filter)
+            )
 
         return build_combined_filter(
             gap_filter, mode_filter, causal_filter, prompt_filter

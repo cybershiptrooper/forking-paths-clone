@@ -292,6 +292,7 @@ def main(
             "mask_mode": mask_mode,
             "num_prefix_sentences": num_sents,
             "negate_scores": False,
+            "score_readout": "raw_score",
             "renormalize_masked_attention": renormalize_masked_attention,
             "objective": "answer_probe_kl",
             "seed": seed,

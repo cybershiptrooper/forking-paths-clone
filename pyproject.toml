@@ -21,6 +21,7 @@ dependencies = [
     "scipy>=1.11.0",
     "seaborn>=0.13.2",
     "sentence-transformers>=2.2.0",
+    "spacy>=3.8.16",
     "streamlit>=1.51.0",
     "torch>=2.0.0",
     "transformers>=4.30.0",

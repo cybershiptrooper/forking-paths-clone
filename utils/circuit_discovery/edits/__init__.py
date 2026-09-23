@@ -40,11 +40,21 @@ from utils.circuit_discovery.edits.nodewise_subnetwork_probing_boundary_hazard_b
     NodewiseSubnetworkProbingBoundaryHazardBatched,
     NodewiseSubnetworkProbingBoundaryHazardProbeWeightedBatched,
 )
+from utils.circuit_discovery.edits.nodewise_subnetwork_probing_boundary_hazard_answer_dist import (
+    NodewiseSubnetworkProbingBoundaryHazardAnswerDistBatched,
+)
 from utils.circuit_discovery.edits.column_subnetwork_probing import (
     ColumnSubnetworkProbing,
 )
 from utils.circuit_discovery.edits.nodewise_subnetwork_probing_hc_batched import (
     NodewiseSubnetworkProbingHCBatched,
+)
+from utils.circuit_discovery.edits.nodewise_subnetwork_probing_region import (
+    NodewiseSubnetworkProbingRegion,
+)
+from utils.circuit_discovery.edits.nodewise_deterministic_mask_trainers import (
+    NodewiseStraightThroughTopK,
+    NodewiseDeterministicContinuousMask,
 )
 
 register_patching_method(
@@ -89,6 +99,10 @@ register_patching_method(
     "nodewise_subnetwork_probing_boundary_hazard_probe_weighted_batched",
 )
 register_patching_method(
+    NodewiseSubnetworkProbingBoundaryHazardAnswerDistBatched,
+    "nodewise_subnetwork_probing_boundary_hazard_answer_dist_batched",
+)
+register_patching_method(
     NodewiseDCMPIDBoundaryHazardBatched,
     "nodewise_dcm_pid_boundary_hazard_batched",
 )
@@ -102,4 +116,14 @@ register_patching_method(
 register_patching_method(
     NodewiseSubnetworkProbingHCBatched,
     "nodewise_subnetwork_probing_hc_batched",
+)
+register_patching_method(
+    NodewiseSubnetworkProbingRegion,
+    "nodewise_subnetwork_probing_region",
+)
+register_patching_method(
+    NodewiseStraightThroughTopK, "nodewise_straight_through_topk",
+)
+register_patching_method(
+    NodewiseDeterministicContinuousMask, "nodewise_deterministic_continuous",
 )

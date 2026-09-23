@@ -27,10 +27,15 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from utils.utils import set_seed, clear_cuda
 from utils.cot_analysis import (
+    Sentence,
     split_tokens_into_sentences,
     remove_bos_from_sentences,
     chunk_sentences,
 )
+# The only trainer that restricts the learnable pool to a named region
+# (utils/circuit_discovery/edits/nodewise_subnetwork_probing_region.py).
+REGION_ALGORITHM = "nodewise_subnetwork_probing_region"
+
 from utils.objectives import (
     answer_probe_kl_loss,
     answer_probe_logit_margin_loss,
@@ -114,6 +119,28 @@ def _resolve_layers(layers_to_analyse, model) -> List[int]:
             raise ValueError("Use 'all' by itself.")
         return list(range(model.config.num_hidden_layers))
     return [int(l) for l in layers_to_analyse]
+
+
+def split_with_prompt_chunks(full_tensor, tokenizer, prompt_len, prompt_chunk_spans, min_sentence_length, skip_reasoning_tokens=0):
+    """Sentence list for a sequence whose prompt part is pre-chunked.
+
+    ``prompt_chunk_spans`` are inclusive token spans over the prompt (from
+    ``prompt_chunking.chunk_prompt``); they are used verbatim. The
+    reasoning part (tokens from ``prompt_len`` on) is split with the usual
+    delimiter splitter, so no sentence straddles the prompt/reasoning
+    boundary (the legacy splitter merges the first reasoning words into
+    the last prompt sentence when the chat-template tail is short).
+
+    Tokens outside every span (a leading chat-template chunk left out of
+    ``prompt_chunk_spans``, or the first ``skip_reasoning_tokens`` reasoning
+    tokens such as ``<think>``) belong to no sentence: the mask machinery
+    treats them as always attended, i.e. they are never ablated."""
+    sents = [Sentence(start=int(s), end=int(e)) for s, e in prompt_chunk_spans if e < full_tensor.shape[-1]]
+    start = prompt_len + int(skip_reasoning_tokens or 0)
+    if full_tensor.shape[-1] > start:
+        rest = split_tokens_into_sentences(full_tensor[start:], tokenizer, min_sentence_length=min_sentence_length)
+        sents += [Sentence(start=s.start + start, end=s.end + start) for s in rest]
+    return sents
 
 
 def _build_prefix(
@@ -206,9 +233,14 @@ def _build_prefix(
             raise ValueError(
                 "analysis_sentence_step requires data_path + prompt_index."
             )
-        raw_sentences = split_tokens_into_sentences(
-            full_tensor, tokenizer, min_sentence_length=min_sentence_length,
-        )
+        if record is not None and record.get("prompt_chunk_spans"):
+            raw_sentences = split_with_prompt_chunks(
+                full_tensor, tokenizer, prompt_len, record["prompt_chunk_spans"], min_sentence_length,
+                skip_reasoning_tokens=record.get("reasoning_skip_tokens", 0))
+        else:
+            raw_sentences = split_tokens_into_sentences(
+                full_tensor, tokenizer, min_sentence_length=min_sentence_length,
+            )
         raw_sentences = remove_bos_from_sentences(raw_sentences)
         raw_sentences = chunk_sentences(raw_sentences, sentence_chunk)
         if analysis_sentence_step >= len(raw_sentences):
@@ -246,9 +278,14 @@ def _build_prefix(
         cut = full_tensor.shape[-1]
 
     prefix_ids = full_tensor[:cut].unsqueeze(0)
-    all_sentences = split_tokens_into_sentences(
-        prefix_ids[0], tokenizer, min_sentence_length=min_sentence_length,
-    )
+    if record is not None and record.get("prompt_chunk_spans"):
+        all_sentences = split_with_prompt_chunks(
+            prefix_ids[0], tokenizer, prompt_len, record["prompt_chunk_spans"], min_sentence_length,
+            skip_reasoning_tokens=record.get("reasoning_skip_tokens", 0))
+    else:
+        all_sentences = split_tokens_into_sentences(
+            prefix_ids[0], tokenizer, min_sentence_length=min_sentence_length,
+        )
     all_sentences = remove_bos_from_sentences(all_sentences)
     all_sentences = chunk_sentences(all_sentences, sentence_chunk)
 
@@ -305,6 +342,12 @@ def main(
     masking_algorithm: str = "nodewise_attribution",
     objective: str = "answer_probe_kl",
     answer_bank_path: Optional[str] = None,
+    # Train the probe objective on a bank of sampled clean rollouts instead of
+    # the stored suffix: a clean_rollouts_k32 file of eval_onpolicy_kl.py
+    rollout_bank_path: Optional[str] = None,
+    rollout_bank_set: str = "B",
+    continuations_per_step: Optional[int] = None,
+    clean_logits_dtype: Optional[str] = None,
     target_letter: Optional[str] = None,
     target_probs: Optional[List[float]] = None,
     logit_margin_reduce: str = "mean",
@@ -316,8 +359,13 @@ def main(
     mask_mode: str = "prefix",
     freeze_prompt_sentences: bool = False,
     freeze_sentences_before: Optional[int] = None,
+    # Named learnable region: None (default pool) or "prompt_to_trace"
+    # (only cells where a reasoning sentence reads a prompt sentence are
+    # learnable; every reasoning-to-reasoning cell is frozen at 1.0).
+    learnable_region: Optional[str] = None,
+    frozen_key_sentences: Optional[list] = None,
     mask_granularity: str = "head",
-    pair_aggregation: str = "mean",
+    pair_aggregation: str = "sum",  # attribution only; see run.py
     ablate_non_target_layers: bool = False,
     renormalize_masked_attention: bool = True,
     num_ig_steps: int = 10,
@@ -381,6 +429,7 @@ def main(
     pid_snapshot_hold_steps: Optional[int] = None,
     dcm_lr_init: Optional[float] = None,
     dcm_lr_warmup_frac: Optional[float] = None,
+    algorithm_kwargs: Optional[dict] = None,
 ):
     if model_to_analyse is None:
         model_to_analyse = model_name
@@ -444,7 +493,8 @@ def main(
         base_answer_type=base_answer_type,
         analysis_timestep=analysis_timestep,
         analysis_sentence_step=analysis_sentence_step,
-        sentences_after_prefix=sentences_after_prefix,
+        # with a rollout bank the sampled rollouts replace the stored suffix
+        sentences_after_prefix=0 if rollout_bank_path else sentences_after_prefix,
         min_sentence_length=min_sentence_length,
         sentence_chunk=sentence_chunk,
     )
@@ -457,6 +507,9 @@ def main(
     _frozen_prompt_algorithms = {
         "nodewise_subnetwork_probing_sdpa",
         "nodewise_subnetwork_probing_hc_batched",
+        # subclasses of the batched trainer; the prompt filter is inherited
+        "nodewise_straight_through_topk",
+        "nodewise_deterministic_continuous",
         "column_subnetwork_probing",
         "nodewise_activation_patching_flash",
         "nodewise_attribution_sdpa",
@@ -576,6 +629,34 @@ def main(
         continuation = probe.make_continuation(target_device)        # (1, L)
         continuations = [continuation]
         position_mask = probe.make_position_mask(prefix_len, target_device)  # (1, P+L)
+        position_masks = [position_mask]
+        rollout_bank_info = None
+        if rollout_bank_path is not None:
+            if use_candidate_objective:
+                raise ValueError("rollout_bank_path is for the probe objectives only")
+            with open(rollout_bank_path) as f:
+                bank = json.load(f)
+            for key, val in [("data_path", data_path), ("prompt_index", prompt_index),
+                             ("analysis_sentence_step", analysis_sentence_step),
+                             ("prefix_len", prefix_len), ("probe_suffix", probe_suffix),
+                             ("answer_letters", list(probe.answer_letters))]:
+                if bank.get(key) != val:
+                    raise ValueError(f"rollout bank {rollout_bank_path}: {key}={bank.get(key)!r} "
+                                     f"does not match this run ({val!r})")
+            rolls = bank["sets"][rollout_bank_set]["rollouts"]
+            continuations = [
+                torch.cat([torch.tensor([r["tokens"]], dtype=torch.long, device=target_device), continuation], dim=-1)
+                for r in rolls
+            ]
+            position_masks = [probe.make_position_mask(prefix_len + len(r["tokens"]), target_device) for r in rolls]
+            rollout_bank_info = {
+                "path": rollout_bank_path, "set": rollout_bank_set, "num_rollouts": len(rolls),
+                "continuations_per_step": continuations_per_step,
+                "mean_clean_answer_probs": torch.tensor([r["clean_answer_probs"] for r in rolls]).mean(0).tolist(),
+                "rollout_n_tokens": [len(r["tokens"]) for r in rolls],
+            }
+            print(f"  Rollout bank: {rollout_bank_path} set {rollout_bank_set}, {len(rolls)} continuations "
+                  f"({continuations_per_step or 'all'} per step)")
         print(f"  Continuation length: {continuation.shape[-1]} tokens")
         print(f"  Answer logit position: {probe.answer_logit_position(prefix_len)}")
 
@@ -706,6 +787,8 @@ def main(
         "lr_plateau_patience": lr_plateau_patience,
         "lr_plateau_factor": lr_plateau_factor,
         "training_gap_mode": training_gap_mode,
+        "continuations_per_step": continuations_per_step,
+        "clean_logits_dtype": clean_logits_dtype,
         "pid_kp": pid_kp,
         "pid_ki": pid_ki,
         "pid_kd": pid_kd,
@@ -722,6 +805,10 @@ def main(
     }.items():
         if _v is not None:
             discovery_kwargs[_k] = _v
+    if algorithm_kwargs:
+        # Algorithm-specific keys without a dedicated argument (YAML mapping
+        # ``algorithm_kwargs``); they go straight to the constructor.
+        discovery_kwargs.update(dict(algorithm_kwargs))
     log_dir = os.path.join(output_dir, file_name.removesuffix(".json")) if file_name else os.path.join(output_dir, masking_algorithm)
     discovery_kwargs["log_dir"] = log_dir
 
@@ -734,12 +821,35 @@ def main(
         num_prefix_sentences=len(sentences),
         branch_rewards=None,
         position_mask_overrides=(
-            None if use_candidate_objective else [position_mask]
+            None if use_candidate_objective else position_masks
         ),
         num_frozen_prompt_sentences=(
             num_prompt_sentences if freeze_prompt_sentences else 0
         ),
     )
+    if learnable_region is not None:
+        # Only the region-aware trainer variant understands these kwargs;
+        # every other algorithm would swallow them in **kwargs and train
+        # over the default pool, so refuse loudly instead.
+        if masking_algorithm != REGION_ALGORITHM:
+            raise ValueError(
+                f"learnable_region={learnable_region!r} requires "
+                f"masking_algorithm={REGION_ALGORITHM!r}, got "
+                f"{masking_algorithm!r}."
+            )
+        if freeze_prompt_sentences:
+            raise ValueError(
+                "learnable_region and freeze_prompt_sentences are mutually "
+                "exclusive: the frozen-prompt filter removes every "
+                "prompt-key cell that learnable_region='prompt_to_trace' needs."
+            )
+        discover_kwargs["learnable_region"] = learnable_region
+        discover_kwargs["num_prompt_sentences"] = num_prompt_sentences
+        if frozen_key_sentences:
+            discover_kwargs["frozen_key_sentences"] = [int(j) for j in frozen_key_sentences]
+            print(f"  Frozen key sentences (always readable): {sorted(int(j) for j in frozen_key_sentences)}")
+    elif frozen_key_sentences:
+        raise ValueError("frozen_key_sentences requires learnable_region (the region-aware trainer)")
     if use_candidate_objective:
         discover_kwargs["answer_ids"] = candidate_answer_ids
         discover_kwargs["num_answers"] = num_answer_clusters
@@ -762,7 +872,12 @@ def main(
         "num_frozen_prompt_sentences": (
             num_prompt_sentences if freeze_prompt_sentences else 0
         ),
+        "learnable_region": learnable_region,
+        "num_prompt_sentences": num_prompt_sentences,
+        "frozen_key_sentences": list(frozen_key_sentences or []),
     })
+    if rollout_bank_info is not None:
+        node_mask.metadata["rollout_bank"] = rollout_bank_info
     if use_candidate_objective:
         node_mask.metadata.update({
             "answer_bank_path": answer_bank_path,

@@ -60,7 +60,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bank_path", required=True)
     ap.add_argument("--model_name", default="Qwen/Qwen3-8B")
-    ap.add_argument("--target_sparsities", nargs="+", type=float,
+    ap.add_argument("--target_sparsities", nargs="*", type=float,
                     default=[0.1])
     ap.add_argument("--n_rollouts", type=int, default=16)
     ap.add_argument("--horizon", type=int, default=4096)
@@ -69,6 +69,14 @@ def main():
     ap.add_argument("--sentence_gap", type=int, default=0)
     ap.add_argument("--mask_mode", default="prefix")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--probe_at_horizon", action="store_true",
+                    help="Also probe continuations that hit the horizon, "
+                    "with </think> forced after their last token.")
+    ap.add_argument("--store_token_ids", action="store_true")
+    ap.add_argument("--include_clean", action="store_true",
+                    help="Also generate the unmasked model's rollouts "
+                    "(same seed and settings) into "
+                    "<stem>_clean_rollout_eval.json.")
     ap.add_argument("--output_dir", required=True)
     args = ap.parse_args()
     set_seed(args.seed)
@@ -92,7 +100,9 @@ def main():
         if len(ids) == 1:
             letter_ids[L] = ids[0]
     gen_kwargs = dict(suffix_ids=suffix_ids, letter_ids=letter_ids,
-                      trace_answer=trace_answer, batch_size=args.batch_size)
+                      trace_answer=trace_answer, batch_size=args.batch_size,
+                      probe_at_horizon=args.probe_at_horizon,
+                      store_token_ids=args.store_token_ids)
 
     prefix_ids, sentences, _, _, _, num_prompt_sentences = _build_prefix(
         tokenizer=tokenizer, prompt=None, data_path=data_path,
@@ -140,6 +150,33 @@ def main():
 
     os.makedirs(args.output_dir, exist_ok=True)
     stem = os.path.splitext(os.path.basename(args.bank_path))[0]
+    if args.include_clean:
+        set_seed(args.seed)
+        rolls = _generate_and_grade(model, tokenizer, prefix_ids,
+                                    args.n_rollouts, args.horizon,
+                                    args.temperature, device, **gen_kwargs)
+        out = {
+            "method": "clean",
+            "bank_path": args.bank_path,
+            "data_path": data_path,
+            "prompt_index": prompt_index,
+            "analysis_sentence_step": step,
+            "prefix_len": prefix_len,
+            "horizon": args.horizon,
+            "temperature": args.temperature,
+            "trace_answer": trace_answer,
+            "gold_letter": gold_letter,
+            "variants": {"clean": {
+                "summary": _summarize(rolls, trace_answer, gold_letter),
+                "rollouts": rolls,
+            }},
+        }
+        out_path = os.path.join(args.output_dir,
+                                f"{stem}_clean_rollout_eval.json")
+        with open(out_path, "w") as f:
+            json.dump(out, f)
+        print(f"clean: {out['variants']['clean']['summary']}")
+        print(f"wrote {out_path}")
     for tsp in args.target_sparsities:
         # top-k on the raw Thought Anchors scores (ranking is monotonic, so
         # no log-alpha conversion is needed)

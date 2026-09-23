@@ -385,6 +385,9 @@ class NodewiseAttribution(CircuitDiscovery):
             objective_name=getattr(self.objective_fn, "__name__", "unknown"),
             metadata={
                 "num_ig_steps": self.num_ig_steps,
+                # Signed IG scores; evaluators must rank them as-is
+                # (never as Hard-Concrete means).
+                "score_readout": "raw_score",
                 "include_zero_ablation": self.include_zero_ablation,
                 "num_continuations": len(continuations),
                 "sentence_gap": self.sentence_gap,

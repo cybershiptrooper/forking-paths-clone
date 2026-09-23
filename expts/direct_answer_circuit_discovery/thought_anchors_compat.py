@@ -60,6 +60,7 @@ def main(
     sentence_chunk: int = 1,
     mask_mode: str = "prefix",
     freeze_prompt_sentences: bool = False,
+    learnable_region: Optional[str] = None,
     min_sentence_length: int = 10,
     seed: int = 42,
     device: str = "cuda",
@@ -139,6 +140,7 @@ def main(
             "mask_mode": mask_mode,
             "num_prefix_sentences": len(sentences),
             "negate_scores": False,
+            "score_readout": "raw_score",
             "objective": "kl_divergence",
             "seed": seed,
             "mode": "thought_anchors_prefix_kl",
@@ -148,6 +150,8 @@ def main(
             "num_frozen_prompt_sentences": (
                 num_prompt_sentences if freeze_prompt_sentences else 0
             ),
+            "learnable_region": learnable_region,
+            "num_prompt_sentences": num_prompt_sentences,
         },
         scores=scores,
     )

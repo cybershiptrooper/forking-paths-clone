@@ -1161,6 +1161,82 @@ def boundary_expected_length_eligible_loss(
     return loss
 
 
+def boundary_answer_dist_kl_length_loss(
+    log_h: List[torch.Tensor],
+    eligible: List[torch.Tensor],
+    clean_log_h: List[torch.Tensor],
+    gaps: List[torch.Tensor],
+    horizon: int,
+    positions: Optional[List[torch.Tensor]] = None,
+    probe_probs: Optional[List[torch.Tensor]] = None,
+    final_probs: Optional[List[torch.Tensor]] = None,
+    answer_kl_weight: float = 1.0,
+    smoothing_eps: float = 1e-6,
+    **kwargs,
+) -> torch.Tensor:
+    """Unguarded expected length + lambda * KL(p_ref || p_predicted).
+
+    Fix 2 of the 2026-09-21 meeting notes (tab 5): instead of choosing which
+    paragraph breaks count as stopping points, walk every break and match
+    the answer distribution the stops imply to the bank's own.  Per chain c,
+    with S_{<b} the probability of not having stopped before break b and
+    S_all of never stopping:
+
+        E_c       = sum_b S_{<b} h_b t_b + S_all H
+        q_c(a)    = sum_b S_{<b} h_b p_b(a) + S_all f_c(a)
+        p_pred    = mean_c q_c,   p_ref = mean_c f_c
+        loss      = mean_c E_c / H + answer_kl_weight * KL(p_ref || p_pred)
+
+    ``probe_probs[c]`` (B_c, K) is the clean forced-probe distribution at
+    each break, ``final_probs[c]`` (K,) the clean forced-probe distribution
+    at the end of continuation c (after its own ``</think>``, or forced at
+    its last token if it never stopped).  The reference is the final-answer
+    distribution of the bank, not the distribution at any break.  Both
+    distributions are smoothed as (1 - eps) p + eps / K before the KL.
+    """
+    if positions is None or probe_probs is None or final_probs is None:
+        raise ValueError(
+            "boundary_answer_dist_kl_length_loss requires positions, "
+            "probe_probs and final_probs"
+        )
+    lengths, q_chains, f_chains = [], [], []
+    for lh, pos, pp, fp in zip(log_h, positions, probe_probs, final_probs):
+        pos_f = pos.to(lh.device).float()
+        pp = pp.to(lh.device).float()
+        fp = fp.to(lh.device).float()
+        log_surv = torch.cumsum(_log1m_exp(lh), dim=0)
+        log_surv_before = torch.cat(
+            [log_surv.new_zeros(1), log_surv[:-1]], dim=0
+        )
+        p_stop = (log_surv_before + lh).exp()               # (B,)
+        s_all = log_surv[-1].exp()
+        lengths.append(
+            ((p_stop * pos_f).sum() + s_all * float(horizon)) / float(horizon)
+        )
+        q_chains.append((p_stop.unsqueeze(-1) * pp).sum(0) + s_all * fp)
+        f_chains.append(fp)
+    length_term = torch.stack(lengths).mean()
+    K = q_chains[0].shape[-1]
+    p_pred = torch.stack(q_chains).mean(0)
+    p_ref = torch.stack(f_chains).mean(0).detach()
+    p_pred = p_pred / p_pred.sum()
+    p_ref = p_ref / p_ref.sum()
+    p_pred = (1.0 - smoothing_eps) * p_pred + smoothing_eps / K
+    p_ref = (1.0 - smoothing_eps) * p_ref + smoothing_eps / K
+    kl = (p_ref * (p_ref.log() - p_pred.log())).sum()
+    loss = length_term + float(answer_kl_weight) * kl
+    with torch.no_grad():
+        diag = dict(
+            expected_length_frac_of_horizon=float(length_term.item()),
+            answer_dist_kl=float(kl.item()),
+        )
+        for k in range(K):
+            diag[f"p_pred_{k}"] = float(p_pred[k].item())
+            diag[f"p_ref_{k}"] = float(p_ref[k].item())
+        _set_diagnostics(**diag)
+    return loss
+
+
 GLOBAL_OBJECTIVES = {
     "answer_kl": answer_distribution_kl_loss,
     "answer_kl_weighted": answer_distribution_kl_loss_weighted,
@@ -1184,6 +1260,7 @@ HAZARD_OBJECTIVES = {
     "boundary_hazard_lift": boundary_hazard_lift_loss,
     "boundary_expected_length": boundary_expected_length_loss,
     "boundary_expected_length_eligible": boundary_expected_length_eligible_loss,
+    "boundary_answer_dist_kl_length": boundary_answer_dist_kl_length_loss,
 }
 
 

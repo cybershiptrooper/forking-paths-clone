@@ -15,9 +15,12 @@ with a leave-one-out baseline over the K mask samples per step:
 
     g = (1/K) sum_k (r_k - mean_{j != k} r_j) * grad log P(z_k)
 
-The sparsity penalty is applied analytically (no score function needed):
-lambda_sp * ReLU(mean(p) - (1 - target_sparsity)), matching the
-trainer's target-size penalty on gate openness.
+The sparsity penalty is applied analytically (no score function needed).
+``--sparsity_loss_mode l2`` (the trainer's ``target_size_l2``) is the
+two-sided quadratic lambda_sp * (mean(p) - (1 - target_sparsity))^2 that
+pushes the expected keep fraction onto the target from either side;
+``relu`` is the one-sided hinge lambda_sp * ReLU(mean(p) - (1 - target_sparsity))
+used by the termination pilot (kept as the default so that pilot reproduces).
 
 This is expensive (each step generates K * n_gen continuations of up to
 --horizon tokens) — intended as a 1-prompt pilot, not a sweep.
@@ -74,6 +77,9 @@ def main():
                     "unmasked model).")
     ap.add_argument("--target_sparsity", type=float, default=0.2)
     ap.add_argument("--sparsity_lambda", type=float, default=5.0)
+    ap.add_argument("--sparsity_loss_mode", choices=["relu", "l2"], default="relu",
+                    help="relu: one-sided hinge on the expected keep fraction (termination pilot); "
+                    "l2: two-sided quadratic toward the target, as target_size_l2 in the SNP trainer")
     ap.add_argument("--mask_mode", default="prefix")
     ap.add_argument("--sentence_gap", type=int, default=0)
     ap.add_argument("--seed", type=int, default=42)
@@ -196,8 +202,11 @@ def main():
         surrogate = -torch.stack(logp_terms).mean()
         # Analytic sparsity penalty on expected gate openness.
         keep_frac = torch.sigmoid(logits_param)[valid].mean()
-        sparsity_pen = args.sparsity_lambda * torch.relu(
-            keep_frac - (1.0 - args.target_sparsity))
+        if args.sparsity_loss_mode == "l2":
+            sparsity_pen = args.sparsity_lambda * (keep_frac - (1.0 - args.target_sparsity)) ** 2
+        else:
+            sparsity_pen = args.sparsity_lambda * torch.relu(
+                keep_frac - (1.0 - args.target_sparsity))
         (surrogate + sparsity_pen).backward()
 
         with torch.no_grad():
@@ -246,6 +255,7 @@ def main():
         "init_logit": args.init_logit,
         "target_sparsity": args.target_sparsity,
         "sparsity_lambda": args.sparsity_lambda,
+        "sparsity_loss_mode": args.sparsity_loss_mode,
         "seed": args.seed,
         "edge_keep_probs": torch.sigmoid(logits_param).detach().cpu().tolist(),
     }

@@ -41,6 +41,7 @@ from utils.masks import (
     build_causal_filter,
     build_combined_filter,
     build_prompt_filter,
+    build_region_filter,
 )
 from utils.circuit_eval import install_clean_sdpa_forward, remove_handles
 from utils.utils import set_seed, clear_cuda
@@ -73,6 +74,10 @@ def main():
                    "them from the samplable pool (the frozen treatment). "
                    "Omit for the maskable treatment: prompt edges are part "
                    "of the pool and can be ablated by the random mask.")
+    p.add_argument("--learnable_region", choices=["prompt_to_trace"],
+                   default=None,
+                   help="Sample random masks over a named learnable region "
+                   "(see run.py) instead of the default pool.")
     p.add_argument("--answer_letters", type=str, default=None,
                    help="Comma-separated probe letters override "
                    "(e.g. ' A, B, C, D, E' for AQuA).")
@@ -117,6 +122,11 @@ def main():
     num_frozen = num_prompt_sentences if args.force_freeze_prompt else 0
     prompt_filter = (build_prompt_filter(num_frozen, num_sents, device=device)
                      if num_frozen else None)
+    region_filter = build_region_filter(
+        args.learnable_region, num_prompt_sentences, num_sents, device=device)
+    if region_filter is not None:
+        prompt_filter = (region_filter if prompt_filter is None
+                         else (prompt_filter | region_filter))
     combined_filter = build_combined_filter(
         gap_filter, mode_filter, causal_filter, prompt_filter)
     valid = ~combined_filter.bool()
@@ -151,6 +161,7 @@ def main():
         # matched-size keep set: identical accounting to the top-K evaluator
         n_keep = max(0, int(round((1.0 - s) * n_valid)))
         kls = []
+        sample_probs = []
         for i in range(args.n_samples):
             rng = np.random.default_rng(
                 (args.seed, args.prompt_index, int(round(s * 1000)), i))
@@ -162,6 +173,7 @@ def main():
                 model, layers, num_heads, full_input, prefix_len, probe,
                 binary, token_to_sent, combined_filter, device, True, "sdpa")
             kls.append(_kl(clean_p, p_masked))
+            sample_probs.append(p_masked.tolist())
         mean_kl = float(np.mean(kls))
         rows.append({
             "target_sparsity": s,
@@ -170,6 +182,10 @@ def main():
             "mean_kl": mean_kl,
             "mean_kl_normalized": mean_kl / kl_max if kl_max > 0 else None,
             "median_kl": float(np.median(kls)),
+            # per-sample answer distributions and their mean, so callers can
+            # read P(letter) under random masks, not only the KL
+            "sample_answer_probs": sample_probs,
+            "mean_answer_probs": np.mean(np.array(sample_probs), axis=0).tolist(),
         })
         print(f"  sp={s}: mean KL {mean_kl:.5f} "
               f"(norm {rows[-1]['mean_kl_normalized']})")
@@ -185,6 +201,8 @@ def main():
         "sentence_gap": args.sentence_gap,
         "mask_mode": args.mask_mode,
         "num_frozen_prompt_sentences": num_frozen,
+        "learnable_region": args.learnable_region,
+        "num_prompt_sentences": num_prompt_sentences,
         "n_valid": n_valid,
         "n_samples": args.n_samples,
         "seed": args.seed,
