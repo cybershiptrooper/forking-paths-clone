@@ -1,236 +1,415 @@
-# Circuit Discovery
+# Learning Attention Circuits over Reasoning Sentences
 
-Discover and evaluate sentence-level attention circuits in transformer language models. The pipeline learns which attention heads (or layers, or sentence pairs) are most important for preserving a model's output distribution at a given point in its chain-of-thought, then evaluates the learned mask at multiple sparsity levels.
+Code for learning sparse masks over sentence-to-sentence attention in a reasoning model's chain of thought. A mask removes attention from sentence `i` to earlier sentence `j` in every layer and head. It is trained with subnetwork probing (hard-concrete mask values plus a quadratic penalty on the number of kept connections) so that the masked model still satisfies an objective defined on the reasoning outcome.
 
-## Quick start
+There are three tasks:
+
+| Task | Objective | Training entry point |
+|---|---|---|
+| Answer preservation | KL between the clean and masked answer distributions | `expts.direct_answer_circuit_discovery.run` |
+| Correct-answer probability | reward gap on the correct answer letter | `expts.direct_answer_circuit_discovery.run` |
+| Shortening | expected remaining reasoning length | `expts.cot_termination_circuit_discovery.run` |
+
+There are two baselines:
+
+- A local-connection baseline adapted from Thought Anchors. It scores each pair by next-token KL when the attention is removed.
+- Random masks with the same number of kept connections.
+
+## Setup
 
 ```bash
-uv sync                  # install dependencies
-bash learn_circuit.sh    # learn a circuit mask + evaluate it
+uv sync            # Python 3.12, dependencies from pyproject.toml / uv.lock
 ```
 
-`learn_circuit.sh` auto-selects the first GPU with >75 GB free memory and runs:
+- Run every command from the repository root; `base_config` paths and data paths are resolved relative to it.
+- The models are `Qwen/Qwen3-8B` and `Qwen/Qwen3-32B` from the Hugging Face Hub.
+- Training loads the model with attention hooks, so one GPU is enough for 8B. For 32B, set `device: auto` to shard the model over the visible GPUs.
 
-```bash
-CUDA_VISIBLE_DEVICES=$FREE_GPU uv run python -m expts.circuit_discovery.learn_and_evaluate \
-    --config expts/configs/answer_kl_patching.yaml
-```
+## How configs work
 
-Point it at a different config by editing the `--config` path, or pass CLI args directly (CLI args override config values).
+Every training script takes `--config <file.yaml>`. Configs are loaded by `utils/expt_config.py:load_config` with these rules:
 
-## Pipeline overview
+1. **Inheritance.** A config may set `base_config: <path>`. The base is loaded first, recursively, so chains of any depth work. The child's keys then override it (nested dicts are merged key by key).
+2. **CLI beats config beats default.** `run.py` passes the loaded config to `parser.set_defaults(...)`, so any flag given on the command line overrides the YAML value.
+3. **Extra keys pass through.** Keys without a matching CLI flag still reach the trainer. For example, `deterministic_algorithms: true` works this way.
+4. **Output location.** Each run writes its mask to `<output_dir>/<file_name>`. Give every config a unique `file_name`.
 
-The entry point is `expts/circuit_discovery/learn_and_evaluate.py`, which runs two stages back-to-back:
+A typical layout is a shared base, plus one small file per run that sets only what varies.
 
-1. **`learn_circuit.py`** — learns a circuit mask and saves it as a `NodeMask` JSON.
-2. **`evaluate_mask.py`** — loads the saved mask, evaluates it at multiple sparsity thresholds, and writes the results back into the same JSON.
-
-### Learning (`learn_circuit.py`)
-
-The learning pipeline has six steps:
-
-1. **Prepare input** — tokenize the prompt and apply the chat template.
-2. **Generate branches** — use vLLM to sample a base completion and `num_new_branches` continuations from the `analysis_timestep`. Results are cached to `cache_dir`.
-3. **Split into sentences** — segment the token sequence into sentence chunks, optionally including generation-region sentences for `mask_mode=generation|both`.
-4. **Group answers** — extract `\boxed{}` answers from branches, cluster them by mathematical equivalence (optionally via an LLM judge), and assign answer IDs for importance-sampling metrics.
-5. **Run circuit discovery** — load the model with eager attention, instantiate the chosen algorithm via `create_circuit_discovery()`, and compute per-edge attribution scores.
-6. **Save** — write the `NodeMask` (scores, sentences, metadata) to JSON under `output_dir`.
-
-### Evaluation (`evaluate_mask.py`)
-
-Loads a `NodeMask` JSON and its cached completions, then calls `evaluate_at_thresholds()`:
-
-- Converts target sparsity levels (e.g. 0%, 10%, 50%, 90%) into score thresholds.
-- At each threshold, zeros out edges below the threshold and measures the resulting KL divergence (and all other available metrics) against the clean model.
-- Compares against `num_random_samples` random baseline masks at the same sparsity.
-- Writes all results back into the mask JSON under `metadata.threshold_evaluation`.
-
-## Config files
-
-Configs are YAML files in `expts/configs/`. They set default values for any CLI argument; CLI args always override config values.
-
-Example (`answer_kl_patching.yaml`):
+`my_configs/base_answer.yaml`, shared by the answer-preservation and correct-answer tasks:
 
 ```yaml
-model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
-data_path: data/collection/deepseek_llama_8b/math_open.json
-prompt_index: 6
-objective: answer_kl
-masking_algorithm: nodewise_activation_patching_kv_cache
-num_new_branches: 32
-mask_granularity: pair
-mask_mode: prefix
-layers_to_analyse: all
-max_sampling_tokens: 10000
-analysis_timestep: 1126
-sentence_gap: 4
-output_dir: results/circuit_discovery/v2
-file_name: retain_outcome_dist_at_1126_32_branches
-ablate_non_target_layers: true
-device: cuda:0
+mode: learn
+probe_suffix: " </think> I think the answer is"   # forced suffix; answer read from next-token logits
+answer_letters: [" A", " B", " C", " D"]          # AQuA: add " E"
+mask_mode: prefix               # mask only inside the prefix
+mask_granularity: pair          # sentence-to-sentence connections
+pair_aggregation: mean
+sentence_chunk: 1
+sentence_gap: 1                 # never mask a sentence's attention to itself
+freeze_prompt_sentences: true   # the prompt's sentences are always attended to
+layers_to_analyse: "all"
+renormalize_masked_attention: true
+gradient_checkpointing: true
+ablate_non_target_layers: false
+
+# subnetwork probing, final recipe
+sparsity_loss_mode: target_size_l2   # quadratic penalty on (#kept - k)
+l0_lambda: 1000.0
+optimizer: hybrid
+learning_rate: 0.1
+log_alpha_init: 2.0
+num_training_steps: 1000
+save_log_alpha: true
+deterministic_algorithms: true
+log_every: 20
+seed: 42
+device: cuda
 ```
 
-### Key parameters
+`my_configs/kl/gpqa_p08_tsp40.yaml`, a single run:
 
-| Parameter | Default | Description |
-|---|---|---|
-| `model_name` | `deepseek-ai/DeepSeek-R1-Distill-Llama-8B` | Model used for vLLM branch generation. |
-| `model_to_analyse` | same as `model_name` | Model loaded with eager attention for circuit discovery. |
-| `prompt` | built-in math problem | Input prompt. Overridden when using `data_path` + `prompt_index`. |
-| `data_path` / `prompt_index` | `None` | Load a question + correct answer from a collection JSON. |
-| `masking_algorithm` | `nodewise_attribution` | Circuit discovery algorithm (see below). |
-| `objective` | `kl_divergence` | Optimization objective: `kl_divergence`, `log_prob` (local per-token), `answer_kl` (global faithfulness), `reward_gap` (global reward). |
-| `mask_granularity` | `head` | Score resolution: `head` (per-head), `layer` (shared across heads), `pair` (shared across layers and heads). |
-| `mask_mode` | `prefix` | Which attention region to mask: `prefix` (query=prefix, key=prefix), `generation`, or `both`. |
-| `layers_to_analyse` | `[8, 12, 16, 20, 24]` | Layer indices to include, or `all`. |
-| `analysis_timestep` | prompt length + 200 | Token index (relative to prompt start) where branches diverge. |
-| `num_new_branches` | `8` | Number of continuation branches to sample. |
-| `num_ig_steps` | `10` | Integrated gradients interpolation steps. |
-| `sentence_gap` | `1` | Minimum sentence index gap for mask pairs. |
-| `sentence_chunk` | `1` | Number of sentences to merge into each chunk. |
-| `max_sampling_tokens` | `150` | Max tokens for vLLM generation. |
-| `num_tokens_to_analyse` | same as `max_sampling_tokens` | Truncate continuations for discovery while keeping full branches for answer extraction. |
-| `pair_aggregation` | `mean` | Aggregation over token pairs within a sentence pair: `sum`, `mean`, `median`, `max`. |
-| `ablate_non_target_layers` | `false` | Zero out attention in all layers outside `layers_to_analyse`. |
-| `renormalize_masked_attention` | `true` | Renormalize post-softmax attention after masking. |
-| `reward_type` | `none` | Reward-weighted discovery: `none`, `correctness` (requires `correct_answer`), `cot_length`. |
-| `answer_only` | `false` | Restrict the position mask to `\boxed{...}` answer tokens only. |
-| `judge_answers` | `false` | Use an LLM judge (via OpenRouter) to cluster branch answers. Falls back automatically if >50% of branches lack `\boxed{}`. |
-| `sparsities` | `[0.0, 0.01, ..., 1.0]` | Target sparsity levels for evaluation. |
-| `num_random_samples` | `5` | Number of random baseline masks (K) for comparison. |
+```yaml
+base_config: my_configs/base_answer.yaml
+masking_algorithm: nodewise_subnetwork_probing_hc_batched
+objective: answer_probe_kl
+num_hc_samples_per_step: 4      # masks sampled per step
+batch_chunk_size: 4
 
-## Data collection & analysis pipeline
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/gpqa_filtered.json
+prompt_index: 8
+analysis_sentence_step: 80      # prefix = prompt + first 80 reasoning sentences
+sentences_after_prefix: 5       # stored suffix used as training continuation
+target_sparsity: 0.4            # fraction of eligible connections removed
 
-End-to-end pipeline that collects branch samples for a given model on a dataset, judges them against ground truth with an LLM, filters ambiguous samples (25-75% accuracy), and generates per-sample plots + error categorisation.
+output_dir: results/kl/masks
+file_name: gpqa_p08_s80_tsp40
+```
 
-### One-shot pipeline (recommended)
-
-Use [scripts/data_collection/qwen3_math_pipeline.sh](scripts/data_collection/qwen3_math_pipeline.sh) as the template. It runs data collection → analysis → logic-error report for one or both Qwen 3 models:
+Run it:
 
 ```bash
-bash scripts/data_collection/qwen3_math_pipeline.sh        # both 8B and 4B
-bash scripts/data_collection/qwen3_math_pipeline.sh 8b     # only 8B
-bash scripts/data_collection/qwen3_math_pipeline.sh 4b     # only 4B
+uv run python -m expts.direct_answer_circuit_discovery.run --config my_configs/kl/gpqa_p08_tsp40.yaml
 ```
 
-Key params (edit the script to change):
-
-- `--num_examples 200` — number of prompts to sample from the dataset
-- `--num_paths 16` — branches per prompt
-- `--max_new_tokens 50000` — set high to avoid truncated thinking chains
-- `--temperature 0.6`, `--seed 42`
-
-**Always run long-running pipelines in tmux** so they survive SSH disconnects:
+You can also override config values on the command line, for example:
 
 ```bash
-mkdir -p logs
-tmux new-session -d -s qwen3_8b "bash scripts/data_collection/qwen3_math_pipeline.sh 8b 2>&1 | tee logs/qwen3_8b_pipeline.log"
-tmux attach -t qwen3_8b   # to monitor
+uv run python -m expts.direct_answer_circuit_discovery.run --config my_configs/kl/gpqa_p08_tsp40.yaml \
+    --target_sparsity 0.8 --file_name gpqa_p08_s80_tsp80
 ```
 
-### Adding a new model
+### Sweeps
 
-1. Add an entry to `MODEL_METADATA` in [utils/utils.py](utils/utils.py) with `nickname` and `reasoning` fields.
-2. Copy `qwen3_math_pipeline.sh` and update the `run_model` calls at the bottom.
+A sweep is a directory with one YAML per run. The simplest way to make one is a short generator script:
 
-### Pipeline steps
+```python
+# make_sweep.py
+import os, yaml
 
-**Step 1: Data collection** — [expts/forking_paths/data_collection_new.py](expts/forking_paths/data_collection_new.py) generates `num_paths` samples per prompt for `num_examples` prompts, saves to `data/collection/<model_nickname>/<dataset>.json`. Must be invoked with `PYTHONPATH=.`.
+OUT = "my_configs/kl_sweep"
+os.makedirs(OUT, exist_ok=True)
+for p, step in [(0, 50), (8, 80), (22, 65)]:
+    for tsp in [0.01, 0.05, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99]:
+        stem = f"gpqa_p{p:02d}_s{step}_tsp{round(tsp * 100):02d}"
+        cfg = {
+            "base_config": "my_configs/base_answer.yaml",
+            "masking_algorithm": "nodewise_subnetwork_probing_hc_batched",
+            "objective": "answer_probe_kl",
+            "num_hc_samples_per_step": 4,
+            "model_name": "Qwen/Qwen3-8B",
+            "data_path": "data/collection/qwen3_8b/gpqa_filtered.json",
+            "prompt_index": p, "analysis_sentence_step": step,
+            "sentences_after_prefix": 5, "target_sparsity": tsp,
+            "output_dir": "results/kl_sweep/masks", "file_name": stem,
+        }
+        with open(f"{OUT}/{stem}.yaml", "w") as f:
+            yaml.safe_dump(cfg, f, sort_keys=False)
+```
 
-**Step 2: Analysis + filtering** — [expts/analyse_collected_data.py](expts/analyse_collected_data.py) uses an OpenRouter LLM judge (Llama 3.1 8B by default) to score each path, filters samples with 25-75% accuracy, and writes:
-- `data/collection/<model_nickname>/math_filtered.json` — full original records of filtered samples
-- `results/data_collection_analysis/<model_nickname>/<filtered_index>/` — per-sample plots and `metadata.json` (with `parsed_answers`, `verdicts`, `complete_final_answers`)
-- `results/data_collection_analysis/<model_nickname>/report.json` — full summary
-
-The folder name `<filtered_index>` is the array position in `math_filtered.json`, so it plugs directly into `prompt_index` in circuit-discovery configs.
-
-OpenRouter responses are cached in `cache/openrouter/<model>/`. Re-runs of the analysis step are near-instant if prompts haven't changed.
-
-**Step 3: Logic error report** — scans the filtered samples and prints those where >50% of wrong answers are categorised as `logic_error` (vs. `silly_mistake`, `token_error`, `incomplete`).
-
-### Running analysis on existing data
-
-If data was already collected, skip straight to step 2:
+Then run every config in the directory:
 
 ```bash
-uv run python -m expts.analyse_collected_data \
-    --data data/collection/qwen3_8b/math_open.json \
-    --output-dir results/data_collection_analysis/qwen3_8b \
-    --filtered-output data/collection/qwen3_8b/math_filtered.json
+uv run python make_sweep.py
+for cfg in my_configs/kl_sweep/*.yaml; do
+    uv run python -m expts.direct_answer_circuit_discovery.run --config "$cfg"
+done
 ```
 
-### Running forking paths on a filtered prompt
+On a cluster, submit one job per file, for example as a job array indexed into the sorted file list.
 
-After filtering, run the forking-paths script on a specific prompt using its filtered index:
+### Main config keys
 
-```bash
-bash scripts/forking_paths/llama3_8b_from_collection.sh <filtered_index>
-# or with a different data path:
-bash scripts/forking_paths/llama3_8b_from_collection.sh <filtered_index> <data_path>
-```
-
-This uses [expts/forking_paths/forking_paths_from_collection.py](expts/forking_paths/forking_paths_from_collection.py), which respects the same sentence splitting (`split_tokens_into_sentences`) and sampling params (temp=0.6, seed=42) as `learn_circuit.py` for consistency.
-
-## Circuit discovery algorithms
-
-Algorithms are registered via `utils/circuit_discovery/factory.py`. The available algorithms:
-
-| Algorithm | Method | Description |
-|---|---|---|
-| `nodewise_attribution` | Integrated Gradients | Interpolates a mask from 0 (fully ablated) to 1 (fully present) and integrates gradients of the objective w.r.t. the mask. Default algorithm. |
-| `nodewise_attribution_attention` | AP + IG | Captures clean vs. corrupted attention activations, then applies integrated gradients over the interpolation. Supports richer aggregation (sum, mean, median, max). |
-| `nodewise_activation_patching` | Leave-one-out ablation | Zeros each edge individually and measures the resulting change in objective. Forward-pass only (no gradients). |
-| `nodewise_activation_patching_kv_cache` | Activation patching + KV cache | Variant that pre-computes the prefix KV cache for efficiency. |
-| `nodewise_activation_patching_batch` | Batched activation patching | Variant with configurable `max_batch_size` for throughput. |
-| `nodewise_attribution_memory` | Memory-optimized IG | Memory-efficient variant of the integrated gradients approach. |
-
-All algorithms produce a `NodeMask` with the same structure, so evaluation and the dashboard work identically regardless of which algorithm was used.
-
-## Dashboard
-
-The dashboard is a single-page web app (`dashboard/index.html`) for visualizing learned circuit masks.
-
-### Running
-
-```bash
-python dashboard/serve.py [port]   # default port 8765
-```
-
-Or open `dashboard/index.html` directly in a browser and use the file picker to load a mask JSON (the server API won't be available in this mode).
-
-### Server API
-
-| Endpoint | Description |
+| Key | Meaning |
 |---|---|
-| `GET /api/masks` | Lists all mask JSON files matching `results/circuit_discovery/**/*.json`. |
-| `GET /api/mask?path=<relative_path>` | Returns the contents of a specific mask JSON. |
+| `model_name`, `data_path`, `prompt_index` | model and question (see Data below) |
+| `analysis_sentence_step` | number of reasoning sentences in the prefix |
+| `sentences_after_prefix` | length of the stored suffix used for training and fixed-suffix evaluation |
+| `masking_algorithm` | `nodewise_subnetwork_probing_hc_batched` (several masks per step), `nodewise_subnetwork_probing_sdpa` (one mask per step), `nodewise_subnetwork_probing_boundary_hazard_batched` (shortening) |
+| `objective` | `answer_probe_kl`, `answer_probe_reward_gap`, `boundary_expected_length_eligible` |
+| `target_sparsity` | fraction of eligible connections removed; the final mask keeps the top `k = round((1 - s)·\|E\|)` |
+| `sparsity_loss_mode`, `l0_lambda` | `target_size_l2` with λ = 1000 is the quadratic penalty used throughout |
+| `num_hc_samples_per_step` | hard-concrete masks sampled per step (4 for answer preservation, 1 otherwise) |
+| `rollout_bank_path`, `rollout_bank_set`, `continuations_per_step` | train on sampled continuations instead of the stored suffix |
+| `log_alpha_init_mask_path`, `log_alpha_init_mask_alpha` | initialise from another mask's ranking (e.g. the local-connection baseline) |
+| `mask_granularity` | `pair` (default), `head` or `layer` |
 
-### Visualization modes
+## 1. Data
 
-The main graph renders sentences as columns and layers as rows:
+Traces are sampled with vLLM, 16 per question, and only questions whose accuracy over the 16 samples is between 25% and 75% are kept. Dataset names are listed in `utils/data_utils.py` (`GPQA`, `AQuA`, `AQuA_train`, `MATH_open`, `MMLU_<subject>`, ...).
 
-- **Within-layer arcs** — Bezier arcs within each layer row connecting sentence pairs.
-- **Cross-layer flow** — Vertical S-curves grouping edges by (src, tgt) pair across layers.
-- **Aggregated mask** — S x S heatmap of sentence-to-sentence scores aggregated across all active layers.
+```bash
+# Sample traces (use --tensor_parallel_size 2 for Qwen3-32B)
+uv run python -m expts.forking_paths.data_collection_new \
+    --model_name Qwen/Qwen3-8B --dataset_names GPQA --num_examples 198 --shuffle \
+    --num_paths 16 --max_new_tokens 50000 --temperature 0.6 --batch_size 8 \
+    --return_logprobs --return_alternate_texts --seed 42 --enable_prefix_caching
 
-### Controls
+# Keep questions with 25-75% accuracy
+uv run python -m expts.analyse_collected_data \
+    --data data/collection/qwen3_8b/gpqa.json \
+    --output-dir results/data_analysis/gpqa_8b \
+    --filtered-output data/collection/qwen3_8b/gpqa_filtered.json
+```
 
-- **Threshold slider** — snaps to values from evaluation data to filter edges by score.
-- **Influence %** — pre-filters edges by cumulative absolute score before threshold is applied.
-- **Aggregation** — for `head`-granularity masks, combines per-head matrices via mean, max, or sum.
-- **Layer range** — filters which layers appear (disabled for `pair` granularity since scores are shared).
-- **Sentence legend** — click a sentence to highlight all its connected edges.
+The answer-preservation and correct-answer tasks use the filtered files. The shortening task uses the unfiltered ones.
 
-### Detail panel
+## 2. Answer preservation
 
-Contains a metric dropdown with interactive Plotly charts. Available metrics depend on what data is present in the mask:
+### Local-connection baseline
 
-| Metric | When available | Description |
-|---|---|---|
-| Per-token KL vs Sparsity | Always | Mean per-token KL at each sparsity level, with random baseline band. |
-| Per-sentence KL | Always | Per-branch, per-sentence KL breakdown. |
-| Answer KL vs Sparsity | With `answer_ids` | KL between clean and masked answer distributions (Objective 1). |
-| Reward Gap vs Sparsity | With `answer_ids` | P(target) - P(best other) (Objective 2). |
-| KL_A / KL_B / Contrastive Loss | With `answer_ids` | Per-group KL and contrastive separation (Objective 3). |
-| N_eff / N vs Sparsity | With `answer_ids` | Importance sampling health diagnostic. |
-| Reward-weighted KL | With `branch_rewards` | KL weighted by branch correctness/length reward. |
+This baseline has no training loop, and its config is flat (no `base_config`, no CLI overrides):
+
+```yaml
+# my_configs/ta/gpqa_p08.yaml
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/gpqa_filtered.json
+prompt_index: 8
+analysis_sentence_step: 80
+sentences_after_prefix: 5
+sentence_gap: 1
+sentence_chunk: 1
+mask_mode: prefix
+device: cuda
+seed: 42
+output_dir: results/ta
+file_name: gpqa_p08_s80
+```
+
+```bash
+uv run python -m expts.direct_answer_circuit_discovery.thought_anchors_compat --config my_configs/ta/gpqa_p08.yaml
+```
+
+The baseline produces one score matrix per prompt. It is thresholded to any target sparsity at evaluation time.
+
+### Learned masks
+
+**On the stored suffix.** This is the config shown in [How configs work](#how-configs-work).
+
+**On sampled continuations, initialised from the baseline (paper recipe).** First sample 32 continuations of the prefix per clean set (at most 200 tokens, temperature 0.7). Set B is used for training; set A is held out.
+
+```python
+# build_bank.py
+from argparse import Namespace
+from expts.direct_answer_circuit_discovery.eval_onpolicy_kl import build_clean_rollouts
+
+build_clean_rollouts(Namespace(
+    model_name="Qwen/Qwen3-8B", data_path="data/collection/qwen3_8b/gpqa_filtered.json",
+    prompt_index=8, analysis_sentence_step=80, sentence_gap=1, mask_mode="prefix",
+    answer_letters=None, probe_suffix=None,          # AQuA: answer_letters=" A, B, C, D, E"
+    n_rollouts=32, max_new_tokens=200, temperature=0.7, gen_batch=16, seed=42, alpha=0.5,
+    output="results/banks/gpqa_p08_s80.json"), ctx={})
+```
+
+For open-ended answers (MATH), use `python -m expts.direct_answer_circuit_discovery.build_candidate_rollout_bank` instead, with a candidate answer bank from `build_answer_bank`.
+
+Then add these keys to the answer-preservation config:
+
+```yaml
+rollout_bank_path: results/banks/gpqa_p08_s80.json
+rollout_bank_set: B
+continuations_per_step: 4
+clean_logits_dtype: bfloat16
+log_alpha_init_mask_path: results/ta/gpqa_p08_s80_thought_anchors.json
+log_alpha_init_mask_alpha: 0.0
+```
+
+**Qwen3-32B.** Set `model_name: Qwen/Qwen3-32B` and `device: auto`, and make 2 GPUs visible.
+
+## 3. Correct-answer probability
+
+This task uses the same base config and the same prompts as answer preservation. It changes the objective, uses one mask per step, and trains on the 5 stored sentences after the prefix:
+
+```yaml
+# my_configs/rg/gpqa_p08_tsp40.yaml
+base_config: my_configs/base_answer.yaml
+masking_algorithm: nodewise_subnetwork_probing_sdpa
+objective: answer_probe_reward_gap
+num_hc_samples_per_step: 1
+
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/gpqa_filtered.json
+prompt_index: 8
+analysis_sentence_step: 80
+sentences_after_prefix: 5
+target_sparsity: 0.4
+
+output_dir: results/rg/masks
+file_name: gpqa_p08_s80_tsp40
+```
+
+```bash
+uv run python -m expts.direct_answer_circuit_discovery.run --config my_configs/rg/gpqa_p08_tsp40.yaml
+```
+
+## 4. Evaluation (answer tasks)
+
+All evaluation scripts read a saved mask, keep its top-`k` connections at the requested sparsity, and compare the masked model to the clean model. The flags must match the training setup: `sentence_gap` and `sentences_after_prefix` default to 0 in the evaluation scripts, so always pass them.
+
+**Fixed-suffix evaluation.** This teacher-forces the stored suffix and reports answer KL, answer probabilities, and the reward gap. Evaluate at the training target:
+
+```bash
+uv run python -m expts.direct_answer_circuit_discovery.eval_log_alpha \
+    --mask_path results/kl/masks/gpqa_p08_s80_tsp40.json \
+    --model_name Qwen/Qwen3-8B --data_path data/collection/qwen3_8b/gpqa_filtered.json \
+    --prompt_index 8 --analysis_sentence_step 80 --sentences_after_prefix 5 \
+    --sentence_gap 1 --mask_mode prefix --top_k_sparsities 0.4 \
+    --output results/kl/eval/gpqa_p08_s80_tsp40.eval.json
+```
+
+For the local-connection baseline, pass its score file as `--mask_path`, add `--force_freeze_prompt`, and give all target sparsities at once, for example `--top_k_sparsities 0.01,0.05,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99`.
+
+**Random masks.** These use the same eligible-connection pool and the same `k`:
+
+```bash
+uv run python -m expts.direct_answer_circuit_discovery.eval_random_masks \
+    --model_name Qwen/Qwen3-8B --data_path data/collection/qwen3_8b/gpqa_filtered.json \
+    --prompt_index 8 --analysis_sentence_step 80 --sentences_after_prefix 5 --sentence_gap 1 \
+    --mask_mode prefix --sparsities 0.2,0.4,0.6,0.8 --n_samples 3 --seed 42 --force_freeze_prompt \
+    --output results/random/gpqa_p08_s80.random_eval.json
+```
+
+**Generated-suffix evaluation.** This samples continuations from the masked model at temperature 0.7 and reads the answer after the forced suffix:
+
+```bash
+uv run python -m expts.direct_answer_circuit_discovery.eval_masked_rollouts \
+    --mask_path results/kl/masks/gpqa_p08_s80_tsp40.json \
+    --model_name Qwen/Qwen3-8B --data_path data/collection/qwen3_8b/gpqa_filtered.json \
+    --prompt_index 8 --analysis_sentence_step 80 --sentences_after_prefix 5 --sentence_gap 1 \
+    --mask_mode prefix --target_sparsity 0.4 --n_rollouts 5 --max_new_tokens 200 \
+    --temperature 0.7 --seed 42 --output results/kl/rollouts/gpqa_p08_s80_tsp40.json
+```
+
+To compare the masked model's answer-outcome distribution with the clean bank over 32 rollouts, call `run_cell` from `expts/direct_answer_circuit_discovery/eval_onpolicy_kl.py`. It takes the same arguments as `build_clean_rollouts` above, plus `mask_path`, `target_sparsity`, `sentences_after_prefix`, `force_freeze_prompt` and `clean_path` (the bank file).
+
+## 5. Shortening
+
+**1. Pick questions and analysis points, and sample continuation banks.**
+
+- Questions are kept if their accuracy is between 0.5 and 0.75.
+- The analysis point is placed about 2200 tokens before `</think>`.
+
+```bash
+uv run python -m expts.cot_termination_circuit_discovery.scan_early_analysis_points \
+    --data_paths data/collection/qwen3_8b/gpqa.json data/collection/qwen3_8b/aqua.json \
+                 data/collection/qwen3_8b/aqua_train.json \
+    --offset_tokens 2200 --fallback_offset_tokens 3000 --n_samples 16 --horizon 4096 \
+    --max_prefix_tokens 15000 --per_dataset 5 --candidates_per_dataset 10 \
+    --output_dir results/termination/banks_root
+```
+
+**2. Build the sentence-boundary training data for each selected bank:**
+
+```bash
+uv run python -m expts.cot_termination_circuit_discovery.build_boundary_data \
+    --bank_path results/termination/banks_root/banks/aqua_p004_s198.json \
+    --output results/termination/boundary_data/aqua_p004_s198.json
+```
+
+**3. Train.** The config is self-contained here:
+
+```yaml
+# my_configs/term/aqua_p004_tsp40.yaml
+mode: learn
+masking_algorithm: nodewise_subnetwork_probing_boundary_hazard_batched
+objective: boundary_expected_length_eligible
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/aqua.json
+prompt_index: 4
+analysis_sentence_step: 198
+answer_bank_path: results/termination/banks_root/banks/aqua_p004_s198.json
+boundary_data_path: results/termination/boundary_data/aqua_p004_s198.json
+probe_suffix: " </think> I think the answer is"
+
+mask_mode: prefix
+mask_granularity: pair
+pair_aggregation: mean
+sentence_gap: 1
+sentence_chunk: 1
+layers_to_analyse: "all"
+freeze_prompt_sentences: true
+sentences_after_prefix: 0
+renormalize_masked_attention: true
+gradient_checkpointing: true
+
+sparsity_loss_mode: target_size_l2
+l0_lambda: 1000
+optimizer: hybrid
+learning_rate: 0.1
+log_alpha_init: 2.0
+target_sparsity: 0.4
+num_training_steps: 500
+candidate_batch_size: 6
+save_log_alpha: true
+log_every: 10
+seed: 42
+device: cuda
+
+output_dir: results/termination/masks
+file_name: aqua_p004_s198_tsp40
+checkpoint_path: results/termination/checkpoints/aqua_p004_s198_tsp40.pt
+checkpoint_every: 50
+resume_from_checkpoint: true
+```
+
+```bash
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+uv run python -m expts.cot_termination_circuit_discovery.run --config my_configs/term/aqua_p004_tsp40.yaml
+```
+
+**4. Evaluate.** This samples 16 continuations with the mask applied, up to 4096 tokens. It reports reasoning length and answer outcome, together with 2 random masks at the same sparsity:
+
+```bash
+uv run python -m expts.cot_termination_circuit_discovery.eval_termination_rollouts \
+    --mask_path results/termination/masks/aqua_p004_s198_tsp40.json \
+    --bank_path results/termination/banks_root/banks/aqua_p004_s198.json \
+    --n_rollouts 16 --horizon 4096 --batch_size 16 --n_random_masks 2 --sentence_gap 1 \
+    --probe_at_horizon --store_token_ids --skip_clean --skip_snis_check \
+    --output results/termination/eval/aqua_p004_s198_tsp40.json
+```
+
+**5. Local-connection baseline.** This scores, thresholds and evaluates in one process. Add `--include_clean` once per prompt to also sample unmasked continuations.
+
+```bash
+uv run python -m expts.cot_termination_circuit_discovery.eval_thought_anchors_termination \
+    --bank_path results/termination/banks_root/banks/aqua_p004_s198.json \
+    --target_sparsities 0.2 0.4 0.6 0.8 --n_rollouts 16 --horizon 4096 --batch_size 16 \
+    --sentence_gap 1 --probe_at_horizon --store_token_ids \
+    --output_dir results/termination/eval_ta
+```
+
+After the first run, you can pass `--scores_path <saved score file>` to reuse the baseline scores instead of recomputing them.
+
+## Code layout
+
+| Path | Contents |
+|---|---|
+| `expts/direct_answer_circuit_discovery/` | answer-preservation and correct-answer training (`run.py`, `learn.py`), baseline (`thought_anchors_compat.py`), evaluation (`eval_*.py`) |
+| `expts/cot_termination_circuit_discovery/` | shortening: bank and boundary-data builders, training (`run.py`), evaluation |
+| `expts/forking_paths/data_collection_new.py` | trace sampling with vLLM |
+| `utils/circuit_discovery/edits/` | subnetwork-probing trainers (registered in `utils/circuit_discovery/factory.py`) |
+| `utils/masks.py` | mask container and eligible-connection filters |
+| `utils/expt_config.py` | config loading |
+
+Tests: `uv run pytest tests/`.
