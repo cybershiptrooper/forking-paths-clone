@@ -1,0 +1,14 @@
+uv run python steering.py \
+    --model_name deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B \
+    --dataset_name GPQA \
+    --num_paths 500 \
+    --temperature 0.7 \
+    --max_new_tokens 10 \
+    --layer 20 \
+    --token_index -1 \
+    --num_outcomes_to_steer 1 \
+    --num_steer_samples 2 \
+    --batch_size 16 \
+    --start_index 2 \
+    --end_index 3 \
+    --seed 42

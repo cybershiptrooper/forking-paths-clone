@@ -1,0 +1,41 @@
+# Shortening, Qwen3-8B. Needs the continuation bank and boundary data (see README, section 5).
+mode: learn
+masking_algorithm: nodewise_subnetwork_probing_boundary_hazard_batched
+objective: boundary_expected_length_eligible
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/aqua.json
+prompt_index: 4
+analysis_sentence_step: 198
+answer_bank_path: results/termination/banks_root/banks/aqua_p004_s198.json
+boundary_data_path: results/termination/boundary_data/aqua_p004_s198.json
+probe_suffix: " </think> I think the answer is"
+
+mask_mode: prefix
+mask_granularity: pair
+pair_aggregation: mean
+sentence_gap: 1
+sentence_chunk: 1
+layers_to_analyse: "all"
+freeze_prompt_sentences: true
+sentences_after_prefix: 0
+renormalize_masked_attention: true
+gradient_checkpointing: true
+
+sparsity_loss_mode: target_size_l2
+l0_lambda: 1000
+optimizer: hybrid
+learning_rate: 0.1
+log_alpha_init: 2.0
+target_sparsity: 0.4
+num_training_steps: 500
+candidate_batch_size: 6
+save_log_alpha: true
+log_every: 10
+seed: 42
+device: cuda
+
+output_dir: results/termination/masks
+file_name: aqua_p004_s198_tsp40
+checkpoint_path: results/termination/checkpoints/aqua_p004_s198_tsp40.pt
+checkpoint_every: 50
+resume_from_checkpoint: true

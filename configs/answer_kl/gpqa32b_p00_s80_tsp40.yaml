@@ -1,0 +1,16 @@
+# Answer preservation, Qwen3-32B. device: auto shards the model over the visible GPUs (2 x 80 GB).
+base_config: configs/base_answer.yaml
+masking_algorithm: nodewise_subnetwork_probing_hc_batched
+objective: answer_probe_kl
+num_hc_samples_per_step: 4
+batch_chunk_size: 4
+device: auto
+
+model_name: Qwen/Qwen3-32B
+data_path: data/collection/qwen3_32b/gpqa_filtered.json
+prompt_index: 0
+analysis_sentence_step: 80
+target_sparsity: 0.4
+
+output_dir: results/answer_kl/masks
+file_name: gpqa32b_p00_s80_tsp40

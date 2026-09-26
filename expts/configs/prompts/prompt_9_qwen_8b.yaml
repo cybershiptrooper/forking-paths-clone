@@ -1,0 +1,9 @@
+base_config: expts/configs/prompts/base.yaml
+
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/math_filtered.json
+prompt_index: 9
+analysis_timestep: 1722
+seed: 42
+file_name: qwen3_8b_9_at_1722
+# num_new_branches: 64

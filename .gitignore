@@ -1,0 +1,71 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# vscode
+.vscode
+
+data/collection
+data/forking_paths
+playground.ipynb
+
+# custom
+plots
+thought_anchors
+*rollouts*
+*log
+*logs
+.cursor
+*rough*
+results/attention*
+expts/test_scripts
+results/circuitviz*
+
+.DS_Store
+cluster.md
+.env
+*.patch
+.superset
+*old*
+roadmap/
+cache/
+*results/*
+
+TASK.md
+analyse_collected_data.ipynb
+expts/circuit_debug/
+# notes/
+results
+optimisation_reports/
+plan.md
+refactor/
+.nfs*
+todos/*
+wandb/*
+*.yaml
+*legacy*
+*draft*
+*.json
+# notes/
+website
+*.sh
+*scripts*
+*_review.ipynb
+
+# Keep the rollout collector source visible despite the generated-output rule.
+!expts/prompt_bias_circuit_discovery/collect_bias_rollouts.py
+
+# Example configs and rollout modules referenced by the README
+!configs/
+!configs/thought_anchors/
+!configs/**/*.yaml
+!expts/**/*rollouts*.py
+!utils/**/*rollouts*.py
+slurm_scripts/*

@@ -1,0 +1,29 @@
+# Shared settings for the answer-preservation and correct-answer tasks.
+# Per-run configs set base_config: configs/base_answer.yaml and override what varies.
+mode: learn
+probe_suffix: " </think> I think the answer is"   # forced suffix; answer read from next-token logits
+answer_letters: [" A", " B", " C", " D"]          # AQuA: add " E"
+mask_mode: prefix               # mask only inside the prefix
+mask_granularity: pair          # sentence-to-sentence connections
+pair_aggregation: mean
+sentence_chunk: 1
+sentence_gap: 1                 # never mask a sentence's attention to itself
+freeze_prompt_sentences: true   # the prompt's sentences are always attended to
+sentences_after_prefix: 5       # stored suffix used for training and fixed-suffix evaluation
+layers_to_analyse: "all"
+renormalize_masked_attention: true
+gradient_checkpointing: true
+ablate_non_target_layers: false
+
+# Subnetwork probing, final recipe
+sparsity_loss_mode: target_size_l2   # quadratic penalty on (#kept - k)
+l0_lambda: 1000.0
+optimizer: hybrid
+learning_rate: 0.1
+log_alpha_init: 2.0
+num_training_steps: 1000
+save_log_alpha: true
+deterministic_algorithms: true
+log_every: 20
+seed: 42
+device: cuda

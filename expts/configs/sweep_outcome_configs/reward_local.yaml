@@ -1,0 +1,6 @@
+base_config: expts/configs/sweep_outcome_configs/base.yaml
+
+reward_type: correctness
+objective: kl_divergence
+file_name: reward_with_local_kl
+num_tokens_to_analyse: 200

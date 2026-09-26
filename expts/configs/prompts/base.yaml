@@ -1,0 +1,27 @@
+num_new_branches: 32
+mask_granularity: pair
+mask_mode: prefix
+layers_to_analyse: all
+max_sampling_tokens: 20000
+sentence_gap: 4
+output_dir: results/circuit_discovery/prompts_t10_l0_5e-3
+ablate_non_target_layers: true
+temperature: 0.6
+objective: reward_gap
+reward_type: correctness
+
+masking_algorithm: nodewise_subnetwork_probing_sdpa
+importance_sampling_method: tempered_snis
+importance_sampling_temperature: 10.0
+device: auto
+gradient_checkpointing: true
+l0_lambda: 5.0e-3
+
+
+# NEEDED
+# model_name: Qwen/Qwen3-8B
+# data_path: data/collection/qwen3_8b/math_filtered.json
+# prompt_index: 9
+# analysis_timestep: 489 # 584 # 609
+# seed: 32
+# file_name: qwen3_8b_9_at_489

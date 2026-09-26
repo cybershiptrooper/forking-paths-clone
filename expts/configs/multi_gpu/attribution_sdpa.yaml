@@ -1,0 +1,11 @@
+base_config: expts/configs/tempered_snis_configs/base.yaml
+
+objective: reward_gap
+masking_algorithm: nodewise_attribution_sdpa
+importance_sampling_method: tempered_snis
+importance_sampling_temperature: 20.0
+file_name: reward_gap_attribution_t20
+batch_chunk_size: 1
+num_new_branches: 32
+device: auto
+gradient_checkpointing: true

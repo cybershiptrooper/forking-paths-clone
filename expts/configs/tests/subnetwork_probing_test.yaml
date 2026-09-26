@@ -1,0 +1,16 @@
+model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+prompt: "Question: If (1+16*x)^2 = 1.44, what is the value of x?"
+objective: answer_kl
+masking_algorithm: nodewise_subnetwork_probing_sdpa
+num_new_branches: 2
+mask_granularity: pair
+mask_mode: prefix
+layers_to_analyse: all
+max_sampling_tokens: 200
+analysis_timestep: 20
+sentence_gap: 1
+output_dir: results/circuit_discovery
+file_name: subnetwork_probing_test
+ablate_non_target_layers: true
+device: cuda:0
+gradient_checkpointing: true

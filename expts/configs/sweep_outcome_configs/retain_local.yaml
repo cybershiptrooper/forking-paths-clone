@@ -1,0 +1,4 @@
+base_config: expts/configs/sweep_outcome_configs/base.yaml
+objective: kl_divergence
+file_name: retain_local_dist
+num_tokens_to_analyse: 200

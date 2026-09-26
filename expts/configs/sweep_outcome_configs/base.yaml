@@ -1,0 +1,26 @@
+# model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+# data_path: data/collection/deepseek_llama_8b/math_filtered.json
+# analysis_timestep: 1850
+# seed: 50
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/math_filtered.json
+prompt_index: 9
+masking_algorithm: nodewise_activation_patching_flash
+num_new_branches: 32
+mask_granularity: pair
+mask_mode: prefix
+layers_to_analyse: all
+max_sampling_tokens: 20000
+analysis_timestep: 1036 # 1140 # 1040
+sentence_gap: 4
+output_dir: results/circuit_discovery/logic_error_prompt/v1
+ablate_non_target_layers: true
+device: cuda:0
+seed: 42
+temperature: 0.6
+
+# NEEDED
+# objective: ...
+# file_name: ...
+# num_tokens_to_analyse: ... (if local)
+# reward_type: ... (if using rewards)

@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circuit Tracer — Sentence Connections</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+
+<div id="sidebar">
+  <h1>Circuit Tracer</h1>
+  <div class="subtitle">Sentence-level attention attribution</div>
+  <button id="tour-btn" onclick="startTour()">? Tour</button>
+
+  <div class="ctrl">
+    <h2>Load Mask</h2>
+    <input type="file" id="file-input" accept=".json">
+    <select id="server-masks"><option value="">— server masks —</option></select>
+  </div>
+
+  <div id="meta-info"></div>
+
+  <div class="ctrl">
+    <h2>View</h2>
+    <div class="view-toggle">
+      <button id="view-arcs" class="active" onclick="setView('arcs')">Within-layer arcs</button>
+      <button id="view-flow" onclick="setView('flow')">Cross-layer flow</button>
+      <button id="view-agg" onclick="setView('agg')">Aggregated mask</button>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <h2>Threshold</h2>
+    <input type="range" id="threshold-slider" min="0" max="0" step="1" value="0" disabled>
+    <div style="display:flex;gap:4px;align-items:center;">
+      <input type="number" id="threshold-input" step="any" value="0"
+        style="width:110px;font-size:11px;font-family:'SF Mono',monospace;padding:2px 4px;border:1px solid var(--border);border-radius:3px;">
+      <span style="font-size:10px;color:var(--text-dim);"><span class="mono" id="threshold-idx-label">0/0</span></span>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <h2>Influence %</h2>
+    <input type="range" id="influence-slider" min="10" max="100" step="1" value="80">
+    <label>Show top <span class="mono" id="influence-value">80</span>% of influence</label>
+  </div>
+
+  <div class="ctrl">
+    <h2>Aggregation</h2>
+    <select id="agg-select">
+      <option value="mean" selected>Mean</option>
+      <option value="max">Max</option>
+      <option value="sum">Sum</option>
+    </select>
+  </div>
+
+  <div class="ctrl">
+    <h2>Layer Range</h2>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <select id="layer-start" style="flex:1;"></select>
+      <span style="font-size:11px;color:var(--text-dim);">to</span>
+      <select id="layer-end" style="flex:1;"></select>
+    </div>
+    <div id="pair-note" style="display:none;font-size:10px;color:var(--text-dim);margin-top:2px;">Pair granularity: scores shared across layers.</div>
+  </div>
+
+  <div class="ctrl">
+    <h2>Display</h2>
+    <label><input type="checkbox" id="show-labels" checked> Node labels</label>
+    <label id="color-by-cat-label" style="display:none;"><input type="checkbox" id="color-by-category"> Color edges by category</label>
+    <div id="cat-color-legend" class="cat-legend" style="display:none;"></div>
+  </div>
+
+  <div class="ctrl">
+    <h2>Sentences</h2>
+    <div id="sentence-legend"></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="tab-bar">
+    <button class="active" onclick="setTab('single')">Single Mask</button>
+    <button onclick="setTab('compare')">Compare Masks</button>
+    <button onclick="setTab('resample')">Resample Sweep</button>
+  </div>
+  <div id="tab-single" class="tab-pane active" style="flex-direction:column;">
+    <div id="toolbar">
+      <b>Sentence Connection Graph</b>
+      <span class="pill" id="edge-badge"></span>
+      <span class="pill" id="node-badge"></span>
+      <span style="flex:1;"></span>
+      <span class="mono" id="hover-info"></span>
+    </div>
+    <div id="content">
+      <div id="graph-container">
+        <div id="empty-state">
+          <div style="font-size:40px;opacity:0.25;">&#x1F50C;</div>
+          <div>Load a NodeMask JSON to begin</div>
+        </div>
+      </div>
+      <div id="detail-panel" style="position:relative;">
+        <div id="detail-resize-handle"></div>
+        <h2>Threshold Evaluation</h2>
+        <div id="threshold-chart-section" style="display:none;">
+          <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px;">Click on chart to set threshold. Sparsity vs metric (colored by threshold).</div>
+          <select id="metric-select" style="font-size:11px;padding:2px 5px;border:1px solid var(--border);border-radius:4px;background:var(--bg);margin-bottom:6px;width:100%;"></select>
+          <div id="threshold-chart-container"><canvas id="threshold-chart"></canvas></div>
+        </div>
+        <div id="no-threshold-eval" class="detail-box" style="font-size:10px;color:var(--text-dim);">
+          No threshold_evaluation data in this mask.
+        </div>
+        <h2 style="margin-top:10px;">Node Details</h2>
+        <div class="detail-box" id="detail-content">Click a node to inspect connections.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-compare" class="tab-pane">
+    <div id="compare-controls">
+      <div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-dim);margin-bottom:4px;">Select masks to compare</div>
+        <div id="compare-mask-list"><em style="color:var(--text-dim)">Loading server masks...</em></div>
+      </div>
+      <div id="compare-actions">
+        <button class="primary" onclick="loadCompareMasks()">Load &amp; Compare</button>
+        <button onclick="clearCompareMasks()">Clear All</button>
+        <div id="compare-status"></div>
+      </div>
+    </div>
+    <div id="compare-chart-area">
+      <div id="compare-metric-bar">
+        <select id="compare-metric-select" onchange="onCompareMetricChange()"></select>
+        <select id="compare-threshold-select" onchange="onCompareSparsityChange()" style="display:none;">
+          <option value="">— sparsity —</option>
+        </select>
+        <div id="compare-legend"></div>
+      </div>
+      <div id="compare-chart-container"></div>
+      <div id="compare-heatmap-grid" style="display:none;"></div>
+    </div>
+  </div>
+
+  <div id="tab-resample" class="tab-pane" style="flex-direction:column;overflow:hidden;">
+    <div id="resample-toolbar" style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--panel-bg);display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <b style="font-size:12px;">Resample sweep</b>
+      <span class="pill" id="resample-count-badge">0 series</span>
+      <span style="flex:1;"></span>
+      <button onclick="loadResampleSweep()" id="resample-reload-btn"
+              style="font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text-muted);font-weight:600;">
+        Reload
+      </button>
+      <a id="resample-download-csv" download="resample_fraction_correct.csv"
+         style="font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text-muted);font-weight:600;text-decoration:none;display:inline-block;">
+        Download CSV
+      </a>
+    </div>
+    <div id="resample-content" style="flex:1;display:flex;overflow:hidden;">
+      <div id="resample-sidebar" style="width:280px;min-width:240px;border-right:1px solid var(--border);background:var(--panel-bg);overflow-y:auto;padding:10px 12px;font-size:11px;">
+        <div style="font-weight:600;text-transform:uppercase;font-size:10px;color:var(--text-dim);letter-spacing:0.06em;margin-bottom:6px;">Series</div>
+        <div id="resample-series-list" style="display:flex;flex-direction:column;gap:3px;">
+          <em style="color:var(--text-dim)">Loading…</em>
+        </div>
+        <div style="margin-top:10px;">
+          <label style="display:flex;align-items:center;gap:5px;color:var(--text-muted);">
+            <input type="checkbox" id="resample-show-baseline" checked onchange="renderResampleSweep()">
+            Show baseline (no-mask)
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;color:var(--text-muted);margin-top:3px;">
+            <input type="checkbox" id="resample-show-ci" checked onchange="renderResampleSweep()">
+            Show 95% CI bars
+          </label>
+        </div>
+        <div id="resample-meta" style="margin-top:14px;font-size:10px;color:var(--text-dim);line-height:1.55;"></div>
+      </div>
+      <div id="resample-chart-area" style="flex:1;background:var(--bg);position:relative;">
+        <div id="resample-empty" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:13px;">
+          Loading resample data…
+        </div>
+        <div id="resample-chart" style="width:100%;height:100%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<!-- Tour overlay elements -->
+<div id="tour-backdrop"><svg><rect width="100%" height="100%" fill="rgba(15,23,42,0.55)"/></svg></div>
+<div id="tour-highlight"></div>
+<div id="tour-popover">
+  <div class="tour-title"></div>
+  <div class="tour-body"></div>
+  <div class="tour-footer">
+    <span class="tour-step-info"></span>
+    <div class="tour-btns">
+      <button class="tour-prev" onclick="tourPrev()">Prev</button>
+      <button class="tour-next" onclick="tourNext()">Next</button>
+      <button class="tour-close" onclick="endTour()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+// Page-specific state
+// ══════════════════════════════════════════════════════════════
+let resampleData = null;
+let thresholdEvalData = null;
+let activeTab = 'single';
+let compareMasks = [];
+let serverMaskPaths = [];
+
+// ══════════════════════════════════════════════════════════════
+// Page hooks called by shared.js
+// ══════════════════════════════════════════════════════════════
+function pageInitEval() {
+  initThresholdChart();
+  onMetricChange();
+}
+function pageOnReprocess() {
+  onMetricChange();
+}
+
+// ══════════════════════════════════════════════════════════════
+// File / server loading
+// ══════════════════════════════════════════════════════════════
+document.getElementById('file-input').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => { try { maskData = JSON.parse(ev.target.result); resampleData = null; boot(); } catch(err){ alert(err); }};
+  r.readAsText(f);
+});
+document.getElementById('server-masks').addEventListener('change', e => {
+  if (!e.target.value) return;
+  const maskPath = e.target.value;
+  fetch('/api/mask?path=' + encodeURIComponent(maskPath))
+    .then(r=>r.json()).then(d => {
+      maskData = d;
+      resampleData = null;
+      fetch('/api/resample?path=' + encodeURIComponent(maskPath))
+        .then(r=>r.json()).then(sd => {
+          resampleData = sd;
+          if (resampleData && thresholdEvalData) { initThresholdChart(); onMetricChange(); }
+        })
+        .catch(() => { resampleData = null; });
+      boot();
+    }).catch(console.error);
+});
+
+// Load mask list and populate compare checklist
+initShared();
+loadServerMaskList(function(ps) {
+  populateCompareMaskList(ps);
+});
+
+// ══════════════════════════════════════════════════════════════
+// Tab switching
+// ══════════════════════════════════════════════════════════════
+function setTab(tab) {
+  activeTab = tab;
+  const labels = ['single', 'compare', 'resample'];
+  document.querySelectorAll('#tab-bar button').forEach((btn, i) => {
+    btn.classList.toggle('active', labels[i] === tab);
+  });
+  document.getElementById('tab-single').classList.toggle('active', tab === 'single');
+  document.getElementById('tab-compare').classList.toggle('active', tab === 'compare');
+  document.getElementById('tab-resample').classList.toggle('active', tab === 'resample');
+  if (tab === 'single' && processed) { render(); onMetricChange(); }
+  if (tab === 'compare' && compareMasks.length > 0) onCompareMetricChange();
+  if (tab === 'resample') {
+    if (!window._resampleData) loadResampleSweep();
+    else renderResampleSweep();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Threshold Evaluation Chart
+// ══════════════════════════════════════════════════════════════
+const METRIC_DEFS = [
+  { key: 'kl_divergence',     label: 'Per-token KL vs Sparsity',          chartType: 'line+random', alwaysAvailable: true },
+  { key: 'per_sentence_kl',   label: 'Per-sentence KL (across chains)',   chartType: 'line_per_sentence' },
+  { key: 'per_sentence_kl_heatmap', label: 'Per-sentence KL heatmap (by answer)', chartType: 'heatmap_per_sentence' },
+  { key: 'answer_kl',         label: 'Answer KL vs Sparsity',             chartType: 'line+random' },
+  { key: 'answer_kl_weighted', label: 'Answer KL (weighted) vs Sparsity',  chartType: 'line+random' },
+  { key: 'reward_gap',        label: 'Reward Gap vs Sparsity',            chartType: 'line+random' },
+  { key: 'p_target',          label: 'P(target) vs Sparsity',             chartType: 'line+random' },
+  { key: 'p_best_other',      label: 'P(best other) vs Sparsity',         chartType: 'line+random' },
+  { key: 'n_eff_ratio',       label: 'N_eff / N vs Sparsity',             chartType: 'line+threshold' },
+  { key: 'answer_probs_masked', label: 'Per-answer Probabilities',        chartType: 'table' },
+  { key: 'answer_probs_masked_weighted', label: 'Per-answer Probabilities (Eq. 1 weighted)', chartType: 'table_weighted' },
+  { key: 'resample_comparison', label: 'Resample Comparison',             chartType: 'resample', alwaysAvailable: false },
+  { key: 'log_weights',       label: 'Log-weight Histogram',              chartType: 'histogram' },
+  { key: 'chain_weights_normalized', label: 'Per-chain IS weights',       chartType: 'per_chain_weights_bar' },
+  { key: 'kl_a',              label: 'KL_A vs Sparsity',                  chartType: 'line+random' },
+  { key: 'kl_b',              label: 'KL_B vs Sparsity',                  chartType: 'line+random' },
+  { key: 'contrastive_loss',  label: 'Contrastive Loss vs Sparsity',      chartType: 'line+random' },
+  { key: 'tag_distribution',  label: 'Tag Distribution',                  chartType: 'tag_bar', alwaysAvailable: false },
+];
+
+function getRandomKey(field) { return 'random_' + field + 's'; }
+function getRandomSingleKey(field) { return 'random_' + field; }
+
+function initThresholdChart() {
+  const meta = maskData.metadata || {};
+  const te = meta.threshold_evaluation;
+  if (!Array.isArray(te) || te.length === 0) {
+    document.getElementById('threshold-chart-section').style.display = 'none';
+    document.getElementById('no-threshold-eval').style.display = '';
+    thresholdEvalData = null;
+    return;
+  }
+  const entries = te.filter(e => e && typeof e.threshold === 'number' && typeof e.sparsity === 'number');
+  if (entries.length === 0) { thresholdEvalData = null; return; }
+
+  const firstEntry = entries[0];
+  const select = document.getElementById('metric-select');
+  select.innerHTML = '';
+  const availableMetrics = [];
+  for (const def of METRIC_DEFS) {
+    let available = def.alwaysAvailable || (def.key in firstEntry && firstEntry[def.key] != null);
+    if (def.key === 'per_sentence_kl_heatmap') {
+      available = ('per_sentence_kl' in firstEntry) && Array.isArray(meta.answer_ids);
+    }
+    if (def.key === 'resample_comparison') {
+      available = resampleData != null && Array.isArray(resampleData.thresholds);
+    }
+    if (def.key === 'tag_distribution') {
+      available = (maskData.sentences || []).some(s => s.function_tags && s.function_tags.length);
+    }
+    if (def.key === 'chain_weights_normalized') {
+      available = ('log_weights' in firstEntry) || ('chain_weights_normalized' in firstEntry);
+    }
+    if (available) {
+      availableMetrics.push(def);
+      const opt = document.createElement('option');
+      opt.value = def.key; opt.textContent = def.label;
+      select.appendChild(opt);
+    }
+  }
+
+  const preferredOrder = ['answer_kl', 'reward_gap', 'kl_divergence'];
+  let defaultKey = availableMetrics.length > 0 ? availableMetrics[0].key : 'kl_divergence';
+  for (const pk of preferredOrder) {
+    if (availableMetrics.some(m => m.key === pk)) { defaultKey = pk; break; }
+  }
+  select.value = defaultKey;
+  select.onchange = onMetricChange;
+
+  const hasNeff = entries.some(e => 'n_eff_ratio' in e);
+  const nEffRatios = hasNeff ? entries.map(e => e.n_eff_ratio ?? NaN) : null;
+  const randomNeffs = hasNeff ? entries.map(e => {
+    const rn = e.random_n_effs;
+    if (Array.isArray(rn) && rn.length > 0) {
+      const N = meta.num_branches || rn.length;
+      return rn.reduce((a,b) => a + b, 0) / rn.length / N;
+    }
+    return NaN;
+  }) : null;
+
+  const hasAnswerProbs = entries.some(e => Array.isArray(e.answer_probs_masked));
+  const hasAnswerProbsWeighted = entries.some(e => Array.isArray(e.answer_probs_masked_weighted));
+  const answerLabels = meta.answer_labels || null;
+  const answerProbsCleanWeighted = Array.isArray(meta.answer_probs_clean_weighted)
+    ? meta.answer_probs_clean_weighted : null;
+
+  thresholdEvalData = {
+    entries, thresholds: entries.map(e => e.threshold), sparsities: entries.map(e => e.sparsity),
+    availableMetrics, nEffRatios, randomNeffs, hasNeff,
+    hasAnswerProbs, hasAnswerProbsWeighted, answerLabels, answerProbsCleanWeighted,
+  };
+  document.getElementById('threshold-chart-section').style.display = '';
+  document.getElementById('no-threshold-eval').style.display = 'none';
+}
+
+function onMetricChange() {
+  if (!thresholdEvalData) return;
+  const select = document.getElementById('metric-select');
+  const metricKey = select.value;
+  const def = METRIC_DEFS.find(d => d.key === metricKey);
+  if (!def) return;
+  if (def.chartType === 'resample') renderResampleComparison();
+  else if (def.chartType === 'tag_bar') renderTagDistributionChart();
+  else if (def.chartType === 'line_per_sentence') renderPerSentenceKLChart();
+  else if (def.chartType === 'heatmap_per_sentence') renderPerSentenceKLHeatmap();
+  else if (def.chartType === 'histogram') renderLogWeightHistogram();
+  else if (def.chartType === 'per_chain_weights_bar') renderPerChainWeightsChart();
+  else if (def.chartType === 'table') renderAnswerProbsAsMainChart();
+  else if (def.chartType === 'table_weighted') renderWeightedAnswerProbsAsMainChart();
+  else if (def.chartType === 'line+threshold') renderNeffAsMainChart();
+  else renderThresholdChart();
+}
+
+function _findNearestEntry() {
+  const { entries } = thresholdEvalData;
+  const ct = getThreshold();
+  let idx = 0, best = Infinity;
+  for (let i = 0; i < entries.length; i++) { const d = Math.abs(entries[i].threshold - ct); if (d < best) { best = d; idx = i; } }
+  return entries[idx];
+}
+
+function _getKL(item) {
+  if (item && typeof item === 'object' && 'mean_kl' in item) return item.mean_kl;
+  return typeof item === 'number' ? item : 0;
+}
+function _getSentText(item) {
+  if (item && typeof item === 'object' && 'text' in item) return item.text;
+  return '';
+}
+
+// ── Tag distribution ──
+function renderTagDistributionChart() {
+  const container = document.getElementById('threshold-chart-container');
+  const sents = maskData.sentences || [];
+  const tagCounts = {};
+  for (const s of sents) { for (const tag of (s.function_tags || [])) { tagCounts[tag] = (tagCounts[tag] || 0) + 1; } }
+  const tags = Object.keys(tagCounts).sort((a, b) => tagCounts[b] - tagCounts[a]);
+  const counts = tags.map(t => tagCounts[t]);
+  const colors = tags.map(t => TAG_COLORS[t] || TAG_COLORS.unknown);
+  const trace = { x: tags.map(t => t.replace(/_/g, ' ')), y: counts, type: 'bar', marker: { color: colors }, hovertemplate: '%{x}: %{y}<extra></extra>' };
+  const layout = { ...PLOTLY_LAYOUT_BASE, margin: { ...PLOTLY_LAYOUT_BASE.margin, b: 100 }, xaxis: { tickangle: -45, automargin: true }, yaxis: { title: 'Count' } };
+  Plotly.react(container, [trace], layout, PLOTLY_CONFIG);
+}
+
+// ── Main line chart ──
+function renderThresholdChart() {
+  if (!thresholdEvalData) return;
+  const container = document.getElementById('threshold-chart-container');
+  const select = document.getElementById('metric-select');
+  const metricKey = select.value;
+  const def = METRIC_DEFS.find(d => d.key === metricKey);
+  const metricLabel = def ? def.label : metricKey;
+  const showRandom = def && def.chartType === 'line+random';
+  const { entries, thresholds, sparsities } = thresholdEvalData;
+  const metrics = entries.map(e => e[metricKey] ?? NaN);
+  const n = sparsities.length;
+  if (n === 0) return;
+
+  const idx = d3.range(n).sort((a, b) => sparsities[a] - sparsities[b]);
+  const sortedSp = idx.map(i => sparsities[i]);
+  const sortedM = idx.map(i => metrics[i]);
+  const sortedT = idx.map(i => thresholds[i]);
+  const validIdx = d3.range(n).filter(i => !isNaN(sortedM[i]));
+  if (validIdx.length === 0) return;
+
+  const xVals = validIdx.map(i => sortedSp[i]);
+  const yVals = validIdx.map(i => sortedM[i]);
+  const hoverText = validIdx.map(i => `t=${sortedT[i].toExponential(2)}<br>sparsity=${(sortedSp[i]*100).toFixed(1)}%<br>${metricLabel}=${sortedM[i].toExponential(3)}`);
+  const traces = [];
+
+  if (showRandom) {
+    const randomArrayKey = getRandomKey(metricKey);
+    const randomSingleKey = getRandomSingleKey(metricKey);
+    const hasMulti = entries.every(e => Array.isArray(e[randomArrayKey]) && e[randomArrayKey].length > 0);
+    let rMean = null, rStdLow = null, rStdHigh = null;
+    if (hasMulti) {
+      rMean = entries.map(e => { const a = e[randomArrayKey]; return a.reduce((x,y)=>x+y,0)/a.length; });
+      const rStd = entries.map((e,i) => { const a = e[randomArrayKey]; const m = rMean[i]; return Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/a.length); });
+      rStdLow = rMean.map((m,i) => m - rStd[i]);
+      rStdHigh = rMean.map((m,i) => m + rStd[i]);
+    } else if (entries.every(e => randomSingleKey in e && e[randomSingleKey] != null)) {
+      rMean = entries.map(e => e[randomSingleKey]);
+    }
+    if (rMean) {
+      const sortedRM = idx.map(i => rMean[i]);
+      if (rStdHigh && rStdLow) {
+        const sortedRH = idx.map(i => rStdHigh[i]);
+        const sortedRL = idx.map(i => rStdLow[i]);
+        traces.push({ x: [...xVals, ...xVals.slice().reverse()], y: [...validIdx.map(i => sortedRH[i]), ...validIdx.slice().reverse().map(i => sortedRL[i])], fill: 'toself', fillcolor: 'rgba(255,165,0,0.12)', line: { color: 'transparent' }, name: 'Random ±1σ', hoverinfo: 'skip', showlegend: true });
+      }
+      traces.push({ x: xVals, y: validIdx.map(i => sortedRM[i]), mode: 'lines', line: { color: 'orange', dash: 'dash', width: 1.5 }, name: 'Random baseline' });
+    }
+  }
+
+  traces.push({ x: xVals, y: yVals, mode: 'lines+markers', line: { color: '#4caf50', width: 1.5 }, marker: { size: 5, color: '#4caf50' }, name: 'Learned mask', text: hoverText, hoverinfo: 'text' });
+
+  const currentThreshold = getThreshold();
+  let nearIdx = 0, nearDist = Infinity;
+  for (let i = 0; i < n; i++) { const d = Math.abs(thresholds[i] - currentThreshold); if (d < nearDist) { nearDist = d; nearIdx = i; } }
+  const selSp = sparsities[nearIdx], selM = metrics[nearIdx];
+  if (!isNaN(selM)) {
+    traces.push({ x: [selSp], y: [selM], mode: 'markers', marker: { size: 12, symbol: 'star', color: '#1e293b', line: { color: '#fff', width: 1.5 } }, name: 'Selected', hoverinfo: 'skip', showlegend: false });
+  }
+
+  const layout = { ...PLOTLY_LAYOUT_BASE, xaxis: { title: { text: 'Sparsity', standoff: 12 }, tickformat: '.0%', gridcolor: '#e2e8f0' }, yaxis: { title: { text: metricLabel, standoff: 12 }, exponentformat: 'e', gridcolor: '#e2e8f0' } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+
+  container.on('plotly_click', function(data) {
+    if (data.points && data.points.length > 0) {
+      const sp = data.points[0].x;
+      let best = 0, bestD = Infinity;
+      for (let i = 0; i < n; i++) { const d = Math.abs(sparsities[i] - sp); if (d < bestD) { bestD = d; best = i; } }
+      setThresholdToValue(thresholds[best]);
+      reprocess();
+    }
+  });
+}
+
+// ── Per-sentence KL ──
+function renderPerSentenceKLChart() {
+  if (!thresholdEvalData) return;
+  const container = document.getElementById('threshold-chart-container');
+  const entry = _findNearestEntry();
+  const perSentKL = entry.per_sentence_kl;
+  if (!perSentKL || !Array.isArray(perSentKL) || perSentKL.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No per-sentence KL data at this threshold.</div>';
+    return;
+  }
+  const branches = perSentKL;
+  const numSents = Math.max(...branches.map(b => Array.isArray(b) ? b.length : 0), 0);
+  if (numSents === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Empty sentence data.</div>'; return; }
+  const colors = d3.schemeTableau10;
+  const traces = [];
+  for (let b = 0; b < branches.length; b++) {
+    const xVals = [], yVals = [], hoverTexts = [];
+    const bData = branches[b] || [];
+    for (let s = 0; s < bData.length; s++) {
+      xVals.push(s); yVals.push(_getKL(bData[s]));
+      const txt = _getSentText(bData[s]);
+      hoverTexts.push(`Branch ${b}, S${s}<br>${txt.length > 60 ? txt.slice(0, 58) + '…' : txt}<br>KL=${_getKL(bData[s]).toExponential(3)}`);
+    }
+    traces.push({ x: xVals, y: yVals, mode: 'lines+markers', name: 'Branch ' + b, line: { color: colors[b % colors.length], width: 1.5 }, marker: { symbol: 'x', size: 6, color: colors[b % colors.length] }, text: hoverTexts, hoverinfo: 'text' });
+  }
+  const layout = { ...PLOTLY_LAYOUT_BASE, title: { text: `Threshold=${entry.threshold.toExponential(2)}, Sparsity=${(entry.sparsity*100).toFixed(1)}%`, font: { size: 10, color: '#94a3b8' }, x: 0 }, xaxis: { title: { text: 'Continuation sentence index', standoff: 12 }, gridcolor: '#e2e8f0', dtick: 1 }, yaxis: { title: { text: 'Mean KL Divergence', standoff: 12 }, exponentformat: 'e', gridcolor: '#e2e8f0' } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Per-sentence KL heatmap ──
+function renderPerSentenceKLHeatmap() {
+  if (!thresholdEvalData) return;
+  const container = document.getElementById('threshold-chart-container');
+  const entry = _findNearestEntry();
+  const perSentKL = entry.per_sentence_kl;
+  const meta = maskData.metadata || {};
+  const answerIds = meta.answer_ids || [];
+  const answerLabels = meta.answer_labels || [];
+  if (!perSentKL || !Array.isArray(perSentKL) || perSentKL.length === 0 || answerIds.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No per-sentence KL or answer_ids data.</div>';
+    return;
+  }
+  const branches = perSentKL;
+  const numSents = Math.max(...branches.map(b => Array.isArray(b) ? b.length : 0), 0);
+  const branchOrder = d3.range(branches.length).sort((a, b) => (answerIds[a] || 0) - (answerIds[b] || 0));
+  const zData = [], yLabels = [];
+  for (const bi of branchOrder) {
+    zData.push(d3.range(numSents).map(s => (branches[bi] || [])[s] ? _getKL((branches[bi] || [])[s]) : 0));
+    yLabels.push(`B${bi} (${answerLabels[answerIds[bi]] || ('Ans ' + answerIds[bi])})`);
+  }
+  const traces = [{ z: zData, x: d3.range(numSents).map(String), y: yLabels, type: 'heatmap', colorscale: 'YlOrRd', hovertemplate: '%{y}<br>Sentence %{x}<br>KL=%{z:.2e}<extra></extra>', colorbar: { title: { text: 'KL', side: 'right' }, thickness: 12 } }];
+  const layout = { ...PLOTLY_LAYOUT_BASE, title: { text: `Per-sentence KL heatmap (by answer) — t=${entry.threshold.toExponential(2)}`, font: { size: 10, color: '#94a3b8' }, x: 0 }, xaxis: { title: { text: 'Sentence index', standoff: 12 }, type: 'category' }, yaxis: { type: 'category', autorange: 'reversed' }, margin: { ...PLOTLY_LAYOUT_BASE.margin, l: 100 } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Log-weight histogram ──
+function renderLogWeightHistogram() {
+  if (!thresholdEvalData) return;
+  const container = document.getElementById('threshold-chart-container');
+  const entry = _findNearestEntry();
+  const logWeights = entry.log_weights;
+  if (!Array.isArray(logWeights) || logWeights.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No log_weights data.</div>'; return; }
+  const traces = [{ x: logWeights, type: 'histogram', marker: { color: 'rgba(76,175,80,0.6)', line: { color: '#4caf50', width: 1 } }, hovertemplate: 'log(w): %{x:.2f}<br>count: %{y}<extra></extra>', nbinsx: Math.min(30, Math.max(10, Math.ceil(Math.sqrt(logWeights.length)))) }];
+  const layout = { ...PLOTLY_LAYOUT_BASE, showlegend: false, xaxis: { title: { text: 'log(weight)', standoff: 12 }, gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Count', standoff: 12 }, gridcolor: '#e2e8f0' } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Per-chain weights ──
+function renderPerChainWeightsChart() {
+  if (!thresholdEvalData) return;
+  const container = document.getElementById('threshold-chart-container');
+  const entry = _findNearestEntry();
+  let weights = entry.chain_weights_normalized;
+  if (!Array.isArray(weights)) {
+    const lw = entry.log_weights;
+    if (!Array.isArray(lw) || lw.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No per-chain weight data.</div>'; return; }
+    const mx = Math.max(...lw); const es = lw.map(v => Math.exp(v - mx)); const S = es.reduce((a, b) => a + b, 0); weights = es.map(v => v / S);
+  }
+  const meta = maskData.metadata || {};
+  const answerIds = meta.answer_ids || [];
+  const answerLabels = meta.answer_labels || [];
+  const correctAnswer = meta.correct_answer;
+  const N = weights.length;
+  const incorrectPalette = ['#dc2626', '#f97316', '#ca8a04', '#be123c', '#7c2d12'];
+  const bucketColors = answerLabels.map((lab, i) => lab === correctAnswer ? '#16a34a' : incorrectPalette[i % incorrectPalette.length]);
+  const bucketIndices = {};
+  for (let i = 0; i < N; i++) { const aid = answerIds[i] ?? 0; if (!bucketIndices[aid]) bucketIndices[aid] = []; bucketIndices[aid].push(i); }
+  const traces = Object.entries(bucketIndices).map(([aid, idxs]) => ({ x: idxs, y: idxs.map(i => weights[i]), type: 'bar', name: (answerLabels[aid] || 'Ans ' + aid) + (answerLabels[aid] === correctAnswer ? ' (correct)' : ''), marker: { color: bucketColors[aid] || '#94a3b8' }, hovertemplate: 'chain %{x}<br>weight=%{y:.3f}<extra></extra>' }));
+  const baseline = 1.0 / N;
+  traces.push({ x: [0, N - 1], y: [baseline, baseline], type: 'scatter', mode: 'lines', line: { color: '#64748b', dash: 'dash', width: 1 }, name: '1/N uniform', hoverinfo: 'skip' });
+  const method = entry.importance_sampling_method || meta.importance_sampling_method || 'snis';
+  const titleText = `IS weights under ${method} | sparsity=${(entry.sparsity * 100).toFixed(1)}%` + (entry.n_eff != null ? ` | N_eff=${entry.n_eff.toFixed(1)}/${N}` : '');
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'stack', title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 }, xaxis: { title: { text: 'chain index', standoff: 12 }, gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'SNIS weight', standoff: 12 }, gridcolor: '#e2e8f0', range: [0, 1.02] } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Answer probs ──
+function renderAnswerProbsAsMainChart() {
+  if (!thresholdEvalData || !thresholdEvalData.hasAnswerProbs) return;
+  const container = document.getElementById('threshold-chart-container');
+  const entry = _findNearestEntry();
+  const probs = Array.isArray(entry.answer_probs_masked_fine) ? entry.answer_probs_masked_fine : entry.answer_probs_masked;
+  if (!Array.isArray(probs)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No answer probs.</div>'; return; }
+  const meta = maskData.metadata || {};
+  const answerIds = meta.answer_ids || []; const N = answerIds.length || 1;
+  const numAnswers = Math.max(meta.num_answers || 0, probs.length);
+  const pClean = new Array(numAnswers).fill(0);
+  for (const aid of answerIds) { if (aid < numAnswers) pClean[aid]++; }
+  for (let i = 0; i < numAnswers; i++) pClean[i] /= N;
+  const labels = d3.range(numAnswers).map(i => (thresholdEvalData.answerLabels && thresholdEvalData.answerLabels[i]) || 'Answer ' + i);
+  const traces = [
+    { x: labels, y: pClean.map(v => v * 100), type: 'bar', name: 'P_clean', marker: { color: '#60a5fa', opacity: 0.7 }, hovertemplate: '%{x}<br>P_clean=%{y:.1f}%<extra></extra>' },
+    { x: labels, y: probs.map(v => v * 100), type: 'bar', name: 'P_masked', marker: { color: '#4caf50' }, hovertemplate: '%{x}<br>P_masked=%{y:.1f}%<extra></extra>' },
+  ];
+  const nEff = entry.n_eff, nEffRatio = entry.n_eff_ratio;
+  let titleText = `Sparsity: ${(entry.sparsity * 100).toFixed(1)}%`;
+  if (nEff != null) titleText += ` | N_eff: ${nEff.toFixed(1)}/${N} (${(nEffRatio * 100).toFixed(1)}%)`;
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group', title: { text: titleText, font: { size: 10, color: '#64748b' }, x: 0 }, xaxis: { type: 'category', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Weighted answer probs ──
+function renderWeightedAnswerProbsAsMainChart() {
+  if (!thresholdEvalData) return;
+  const container = document.getElementById('threshold-chart-container');
+  const { answerLabels, answerProbsCleanWeighted } = thresholdEvalData;
+  const entry = _findNearestEntry();
+  const probsM = entry ? entry.answer_probs_masked_weighted : null;
+  if (!Array.isArray(probsM) || !Array.isArray(answerProbsCleanWeighted)) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Paper-style (Eq. 1) weighted answer probs not available.</div>';
+    return;
+  }
+  const numAnswers = probsM.length;
+  const labels = d3.range(numAnswers).map(i => (answerLabels && answerLabels[i]) || 'Answer ' + i);
+  const traces = [
+    { x: labels, y: answerProbsCleanWeighted.map(v => v * 100), type: 'bar', name: 'P_clean (weighted)', marker: { color: '#60a5fa', opacity: 0.7 } },
+    { x: labels, y: probsM.map(v => v * 100), type: 'bar', name: 'P_masked (weighted)', marker: { color: '#f97316' } },
+  ];
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group', title: { text: `Sparsity: ${(entry.sparsity * 100).toFixed(1)}% | Eq. 1 outcome distributions`, font: { size: 10, color: '#64748b' }, x: 0 }, xaxis: { type: 'category', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── Resample comparison ──
+function renderResampleComparison() {
+  const container = document.getElementById('threshold-chart-container');
+  if (!resampleData || !Array.isArray(resampleData.thresholds) || resampleData.thresholds.length === 0) {
+    container.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">No resample data available.</div>';
+    return;
+  }
+  const ct = getThreshold();
+  let bestIdx = 0, bestDist = Infinity;
+  for (let i = 0; i < resampleData.thresholds.length; i++) { const d = Math.abs(resampleData.thresholds[i].threshold - ct); if (d < bestDist) { bestDist = d; bestIdx = i; } }
+  const rEntry = resampleData.thresholds[bestIdx];
+  const allLabels = resampleData.answer_labels || [];
+  if (allLabels.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No answer labels.</div>'; return; }
+  const origDist = resampleData.original.answer_distribution || {};
+  const isDist = rEntry.masked_is_answer_distribution || {};
+  const resDist = rEntry.resample_answer_distribution || {};
+  const hasIS = Object.keys(isDist).length > 0;
+  const displayLabels = allLabels.map(l => l.length > 30 ? l.slice(0, 27) + '...' : l);
+  const traces = [{ x: displayLabels, y: allLabels.map(l => (origDist[l] || 0) * 100), type: 'bar', name: 'Unmasked', marker: { color: '#60a5fa', opacity: 0.8 } }];
+  if (hasIS) traces.push({ x: displayLabels, y: allLabels.map(l => (isDist[l] || 0) * 100), type: 'bar', name: 'Masked (IS)', marker: { color: '#4caf50', opacity: 0.8 } });
+  traces.push({ x: displayLabels, y: allLabels.map(l => (resDist[l] || 0) * 100), type: 'bar', name: 'Masked (resample)', marker: { color: '#f59e0b', opacity: 0.8 } });
+  const layout = { ...PLOTLY_LAYOUT_BASE, barmode: 'group', title: { text: `Sparsity: ${(rEntry.sparsity * 100).toFixed(1)}%`, font: { size: 10, color: '#64748b' }, x: 0 }, xaxis: { type: 'category', gridcolor: '#e2e8f0', tickangle: allLabels.length > 5 ? -45 : 0 }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' }, margin: { ...PLOTLY_LAYOUT_BASE.margin, b: allLabels.length > 5 ? 100 : 52 } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+// ── N_eff chart ──
+function renderNeffAsMainChart() {
+  if (!thresholdEvalData || !thresholdEvalData.hasNeff) return;
+  const container = document.getElementById('threshold-chart-container');
+  const { sparsities, nEffRatios, randomNeffs, thresholds: thrArr } = thresholdEvalData;
+  const n = sparsities.length;
+  if (n === 0) return;
+  const idx = d3.range(n).sort((a, b) => sparsities[a] - sparsities[b]);
+  const sortedSp = idx.map(i => sparsities[i]);
+  const sortedNeff = idx.map(i => nEffRatios[i]);
+  const validIdx = d3.range(n).filter(i => !isNaN(sortedNeff[i]));
+  if (validIdx.length === 0) return;
+  const xVals = validIdx.map(i => sortedSp[i]);
+  const yVals = validIdx.map(i => Math.min(sortedNeff[i], 1));
+  const ptColors = validIdx.map(i => sortedNeff[i] >= 0.1 ? '#4caf50' : '#ef4444');
+  const traces = [];
+  if (randomNeffs) {
+    const { entries } = thresholdEvalData;
+    const N = entries[0] ? (maskData.metadata.num_branches || entries.length) : 1;
+    const sortedRN = idx.map(i => randomNeffs[i]);
+    const rVals = validIdx.filter(i => !isNaN(sortedRN[i]));
+    if (rVals.length > 0) {
+      const rMeans = rVals.map(i => Math.min(sortedRN[i], 1));
+      const rStds = rVals.map(i => {
+        const origIdx = idx[i]; const arr = entries[origIdx].random_n_effs;
+        if (!Array.isArray(arr) || arr.length === 0) return 0;
+        const numConts = entries[origIdx].n_eff ? (entries[origIdx].n_eff / (entries[origIdx].n_eff_ratio || 1)) : arr.length;
+        const ratios = arr.map(v => Math.min(v / (numConts || 1), 1));
+        const mean = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+        return Math.sqrt(ratios.reduce((a, b) => a + (b - mean) ** 2, 0) / ratios.length);
+      });
+      traces.push({ x: rVals.map(i => sortedSp[i]), y: rMeans, mode: 'lines', line: { color: 'orange', dash: 'dash', width: 1.5 }, name: 'Random baseline', error_y: { type: 'data', array: rStds, visible: true, color: 'rgba(255,165,0,0.4)', thickness: 1 } });
+    }
+  }
+  traces.push({ x: xVals, y: yVals, mode: 'lines+markers', line: { color: '#64748b', width: 1 }, marker: { size: 6, color: ptColors }, name: 'N_eff/N', hovertemplate: 'sparsity=%{x:.1%}<br>N_eff/N=%{y:.3f}<extra></extra>' });
+  const spMin = d3.min(xVals), spMax = d3.max(xVals);
+  traces.push({ x: [spMin, spMax], y: [0.1, 0.1], mode: 'lines', line: { color: 'rgba(239,68,68,0.5)', dash: 'dash', width: 1 }, name: 'N_eff/N = 0.1', showlegend: true });
+  const currentThreshold = getThreshold();
+  let nearIdx = 0, nearDist = Infinity;
+  for (let i = 0; i < n; i++) { const d = Math.abs(thrArr[i] - currentThreshold); if (d < nearDist) { nearDist = d; nearIdx = i; } }
+  if (!isNaN(nEffRatios[nearIdx])) {
+    traces.push({ x: [sparsities[nearIdx]], y: [Math.min(nEffRatios[nearIdx], 1)], mode: 'markers', marker: { size: 12, symbol: 'star', color: '#1e293b', line: { color: '#fff', width: 1.5 } }, showlegend: false, hoverinfo: 'skip' });
+  }
+  const layout = { ...PLOTLY_LAYOUT_BASE, xaxis: { title: { text: 'Sparsity', standoff: 12 }, tickformat: '.0%', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'N_eff / N', standoff: 12 }, range: [0, 1.05], gridcolor: '#e2e8f0' } };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+  container.on('plotly_click', function(data) {
+    if (data.points && data.points.length > 0) {
+      const sp = data.points[0].x;
+      let best = 0, bestD = Infinity;
+      for (let i = 0; i < n; i++) { const d = Math.abs(sparsities[i] - sp); if (d < bestD) { bestD = d; best = i; } }
+      setThresholdToValue(thrArr[best]);
+      reprocess();
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// Guided Tour
+// ══════════════════════════════════════════════════════════════
+let tourStep = 0, tourActive = false;
+const tourSteps = [
+  { target: null, title: 'Welcome to Circuit Tracer', body: 'This dashboard visualizes attention attribution circuits discovered by the circuit discovery pipeline. Nodes are (Layer, Sentence) pairs. Edges show how much one sentence attends to another at each layer.' },
+  { target: () => document.querySelector('#sidebar .ctrl:nth-of-type(1)'), title: 'Load Mask', body: 'Load a NodeMask JSON file from your local machine or from the server\'s results directory.', arrow: 'left' },
+  { target: () => document.querySelector('.view-toggle'), title: 'View Toggle', body: '<b>Within-layer arcs</b>: Bezier arcs within each layer row.<br><b>Cross-layer flow</b>: Vertical S-curves across layers.<br><b>Aggregated mask</b>: S&times;S heatmap aggregated across layers.', arrow: 'left' },
+  { target: () => document.querySelector('#threshold-slider').closest('.ctrl'), title: 'Threshold', body: 'Filter edges by minimum score. Steps through discrete values from the threshold evaluation.', arrow: 'left' },
+  { target: () => document.querySelector('#influence-slider').closest('.ctrl'), title: 'Influence %', body: 'Pre-filters edges by cumulative |score|. 80% keeps only the strongest edges.', arrow: 'left' },
+  { target: () => document.getElementById('graph-container'), title: 'Graph Area', body: 'X = sentences, Y = layers. Node size reflects importance. <b>Click a node</b> to inspect, <b>scroll</b> to zoom, <b>drag</b> to pan.', arrow: 'top' },
+  { target: () => document.getElementById('metric-select'), title: 'Metric Dropdown', body: 'Select from available evaluation metrics. Charts are interactive Plotly.', arrow: 'right' },
+  { target: () => document.getElementById('detail-panel'), title: 'Detail Panel', body: 'Resizable panel. Below the metric chart, <b>Node Details</b> shows connections for the selected node.', arrow: 'right' },
+];
+function startTour() { tourStep = 0; tourActive = true; showTourStep(); }
+function endTour() { tourActive = false; document.getElementById('tour-backdrop').classList.remove('active'); document.getElementById('tour-highlight').classList.remove('active'); document.getElementById('tour-popover').classList.remove('active'); }
+function tourNext() { if (tourStep < tourSteps.length - 1) { tourStep++; showTourStep(); } else endTour(); }
+function tourPrev() { if (tourStep > 0) { tourStep--; showTourStep(); } }
+function showTourStep() {
+  if (!tourActive) return;
+  const step = tourSteps[tourStep];
+  const backdrop = document.getElementById('tour-backdrop'), highlight = document.getElementById('tour-highlight'), popover = document.getElementById('tour-popover');
+  backdrop.classList.add('active'); popover.classList.add('active');
+  popover.querySelector('.tour-title').textContent = step.title;
+  popover.querySelector('.tour-body').innerHTML = step.body;
+  popover.querySelector('.tour-step-info').textContent = (tourStep + 1) + ' / ' + tourSteps.length;
+  popover.querySelector('.tour-prev').style.display = tourStep === 0 ? 'none' : '';
+  popover.querySelector('.tour-next').textContent = tourStep === tourSteps.length - 1 ? 'Finish' : 'Next';
+  const targetEl = step.target ? step.target() : null;
+  if (targetEl) {
+    const rect = targetEl.getBoundingClientRect(); const pad = 6;
+    backdrop.innerHTML = `<svg width="100%" height="100%"><defs><mask id="tour-mask"><rect width="100%" height="100%" fill="white"/><rect x="${rect.left - pad}" y="${rect.top - pad}" width="${rect.width + pad*2}" height="${rect.height + pad*2}" rx="6" fill="black"/></mask></defs><rect width="100%" height="100%" fill="rgba(15,23,42,0.55)" mask="url(#tour-mask)"/></svg>`;
+    highlight.classList.add('active');
+    highlight.style.left = (rect.left - pad) + 'px'; highlight.style.top = (rect.top - pad) + 'px';
+    highlight.style.width = (rect.width + pad * 2) + 'px'; highlight.style.height = (rect.height + pad * 2) + 'px';
+    const gap = 14, popW = 370, popH = popover.offsetHeight || 200, vw = window.innerWidth, vh = window.innerHeight;
+    const arrow = step.arrow || 'right';
+    let left, top;
+    if (arrow === 'left') { left = rect.right + gap; top = rect.top + rect.height / 2 - popH / 2; if (left + popW > vw - 10) left = rect.left - gap - popW; }
+    else if (arrow === 'right') { left = rect.left - gap - popW; top = rect.top + rect.height / 2 - popH / 2; if (left < 10) left = rect.right + gap; }
+    else { left = rect.left + rect.width / 2 - popW / 2; top = rect.bottom + gap; if (top + popH > vh - 10) top = rect.top - gap - popH; }
+    left = Math.max(10, Math.min(left, vw - popW - 10)); top = Math.max(10, Math.min(top, vh - popH - 10));
+    popover.style.left = left + 'px'; popover.style.top = top + 'px'; popover.style.transform = '';
+  } else {
+    backdrop.innerHTML = '<svg width="100%" height="100%"><rect width="100%" height="100%" fill="rgba(15,23,42,0.55)"/></svg>';
+    highlight.classList.remove('active');
+    popover.style.left = '50%'; popover.style.top = '50%'; popover.style.transform = 'translate(-50%, -50%)';
+  }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && tourActive) endTour(); });
+document.getElementById('tour-backdrop').addEventListener('click', e => { if (e.target === e.currentTarget || e.target.tagName === 'rect' || e.target.tagName === 'svg') endTour(); });
+
+// ══════════════════════════════════════════════════════════════
+// Compare Masks Tab
+// ══════════════════════════════════════════════════════════════
+const COMPARE_COLORS = ['#4caf50', '#2196f3', '#e91e63', '#ff9800', '#9c27b0', '#00bcd4', '#795548', '#607d8b', '#f44336', '#3f51b5'];
+const COMPARE_METRIC_DEFS = METRIC_DEFS.filter(d => d.key !== 'per_sentence_kl');
+
+function populateCompareMaskList(paths) {
+  serverMaskPaths = paths;
+  const container = document.getElementById('compare-mask-list');
+  if (paths.length === 0) { container.innerHTML = '<em style="color:var(--text-dim)">No masks found on server.</em>'; return; }
+  container.innerHTML = '';
+  for (const p of paths) {
+    const label = document.createElement('label');
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = p;
+    const span = document.createElement('span');
+    const ci = p.indexOf('circuit_discovery/');
+    span.textContent = ci >= 0 ? p.slice(ci + 'circuit_discovery/'.length) : p;
+    span.title = p;
+    label.appendChild(cb); label.appendChild(span); container.appendChild(label);
+  }
+}
+
+async function loadCompareMasks() {
+  const checks = document.querySelectorAll('#compare-mask-list input[type="checkbox"]:checked');
+  const paths = Array.from(checks).map(c => c.value);
+  if (paths.length < 2) { document.getElementById('compare-status').innerHTML = '<span class="compat-err">Select at least 2 masks.</span>'; return; }
+  document.getElementById('compare-status').innerHTML = 'Loading ' + paths.length + ' masks...';
+  try {
+    const results = await Promise.all(paths.map(p => fetch('/api/mask?path=' + encodeURIComponent(p)).then(r => r.json())));
+    compareMasks = results.map((data, i) => {
+      const ci = paths[i].indexOf('circuit_discovery/');
+      const shortName = ci >= 0 ? paths[i].slice(ci + 'circuit_discovery/'.length) : paths[i];
+      const parts = shortName.split('/');
+      return { name: parts[parts.length - 1].replace(/\.json$/, ''), fullPath: paths[i], data, color: COMPARE_COLORS[i % COMPARE_COLORS.length] };
+    });
+    const compat = checkMaskCompatibility(compareMasks.map(m => m.data));
+    document.getElementById('compare-status').innerHTML = compat.compatible
+      ? '<span class="compat-ok">&#10003; Compatible</span> — ' + compareMasks.length + ' masks loaded.'
+      : '<span class="compat-err">&#10007; Incompatible</span>: ' + compat.reason;
+    initCompareMetricDropdown();
+    onCompareMetricChange();
+  } catch (err) { document.getElementById('compare-status').innerHTML = '<span class="compat-err">Error: ' + err.message + '</span>'; }
+}
+
+function clearCompareMasks() {
+  compareMasks = [];
+  document.querySelectorAll('#compare-mask-list input[type="checkbox"]').forEach(cb => cb.checked = false);
+  document.getElementById('compare-status').innerHTML = '';
+  document.getElementById('compare-chart-container').innerHTML = '';
+  document.getElementById('compare-heatmap-grid').innerHTML = '';
+  document.getElementById('compare-heatmap-grid').style.display = 'none';
+  document.getElementById('compare-legend').innerHTML = '';
+  document.getElementById('compare-metric-select').innerHTML = '';
+  document.getElementById('compare-threshold-select').style.display = 'none';
+}
+
+function checkMaskCompatibility(masks) {
+  if (masks.length < 2) return { compatible: true, reason: '' };
+  const ref = masks[0], refMeta = ref.metadata || {};
+  const refSentLen = (ref.sentences || []).length;
+  const refLayers = JSON.stringify((ref.layers || []).sort((a, b) => a - b));
+  for (let i = 1; i < masks.length; i++) {
+    const m = masks[i], meta = m.metadata || {};
+    if ((m.sentences || []).length !== refSentLen) return { compatible: false, reason: `Mask ${i + 1} has ${(m.sentences || []).length} sentences vs ${refSentLen}` };
+    if (JSON.stringify((m.layers || []).sort((a, b) => a - b)) !== refLayers) return { compatible: false, reason: `Mask ${i + 1} has different layers` };
+  }
+  return { compatible: true, reason: '' };
+}
+
+function areMasksCompatible() { return checkMaskCompatibility(compareMasks.map(m => m.data)).compatible; }
+
+function _getThresholdEntries(md) { return ((md.metadata || {}).threshold_evaluation || []).filter(e => e && typeof e.threshold === 'number' && typeof e.sparsity === 'number'); }
+function _findEntryAtSparsity(entries, sparsity) { let idx = 0, best = Infinity; for (let i = 0; i < entries.length; i++) { const d = Math.abs(entries[i].sparsity - sparsity); if (d < best) { best = d; idx = i; } } return entries[idx]; }
+function _getSelectedCompareSparsity() { const v = parseFloat(document.getElementById('compare-threshold-select').value); if (isNaN(v) && compareMasks.length > 0) { const te = _getThresholdEntries(compareMasks[0].data); if (te.length > 0) return te[Math.round((te.length - 1) * 0.3)].sparsity; } return v; }
+
+function initCompareMetricDropdown() {
+  const select = document.getElementById('compare-metric-select'); select.innerHTML = '';
+  if (compareMasks.length === 0) return;
+  const firstEntries = compareMasks.map(m => { const te = (m.data.metadata || {}).threshold_evaluation; return (Array.isArray(te) && te.length > 0) ? te[0] : null; });
+  for (const def of COMPARE_METRIC_DEFS) {
+    let available = false;
+    if (def.alwaysAvailable) available = firstEntries.some(e => e != null);
+    else if (def.key === 'resample_comparison') available = true;
+    else available = firstEntries.some(e => e && def.key in e && e[def.key] != null);
+    if (available) { const opt = document.createElement('option'); opt.value = def.key; opt.textContent = def.label; select.appendChild(opt); }
+  }
+  const preferredOrder = ['answer_kl', 'reward_gap', 'kl_divergence'];
+  for (const pk of preferredOrder) { if (select.querySelector(`option[value="${pk}"]`)) { select.value = pk; break; } }
+  const legend = document.getElementById('compare-legend'); legend.innerHTML = '';
+  for (const m of compareMasks) { const el = document.createElement('div'); el.className = 'cleg'; el.innerHTML = `<span class="cleg-swatch" style="background:${m.color}"></span><span title="${m.fullPath}">${m.name}</span>`; legend.appendChild(el); }
+}
+
+function initCompareThresholdDropdown() {
+  const select = document.getElementById('compare-threshold-select'); select.innerHTML = '<option value="">— select sparsity —</option>';
+  if (compareMasks.length === 0) return;
+  const te = (compareMasks[0].data.metadata || {}).threshold_evaluation || [];
+  for (const entry of te) { if (entry && typeof entry.sparsity === 'number') { const opt = document.createElement('option'); opt.value = entry.sparsity; opt.textContent = `sparsity ${(entry.sparsity * 100).toFixed(1)}%`; select.appendChild(opt); } }
+  if (te.length > 0) select.value = te[Math.round((te.length - 1) * 0.3)].sparsity;
+}
+
+function onCompareSparsityChange() { if (compareMasks.length === 0) return; const metricKey = document.getElementById('compare-metric-select').value; const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey); if (!def) return; if (def.chartType === 'heatmap_per_sentence') renderCompareHeatmaps(); else if (def.chartType === 'histogram') renderCompareHistogram(); else if (def.chartType === 'table') renderCompareAnswerProbs(); else if (def.chartType === 'table_weighted') renderCompareWeightedAnswerProbs(); }
+
+function onCompareMetricChange() {
+  if (compareMasks.length === 0) return;
+  const metricKey = document.getElementById('compare-metric-select').value;
+  const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey); if (!def) return;
+  const chartContainer = document.getElementById('compare-chart-container');
+  const heatmapGrid = document.getElementById('compare-heatmap-grid');
+  const thresholdSelect = document.getElementById('compare-threshold-select');
+  if (def.chartType === 'resample') { chartContainer.style.display = ''; heatmapGrid.style.display = 'none'; thresholdSelect.style.display = 'none'; renderCompareResampleSweep(); }
+  else if (def.chartType === 'heatmap_per_sentence') { chartContainer.style.display = 'none'; heatmapGrid.style.display = ''; thresholdSelect.style.display = ''; initCompareThresholdDropdown(); renderCompareHeatmaps(); }
+  else if (['histogram','table','table_weighted'].includes(def.chartType)) { chartContainer.style.display = ''; heatmapGrid.style.display = 'none'; thresholdSelect.style.display = ''; initCompareThresholdDropdown(); if (def.chartType === 'histogram') renderCompareHistogram(); else if (def.chartType === 'table') renderCompareAnswerProbs(); else renderCompareWeightedAnswerProbs(); }
+  else { chartContainer.style.display = ''; heatmapGrid.style.display = 'none'; thresholdSelect.style.display = 'none'; renderCompareLineChart(); }
+}
+
+function computeCombinedRandomBaseline(metricKey) {
+  if (!areMasksCompatible()) return null;
+  const randomArrayKey = 'random_' + metricKey + 's';
+  const refEntries = _getThresholdEntries(compareMasks[0].data);
+  const n = refEntries.length; if (n === 0) return null;
+  const sparsities = refEntries.map(e => e.sparsity);
+  const means = [], stdLows = [], stdHighs = [];
+  for (let si = 0; si < n; si++) {
+    const allSamples = [];
+    for (const m of compareMasks) { const entries = _getThresholdEntries(m.data); const entry = _findEntryAtSparsity(entries, refEntries[si].sparsity); if (entry && Array.isArray(entry[randomArrayKey])) allSamples.push(...entry[randomArrayKey]); }
+    if (allSamples.length === 0) return null;
+    const mean = allSamples.reduce((a, b) => a + b, 0) / allSamples.length;
+    const std = Math.sqrt(allSamples.reduce((a, b) => a + (b - mean) ** 2, 0) / allSamples.length);
+    means.push(mean); stdLows.push(mean - std); stdHighs.push(mean + std);
+  }
+  return { sparsities, means, stdLows, stdHighs };
+}
+
+function renderCompareLineChart() {
+  const container = document.getElementById('compare-chart-container');
+  const metricKey = document.getElementById('compare-metric-select').value;
+  const def = COMPARE_METRIC_DEFS.find(d => d.key === metricKey); if (!def) return;
+  const metricLabel = def.label;
+  const showRandom = def.chartType === 'line+random';
+  const traces = [];
+  if (showRandom) {
+    const combined = computeCombinedRandomBaseline(metricKey);
+    if (combined) {
+      traces.push({ x: [...combined.sparsities, ...combined.sparsities.slice().reverse()], y: [...combined.stdHighs, ...combined.stdLows.slice().reverse()], fill: 'toself', fillcolor: 'rgba(255,165,0,0.10)', line: { color: 'transparent' }, name: 'Random ±1σ', hoverinfo: 'skip', showlegend: true });
+      traces.push({ x: combined.sparsities, y: combined.means, mode: 'lines', line: { color: 'orange', dash: 'dash', width: 1.5 }, name: 'Random baseline (combined)' });
+    }
+  }
+  const missingMasks = [];
+  for (let mi = 0; mi < compareMasks.length; mi++) {
+    const m = compareMasks[mi];
+    const entries = _getThresholdEntries(m.data);
+    const n = entries.length; if (n === 0) { missingMasks.push(m.name); continue; }
+    const idx = d3.range(n).sort((a, b) => entries[a].sparsity - entries[b].sparsity);
+    const sortedSp = idx.map(i => entries[i].sparsity);
+    const sortedM = idx.map(i => entries[i][metricKey] ?? NaN);
+    const validIdx = d3.range(n).filter(i => !isNaN(sortedM[i]));
+    if (validIdx.length === 0) { missingMasks.push(m.name); continue; }
+    const xVals = validIdx.map(i => sortedSp[i]);
+    const yPlot = def.chartType === 'line+threshold' ? validIdx.map(i => Math.min(sortedM[i], 1)) : validIdx.map(i => sortedM[i]);
+    traces.push({ x: xVals, y: yPlot, mode: 'lines+markers', line: { color: m.color, width: 2 }, marker: { size: 4, color: m.color }, name: m.name, hovertemplate: `${m.name}<br>sparsity=%{x:.1%}<br>${metricKey}=%{y:.3e}<extra></extra>` });
+  }
+  const layout = { ...PLOTLY_LAYOUT_BASE, xaxis: { title: { text: 'Sparsity', standoff: 12 }, tickformat: '.0%', gridcolor: '#e2e8f0' }, yaxis: { title: { text: metricLabel, standoff: 12 }, exponentformat: 'e', gridcolor: '#e2e8f0' }, height: 420 };
+  Plotly.newPlot(container, traces, layout, PLOTLY_CONFIG);
+}
+
+function renderCompareHeatmaps() {
+  const grid = document.getElementById('compare-heatmap-grid'); grid.innerHTML = '';
+  const sparsity = _getSelectedCompareSparsity();
+  if (isNaN(sparsity)) { grid.innerHTML = '<em style="color:var(--text-dim);padding:10px;">Select a sparsity.</em>'; return; }
+  for (const m of compareMasks) {
+    const entries = _getThresholdEntries(m.data);
+    const entry = _findEntryAtSparsity(entries, sparsity);
+    const meta = m.data.metadata || {};
+    const perSentKL = entry ? entry.per_sentence_kl : null;
+    const cell = document.createElement('div'); cell.className = 'heatmap-cell';
+    const label = document.createElement('div'); label.className = 'heatmap-label'; label.textContent = m.name;
+    cell.appendChild(label);
+    const chartDiv = document.createElement('div'); chartDiv.style.minHeight = '280px'; cell.appendChild(chartDiv); grid.appendChild(cell);
+    if (!perSentKL || !Array.isArray(perSentKL) || perSentKL.length === 0) { chartDiv.innerHTML = '<div style="padding:20px;color:#94a3b8;">No heatmap data.</div>'; continue; }
+    const answerIds = meta.answer_ids || [], answerLabels = meta.answer_labels || [];
+    const numSents = Math.max(...perSentKL.map(b => Array.isArray(b) ? b.length : 0), 0);
+    const branchOrder = d3.range(perSentKL.length).sort((a, b) => (answerIds[a] || 0) - (answerIds[b] || 0));
+    const zData = [], yLabels = [];
+    for (const bi of branchOrder) { zData.push(d3.range(numSents).map(s => (perSentKL[bi] || [])[s] ? _getKL((perSentKL[bi] || [])[s]) : 0)); yLabels.push(`B${bi} (${answerLabels[answerIds[bi]] || ('Ans ' + answerIds[bi])})`); }
+    Plotly.newPlot(chartDiv, [{ z: zData, x: d3.range(numSents).map(String), y: yLabels, type: 'heatmap', colorscale: 'YlOrRd', hovertemplate: '%{y}<br>Sentence %{x}<br>KL=%{z:.2e}<extra></extra>' }], { ...PLOTLY_LAYOUT_BASE, xaxis: { type: 'category' }, yaxis: { type: 'category', autorange: 'reversed' }, margin: { l: 80, r: 16, t: 24, b: 40 }, height: 280 }, PLOTLY_CONFIG);
+  }
+}
+
+function renderCompareHistogram() {
+  const container = document.getElementById('compare-chart-container');
+  const sparsity = _getSelectedCompareSparsity();
+  if (isNaN(sparsity)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a sparsity.</div>'; return; }
+  const traces = [];
+  for (const m of compareMasks) { const entries = _getThresholdEntries(m.data); const entry = _findEntryAtSparsity(entries, sparsity); const lw = entry ? entry.log_weights : null; if (Array.isArray(lw) && lw.length > 0) traces.push({ x: lw, type: 'histogram', name: m.name, marker: { color: m.color, opacity: 0.5, line: { color: m.color, width: 1 } }, nbinsx: Math.min(30, Math.max(10, Math.ceil(Math.sqrt(lw.length)))) }); }
+  Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, barmode: 'overlay', height: 400, xaxis: { title: { text: 'log(weight)', standoff: 12 }, gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Count', standoff: 12 }, gridcolor: '#e2e8f0' } }, PLOTLY_CONFIG);
+}
+
+function renderCompareAnswerProbs() {
+  const container = document.getElementById('compare-chart-container');
+  const sparsity = _getSelectedCompareSparsity();
+  if (isNaN(sparsity)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a sparsity.</div>'; return; }
+  const meta0 = compareMasks[0].data.metadata || {};
+  const answerIds0 = meta0.answer_ids || [], answerLabels0 = meta0.answer_labels || [];
+  const numAnswers0 = meta0.num_answers || 2;
+  const pClean = new Array(numAnswers0).fill(0);
+  for (const aid of answerIds0) { if (aid < numAnswers0) pClean[aid]++; }
+  for (let i = 0; i < numAnswers0; i++) pClean[i] /= (answerIds0.length || 1);
+  const labels = d3.range(numAnswers0).map(i => answerLabels0[i] || 'Answer ' + i);
+  const traces = [{ x: labels, y: pClean.map(v => v * 100), type: 'bar', name: 'P_clean', marker: { color: '#94a3b8', opacity: 0.5 } }];
+  for (const m of compareMasks) { const entries = _getThresholdEntries(m.data); const entry = _findEntryAtSparsity(entries, sparsity); const probs = entry ? (Array.isArray(entry.answer_probs_masked_fine) ? entry.answer_probs_masked_fine : entry.answer_probs_masked) : null; if (Array.isArray(probs)) traces.push({ x: labels, y: probs.map(v => v * 100), type: 'bar', name: m.name, marker: { color: m.color } }); }
+  Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, barmode: 'group', height: 400, xaxis: { type: 'category', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' } }, PLOTLY_CONFIG);
+}
+
+function renderCompareWeightedAnswerProbs() {
+  const container = document.getElementById('compare-chart-container');
+  const sparsity = _getSelectedCompareSparsity();
+  if (isNaN(sparsity)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Select a sparsity.</div>'; return; }
+  const meta0 = compareMasks[0].data.metadata || {};
+  const pCleanW = meta0.answer_probs_clean_weighted, answerLabels0 = meta0.answer_labels || [];
+  if (!Array.isArray(pCleanW)) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No weighted probs available.</div>'; return; }
+  const labels = d3.range(pCleanW.length).map(i => answerLabels0[i] || 'Answer ' + i);
+  const traces = [{ x: labels, y: pCleanW.map(v => v * 100), type: 'bar', name: 'P_clean (weighted)', marker: { color: '#94a3b8', opacity: 0.5 } }];
+  for (const m of compareMasks) { const entries = _getThresholdEntries(m.data); const entry = _findEntryAtSparsity(entries, sparsity); const probs = entry ? entry.answer_probs_masked_weighted : null; if (Array.isArray(probs)) traces.push({ x: labels, y: probs.map(v => v * 100), type: 'bar', name: m.name, marker: { color: m.color } }); }
+  Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, barmode: 'group', height: 400, xaxis: { type: 'category', gridcolor: '#e2e8f0' }, yaxis: { title: { text: 'Probability (%)', standoff: 12 }, gridcolor: '#e2e8f0' } }, PLOTLY_CONFIG);
+}
+
+async function renderCompareResampleSweep() {
+  const container = document.getElementById('compare-chart-container');
+  if (compareMasks.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">Load masks first.</div>'; return; }
+  if (!window._resampleData) { try { const r = await fetch('/api/resample_sweep'); window._resampleData = await r.json(); } catch (e) { container.innerHTML = `<div style="padding:20px;color:#ef4444;">Error: ${e.message}</div>`; return; } }
+  const allSeries = (window._resampleData.series || []);
+  const matched = [], missingMasks = [];
+  for (const m of compareMasks) { const s = allSeries.filter(s => s.mask_path === m.fullPath); if (s.length === 0) missingMasks.push(m.name); else s.forEach(sr => matched.push({ series: sr, mask: m })); }
+  if (matched.length === 0) { container.innerHTML = '<div style="padding:20px;color:#94a3b8;">No resample data for selected masks.</div>'; return; }
+  const traces = [];
+  for (const { series: s, mask } of matched) {
+    traces.push({ type: 'scatter', mode: s.kind === 'line' ? 'lines+markers' : 'markers', x: s.points.map(p => p.sparsity), y: s.points.map(p => p.fraction_correct), name: `${mask.name} · ${s.task_name}`, marker: { color: mask.color, size: s.kind === 'line' ? 7 : 14 }, line: { color: mask.color, width: 2 }, error_y: { type: 'data', symmetric: false, array: s.points.map(p => p.ci_hi - p.fraction_correct), arrayminus: s.points.map(p => p.fraction_correct - p.ci_lo), color: mask.color, thickness: 1, width: 4 } });
+  }
+  Plotly.newPlot(container, traces, { ...PLOTLY_LAYOUT_BASE, xaxis: { title: 'Sparsity', range: [-0.02, 1.02], gridcolor: '#e2e8f0' }, yaxis: { title: 'Fraction correct', range: [-0.02, 1.02], gridcolor: '#e2e8f0' }, height: 460 }, PLOTLY_CONFIG);
+}
+
+// ══════════════════════════════════════════════════════════════
+// Resample Sweep Tab
+// ══════════════════════════════════════════════════════════════
+const RESAMPLE_LINE_COLORS = ['#2196f3', '#ff9800', '#4caf50', '#e91e63', '#9c27b0', '#00bcd4', '#795548', '#607d8b', '#f44336', '#3f51b5'];
+const RESAMPLE_STANDALONE_COLORS = ['#9333ea', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6', '#8b5cf6'];
+const RESAMPLE_STANDALONE_SYMBOLS = ['square', 'diamond', 'triangle-up', 'triangle-down', 'cross', 'x', 'star', 'hexagon'];
+
+async function loadResampleSweep() {
+  const empty = document.getElementById('resample-empty');
+  empty.style.display = 'flex'; empty.textContent = 'Loading resample data…';
+  try {
+    const r = await fetch('/api/resample_sweep'); if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json(); if (data.error) throw new Error(data.error);
+    window._resampleData = data;
+    populateResampleSeriesList(data);
+    renderResampleSweep();
+    empty.style.display = 'none';
+  } catch (e) { empty.textContent = `Error: ${e.message}`; }
+}
+
+function populateResampleSeriesList(data) {
+  const list = document.getElementById('resample-series-list');
+  const series = data.series || [];
+  document.getElementById('resample-count-badge').textContent = `${series.length} series`;
+  if (series.length === 0) { list.innerHTML = '<em style="color:var(--text-dim)">No resample data.</em>'; return; }
+  if (!window._resampleVisible) window._resampleVisible = new Set(series.map((s, i) => i));
+  list.innerHTML = '';
+  series.forEach((s, i) => {
+    const color = colorForResampleSeries(s, i, series);
+    const wrapper = document.createElement('label');
+    wrapper.style.cssText = 'display:flex;gap:6px;align-items:center;padding:3px 4px;border-radius:4px;cursor:pointer;';
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = window._resampleVisible.has(i);
+    cb.onchange = () => { if (cb.checked) window._resampleVisible.add(i); else window._resampleVisible.delete(i); renderResampleSweep(); };
+    const swatch = document.createElement('span'); swatch.style.cssText = `display:inline-block;width:16px;height:8px;border-radius:2px;background:${color};flex:none;`;
+    const text = document.createElement('span'); text.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    text.innerHTML = `<span title="${s.task_name}">${s.task_name}</span>`;
+    wrapper.appendChild(cb); wrapper.appendChild(swatch); wrapper.appendChild(text); list.appendChild(wrapper);
+  });
+  document.getElementById('resample-download-csv').href = '/api/resample_csv';
+  document.getElementById('resample-meta').innerHTML = `<b>Bootstrap:</b> B=${data.bootstrap_B}, ${data.ci_low}–${data.ci_high}%<br><b>Series:</b> ${series.filter(s => s.kind === 'line').length} curves, ${series.filter(s => s.kind === 'standalone').length} points.`;
+}
+
+function colorForResampleSeries(s, i, all) {
+  if (s.kind === 'line') return RESAMPLE_LINE_COLORS[all.slice(0, i).filter(x => x.kind === 'line').length % RESAMPLE_LINE_COLORS.length];
+  return RESAMPLE_STANDALONE_COLORS[all.slice(0, i).filter(x => x.kind === 'standalone').length % RESAMPLE_STANDALONE_COLORS.length];
+}
+
+function renderResampleSweep() {
+  const data = window._resampleData; if (!data) return;
+  const series = data.series || [];
+  const visible = window._resampleVisible || new Set();
+  const showCI = document.getElementById('resample-show-ci').checked;
+  const showBaseline = document.getElementById('resample-show-baseline').checked;
+  const traces = [], baselines = [];
+  series.forEach((s, i) => {
+    if (!visible.has(i)) return;
+    const color = colorForResampleSeries(s, i, series);
+    const xs = s.points.map(p => p.sparsity), ys = s.points.map(p => p.fraction_correct);
+    const baseLabel = s.baseline_fraction_correct != null ? ` (baseline=${s.baseline_fraction_correct.toFixed(3)})` : '';
+    const sym = s.kind === 'standalone' ? RESAMPLE_STANDALONE_SYMBOLS[series.slice(0, i).filter(x => x.kind === 'standalone').length % RESAMPLE_STANDALONE_SYMBOLS.length] : undefined;
+    traces.push({ type: 'scatter', mode: s.kind === 'line' ? 'lines+markers' : 'markers', x: xs, y: ys, name: s.task_name + baseLabel, marker: { color, size: s.kind === 'line' ? 7 : 14, symbol: sym }, line: { color, width: 2 }, error_y: showCI ? { type: 'data', symmetric: false, array: s.points.map(p => p.ci_hi - p.fraction_correct), arrayminus: s.points.map(p => p.fraction_correct - p.ci_lo), color, thickness: 1, width: 4 } : { visible: false }, legendgroup: s.task_name });
+    if (showBaseline && s.baseline_fraction_correct != null) baselines.push({ type: 'line', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: s.baseline_fraction_correct, y1: s.baseline_fraction_correct, line: { color, width: 1, dash: 'dot' }, opacity: 0.4 });
+  });
+  Plotly.react('resample-chart', traces, { title: { text: 'Resample fraction correct vs sparsity', font: { size: 13 }, x: 0.02 }, margin: { l: 50, r: 240, t: 40, b: 45 }, xaxis: { title: 'Sparsity', range: [-0.02, 1.02], gridcolor: '#e2e8f0', zeroline: false }, yaxis: { title: 'Fraction correct', range: [-0.02, 1.02], gridcolor: '#e2e8f0', zeroline: false }, legend: { x: 1.02, y: 1, xanchor: 'left', bgcolor: 'rgba(255,255,255,0.9)', bordercolor: '#e2e8f0', borderwidth: 1, font: { size: 10 } }, shapes: baselines, hovermode: 'closest', plot_bgcolor: '#fff', paper_bgcolor: '#fff' }, { displaylogo: false, responsive: true });
+}
+
+// Resample tab resize
+window.addEventListener('resize', () => {
+  if (activeTab === 'resample' && window._resampleData) Plotly.Plots.resize('resample-chart');
+});
+</script>
+</body>
+</html>

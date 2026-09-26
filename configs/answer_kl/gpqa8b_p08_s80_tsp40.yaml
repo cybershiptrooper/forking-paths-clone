@@ -1,0 +1,15 @@
+# Answer preservation, Qwen3-8B, trained on the stored 5-sentence suffix.
+base_config: configs/base_answer.yaml
+masking_algorithm: nodewise_subnetwork_probing_hc_batched
+objective: answer_probe_kl
+num_hc_samples_per_step: 4      # masks sampled per step
+batch_chunk_size: 4
+
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/gpqa_filtered.json
+prompt_index: 8
+analysis_sentence_step: 80      # prefix = prompt + first 80 reasoning sentences
+target_sparsity: 0.4            # fraction of eligible connections removed
+
+output_dir: results/answer_kl/masks
+file_name: gpqa8b_p08_s80_tsp40
