@@ -39,6 +39,7 @@ Below are a few paper writing tips that improve the clarity of research papers, 
 Plots:
 - Use font size for axis ticks/labels at least as large as the normal paper text
 - colorblind friendly colormaps (e.g., “perceptually uniform ones” like matplotlib viridis)
+- Box every plot: draw a closed frame on all four sides of each plot area (and around each heatmap/matrix), in opaque black (#1A1915, 1 px), not a light or translucent grey. Tick marks are black too; gridlines stay light.
 
 - “There are four parts to the paper: The title, abstract, intro, and rest of the paper. You should spend equal time on each” – Jitendra Malik. This is good advice because it advises you to spend writing time on sections in proportion to the amount of reading time a section will get. 
 - Check for typos before final submission, e.g., with some auto-checking software. Overleaf misses things that e.g. Grammarly does not.

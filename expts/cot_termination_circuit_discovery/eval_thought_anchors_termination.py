@@ -38,7 +38,9 @@ from utils.masks import (
     build_prompt_filter,
     build_combined_filter,
 )
-from expts.thought_anchor_analysis import compute_suppression_scores
+from expts.cot_termination_circuit_discovery.thought_anchors_scores import (
+    compute_suppression_scores,
+)
 from expts.cot_termination_circuit_discovery.learn import (
     _build_prefix,
     load_model_eager,
@@ -72,11 +74,19 @@ def main():
     ap.add_argument("--probe_at_horizon", action="store_true",
                     help="Also probe continuations that hit the horizon, "
                     "with </think> forced after their last token.")
-    ap.add_argument("--store_token_ids", action="store_true")
+    ap.add_argument("--store_token_ids", action=argparse.BooleanOptionalAction,
+                    default=True,
+                    help="Keep every rollout's generated token ids (default on; "
+                    "--no-store_token_ids to drop them).")
     ap.add_argument("--include_clean", action="store_true",
                     help="Also generate the unmasked model's rollouts "
                     "(same seed and settings) into "
                     "<stem>_clean_rollout_eval.json.")
+    ap.add_argument("--scores_path", default=None,
+                    help="Reuse Thought Anchors scores computed earlier for this "
+                    "prompt and sentence gap instead of rescoring: a rollout-eval "
+                    "JSON from this script (key 'ta_scores') or a score-mask JSON "
+                    "(key 'scores').")
     ap.add_argument("--output_dir", required=True)
     args = ap.parse_args()
     set_seed(args.seed)
@@ -125,11 +135,24 @@ def main():
         t2s_prefix[s.start:s.end + 1] = idx
 
     # ---- Thought Anchors leave-one-out scores (one forward per sentence)
-    print(f"Scoring {num_sents} sentences (prefix {prefix_len} tokens)...")
-    scores = compute_suppression_scores(
-        model, prefix_ids, sentences, t2s_prefix, args.sentence_gap,
-        backend="sdpa",
-    )
+    if args.scores_path:
+        with open(args.scores_path) as f:
+            d = json.load(f)
+        scores = d["ta_scores"] if "ta_scores" in d else d["scores"]
+        gap_saved = d.get("metadata", {}).get("sentence_gap", args.sentence_gap)
+        if len(scores) != num_sents or gap_saved != args.sentence_gap:
+            raise ValueError(
+                f"{args.scores_path}: {len(scores)} sentences at gap {gap_saved}, "
+                f"expected {num_sents} at gap {args.sentence_gap}")
+        print(f"Loaded scores for {num_sents} sentences from {args.scores_path}",
+              flush=True)
+    else:
+        print(f"Scoring {num_sents} sentences (prefix {prefix_len} tokens)...",
+              flush=True)
+        scores = compute_suppression_scores(
+            model, prefix_ids, sentences, t2s_prefix, args.sentence_gap,
+            backend="sdpa",
+        )
     scores_t = torch.tensor(scores, dtype=torch.float32, device=device)
 
     # ---- filters: prompt sentences are never maskable, matching training

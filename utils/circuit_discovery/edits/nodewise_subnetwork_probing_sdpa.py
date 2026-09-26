@@ -24,6 +24,7 @@ Higher = more important. ``negate_scores`` is not applied.
 """
 
 import json
+import math
 import os
 import random
 from typing import List, Optional
@@ -118,6 +119,20 @@ def _hard_concrete_l0_count(
 ) -> torch.Tensor:
     """Expected number of active entries (sum of per-entry probs); for diagnostics."""
     return _hard_concrete_l0_probs(log_alpha, beta=beta).sum()
+
+
+class _SharedPrefixLogits:
+    """Clean logits ``(1, L, V)`` of prefix + one continuation, stored as the
+    prefix rows (one tensor shared by every continuation of the bank) and the
+    continuation rows. Indexing builds the full tensor, so callers that slice
+    it (``logits[:, :full_len]``) are unchanged."""
+
+    def __init__(self, prefix_rows, cont_rows):
+        self.prefix_rows = prefix_rows
+        self.cont_rows = cont_rows
+
+    def __getitem__(self, key):
+        return torch.cat([self.prefix_rows, self.cont_rows], dim=1)[key]
 
 
 class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
@@ -223,6 +238,23 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         # cached in bfloat16 to hold a large bank in CPU memory.
         self.continuations_per_step = kwargs.pop("continuations_per_step", None)
         self.clean_logits_dtype = kwargs.pop("clean_logits_dtype", None) or "float32"
+        # Hold the prefix rows of the cached clean logits once for the whole
+        # bank instead of once per continuation (they depend on the prefix
+        # only). A 32-rollout bank on a 3,000-token Qwen3-32B prefix otherwise
+        # takes ~31 GB of CPU memory in bfloat16.
+        self.clean_logits_share_prefix = bool(kwargs.pop("clean_logits_share_prefix", False))
+        # Optional early stopping (off unless a patience is given). Only
+        # steps at which the sparsity penalty is at full weight are eligible
+        # (so the stopped mask has reached its target size); the criterion
+        # is the mean task loss over the last ``early_stopping_window``
+        # steps, and training stops when that mean has not improved by
+        # ``early_stopping_min_delta`` for ``early_stopping_patience`` steps.
+        # The saved mask is the log_alpha at the step with the best mean.
+        self.early_stopping_patience = kwargs.pop("early_stopping_patience", None)
+        self.early_stopping_min_delta = float(
+            kwargs.pop("early_stopping_min_delta", None) or 1e-3)
+        self.early_stopping_window = int(
+            kwargs.pop("early_stopping_window", None) or 10)
         # IG-specific kwargs passed by the shared learn_circuit.py CLI;
         # accepted and ignored so this method is a drop-in in the factory.
         kwargs.pop("num_ig_steps", None)
@@ -983,6 +1015,15 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         # `sparsity` series only recovers the NET change per interval; these
         # two counters give the gross flux.
         _learnable_flat = (~combined_filter.bool()).flatten()
+        # Early-stopping state (see __init__).
+        es_start = 0
+        if self.l0_lambda_schedule:
+            es_start = math.ceil(
+                (self.l0_warmup_frac + self.l0_ramp_frac)
+                * max(1, self.num_training_steps - 1)
+            )
+        es_buf, es_best, es_best_step = [], float("inf"), None
+        es_snapshot, es_stop_step = None, None
         _prev_clamped = None
         _flips_off_accum = 0
         _flips_on_accum = 0
@@ -1220,6 +1261,31 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
                     with open(jl_path, "a") as _jlf:
                         _jlf.write(json.dumps(metrics) + "\n")
 
+            # ----- Optional early stopping (see __init__) -----
+            if self.early_stopping_patience is not None and step >= es_start:
+                es_buf.append(task_loss_val)
+                if len(es_buf) > self.early_stopping_window:
+                    es_buf.pop(0)
+                if len(es_buf) == self.early_stopping_window:
+                    es_mean = sum(es_buf) / len(es_buf)
+                    if es_mean < es_best - self.early_stopping_min_delta:
+                        es_best, es_best_step = es_mean, step
+                        with torch.no_grad():
+                            es_snapshot = (
+                                log_alpha.detach().clone()
+                                if isinstance(log_alpha, torch.Tensor)
+                                else {l: v.detach().clone()
+                                      for l, v in log_alpha.items()}
+                            )
+                    elif step - es_best_step >= self.early_stopping_patience:
+                        es_stop_step = step
+                        print(
+                            f"  Early stop at step {step}: mean task loss over "
+                            f"{self.early_stopping_window} steps last improved "
+                            f"at step {es_best_step} ({es_best:.5f})."
+                        )
+                        break
+
         finish_wandb_run(wandb_run)
         self._unpatch_model(handles)
         if non_target_handles:
@@ -1233,6 +1299,8 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
         # tensor instead of the noisy live ``log_alpha``.
         if ema_log_alpha is not None:
             readout_source = ema_log_alpha
+        elif es_snapshot is not None:
+            readout_source = es_snapshot
         else:
             readout_source = log_alpha
 
@@ -1298,6 +1366,15 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
                 "score_readout": score_readout_kind,
                 "num_hc_samples_per_step": self.num_hc_samples_per_step,
                 "polyak_ema_log_alpha": self.polyak_ema_log_alpha,
+                "early_stopping_patience": self.early_stopping_patience,
+                "early_stopping_min_delta": self.early_stopping_min_delta,
+                "early_stopping_window": self.early_stopping_window,
+                "early_stopping_start_step": (
+                    es_start if self.early_stopping_patience is not None else None),
+                "early_stop_step": es_stop_step,
+                "early_stopping_best_step": es_best_step,
+                "early_stopping_best_mean_task_loss": (
+                    es_best if es_best_step is not None else None),
                 "hc_beta_anneal": self.hc_beta_anneal,
                 "hc_beta_start": self.hc_beta_start,
                 "hc_beta_end": self.hc_beta_end,
@@ -1446,11 +1523,20 @@ class NodewiseSubnetworkProbingSDPA(CircuitDiscovery):
             return super()._get_clean_logits(input_ids, continuations)
         dtype = getattr(torch, self.clean_logits_dtype)
         out = []
+        prefix_rows = None
+        n_prefix = input_ids.shape[-1]
         self.model.eval()
         with torch.no_grad(), torch.amp.autocast("cuda"):
             for cont in continuations:
                 full_input = torch.cat([input_ids, cont], dim=-1)
-                out.append(self.model(full_input).logits.to(dtype).detach().cpu())
+                logits = self.model(full_input).logits.to(dtype).detach().cpu()
+                if self.clean_logits_share_prefix:
+                    if prefix_rows is None:
+                        prefix_rows = logits[:, :n_prefix].clone()
+                    out.append(_SharedPrefixLogits(prefix_rows, logits[:, n_prefix:].clone()))
+                else:
+                    out.append(logits)
+                del logits
         return out
 
     def _step_local(

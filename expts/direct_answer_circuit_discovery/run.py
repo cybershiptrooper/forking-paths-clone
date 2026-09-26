@@ -160,6 +160,7 @@ def build_parser() -> argparse.ArgumentParser:
             "candidate_reward_gap",
             "candidate_logprob_margin",
             "candidate_snis_reward_gap",
+            "candidate_rollout_kl",
         ],
         default="answer_probe_kl",
     )

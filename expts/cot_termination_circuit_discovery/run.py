@@ -234,6 +234,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--num_training_steps", type=int, default=None)
     parser.add_argument("--learning_rate", type=float, default=None)
     parser.add_argument("--log_alpha_init", type=float, default=None)
+    parser.add_argument(
+        "--log_alpha_init_mask_path", type=str, default=None,
+        help="Initialize from this mask JSON, binarized by top-k at "
+        "--target_sparsity, mixed with the all-open mask by "
+        "--log_alpha_init_mask_alpha (0 = start exactly at the mask).")
+    parser.add_argument("--log_alpha_init_mask_alpha", type=float, default=None)
+    parser.add_argument(
+        "--early_stopping_patience", type=int, default=None,
+        help="Stop when the mean task loss over --early_stopping_window steps "
+        "has not improved by --early_stopping_min_delta for this many steps; "
+        "only steps with the sparsity penalty at full weight count. Off by "
+        "default.")
+    parser.add_argument("--early_stopping_min_delta", type=float, default=None)
+    parser.add_argument("--early_stopping_window", type=int, default=None)
     parser.add_argument("--log_every", type=int, default=None)
     parser.add_argument("--plot_every", type=int, default=None)
     parser.add_argument(
@@ -365,6 +379,11 @@ def main():
             num_training_steps=args.num_training_steps,
             learning_rate=args.learning_rate,
             log_alpha_init=args.log_alpha_init,
+            log_alpha_init_mask_path=args.log_alpha_init_mask_path,
+            log_alpha_init_mask_alpha=args.log_alpha_init_mask_alpha,
+            early_stopping_patience=args.early_stopping_patience,
+            early_stopping_min_delta=args.early_stopping_min_delta,
+            early_stopping_window=args.early_stopping_window,
             log_every=args.log_every,
             plot_every=args.plot_every,
             sparsity_loss_mode=args.sparsity_loss_mode,

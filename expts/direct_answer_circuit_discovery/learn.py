@@ -79,6 +79,14 @@ CANDIDATE_OBJECTIVES = {
     "candidate_snis_reward_gap": candidate_snis_reward_gap_loss,
 }
 
+# Answer-distribution KL over a candidate bank on a rollout bank of sampled
+# clean continuations (open-ended answers). The loss is computed inside the
+# trainer, which reads the candidate paths and the clean cluster
+# distributions from the candidate rollout-bank file
+# (build_candidate_rollout_bank.py) passed as rollout_bank_path.
+CANDIDATE_ROLLOUT_OBJECTIVES = {"candidate_rollout_kl"}
+CANDIDATE_ROLLOUT_ALGORITHM = "nodewise_subnetwork_probing_candidate_rollouts"
+
 
 def load_model_eager(
     model_name: str,
@@ -435,13 +443,29 @@ def main(
         model_to_analyse = model_name
     if answer_letters is None:
         answer_letters = list(DEFAULT_ANSWER_LETTERS)
-    if objective not in PROBE_OBJECTIVES and objective not in CANDIDATE_OBJECTIVES:
+    if (objective not in PROBE_OBJECTIVES and objective not in CANDIDATE_OBJECTIVES
+            and objective not in CANDIDATE_ROLLOUT_OBJECTIVES):
         raise ValueError(
             f"objective must be one of "
-            f"{sorted(PROBE_OBJECTIVES) + sorted(CANDIDATE_OBJECTIVES)}, "
+            f"{sorted(PROBE_OBJECTIVES) + sorted(CANDIDATE_OBJECTIVES) + sorted(CANDIDATE_ROLLOUT_OBJECTIVES)}, "
             f"got {objective!r}"
         )
     use_candidate_objective = objective in CANDIDATE_OBJECTIVES
+    use_candidate_rollouts = objective in CANDIDATE_ROLLOUT_OBJECTIVES
+    candidate_rollout_bank = None
+    if use_candidate_rollouts:
+        if rollout_bank_path is None or masking_algorithm != CANDIDATE_ROLLOUT_ALGORITHM:
+            raise ValueError(f"{objective} needs rollout_bank_path (a candidate rollout bank) and "
+                             f"masking_algorithm={CANDIDATE_ROLLOUT_ALGORITHM!r}")
+        with open(rollout_bank_path) as f:
+            candidate_rollout_bank = json.load(f)
+        if candidate_rollout_bank.get("kind") != "candidate_rollout_bank":
+            raise ValueError(f"{rollout_bank_path} is not a candidate rollout bank")
+        for key, val in [("data_path", data_path), ("prompt_index", prompt_index),
+                         ("analysis_sentence_step", analysis_sentence_step), ("probe_suffix", probe_suffix)]:
+            if candidate_rollout_bank.get(key) != val:
+                raise ValueError(f"rollout bank {rollout_bank_path}: {key}={candidate_rollout_bank.get(key)!r} "
+                                 f"does not match this run ({val!r})")
     answer_bank = None
     if use_candidate_objective:
         if answer_bank_path is None:
@@ -510,6 +534,7 @@ def main(
         # subclasses of the batched trainer; the prompt filter is inherited
         "nodewise_straight_through_topk",
         "nodewise_deterministic_continuous",
+        "nodewise_subnetwork_probing_candidate_rollouts",
         "column_subnetwork_probing",
         "nodewise_activation_patching_flash",
         "nodewise_attribution_sdpa",
@@ -598,6 +623,7 @@ def main(
     print("=" * 80)
     clean_p = None
     clean_lp = None
+    rollout_bank_info = None
     if use_candidate_objective:
         # Continuations are (probe suffix + candidate answer tokens) from
         # the pre-built answer bank; the global objective sums log-probs
@@ -631,7 +657,29 @@ def main(
         position_mask = probe.make_position_mask(prefix_len, target_device)  # (1, P+L)
         position_masks = [position_mask]
         rollout_bank_info = None
-        if rollout_bank_path is not None:
+        if use_candidate_rollouts:
+            crb = candidate_rollout_bank
+            if crb["prefix_len"] != prefix_len:
+                raise ValueError(f"rollout bank prefix_len {crb['prefix_len']} != {prefix_len}")
+            rolls = crb["sets"][rollout_bank_set]["rollouts"]
+            # The trainer rebuilds every (rollout, candidate) row from the bank;
+            # these tensors only fix the number of continuations and the length
+            # of the token-to-sentence map (rollout + suffix + longest path).
+            pad = len(crb["probe_suffix_token_ids"]) + max(len(p) for p in crb["candidate_paths"])
+            continuations = [torch.zeros((1, len(r["tokens"]) + pad), dtype=torch.long, device=target_device)
+                             for r in rolls]
+            position_masks = [None] * len(rolls)
+            rollout_bank_info = {
+                "path": rollout_bank_path, "set": rollout_bank_set, "num_rollouts": len(rolls),
+                "continuations_per_step": continuations_per_step,
+                "mean_clean_cluster_probs": torch.tensor([r["clean_cluster_probs"] for r in rolls]).mean(0).tolist(),
+                "rollout_n_tokens": [len(r["tokens"]) for r in rolls],
+                "num_candidate_paths": len(crb["candidate_paths"]),
+            }
+            print(f"  Candidate rollout bank: {rollout_bank_path} set {rollout_bank_set}, {len(rolls)} "
+                  f"continuations x {len(crb['candidate_paths'])} candidate paths "
+                  f"({continuations_per_step or 'all'} continuations per step)")
+        elif rollout_bank_path is not None:
             if use_candidate_objective:
                 raise ValueError("rollout_bank_path is for the probe objectives only")
             with open(rollout_bank_path) as f:
@@ -678,9 +726,14 @@ def main(
     base_objective = (
         CANDIDATE_OBJECTIVES[objective]
         if use_candidate_objective
-        else PROBE_OBJECTIVES[objective]
+        else PROBE_OBJECTIVES.get(objective)
     )
-    if use_candidate_objective:
+    if use_candidate_rollouts:
+        from utils.circuit_discovery.edits.nodewise_subnetwork_probing_candidate_rollouts import (
+            candidate_rollout_kl,
+        )
+        objective_fn = candidate_rollout_kl
+    elif use_candidate_objective:
         if objective == "candidate_snis_reward_gap":
             objective_fn = partial(
                 base_objective,
@@ -732,7 +785,8 @@ def main(
             base_objective,
             answer_token_ids=probe.answer_token_ids,
         )
-    objective_fn.__name__ = base_objective.__name__
+    if not use_candidate_rollouts:
+        objective_fn.__name__ = base_objective.__name__
 
     discovery_kwargs = dict(
         model=model,
@@ -805,6 +859,9 @@ def main(
     }.items():
         if _v is not None:
             discovery_kwargs[_k] = _v
+    if use_candidate_rollouts:
+        discovery_kwargs["candidate_rollout_bank"] = candidate_rollout_bank
+        discovery_kwargs["rollout_bank_set"] = rollout_bank_set
     if algorithm_kwargs:
         # Algorithm-specific keys without a dedicated argument (YAML mapping
         # ``algorithm_kwargs``); they go straight to the constructor.
@@ -904,6 +961,21 @@ def main(
             "answer_probs_clean": clean_p.tolist(),
             "answer_logprobs_clean": clean_lp.tolist(),
         })
+    if use_candidate_rollouts:
+        # No answer letters: the answer distribution is over the clusters of
+        # the candidate bank the rollout bank was scored with.
+        for key in ("answer_letters", "answer_token_ids", "answer_logit_position",
+                    "answer_probs_clean", "answer_logprobs_clean"):
+            node_mask.metadata.pop(key, None)
+        crb = candidate_rollout_bank
+        node_mask.metadata.update({
+            "answer_bank_path": crb["answer_bank_path"],
+            "num_answer_clusters": crb["num_clusters"],
+            "target_cluster": crb["target_cluster"],
+            "gold_answer": crb["gold_answer"],
+            "candidate_answers": crb["candidate_answers"],
+        })
+        target_answer_id = None
     if correct_answer is not None:
         node_mask.metadata["correct_answer"] = correct_answer
     if target_answer_id is not None:

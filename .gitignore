@@ -62,3 +62,13 @@ website
 *.sh
 *scripts*
 *_review.ipynb
+
+# Keep the rollout collector source visible despite the generated-output rule.
+!expts/prompt_bias_circuit_discovery/collect_bias_rollouts.py
+
+# Example configs and rollout modules referenced by the README
+!configs/
+!configs/thought_anchors/
+!configs/**/*.yaml
+!expts/**/*rollouts*.py
+!utils/**/*rollouts*.py

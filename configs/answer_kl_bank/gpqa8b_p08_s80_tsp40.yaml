@@ -1,0 +1,13 @@
+# Answer preservation on 32 sampled continuations (set B of the clean bank),
+# initialised from the local-connection baseline's ranking.
+# Needs: configs/thought_anchors/gpqa8b_p08_s80.yaml and the clean bank (see README).
+base_config: configs/answer_kl/gpqa8b_p08_s80_tsp40.yaml
+rollout_bank_path: results/banks/gpqa8b_p08_s80.json
+rollout_bank_set: B
+continuations_per_step: 4
+clean_logits_dtype: bfloat16
+log_alpha_init_mask_path: results/thought_anchors/gpqa8b_p08_s80_thought_anchors.json
+log_alpha_init_mask_alpha: 0.0
+
+output_dir: results/answer_kl_bank/masks
+file_name: gpqa8b_p08_s80_tsp40

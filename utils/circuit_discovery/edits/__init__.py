@@ -56,6 +56,9 @@ from utils.circuit_discovery.edits.nodewise_deterministic_mask_trainers import (
     NodewiseStraightThroughTopK,
     NodewiseDeterministicContinuousMask,
 )
+from utils.circuit_discovery.edits.nodewise_subnetwork_probing_candidate_rollouts import (
+    NodewiseSubnetworkProbingCandidateRollouts,
+)
 
 register_patching_method(
     NodewiseActivationPatchingKVCache, "nodewise_activation_patching_kv_cache"
@@ -126,4 +129,8 @@ register_patching_method(
 )
 register_patching_method(
     NodewiseDeterministicContinuousMask, "nodewise_deterministic_continuous",
+)
+register_patching_method(
+    NodewiseSubnetworkProbingCandidateRollouts,
+    "nodewise_subnetwork_probing_candidate_rollouts",
 )

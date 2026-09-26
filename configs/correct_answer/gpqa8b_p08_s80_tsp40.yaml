@@ -1,0 +1,14 @@
+# Correct-answer probability, Qwen3-8B, one mask per step, stored 5-sentence suffix.
+base_config: configs/base_answer.yaml
+masking_algorithm: nodewise_subnetwork_probing_sdpa
+objective: answer_probe_reward_gap
+num_hc_samples_per_step: 1
+
+model_name: Qwen/Qwen3-8B
+data_path: data/collection/qwen3_8b/gpqa_filtered.json
+prompt_index: 8
+analysis_sentence_step: 80
+target_sparsity: 0.4
+
+output_dir: results/correct_answer/masks
+file_name: gpqa8b_p08_s80_tsp40

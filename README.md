@@ -34,9 +34,19 @@ Every training script takes `--config <file.yaml>`. Configs are loaded by `utils
 3. **Extra keys pass through.** Keys without a matching CLI flag still reach the trainer. For example, `deterministic_algorithms: true` works this way.
 4. **Output location.** Each run writes its mask to `<output_dir>/<file_name>`. Give every config a unique `file_name`.
 
-A typical layout is a shared base, plus one small file per run that sets only what varies.
+A typical layout is a shared base, plus one small file per run that sets only what varies. The `configs/` directory has ready-to-run examples of the paper recipe:
 
-`my_configs/base_answer.yaml`, shared by the answer-preservation and correct-answer tasks:
+| Config | What it runs |
+|---|---|
+| `configs/base_answer.yaml` | shared settings for the two answer tasks |
+| `configs/thought_anchors/gpqa8b_p08_s80.yaml` | local-connection baseline |
+| `configs/answer_kl/gpqa8b_p08_s80_tsp40.yaml` | answer preservation, Qwen3-8B, stored suffix |
+| `configs/answer_kl/gpqa32b_p00_s80_tsp40.yaml` | answer preservation, Qwen3-32B |
+| `configs/answer_kl_bank/gpqa8b_p08_s80_tsp40.yaml` | answer preservation on sampled continuations, initialised from the baseline |
+| `configs/correct_answer/gpqa8b_p08_s80_tsp40.yaml` | correct-answer probability |
+| `configs/shortening/aqua_p004_s198_tsp40.yaml` | shortening |
+
+`configs/base_answer.yaml`:
 
 ```yaml
 mode: learn
@@ -44,33 +54,24 @@ probe_suffix: " </think> I think the answer is"   # forced suffix; answer read f
 answer_letters: [" A", " B", " C", " D"]          # AQuA: add " E"
 mask_mode: prefix               # mask only inside the prefix
 mask_granularity: pair          # sentence-to-sentence connections
-pair_aggregation: mean
-sentence_chunk: 1
 sentence_gap: 1                 # never mask a sentence's attention to itself
 freeze_prompt_sentences: true   # the prompt's sentences are always attended to
-layers_to_analyse: "all"
-renormalize_masked_attention: true
-gradient_checkpointing: true
-ablate_non_target_layers: false
-
-# subnetwork probing, final recipe
+sentences_after_prefix: 5       # stored suffix used for training and fixed-suffix evaluation
+...
 sparsity_loss_mode: target_size_l2   # quadratic penalty on (#kept - k)
 l0_lambda: 1000.0
 optimizer: hybrid
 learning_rate: 0.1
 log_alpha_init: 2.0
 num_training_steps: 1000
-save_log_alpha: true
-deterministic_algorithms: true
-log_every: 20
 seed: 42
 device: cuda
 ```
 
-`my_configs/kl/gpqa_p08_tsp40.yaml`, a single run:
+`configs/answer_kl/gpqa8b_p08_s80_tsp40.yaml` inherits it and sets only the run:
 
 ```yaml
-base_config: my_configs/base_answer.yaml
+base_config: configs/base_answer.yaml
 masking_algorithm: nodewise_subnetwork_probing_hc_batched
 objective: answer_probe_kl
 num_hc_samples_per_step: 4      # masks sampled per step
@@ -80,24 +81,28 @@ model_name: Qwen/Qwen3-8B
 data_path: data/collection/qwen3_8b/gpqa_filtered.json
 prompt_index: 8
 analysis_sentence_step: 80      # prefix = prompt + first 80 reasoning sentences
-sentences_after_prefix: 5       # stored suffix used as training continuation
 target_sparsity: 0.4            # fraction of eligible connections removed
 
-output_dir: results/kl/masks
-file_name: gpqa_p08_s80_tsp40
+output_dir: results/answer_kl/masks
+file_name: gpqa8b_p08_s80_tsp40
 ```
 
-Run it:
+Inheritance can chain. `configs/answer_kl_bank/gpqa8b_p08_s80_tsp40.yaml` inherits the config above and adds the continuation bank and the initial mask.
+
+Run a config:
 
 ```bash
-uv run python -m expts.direct_answer_circuit_discovery.run --config my_configs/kl/gpqa_p08_tsp40.yaml
+uv run python -m expts.direct_answer_circuit_discovery.run --config configs/answer_kl/gpqa8b_p08_s80_tsp40.yaml
 ```
 
-You can also override config values on the command line, for example:
+Any config value can be overridden on the command line. For example, to use a different sparsity or prompt without writing a new file:
 
 ```bash
-uv run python -m expts.direct_answer_circuit_discovery.run --config my_configs/kl/gpqa_p08_tsp40.yaml \
-    --target_sparsity 0.8 --file_name gpqa_p08_s80_tsp80
+uv run python -m expts.direct_answer_circuit_discovery.run --config configs/answer_kl/gpqa8b_p08_s80_tsp40.yaml \
+    --target_sparsity 0.8 --file_name gpqa8b_p08_s80_tsp80
+
+uv run python -m expts.direct_answer_circuit_discovery.run --config configs/answer_kl/gpqa8b_p08_s80_tsp40.yaml \
+    --prompt_index 0 --analysis_sentence_step 50 --file_name gpqa8b_p00_s50_tsp40
 ```
 
 ### Sweeps
@@ -108,20 +113,20 @@ A sweep is a directory with one YAML per run. The simplest way to make one is a 
 # make_sweep.py
 import os, yaml
 
-OUT = "my_configs/kl_sweep"
+OUT = "configs/kl_sweep"
 os.makedirs(OUT, exist_ok=True)
 for p, step in [(0, 50), (8, 80), (22, 65)]:
     for tsp in [0.01, 0.05, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99]:
         stem = f"gpqa_p{p:02d}_s{step}_tsp{round(tsp * 100):02d}"
         cfg = {
-            "base_config": "my_configs/base_answer.yaml",
+            "base_config": "configs/base_answer.yaml",
             "masking_algorithm": "nodewise_subnetwork_probing_hc_batched",
             "objective": "answer_probe_kl",
             "num_hc_samples_per_step": 4,
             "model_name": "Qwen/Qwen3-8B",
             "data_path": "data/collection/qwen3_8b/gpqa_filtered.json",
             "prompt_index": p, "analysis_sentence_step": step,
-            "sentences_after_prefix": 5, "target_sparsity": tsp,
+            "target_sparsity": tsp,
             "output_dir": "results/kl_sweep/masks", "file_name": stem,
         }
         with open(f"{OUT}/{stem}.yaml", "w") as f:
@@ -132,7 +137,7 @@ Then run every config in the directory:
 
 ```bash
 uv run python make_sweep.py
-for cfg in my_configs/kl_sweep/*.yaml; do
+for cfg in configs/kl_sweep/*.yaml; do
     uv run python -m expts.direct_answer_circuit_discovery.run --config "$cfg"
 done
 ```
@@ -179,33 +184,21 @@ The answer-preservation and correct-answer tasks use the filtered files. The sho
 
 ### Local-connection baseline
 
-This baseline has no training loop, and its config is flat (no `base_config`, no CLI overrides):
-
-```yaml
-# my_configs/ta/gpqa_p08.yaml
-model_name: Qwen/Qwen3-8B
-data_path: data/collection/qwen3_8b/gpqa_filtered.json
-prompt_index: 8
-analysis_sentence_step: 80
-sentences_after_prefix: 5
-sentence_gap: 1
-sentence_chunk: 1
-mask_mode: prefix
-device: cuda
-seed: 42
-output_dir: results/ta
-file_name: gpqa_p08_s80
-```
+This baseline has no training loop. Its config (`configs/thought_anchors/gpqa8b_p08_s80.yaml`) is flat: it has no `base_config` and does not accept CLI overrides.
 
 ```bash
-uv run python -m expts.direct_answer_circuit_discovery.thought_anchors_compat --config my_configs/ta/gpqa_p08.yaml
+uv run python -m expts.direct_answer_circuit_discovery.thought_anchors_compat --config configs/thought_anchors/gpqa8b_p08_s80.yaml
 ```
 
 The baseline produces one score matrix per prompt. It is thresholded to any target sparsity at evaluation time.
 
 ### Learned masks
 
-**On the stored suffix.** This is the config shown in [How configs work](#how-configs-work).
+**On the stored suffix:**
+
+```bash
+uv run python -m expts.direct_answer_circuit_discovery.run --config configs/answer_kl/gpqa8b_p08_s80_tsp40.yaml
+```
 
 **On sampled continuations, initialised from the baseline (paper recipe).** First sample 32 continuations of the prefix per clean set (at most 200 tokens, temperature 0.7). Set B is used for training; set A is held out.
 
@@ -219,48 +212,25 @@ build_clean_rollouts(Namespace(
     prompt_index=8, analysis_sentence_step=80, sentence_gap=1, mask_mode="prefix",
     answer_letters=None, probe_suffix=None,          # AQuA: answer_letters=" A, B, C, D, E"
     n_rollouts=32, max_new_tokens=200, temperature=0.7, gen_batch=16, seed=42, alpha=0.5,
-    output="results/banks/gpqa_p08_s80.json"), ctx={})
+    output="results/banks/gpqa8b_p08_s80.json"), ctx={})
 ```
 
 For open-ended answers (MATH), use `python -m expts.direct_answer_circuit_discovery.build_candidate_rollout_bank` instead, with a candidate answer bank from `build_answer_bank`.
 
-Then add these keys to the answer-preservation config:
+Then train with the baseline mask and the bank:
 
-```yaml
-rollout_bank_path: results/banks/gpqa_p08_s80.json
-rollout_bank_set: B
-continuations_per_step: 4
-clean_logits_dtype: bfloat16
-log_alpha_init_mask_path: results/ta/gpqa_p08_s80_thought_anchors.json
-log_alpha_init_mask_alpha: 0.0
+```bash
+uv run python -m expts.direct_answer_circuit_discovery.run --config configs/answer_kl_bank/gpqa8b_p08_s80_tsp40.yaml
 ```
 
-**Qwen3-32B.** Set `model_name: Qwen/Qwen3-32B` and `device: auto`, and make 2 GPUs visible.
+**Qwen3-32B.** Use `configs/answer_kl/gpqa32b_p00_s80_tsp40.yaml`, which sets `device: auto`. Make 2 GPUs visible.
 
 ## 3. Correct-answer probability
 
-This task uses the same base config and the same prompts as answer preservation. It changes the objective, uses one mask per step, and trains on the 5 stored sentences after the prefix:
-
-```yaml
-# my_configs/rg/gpqa_p08_tsp40.yaml
-base_config: my_configs/base_answer.yaml
-masking_algorithm: nodewise_subnetwork_probing_sdpa
-objective: answer_probe_reward_gap
-num_hc_samples_per_step: 1
-
-model_name: Qwen/Qwen3-8B
-data_path: data/collection/qwen3_8b/gpqa_filtered.json
-prompt_index: 8
-analysis_sentence_step: 80
-sentences_after_prefix: 5
-target_sparsity: 0.4
-
-output_dir: results/rg/masks
-file_name: gpqa_p08_s80_tsp40
-```
+This task uses the same base config and the same prompts as answer preservation. It changes the objective (`answer_probe_reward_gap`), uses one mask per step, and trains on the 5 stored sentences after the prefix.
 
 ```bash
-uv run python -m expts.direct_answer_circuit_discovery.run --config my_configs/rg/gpqa_p08_tsp40.yaml
+uv run python -m expts.direct_answer_circuit_discovery.run --config configs/correct_answer/gpqa8b_p08_s80_tsp40.yaml
 ```
 
 ## 4. Evaluation (answer tasks)
@@ -271,11 +241,11 @@ All evaluation scripts read a saved mask, keep its top-`k` connections at the re
 
 ```bash
 uv run python -m expts.direct_answer_circuit_discovery.eval_log_alpha \
-    --mask_path results/kl/masks/gpqa_p08_s80_tsp40.json \
+    --mask_path results/answer_kl/masks/gpqa8b_p08_s80_tsp40.json \
     --model_name Qwen/Qwen3-8B --data_path data/collection/qwen3_8b/gpqa_filtered.json \
     --prompt_index 8 --analysis_sentence_step 80 --sentences_after_prefix 5 \
     --sentence_gap 1 --mask_mode prefix --top_k_sparsities 0.4 \
-    --output results/kl/eval/gpqa_p08_s80_tsp40.eval.json
+    --output results/answer_kl/eval/gpqa8b_p08_s80_tsp40.eval.json
 ```
 
 For the local-connection baseline, pass its score file as `--mask_path`, add `--force_freeze_prompt`, and give all target sparsities at once, for example `--top_k_sparsities 0.01,0.05,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99`.
@@ -287,18 +257,18 @@ uv run python -m expts.direct_answer_circuit_discovery.eval_random_masks \
     --model_name Qwen/Qwen3-8B --data_path data/collection/qwen3_8b/gpqa_filtered.json \
     --prompt_index 8 --analysis_sentence_step 80 --sentences_after_prefix 5 --sentence_gap 1 \
     --mask_mode prefix --sparsities 0.2,0.4,0.6,0.8 --n_samples 3 --seed 42 --force_freeze_prompt \
-    --output results/random/gpqa_p08_s80.random_eval.json
+    --output results/random/gpqa8b_p08_s80.random_eval.json
 ```
 
 **Generated-suffix evaluation.** This samples continuations from the masked model at temperature 0.7 and reads the answer after the forced suffix:
 
 ```bash
 uv run python -m expts.direct_answer_circuit_discovery.eval_masked_rollouts \
-    --mask_path results/kl/masks/gpqa_p08_s80_tsp40.json \
+    --mask_path results/answer_kl/masks/gpqa8b_p08_s80_tsp40.json \
     --model_name Qwen/Qwen3-8B --data_path data/collection/qwen3_8b/gpqa_filtered.json \
     --prompt_index 8 --analysis_sentence_step 80 --sentences_after_prefix 5 --sentence_gap 1 \
     --mask_mode prefix --target_sparsity 0.4 --n_rollouts 5 --max_new_tokens 200 \
-    --temperature 0.7 --seed 42 --output results/kl/rollouts/gpqa_p08_s80_tsp40.json
+    --temperature 0.7 --seed 42 --output results/answer_kl/rollouts/gpqa8b_p08_s80_tsp40.json
 ```
 
 To compare the masked model's answer-outcome distribution with the clean bank over 32 rollouts, call `run_cell` from `expts/direct_answer_circuit_discovery/eval_onpolicy_kl.py`. It takes the same arguments as `build_clean_rollouts` above, plus `mask_path`, `target_sparsity`, `sentences_after_prefix`, `force_freeze_prompt` and `clean_path` (the bank file).
@@ -327,55 +297,11 @@ uv run python -m expts.cot_termination_circuit_discovery.build_boundary_data \
     --output results/termination/boundary_data/aqua_p004_s198.json
 ```
 
-**3. Train.** The config is self-contained here:
-
-```yaml
-# my_configs/term/aqua_p004_tsp40.yaml
-mode: learn
-masking_algorithm: nodewise_subnetwork_probing_boundary_hazard_batched
-objective: boundary_expected_length_eligible
-model_name: Qwen/Qwen3-8B
-data_path: data/collection/qwen3_8b/aqua.json
-prompt_index: 4
-analysis_sentence_step: 198
-answer_bank_path: results/termination/banks_root/banks/aqua_p004_s198.json
-boundary_data_path: results/termination/boundary_data/aqua_p004_s198.json
-probe_suffix: " </think> I think the answer is"
-
-mask_mode: prefix
-mask_granularity: pair
-pair_aggregation: mean
-sentence_gap: 1
-sentence_chunk: 1
-layers_to_analyse: "all"
-freeze_prompt_sentences: true
-sentences_after_prefix: 0
-renormalize_masked_attention: true
-gradient_checkpointing: true
-
-sparsity_loss_mode: target_size_l2
-l0_lambda: 1000
-optimizer: hybrid
-learning_rate: 0.1
-log_alpha_init: 2.0
-target_sparsity: 0.4
-num_training_steps: 500
-candidate_batch_size: 6
-save_log_alpha: true
-log_every: 10
-seed: 42
-device: cuda
-
-output_dir: results/termination/masks
-file_name: aqua_p004_s198_tsp40
-checkpoint_path: results/termination/checkpoints/aqua_p004_s198_tsp40.pt
-checkpoint_every: 50
-resume_from_checkpoint: true
-```
+**3. Train.** `configs/shortening/aqua_p004_s198_tsp40.yaml` is self-contained and has no `base_config`. It points at the bank and boundary data from steps 1-2, and saves checkpoints so that a preempted run resumes.
 
 ```bash
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
-uv run python -m expts.cot_termination_circuit_discovery.run --config my_configs/term/aqua_p004_tsp40.yaml
+uv run python -m expts.cot_termination_circuit_discovery.run --config configs/shortening/aqua_p004_s198_tsp40.yaml
 ```
 
 **4. Evaluate.** This samples 16 continuations with the mask applied, up to 4096 tokens. It reports reasoning length and answer outcome, together with 2 random masks at the same sparsity:
@@ -405,6 +331,7 @@ After the first run, you can pass `--scores_path <saved score file>` to reuse th
 
 | Path | Contents |
 |---|---|
+| `configs/` | example configs for every task (paper recipe) |
 | `expts/direct_answer_circuit_discovery/` | answer-preservation and correct-answer training (`run.py`, `learn.py`), baseline (`thought_anchors_compat.py`), evaluation (`eval_*.py`) |
 | `expts/cot_termination_circuit_discovery/` | shortening: bank and boundary-data builders, training (`run.py`), evaluation |
 | `expts/forking_paths/data_collection_new.py` | trace sampling with vLLM |
